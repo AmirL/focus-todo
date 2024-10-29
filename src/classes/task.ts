@@ -1,6 +1,8 @@
 import { Expose, Transform } from 'class-transformer';
 import dayjs from 'dayjs';
 
+export const ListsNames = ['Work', 'Personal', 'Other'];
+
 export class Task {
   @Expose()
   id!: string;

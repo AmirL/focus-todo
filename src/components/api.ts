@@ -23,7 +23,7 @@ export async function apiRequest(endpoint: string, method = 'GET', body: object 
     if (method == 'DELETE') return;
     return response.json();
   } catch (error) {
-    console.error(`API request failed: ${error.message ?? ''}`);
+    if (error instanceof Error) console.error(`API request failed: ${error.message ?? ''}`);
     throw error;
   }
 }

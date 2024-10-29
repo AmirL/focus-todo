@@ -1,10 +1,7 @@
 import 'reflect-metadata';
 
-import { BaserowTodoList } from "@/components/baserow-todo-list";
-
+import { TodoList } from '@/components/TodoList';
 
 export default function Home() {
-  return (
-    <BaserowTodoList/>
-  );
+  return <TodoList />;
 }
