@@ -16,7 +16,7 @@ type TasksState = {
 export const useTasksStore = create<TasksState>((set) => ({
   tasks: [],
   error: null,
-  isLoading: false,
+  isLoading: true,
   fetchTasks: async () => {
     set({ isLoading: true });
     const data = await apiRequest('');
