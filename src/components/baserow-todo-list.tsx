@@ -1,25 +1,19 @@
-"use client"
+'use client';
 
-import { useState, useEffect } from "react"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Trash2, Star, Clock, RotateCw } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { format, isFuture, isSameDay, parseISO } from "date-fns"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Expose, plainToInstance, instanceToPlain, Transform } from 'class-transformer';
-import dayjs from "dayjs"
-
-
-const BASEROW_TOKEN = "ZOlzdEhtUxCeeCcBaM0wMZjMuqDuHbZM"
-const TABLE_ID = 379718
-const API_URL = `https://api.baserow.io/api/database/rows/table/${TABLE_ID}/`
-
-
+import { useState, useEffect } from 'react';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Trash2, Star, Clock, RotateCw } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format, isFuture, isSameDay, parseISO } from 'date-fns';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Expose, plainToInstance, Transform } from 'class-transformer';
+import dayjs from 'dayjs';
+import { apiRequest } from './api';
 
 export const FIELDS = {
   name: 'field_2869962',
@@ -29,10 +23,9 @@ export const FIELDS = {
   list: 'field_2872651',
 };
 
-
 export class Todo {
   @Expose()
-  id!: number;
+  id!: string;
 
   @Expose({ name: 'field_2869962' })
   name!: string;
@@ -48,7 +41,7 @@ export class Todo {
   // date!: string;
 
   @Expose({ name: 'field_2872650' })
-  @Transform(({ value }) => value ? dayjs(value).format('YYYY-MM-DD') : null, { toPlainOnly: true })
+  @Transform(({ value }) => (value ? dayjs(value).format('YYYY-MM-DD') : null), { toPlainOnly: true })
   completedAt?: string | null;
   // completedAt!: string | null;
 
@@ -57,190 +50,122 @@ export class Todo {
   // list!: string;
 }
 
-const lists = [
-  "Work",
-  "Personal" ,
-  "Other" ,
-];
+const lists = ['Work', 'Personal', 'Other'];
 
 export function BaserowTodoList() {
-  const [todos, setTodos] = useState<Todo[]>([])
-  const [newTodo, setNewTodo] = useState("")
-  const [selectedList, setSelectedList] = useState("Personal")
-  const [filter, setFilter] = useState("All")
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [newTodo, setNewTodo] = useState('');
+  const [selectedList, setSelectedList] = useState('Personal');
+  const [filter, setFilter] = useState('All');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleApiCall(endpoint: string = '', method = 'GET', body: object | undefined = undefined) {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await apiRequest(endpoint, method, body);
+      return response;
+    } catch (error) {
+      console.error(`API call failed: ${error.message}`);
+      setError(error.message || 'Something went wrong!');
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   useEffect(() => {
-    fetchTodos()
-  }, [])
+    fetchTodos();
+  }, []);
 
   const fetchTodos = async () => {
-    setIsLoading(true)
-    setError(null)
-    try {
-      const response = await fetch(API_URL, {
-        headers: {
-          'Authorization': `Token ${BASEROW_TOKEN}`,
-          'Content-Type': 'application/json',
-        },
-      })
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      const data = await response.json()
-      setTodos(plainToInstance(Todo, data.results as unknown[]));
-      console.log(data.results);
-      console.log(plainToInstance(Todo, data.results as unknown[]));
-    } catch (error) {
-      console.error("Error fetching todos:", error)
-      setError("Failed to fetch todos. Please try again later.")
-    } finally {
-      setIsLoading(false)
-    }
-  }
+    const data = await handleApiCall('');
+    setTodos(plainToInstance(Todo, data.results as unknown[]));
+  };
 
   const apiCreateTodo = async (todo: Todo) => {
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Token ${BASEROW_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(instanceToPlain(todo)),
-    })
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    const data = plainToInstance(Todo, await response.json());
-    setTodos(prevTodos => {
+    todo.id = undefined;
+    const data = await handleApiCall('', 'POST', todo);
+    const createdTodo = plainToInstance(Todo, data);
+    setTodos((prevTodos) => {
       // TODO: Fix it - when add multiple items need to update id for all of them
-      console.log('prevTodos', prevTodos)
       const lastItem = prevTodos.at(-1);
-      // if (!lastItem) return;
-      lastItem!.id = data.id
+      lastItem!.id = createdTodo.id;
       return prevTodos;
-    })
-  }
+    });
+  };
 
   const addTodo = async () => {
-    if (newTodo.trim() !== "") {
-      setIsLoading(true)
-      setError(null)
-      try {
-        const todoTexts = newTodo.split('\n').filter(text => text.trim() !== "")
-        const newTodoItems = todoTexts.map(text => {
-          const todo = new Todo()
-          todo.name = text;
-          todo.list = selectedList;
-          return todo;
-        })
-        setTodos([...todos, ...newTodoItems])
-        for(const todo of newTodoItems) {
-          await apiCreateTodo(todo);
-        }
-        setNewTodo("")
-      } catch (error) {
-        // TODO: Remove last item in case of error
-        console.error("Error adding todo:", error)
-        setError("Failed to add todo. Please try again.")
-      } finally {
-        setIsLoading(false)
+    if (newTodo.trim() !== '') {
+      const todoTexts = newTodo.split('\n').filter((text) => text.trim() !== '');
+      const newTodoItems = todoTexts.map((text) => {
+        const todo = new Todo();
+        todo.id = text;
+        todo.name = text;
+        todo.list = selectedList;
+        return todo;
+      });
+      setTodos([...todos, ...newTodoItems]);
+      for (const todo of newTodoItems) {
+        await apiCreateTodo(todo);
       }
+      setNewTodo('');
     }
-  }
+  };
 
-  const updateTodo = async (id: number, updates: Partial<Todo>) => {
-    setIsLoading(true)
-    setError(null)
-    try {
-      console.log(instanceToPlain(updates));
-      const response = await fetch(`${API_URL}${id}/`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Token ${BASEROW_TOKEN}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(instanceToPlain(updates)),
-      })
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      const updatedTodo = plainToInstance(Todo, await response.json());
-      setTodos(prevTodos => prevTodos.map(todo => todo.id === id ? updatedTodo : todo))
-    } catch (error) {
-      console.error("Error updating todo:", error)
-      setError("Failed to update todo. Please try again.")
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const updateTodo = async (id: string, updates: Partial<Todo>) => {
+    const updatedTodo = plainToInstance(Todo, await handleApiCall(`${id}/`, 'PATCH', updates));
+    setTodos((prevTodos) => prevTodos.map((todo) => (todo.id === id ? updatedTodo : todo)));
+  };
 
-  const toggleTodo = (id: number) => {
-    const todo = todos.find(t => t.id === id)
-    if (todo) {
-      todo.completedAt = todo.completedAt ? null : new Date().toISOString();
-      updateTodo(id, todo)
-    }
-  }
+  const toggleTodo = (id: string) => {
+    const todo = todos.find((t) => t.id === id);
+    if (!todo) return;
+    todo.completedAt = todo.completedAt ? null : new Date().toISOString();
+    updateTodo(id, todo);
+  };
 
-  const deleteTodo = async (id: number) => {
-    setIsLoading(true)
-    setError(null)
-    try {
-      setTodos(prevTodos => prevTodos.filter(todo => todo.id !== id))
-      const response = await fetch(`${API_URL}${id}/`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Token ${BASEROW_TOKEN}`,
-        },
-      })
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-    } catch (error) {
-      console.error("Error deleting todo:", error)
-      setError("Failed to delete todo. Please try again.")
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const deleteTodo = async (id: string) => {
+    setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
+    await handleApiCall(`${id}/`, 'DELETE');
+  };
 
-  const redoTodo = async (id: number) => {
-    const todoToRedo = todos.find(todo => todo.id === id)
-    if (todoToRedo) {
-      const newTodo: Todo = Object.assign(new Todo(), {...todoToRedo, id: undefined, completedAt: null, date: null});
-      todoToRedo.completedAt = new Date().toISOString();
-      setTodos(prevTodos => [...prevTodos, newTodo])
-      updateTodo(id, todoToRedo);
-      apiCreateTodo(newTodo);
-    }
-  }
+  const redoTodo = async (id: string) => {
+    const todoToRedo = todos.find((todo) => todo.id === id);
+    if (!todoToRedo) return;
 
-  const toggleTodayTask = (id: number) => {
-    const todo = todos.find(t => t.id === id)
-    if (todo) {
-      todo.date = dayjs(todo.date).isBefore(dayjs()) ? null : new Date().toISOString();
-      updateTodo(id, todo)
-    }
-  }
+    const newTodo: Todo = Object.assign(new Todo(), { ...todoToRedo, id: undefined, completedAt: null, date: null });
+    todoToRedo.completedAt = new Date().toISOString();
+    setTodos((prevTodos) => [...prevTodos, newTodo]);
+    updateTodo(id, todoToRedo);
+    apiCreateTodo(newTodo);
+  };
 
-  const snoozeTodo = (id: number, date: Date) => {
-    const todo = todos.find(todo => todo.id === id)
-    if (todo) {
-      todo.date = date.toISOString();
-      updateTodo(id, todo)
-    }
-  }
+  const toggleTodayTask = (id: string) => {
+    const todo = todos.find((t) => t.id === id);
+    if (!todo) return;
 
-  const filteredTodos = todos.filter(todo => {
-    const today = new Date()
-    if (filter === "All") return !todo.date || !isFuture(parseISO(todo.date))
-    if (filter === "Today") return todo.date && isSameDay(parseISO(todo.date), today)
-    if (filter === "Future") return todo.date && isFuture(parseISO(todo.date))
-    return todo.list === filter && (!todo.date || !isFuture(parseISO(todo.date)))
-  })
+    todo.date = dayjs(todo.date).isBefore(dayjs()) ? null : new Date().toISOString();
+    updateTodo(id, todo);
+  };
 
+  const snoozeTodo = (id: string, date: Date) => {
+    const todo = todos.find((todo) => todo.id === id);
+    if (!todo) return;
+
+    todo.date = date.toISOString();
+    updateTodo(id, todo);
+  };
+
+  const filteredTodos = todos.filter((todo) => {
+    const today = new Date();
+    if (filter === 'All') return !todo.date || !isFuture(parseISO(todo.date));
+    if (filter === 'Today') return todo.date && isSameDay(parseISO(todo.date), today);
+    if (filter === 'Future') return todo.date && isFuture(parseISO(todo.date));
+    return todo.list === filter && (!todo.date || !isFuture(parseISO(todo.date)));
+  });
 
   if (error) {
     return (
@@ -248,7 +173,7 @@ export function BaserowTodoList() {
         <AlertTitle>Error</AlertTitle>
         <AlertDescription>{error}</AlertDescription>
       </Alert>
-    )
+    );
   }
 
   return (
@@ -267,33 +192,45 @@ export function BaserowTodoList() {
               <SelectValue placeholder="Select a list" />
             </SelectTrigger>
             <SelectContent>
-              {lists.map(list => (
-                <SelectItem key={list} value={list}>{list}</SelectItem>
+              {lists.map((list) => (
+                <SelectItem key={list} value={list}>
+                  {list}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <Button onClick={addTodo} className="flex-grow">Add Task</Button>
+          <Button onClick={addTodo} className="flex-grow">
+            Add Task
+          </Button>
         </div>
       </div>
       <div className="mb-4 flex flex-wrap gap-2">
-        <Button variant={filter === "All" ? "default" : "outline"} onClick={() => setFilter("All")}>All</Button>
-        <Button variant={filter === "Today" ? "default" : "outline"} onClick={() => setFilter("Today")}>Today</Button>
-        <Button variant={filter === "Future" ? "default" : "outline"} onClick={() => setFilter("Future")}>Future</Button>
-        {lists.map(list => (
-          <Button key={list} variant={filter === list ? "default" : "outline"} onClick={() => setFilter(list)}>{list}</Button>
+        <Button variant={filter === 'All' ? 'default' : 'outline'} onClick={() => setFilter('All')}>
+          All
+        </Button>
+        <Button variant={filter === 'Today' ? 'default' : 'outline'} onClick={() => setFilter('Today')}>
+          Today
+        </Button>
+        <Button variant={filter === 'Future' ? 'default' : 'outline'} onClick={() => setFilter('Future')}>
+          Future
+        </Button>
+        {lists.map((list) => (
+          <Button key={list} variant={filter === list ? 'default' : 'outline'} onClick={() => setFilter(list)}>
+            {list}
+          </Button>
         ))}
       </div>
       {/* {isLoading && <div className="flex justify-center items-center h-5">Loading...</div>} */}
       {filteredTodos.length === 0 ? (
-        isLoading ? <div className="flex justify-center items-center h-5">Loading...</div> :
-        <p className="text-center text-muted-foreground">No tasks found.</p>
+        isLoading ? (
+          <div className="flex justify-center items-center h-5">Loading...</div>
+        ) : (
+          <p className="text-center text-muted-foreground">No tasks found.</p>
+        )
       ) : (
         <ul className="space-y-2">
           {filteredTodos.map((todo) => (
-            <li
-              key={todo.id}
-              className="flex items-center justify-between p-2 bg-muted rounded-md"
-            >
+            <li key={todo.id} className="flex items-center justify-between p-2 bg-muted rounded-md">
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id={`todo-${todo.id}`}
@@ -302,22 +239,26 @@ export function BaserowTodoList() {
                 />
                 <label
                   htmlFor={`todo-${todo.id}`}
-                  className={`${
-                    todo.completedAt ? "line-through text-muted-foreground" : "text-primary"
-                  }`}
+                  className={`${todo.completedAt ? 'line-through text-muted-foreground' : 'text-primary'}`}
                 >
                   {todo.name}
                 </label>
                 <Badge variant="secondary">{todo.list}</Badge>
                 {todo.date && isSameDay(parseISO(todo.date), new Date()) && <Badge variant="default">Today</Badge>}
-                {todo.date && isFuture(parseISO(todo.date)) && <Badge variant="outline">Snoozed: {format(parseISO(todo.date), 'yyyy-MM-dd')}</Badge>}
+                {todo.date && isFuture(parseISO(todo.date)) && (
+                  <Badge variant="outline">Snoozed: {format(parseISO(todo.date), 'yyyy-MM-dd')}</Badge>
+                )}
               </div>
               <div className="flex space-x-1">
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => toggleTodayTask(todo.id)}
-                  className={todo.date && isSameDay(parseISO(todo.date), new Date()) ? "text-yellow-500" : "text-muted-foreground"}
+                  className={
+                    todo.date && isSameDay(parseISO(todo.date), new Date())
+                      ? 'text-yellow-500'
+                      : 'text-muted-foreground'
+                  }
                 >
                   <Star className="h-4 w-4" />
                 </Button>
@@ -336,20 +277,10 @@ export function BaserowTodoList() {
                     />
                   </PopoverContent>
                 </Popover>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => redoTodo(todo.id)}
-                  className="text-primary"
-                >
+                <Button variant="ghost" size="icon" onClick={() => redoTodo(todo.id)} className="text-primary">
                   <RotateCw className="h-4 w-4" />
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => deleteTodo(todo.id)}
-                  className="text-destructive"
-                >
+                <Button variant="ghost" size="icon" onClick={() => deleteTodo(todo.id)} className="text-destructive">
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
@@ -358,5 +289,5 @@ export function BaserowTodoList() {
         </ul>
       )}
     </div>
-  )
+  );
 }
