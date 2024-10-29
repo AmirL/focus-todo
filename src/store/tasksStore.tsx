@@ -13,7 +13,7 @@ type TasksState = {
   deleteTask: (id: string) => Promise<void>;
 };
 
-export const useTasksStore = create<TasksState>((set) => ({
+export const useTasksStore = create<TasksState>((set, get) => ({
   tasks: [],
   error: null,
   isLoading: true,
@@ -27,10 +27,17 @@ export const useTasksStore = create<TasksState>((set) => ({
     set((state) => ({ tasks: [...state.tasks, createdTask] }));
   },
   updateTask: async (id: string, updates: Partial<Task>) => {
-    const task = Object.assign(new Task(), { ...updates });
-    const updatedTask = plainToInstance(Task, await apiRequest(`${id}/`, 'PATCH', task));
+    const task = get().tasks.find((task) => task.id == id);
+    if (!task) return;
+
+    const updatedTask = Object.assign(new Task(), { ...task, ...updates });
     set((state) => ({
       tasks: state.tasks.map((task) => (task.id === id ? updatedTask : task)),
+    }));
+
+    const fetchedTask = plainToInstance(Task, await apiRequest(`${id}/`, 'PATCH', updatedTask));
+    set((state) => ({
+      tasks: state.tasks.map((task) => (task.id === id ? fetchedTask : task)),
     }));
   },
 
