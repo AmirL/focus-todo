@@ -4,12 +4,12 @@ import { ListsNames } from '@/classes/task';
 
 export function Filters({ filter, setFilter }: { filter: string; setFilter: Dispatch<SetStateAction<string>> }) {
   return (
-    <div className="mb-4 flex flex-wrap gap-2">
+    <div className="my-4 flex flex-wrap gap-2">
       <Button variant={filter === 'All' ? 'default' : 'outline'} onClick={() => setFilter('All')}>
         All
       </Button>
-      <Button variant={filter === 'Today' ? 'default' : 'outline'} onClick={() => setFilter('Today')}>
-        Today
+      <Button variant={filter === 'Selected' ? 'default' : 'outline'} onClick={() => setFilter('Selected')}>
+        Selected
       </Button>
       <Button variant={filter === 'Future' ? 'default' : 'outline'} onClick={() => setFilter('Future')}>
         Future

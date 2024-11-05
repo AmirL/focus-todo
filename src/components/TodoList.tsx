@@ -19,9 +19,9 @@ export function TodoList() {
   }, []);
 
   const filteredTasks = tasks.filter((todo) => {
-    const today = new Date();
+    // const today = new Date();
     if (filter === 'All') return !todo.date || !isFuture(parseISO(todo.date));
-    if (filter === 'Today') return todo.date && isSameDay(parseISO(todo.date), today);
+    if (filter === 'Selected') return todo.selected;
     if (filter === 'Future') return todo.date && isFuture(parseISO(todo.date));
     return todo.list === filter && (!todo.date || !isFuture(parseISO(todo.date)));
   });
@@ -31,10 +31,12 @@ export function TodoList() {
   return (
     <div className="max-w-xl mx-auto p-4 bg-background">
       <h1 className="text-2xl font-bold mb-4 text-primary">Zero Resistance Todo List</h1>
-      <ErrorMessagesArea />
       <AddTaskForm />
       <Filters filter={filter} setFilter={setFilter} />
+      <ErrorMessagesArea />
       {hasTasks ? <Tasks tasks={filteredTasks} /> : <EmptyList />}
+      <Filters filter={filter} setFilter={setFilter} />
+      <AddTaskForm />
     </div>
   );
 }
