@@ -7,7 +7,13 @@ export function ReAddButton({ task }: { task: Task }) {
   const { createTask, updateTask } = useTasksStore();
 
   const reAddTask = async () => {
-    const newTask: Task = Object.assign(new Task(), { ...task, id: undefined, completedAt: null, date: null });
+    const newTask: Task = Object.assign(new Task(), {
+      ...task,
+      id: undefined,
+      completedAt: null,
+      date: null,
+      selected: false,
+    });
     createTask(newTask);
 
     updateTask(task.id, { completedAt: new Date().toISOString() });

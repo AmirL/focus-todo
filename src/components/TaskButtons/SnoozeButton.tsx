@@ -10,7 +10,7 @@ export function SnoozeButton({ task }: { task: Task }) {
   const { updateTask } = useTasksStore();
 
   const snoozeTodo = (date: Date) => {
-    updateTask(task.id, { date: date.toISOString() });
+    updateTask(task.id, { date: date.toISOString(), selected: false });
   };
 
   return (
