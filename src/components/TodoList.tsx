@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { isFuture, isSameDay, parseISO } from 'date-fns';
+import { isFuture, parseISO } from 'date-fns';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useTasksStore } from '@/store/tasksStore';
 import { TaskRow } from './Task';
