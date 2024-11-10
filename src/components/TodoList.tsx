@@ -8,8 +8,10 @@ import { TaskRow } from './Task';
 import { AddTaskForm } from './AddTaskForm';
 import { Filters } from './Filters';
 import { Task } from '@/classes/task';
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export function TodoList() {
+  const { user, error, isLoading } = useUser();
   const [filter, setFilter] = useState('All');
 
   const { fetchTasks, tasks } = useTasksStore();
@@ -28,16 +30,23 @@ export function TodoList() {
 
   const hasTasks = filteredTasks.length > 0;
 
+  if (!user) {
+    return (
+      <div className="flex justify-center items-center h-5">
+        {isLoading ? 'Loading...' : 'Please login in to see your tasks.'}
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-xl mx-auto p-4 bg-background">
-      <h1 className="text-2xl font-bold mb-4 text-primary">Zero Resistance Todo List</h1>
+    <>
       <AddTaskForm />
       <Filters filter={filter} setFilter={setFilter} />
       <ErrorMessagesArea />
       {hasTasks ? <Tasks tasks={filteredTasks} /> : <EmptyList />}
       <Filters filter={filter} setFilter={setFilter} />
       <AddTaskForm />
-    </div>
+    </>
   );
 }
 
