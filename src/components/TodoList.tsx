@@ -50,7 +50,7 @@ export function TodoList() {
 function applySpecialFilter(tasks: Task[], filter: SpecialFilter) {
   if (filter === 'future') return tasks.filter((task) => task.date && isFuture(parseISO(task.date)));
 
-  const withoutFutureTasks = tasks.filter((task) => !task.date || isFuture(parseISO(task.date)));
+  const withoutFutureTasks = tasks.filter((task) => !(task.date && isFuture(parseISO(task.date))));
   if (filter === 'all') return withoutFutureTasks;
   if (filter === 'selected') return withoutFutureTasks.filter((task) => task.selected);
   return withoutFutureTasks;
