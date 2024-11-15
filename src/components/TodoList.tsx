@@ -9,10 +9,10 @@ import { AddTaskForm } from './AddTaskForm';
 import { Filters } from './Filters';
 import { Task } from '@/classes/task';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { SpecialFilter, useFilterStore } from '@/store/filterStore';
 
 export function TodoList() {
   const { user, error, isLoading } = useUser();
-  const [filter, setFilter] = useState('All');
 
   const { fetchTasks, tasks } = useTasksStore();
 
@@ -20,15 +20,12 @@ export function TodoList() {
     fetchTasks();
   }, []);
 
-  const filteredTasks = tasks.filter((todo) => {
-    // const today = new Date();
-    if (filter === 'All') return !todo.date || !isFuture(parseISO(todo.date));
-    if (filter === 'Selected') return todo.selected;
-    if (filter === 'Future') return todo.date && isFuture(parseISO(todo.date));
-    return todo.list === filter && (!todo.date || !isFuture(parseISO(todo.date)));
-  });
+  const { specialFilter, list } = useFilterStore();
 
-  const hasTasks = filteredTasks.length > 0;
+  const filteredTasks = applySpecialFilter(tasks, specialFilter);
+  const filteredTasksByList = applyListFilter(filteredTasks, list);
+
+  const hasTasks = filteredTasksByList.length > 0;
 
   if (!user) {
     return (
@@ -41,13 +38,25 @@ export function TodoList() {
   return (
     <>
       <AddTaskForm />
-      <Filters filter={filter} setFilter={setFilter} />
+      <Filters />
       <ErrorMessagesArea />
-      {hasTasks ? <Tasks tasks={filteredTasks} /> : <EmptyList />}
-      <Filters filter={filter} setFilter={setFilter} />
+      {hasTasks ? <Tasks tasks={filteredTasksByList} /> : <EmptyList />}
+      <Filters />
       <AddTaskForm />
     </>
   );
+}
+
+function applySpecialFilter(tasks: Task[], filter: SpecialFilter) {
+  if (filter === 'all') return tasks;
+  if (filter === 'selected') return tasks.filter((task) => task.selected);
+  if (filter === 'future') return tasks.filter((task) => task.date && isFuture(parseISO(task.date)));
+  return tasks;
+}
+
+function applyListFilter(tasks: Task[], filter: string) {
+  if (!filter) return tasks;
+  return tasks.filter((task) => task.list === filter);
 }
 
 function ErrorMessagesArea() {
