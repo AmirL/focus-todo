@@ -48,10 +48,12 @@ export function TodoList() {
 }
 
 function applySpecialFilter(tasks: Task[], filter: SpecialFilter) {
-  if (filter === 'all') return tasks;
-  if (filter === 'selected') return tasks.filter((task) => task.selected);
   if (filter === 'future') return tasks.filter((task) => task.date && isFuture(parseISO(task.date)));
-  return tasks;
+
+  const withoutFutureTasks = tasks.filter((task) => !task.date || isFuture(parseISO(task.date)));
+  if (filter === 'all') return withoutFutureTasks;
+  if (filter === 'selected') return withoutFutureTasks.filter((task) => task.selected);
+  return withoutFutureTasks;
 }
 
 function applyListFilter(tasks: Task[], filter: string) {
