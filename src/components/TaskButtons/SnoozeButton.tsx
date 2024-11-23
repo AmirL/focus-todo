@@ -5,12 +5,15 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { parseISO } from 'date-fns';
 import { useTasksStore } from '@/store/tasksStore';
+import dayjs from 'dayjs';
 
 export function SnoozeButton({ task }: { task: Task }) {
   const { updateTask } = useTasksStore();
 
   const snoozeTodo = (date: Date) => {
-    updateTask(task.id, { date: date.toISOString(), selected: false });
+    const dateIsAfterToday = dayjs(date).isAfter(dayjs().endOf('day'));
+    const selected = dateIsAfterToday ? false : task.selected;
+    updateTask(task.id, { date: date.toISOString(), selected });
   };
 
   return (
