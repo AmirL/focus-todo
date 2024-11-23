@@ -7,6 +7,7 @@ import { StarButton } from './TaskButtons/StarButton';
 import { DeleteButton } from './TaskButtons/DeleteButton';
 import { ReAddButton } from './TaskButtons/ReAddButton';
 import { SnoozeButton } from './TaskButtons/SnoozeButton';
+import { useFilterStore } from '@/store/filterStore';
 
 export function TaskRow({ task }: { task: Task }) {
   const { updateTask } = useTasksStore();
@@ -17,17 +18,21 @@ export function TaskRow({ task }: { task: Task }) {
   };
 
   return (
-    <li key={task.id} className="flex items-center justify-between p-2 bg-muted rounded-md">
+    <li key={task.id} className="flex flex-col  p-2 pt-4 pb-1 bg-muted rounded-md gap-2">
       <div className="flex items-center space-x-2">
         <Checkbox id={`todo-${task.id}`} checked={!!task.completedAt} onCheckedChange={toggleCompleted} />
         <TaskName task={task} />
-        <TaskBadges task={task} />
       </div>
-      <div className="flex space-x-1">
-        <StarButton task={task} />
-        <SnoozeButton task={task} />
-        <ReAddButton task={task} />
-        <DeleteButton task={task} />
+      <div className="flex justify-between">
+        <div className="flex space-x-1">
+          <TaskBadges task={task} />
+        </div>
+        <div className="flex space-x-1">
+          <StarButton task={task} />
+          <SnoozeButton task={task} />
+          <ReAddButton task={task} />
+          <DeleteButton task={task} />
+        </div>
       </div>
     </li>
   );
@@ -45,9 +50,10 @@ export function TaskName({ task }: { task: Task }) {
 }
 
 export function TaskBadges({ task }: { task: Task }) {
+  const { list } = useFilterStore();
   return (
     <>
-      <Badge variant="secondary">{task.list}</Badge>
+      {list === '' && <Badge variant="secondary">{task.list}</Badge>}
       {task.date && isSameDay(parseISO(task.date), new Date()) && <Badge variant="default">Today</Badge>}
       {task.date && isFuture(parseISO(task.date)) && (
         <Badge variant="outline">Snoozed: {format(parseISO(task.date), 'yyyy-MM-dd')}</Badge>
