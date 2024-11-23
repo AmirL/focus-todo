@@ -17,13 +17,17 @@ export class Task {
   selected!: boolean;
 
   @Expose({ name: 'field_2869965' })
-  @Transform(({ value }) => (value ? dayjs(value).format('YYYY-MM-DD') : null), { toPlainOnly: true })
+  @Transform(transformDateToString, { toPlainOnly: true })
   date?: Date | null;
 
   @Expose({ name: 'field_2872650' })
-  @Transform(({ value }) => (value ? dayjs(value).format('YYYY-MM-DD') : null), { toPlainOnly: true })
+  @Transform(transformDateToString, { toPlainOnly: true })
   completedAt?: Date | null;
 
   @Expose({ name: 'field_2872651' })
   list!: string;
+}
+
+function transformDateToString({ value }: { value: Date | null }) {
+  return value ? dayjs(value).format('YYYY-MM-DD') : null;
 }
