@@ -7,7 +7,6 @@ export function StarButton({ task }: { task: Task }) {
   const { updateTask } = useTasksStore();
 
   const toggleTodayTask = (task: Task) => {
-    // const date = dayjs(task.date).isBefore(dayjs()) ? null : new Date().toISOString();
     const selected = !task.selected;
     updateTask(task.id, { selected });
   };

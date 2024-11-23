@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 
 describe('snoozeTask', () => {
   const createTask = ({ date, selected }: { date: Date; selected: boolean }) => {
-    return Object.assign(new Task(), { id: '1', date: date.toISOString(), selected });
+    return Object.assign(new Task(), { id: '1', date, selected });
   };
 
   it('set selected to false if the new date is after today', () => {
@@ -31,6 +31,6 @@ describe('snoozeTask', () => {
     const task = createTask({ date: new Date(), selected: false });
     const newDate = dayjs().add(1, 'day').toDate();
     const result = snoozeTask(task, newDate);
-    expect(result.date).toBe(newDate.toISOString());
+    expect(result.date).toBe(newDate);
   });
 });

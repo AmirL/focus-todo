@@ -1,7 +1,7 @@
 import { Task } from '@/classes/task';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { format, isFuture, isSameDay, parseISO } from 'date-fns';
+import { format, isFuture, isSameDay } from 'date-fns';
 import { useTasksStore } from '@/store/tasksStore';
 import { StarButton } from './TaskButtons/StarButton';
 import { DeleteButton } from './TaskButtons/DeleteButton';
@@ -13,7 +13,7 @@ export function TaskRow({ task }: { task: Task }) {
   const { updateTask } = useTasksStore();
 
   const toggleCompleted = () => {
-    const completedAt = task.completedAt ? null : new Date().toISOString();
+    const completedAt = task.completedAt ? null : new Date();
     updateTask(task.id, { completedAt });
   };
 
@@ -54,10 +54,8 @@ export function TaskBadges({ task }: { task: Task }) {
   return (
     <>
       {list === '' && <Badge variant="secondary">{task.list}</Badge>}
-      {task.date && isSameDay(parseISO(task.date), new Date()) && <Badge variant="default">Today</Badge>}
-      {task.date && isFuture(parseISO(task.date)) && (
-        <Badge variant="outline">Snoozed: {format(parseISO(task.date), 'yyyy-MM-dd')}</Badge>
-      )}
+      {task.date && isSameDay(task.date, new Date()) && <Badge variant="default">Today</Badge>}
+      {task.date && isFuture(task.date) && <Badge variant="outline">Snoozed: {format(task.date, 'yyyy-MM-dd')}</Badge>}
     </>
   );
 }

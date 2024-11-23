@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { isFuture, parseISO } from 'date-fns';
+import { useEffect } from 'react';
+import { isFuture } from 'date-fns';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useTasksStore } from '@/store/tasksStore';
 import { TaskRow } from './Task';
@@ -48,9 +48,9 @@ export function TodoList() {
 }
 
 function applySpecialFilter(tasks: Task[], filter: SpecialFilter) {
-  if (filter === 'future') return tasks.filter((task) => task.date && isFuture(parseISO(task.date)));
+  if (filter === 'future') return tasks.filter((task) => task.date && isFuture(task.date));
 
-  const withoutFutureTasks = tasks.filter((task) => !(task.date && isFuture(parseISO(task.date))));
+  const withoutFutureTasks = tasks.filter((task) => !(task.date && isFuture(task.date)));
   if (filter === 'all') return withoutFutureTasks;
   if (filter === 'selected') return withoutFutureTasks.filter((task) => task.selected);
   return withoutFutureTasks;

@@ -18,11 +18,11 @@ export class Task {
 
   @Expose({ name: 'field_2869965' })
   @Transform(({ value }) => (value ? dayjs(value).format('YYYY-MM-DD') : null), { toPlainOnly: true })
-  date?: string | null;
+  date?: Date | null;
 
   @Expose({ name: 'field_2872650' })
   @Transform(({ value }) => (value ? dayjs(value).format('YYYY-MM-DD') : null), { toPlainOnly: true })
-  completedAt?: string | null;
+  completedAt?: Date | null;
 
   @Expose({ name: 'field_2872651' })
   list!: string;

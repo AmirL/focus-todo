@@ -16,7 +16,7 @@ export function ReAddButton({ task }: { task: Task }) {
     });
     createTask(newTask);
 
-    updateTask(task.id, { completedAt: new Date().toISOString() });
+    updateTask(task.id, { completedAt: new Date() });
   };
   return (
     <Button variant="ghost" size="icon" onClick={reAddTask} className="text-primary">
