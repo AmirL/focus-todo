@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect } from 'react';
-import { isFuture } from 'date-fns';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useTasksStore } from '@/store/tasksStore';
 import { TaskRow } from './Task';
@@ -10,6 +9,8 @@ import { Filters } from './Filters';
 import { Task } from '@/classes/task';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { SpecialFilter, useFilterStore } from '@/store/filterStore';
+import dayjs from 'dayjs';
+import { isFutureDate } from '@/lib/utils';
 
 export function TodoList() {
   const { user, error, isLoading } = useUser();
@@ -48,9 +49,9 @@ export function TodoList() {
 }
 
 function applySpecialFilter(tasks: Task[], filter: SpecialFilter) {
-  if (filter === 'future') return tasks.filter((task) => task.date && isFuture(task.date));
+  if (filter === 'future') return tasks.filter((task) => isFutureDate(task.date));
 
-  const withoutFutureTasks = tasks.filter((task) => !(task.date && isFuture(task.date)));
+  const withoutFutureTasks = tasks.filter((task) => !isFutureDate(task.date));
   if (filter === 'all') return withoutFutureTasks;
   if (filter === 'selected') return withoutFutureTasks.filter((task) => task.selected);
   return withoutFutureTasks;

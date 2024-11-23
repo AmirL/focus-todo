@@ -1,13 +1,15 @@
 import { Task } from '@/classes/task';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { format, isFuture, isSameDay } from 'date-fns';
+
 import { useTasksStore } from '@/store/tasksStore';
 import { StarButton } from './TaskButtons/StarButton';
 import { DeleteButton } from './TaskButtons/DeleteButton';
 import { ReAddButton } from './TaskButtons/ReAddButton';
 import { SnoozeButton } from './TaskButtons/SnoozeButton';
 import { useFilterStore } from '@/store/filterStore';
+import { isFutureDate, isToday } from '@/lib/utils';
+import dayjs from 'dayjs';
 
 export function TaskRow({ task }: { task: Task }) {
   const { updateTask } = useTasksStore();
@@ -54,8 +56,8 @@ export function TaskBadges({ task }: { task: Task }) {
   return (
     <>
       {list === '' && <Badge variant="secondary">{task.list}</Badge>}
-      {task.date && isSameDay(task.date, new Date()) && <Badge variant="default">Today</Badge>}
-      {task.date && isFuture(task.date) && <Badge variant="outline">Snoozed: {format(task.date, 'yyyy-MM-dd')}</Badge>}
+      {isToday(task.date) && <Badge variant="default">Today</Badge>}
+      {isFutureDate(task.date) && <Badge variant="outline">Snoozed: {dayjs(task.date).format('DD.MM.YY')}</Badge>}
     </>
   );
 }
