@@ -5,27 +5,8 @@ import { useFilterStore } from '@/store/filterStore';
 export function Filters() {
   return (
     <div className="my-4 flex flex-wrap items-center justify-between gap-4">
-      <AllButtonGroup />
       <SpecialFiltersGroup />
       <ListFiltersGroup />
-    </div>
-  );
-}
-
-function AllButtonGroup() {
-  const { specialFilter, list, setSpecialFilter, setList } = useFilterStore();
-
-  return (
-    <div className="flex gap-2">
-      <Button
-        variant={specialFilter === 'all' && list === '' ? 'default' : 'outline'}
-        onClick={() => {
-          setSpecialFilter('all');
-          setList('');
-        }}
-      >
-        All
-      </Button>
     </div>
   );
 }
@@ -35,6 +16,14 @@ function SpecialFiltersGroup() {
 
   return (
     <div className="flex gap-2">
+      <Button
+        variant={specialFilter === 'all' ? 'default' : 'outline'}
+        onClick={() => {
+          setSpecialFilter('all');
+        }}
+      >
+        All
+      </Button>
       <Button
         variant={specialFilter === 'selected' ? 'default' : 'outline'}
         onClick={() => setSpecialFilter('selected')}
