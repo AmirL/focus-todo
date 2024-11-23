@@ -7,13 +7,17 @@ import { parseISO } from 'date-fns';
 import { useTasksStore } from '@/store/tasksStore';
 import dayjs from 'dayjs';
 
+export function snoozeTask(task: Task, date: Date) {
+  const dateIsAfterToday = dayjs(date).isAfter(dayjs().endOf('day'));
+  const selected = dateIsAfterToday ? false : task.selected;
+  return { date: date.toISOString(), selected };
+}
+
 export function SnoozeButton({ task }: { task: Task }) {
   const { updateTask } = useTasksStore();
 
-  const snoozeTodo = (date: Date) => {
-    const dateIsAfterToday = dayjs(date).isAfter(dayjs().endOf('day'));
-    const selected = dateIsAfterToday ? false : task.selected;
-    updateTask(task.id, { date: date.toISOString(), selected });
+  const onDateSelect = (date: Date) => {
+    updateTask(task.id, snoozeTask(task, date));
   };
 
   return (
@@ -27,7 +31,7 @@ export function SnoozeButton({ task }: { task: Task }) {
         <Calendar
           mode="single"
           selected={task.date ? parseISO(task.date) : undefined}
-          onSelect={(date) => date && snoozeTodo(date)}
+          onSelect={(date) => date && onDateSelect(date)}
           initialFocus
         />
       </PopoverContent>
