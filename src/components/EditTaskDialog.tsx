@@ -5,6 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 export function EditTaskDialog({ task, children }: { task: Task; children: React.ReactNode }) {
   const { updateTask } = useTasksStore();
@@ -58,13 +61,33 @@ function InputField({ label, id, value, ...props }: { label: string; id: string;
   );
 }
 
-function MarkdownAreaField({ label, id, value, ...props }: { label: string; id: string; value: string }) {
+function MarkdownAreaField(props: { label: string; id: string; value: string }) {
+  const { label, id, value: initialValue, ...rest } = props;
+  const [activeTab, setActiveTab] = useState('view');
+  const [value, setValue] = useState(initialValue);
+
+  const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setValue(e.target.value);
+  };
+
   return (
     <div>
       <Label htmlFor={id} className="text-right">
         {label}
       </Label>
-      <Textarea id={id} name={id} defaultValue={value} className="min-h-[200px]" {...props} />
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="view">View</TabsTrigger>
+          <TabsTrigger value="edit">Edit</TabsTrigger>
+        </TabsList>
+        <TabsContent value="edit">
+          <Textarea id={id} value={value} onChange={onChange} className="min-h-[200px]" {...rest} />
+        </TabsContent>
+        <TabsContent value="view">
+          <ReactMarkdown className="prose prose-sm min-h-[200px]">{value}</ReactMarkdown>
+        </TabsContent>
+      </Tabs>
+      <input type="hidden" name={id} value={value} />
     </div>
   );
 }
