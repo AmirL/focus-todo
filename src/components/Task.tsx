@@ -10,6 +10,7 @@ import { SnoozeButton } from './TaskButtons/SnoozeButton';
 import { useFilterStore } from '@/store/filterStore';
 import { isFutureDate, isToday } from '@/lib/utils';
 import dayjs from 'dayjs';
+import { EditTaskButton } from './TaskButtons/EditTaskButton';
 
 export function TaskRow({ task }: { task: Task }) {
   const { updateTask } = useTasksStore();
@@ -30,6 +31,7 @@ export function TaskRow({ task }: { task: Task }) {
           <TaskBadges task={task} />
         </div>
         <div className="flex space-x-1">
+          <EditTaskButton task={task} />
           <StarButton task={task} />
           <SnoozeButton task={task} />
           <ReAddButton task={task} />
