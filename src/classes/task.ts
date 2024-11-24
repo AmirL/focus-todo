@@ -26,6 +26,10 @@ export class Task {
 
   @Expose({ name: 'field_2872651' })
   list!: string;
+
+  @Expose({ name: 'field_3017209' })
+  @Transform(transformDateToString, { toPlainOnly: true })
+  deletedAt?: Date | null;
 }
 
 function transformDateToString({ value }: { value: Date | null }) {

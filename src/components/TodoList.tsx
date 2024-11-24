@@ -8,20 +8,21 @@ import { AddTaskForm } from './AddTaskForm';
 import { Filters } from './Filters';
 import { Task } from '@/classes/task';
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { SpecialFilter, SpecialFilterEnum, useFilterStore } from '@/store/filterStore';
+import { SpecialFilterEnum, useFilterStore } from '@/store/filterStore';
 import { isFutureDate } from '@/lib/utils';
 
 export function TodoList() {
   const { user, error, isLoading } = useUser();
 
-  const { fetchTasks, tasks } = useTasksStore();
+  const { fetchTasks, tasks: allTasks } = useTasksStore();
 
   useEffect(() => {
-    fetchTasks();
+    if (tasks.length === 0) fetchTasks();
   }, []);
 
   const { specialFilter, list } = useFilterStore();
 
+  const tasks = allTasks.filter((task) => !task.deletedAt);
   const filteredTasks = applySpecialFilter(tasks, specialFilter);
   const filteredTasksByList = applyListFilter(filteredTasks, list);
 
@@ -47,7 +48,7 @@ export function TodoList() {
   );
 }
 
-function applySpecialFilter(tasks: Task[], filter: SpecialFilter) {
+function applySpecialFilter(tasks: Task[], filter: SpecialFilterEnum) {
   if (filter === SpecialFilterEnum.FUTURE) return tasks.filter((task) => isFutureDate(task.date));
 
   const withoutFutureTasks = tasks.filter((task) => !isFutureDate(task.date));
