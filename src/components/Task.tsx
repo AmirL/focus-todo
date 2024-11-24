@@ -1,7 +1,6 @@
 import { Task } from '@/classes/task';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-
 import { useTasksStore } from '@/store/tasksStore';
 import { StarButton } from './TaskButtons/StarButton';
 import { DeleteButton } from './TaskButtons/DeleteButton';
@@ -11,6 +10,7 @@ import { useFilterStore } from '@/store/filterStore';
 import { isFutureDate, isToday } from '@/lib/utils';
 import dayjs from 'dayjs';
 import { EditTaskButton } from './TaskButtons/EditTaskButton';
+import ReactMarkdown from 'react-markdown';
 
 export function TaskRow({ task }: { task: Task }) {
   const { updateTask } = useTasksStore();
@@ -26,6 +26,7 @@ export function TaskRow({ task }: { task: Task }) {
         <Checkbox id={`todo-${task.id}`} checked={!!task.completedAt} onCheckedChange={toggleCompleted} />
         <TaskName task={task} />
       </div>
+      <TaskDetails details={task.details} />
       <div className="flex justify-between">
         <div className="flex space-x-1">
           <TaskBadges task={task} />
@@ -62,4 +63,10 @@ export function TaskBadges({ task }: { task: Task }) {
       {isFutureDate(task.date) && <Badge variant="outline">Snoozed: {dayjs(task.date).format('DD.MM.YY')}</Badge>}
     </>
   );
+}
+
+function TaskDetails({ details }: { details: string }) {
+  if (!details) return <></>;
+
+  return <ReactMarkdown className="prose prose-sm text-muted-foreground line-clamp-1">{details}</ReactMarkdown>;
 }
