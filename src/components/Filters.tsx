@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { ListsNames } from '@/classes/task';
-import { useFilterStore } from '@/store/filterStore';
+import { SpecialFilterEnum, useFilterStore } from '@/store/filterStore';
 
 export function Filters() {
   return (
@@ -17,20 +17,23 @@ function SpecialFiltersGroup() {
   return (
     <div className="flex gap-2">
       <Button
-        variant={specialFilter === 'all' ? 'default' : 'outline'}
+        variant={specialFilter === SpecialFilterEnum.ACTIVE ? 'default' : 'outline'}
         onClick={() => {
-          setSpecialFilter('all');
+          setSpecialFilter(SpecialFilterEnum.ACTIVE);
         }}
       >
-        All
+        Active
       </Button>
       <Button
         variant={specialFilter === 'selected' ? 'default' : 'outline'}
-        onClick={() => setSpecialFilter('selected')}
+        onClick={() => setSpecialFilter(SpecialFilterEnum.SELECTED)}
       >
         Selected
       </Button>
-      <Button variant={specialFilter === 'future' ? 'default' : 'outline'} onClick={() => setSpecialFilter('future')}>
+      <Button
+        variant={specialFilter === 'future' ? 'default' : 'outline'}
+        onClick={() => setSpecialFilter(SpecialFilterEnum.FUTURE)}
+      >
         Future
       </Button>
     </div>

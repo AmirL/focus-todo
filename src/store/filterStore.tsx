@@ -1,20 +1,24 @@
 import { create } from 'zustand';
 
-export type SpecialFilter = 'selected' | 'future' | 'all';
+export enum SpecialFilterEnum {
+  SELECTED = 'selected',
+  FUTURE = 'future',
+  ACTIVE = 'active',
+}
 
 type FilterState = {
-  specialFilter: SpecialFilter;
+  specialFilter: SpecialFilterEnum;
   list: string;
-  setSpecialFilter: (filter: SpecialFilter) => void;
+  setSpecialFilter: (filter: SpecialFilterEnum) => void;
   setList: (list: string) => void;
 };
 
 export const useFilterStore = create<FilterState>((set, get) => ({
-  specialFilter: 'all',
+  specialFilter: SpecialFilterEnum.ACTIVE,
   list: '',
 
   setSpecialFilter: (filter) => {
-    if (filter === get().specialFilter) return set({ specialFilter: 'all' });
+    if (filter === get().specialFilter) return set({ specialFilter: SpecialFilterEnum.ACTIVE });
     return set({ specialFilter: filter });
   },
   setList: (list) => {
