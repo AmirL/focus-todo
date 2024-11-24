@@ -18,7 +18,7 @@ function applyStatusFilter(task: Task, filter: StatusFilterEnum) {
     case StatusFilterEnum.FUTURE:
       return task.isInFuture;
     case StatusFilterEnum.SELECTED:
-      return task.selected;
+      return task.starred;
   }
 }
 

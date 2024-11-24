@@ -7,8 +7,8 @@ export function StarButton({ task }: { task: Task }) {
   const { updateTask } = useTasksStore();
 
   const toggleTodayTask = (task: Task) => {
-    const selected = !task.selected;
-    updateTask(task.id, { selected });
+    const starred = !task.starred;
+    updateTask(task.id, { starred });
   };
 
   return (
@@ -16,9 +16,9 @@ export function StarButton({ task }: { task: Task }) {
       variant="ghost"
       size="icon"
       onClick={() => toggleTodayTask(task)}
-      className={task.selected ? 'text-yellow-500 hover:text-yellow-500' : 'text-muted-foreground'}
+      className={task.starred ? 'text-yellow-500 hover:text-yellow-500' : 'text-muted-foreground'}
     >
-      <Star fill={task.selected ? '#E3B644' : 'none'} className="h-4 w-4" />
+      <Star fill={task.starred ? '#E3B644' : 'none'} className="h-4 w-4" />
     </Button>
   );
 }

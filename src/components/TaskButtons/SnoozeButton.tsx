@@ -9,7 +9,7 @@ import { useState } from 'react';
 
 export function snoozeTask(task: Task, date: Date) {
   const dateIsAfterToday = dayjs(date).isAfter(dayjs().endOf('day'));
-  const selected = dateIsAfterToday ? false : task.selected;
+  const selected = dateIsAfterToday ? false : task.starred;
   return { date, selected };
 }
 

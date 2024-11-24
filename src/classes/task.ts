@@ -15,7 +15,7 @@ export class Task {
   details!: string;
 
   @Expose({ name: 'field_2910918' })
-  selected!: boolean;
+  starred!: boolean;
 
   @Expose({ name: 'field_2869965' })
   @Transform(transformDateToString, { toPlainOnly: true })
