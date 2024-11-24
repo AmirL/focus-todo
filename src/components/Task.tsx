@@ -7,10 +7,11 @@ import { DeleteButton } from './TaskButtons/DeleteButton';
 import { ReAddButton } from './TaskButtons/ReAddButton';
 import { SnoozeButton } from './TaskButtons/SnoozeButton';
 import { useFilterStore } from '@/store/filterStore';
-import { isFutureDate, isToday } from '@/lib/utils';
+import { cn, isFutureDate, isToday } from '@/lib/utils';
 import dayjs from 'dayjs';
 import { EditTaskButton } from './TaskButtons/EditTaskButton';
 import ReactMarkdown from 'react-markdown';
+import { useState } from 'react';
 
 export function TaskRow({ task }: { task: Task }) {
   const { updateTask } = useTasksStore();
@@ -66,7 +67,20 @@ export function TaskBadges({ task }: { task: Task }) {
 }
 
 function TaskDetails({ details }: { details: string }) {
+  const [folded, setFolded] = useState(true);
+
   if (!details) return <></>;
 
-  return <ReactMarkdown className="prose prose-sm text-muted-foreground line-clamp-1">{details}</ReactMarkdown>;
+  return (
+    <div onClick={() => setFolded(!folded)}>
+      <ReactMarkdown
+        className={cn(
+          'prose prose-sm text-muted-foreground cursor-pointer',
+          folded ? 'line-clamp-1' : 'line-clamp-none'
+        )}
+      >
+        {details}
+      </ReactMarkdown>
+    </div>
+  );
 }
