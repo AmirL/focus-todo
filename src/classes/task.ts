@@ -1,3 +1,4 @@
+import { isFutureDate } from '@/lib/utils';
 import { Expose, Transform } from 'class-transformer';
 import dayjs from 'dayjs';
 
@@ -30,6 +31,22 @@ export class Task {
   @Expose({ name: 'field_3017209' })
   @Transform(transformDateToString, { toPlainOnly: true })
   deletedAt?: Date | null;
+
+  get isInFuture() {
+    return isFutureDate(this.date);
+  }
+
+  get isActive() {
+    return !this.isInFuture;
+  }
+
+  get isDeleted() {
+    return !!this.deletedAt;
+  }
+
+  get isCompletedAgo() {
+    return !!this.completedAt && dayjs(this.completedAt).isBefore(dayjs().subtract(1, 'day'));
+  }
 }
 
 function transformDateToString({ value }: { value: Date | null }) {

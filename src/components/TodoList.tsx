@@ -5,11 +5,9 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useTasksStore } from '@/store/tasksStore';
 import { TaskRow } from './Task';
 import { AddTaskForm } from './AddTaskForm';
-import { Filters } from './Filters';
+import { Filters, useApplyFilters } from './Filters';
 import { Task } from '@/classes/task';
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { SpecialFilterEnum, useFilterStore } from '@/store/filterStore';
-import { isFutureDate } from '@/lib/utils';
 
 export function TodoList() {
   const { user, error, isLoading } = useUser();
@@ -20,13 +18,9 @@ export function TodoList() {
     if (tasks.length === 0) fetchTasks();
   }, []);
 
-  const { specialFilter, list } = useFilterStore();
+  const tasks = useApplyFilters(allTasks);
 
-  const tasks = allTasks.filter((task) => !task.deletedAt);
-  const filteredTasks = applySpecialFilter(tasks, specialFilter);
-  const filteredTasksByList = applyListFilter(filteredTasks, list);
-
-  const hasTasks = filteredTasksByList.length > 0;
+  const hasTasks = tasks.length > 0;
 
   if (!user) {
     return (
@@ -41,25 +35,11 @@ export function TodoList() {
       <AddTaskForm />
       <Filters />
       <ErrorMessagesArea />
-      {hasTasks ? <Tasks tasks={filteredTasksByList} /> : <EmptyList />}
+      {hasTasks ? <Tasks tasks={tasks} /> : <EmptyList />}
       <Filters />
       <AddTaskForm />
     </>
   );
-}
-
-function applySpecialFilter(tasks: Task[], filter: SpecialFilterEnum) {
-  if (filter === SpecialFilterEnum.FUTURE) return tasks.filter((task) => isFutureDate(task.date));
-
-  const withoutFutureTasks = tasks.filter((task) => !isFutureDate(task.date));
-  if (filter === SpecialFilterEnum.ACTIVE) return withoutFutureTasks;
-  if (filter === SpecialFilterEnum.SELECTED) return withoutFutureTasks.filter((task) => task.selected);
-  return withoutFutureTasks;
-}
-
-function applyListFilter(tasks: Task[], filter: string) {
-  if (!filter) return tasks;
-  return tasks.filter((task) => task.list === filter);
 }
 
 function ErrorMessagesArea() {

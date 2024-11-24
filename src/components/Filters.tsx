@@ -1,6 +1,26 @@
 import { Button } from '@/components/ui/button';
-import { ListsNames } from '@/classes/task';
-import { SpecialFilterEnum, useFilterStore } from '@/store/filterStore';
+import { ListsNames, Task } from '@/classes/task';
+import { StatusFilterEnum, useFilterStore } from '@/store/filterStore';
+
+export function useApplyFilters(tasks: Task[]) {
+  const { statusFilter, list } = useFilterStore();
+
+  return tasks
+    .filter((task) => !task.isDeleted && !task.isCompletedAgo)
+    .filter((task) => applyStatusFilter(task, statusFilter))
+    .filter((task) => list === '' || task.list === list);
+}
+
+function applyStatusFilter(task: Task, filter: StatusFilterEnum) {
+  switch (filter) {
+    case StatusFilterEnum.ACTIVE:
+      return task.isActive;
+    case StatusFilterEnum.FUTURE:
+      return task.isInFuture;
+    case StatusFilterEnum.SELECTED:
+      return task.selected;
+  }
+}
 
 export function Filters() {
   return (
@@ -12,27 +32,27 @@ export function Filters() {
 }
 
 function SpecialFiltersGroup() {
-  const { specialFilter, setSpecialFilter } = useFilterStore();
+  const { statusFilter, setStatusFilter } = useFilterStore();
 
   return (
     <div className="flex gap-2">
       <Button
-        variant={specialFilter === SpecialFilterEnum.ACTIVE ? 'default' : 'outline'}
+        variant={statusFilter === StatusFilterEnum.ACTIVE ? 'default' : 'outline'}
         onClick={() => {
-          setSpecialFilter(SpecialFilterEnum.ACTIVE);
+          setStatusFilter(StatusFilterEnum.ACTIVE);
         }}
       >
         Active
       </Button>
       <Button
-        variant={specialFilter === 'selected' ? 'default' : 'outline'}
-        onClick={() => setSpecialFilter(SpecialFilterEnum.SELECTED)}
+        variant={statusFilter === 'selected' ? 'default' : 'outline'}
+        onClick={() => setStatusFilter(StatusFilterEnum.SELECTED)}
       >
         Selected
       </Button>
       <Button
-        variant={specialFilter === 'future' ? 'default' : 'outline'}
-        onClick={() => setSpecialFilter(SpecialFilterEnum.FUTURE)}
+        variant={statusFilter === 'future' ? 'default' : 'outline'}
+        onClick={() => setStatusFilter(StatusFilterEnum.FUTURE)}
       >
         Future
       </Button>
