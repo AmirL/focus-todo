@@ -1,4 +1,4 @@
-import { Task } from '@/classes/task';
+import { Task } from '@/data-classes/task';
 import { Button } from '../ui/button';
 import { Pencil } from 'lucide-react';
 import { EditTaskDialog } from '../EditTaskDialog';

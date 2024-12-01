@@ -1,4 +1,4 @@
-import { Task } from '@/classes/task';
+import { Task } from '@/data-classes/task';
 import { apiRequest } from '@/components/api';
 import { plainToInstance } from 'class-transformer';
 import { create } from 'zustand';

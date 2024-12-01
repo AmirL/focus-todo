@@ -1,5 +1,5 @@
 import { snoozeTask } from './SnoozeButton';
-import { Task } from '@/classes/task';
+import { Task } from '@/data-classes/task';
 import dayjs from 'dayjs';
 
 describe('snoozeTask', () => {

@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { isTaskActive, isTaskCompletedAgo, isTaskDeleted, isTaskInFuture, ListsNames, Task } from '@/classes/task';
+import { isTaskActive, isTaskCompletedAgo, isTaskDeleted, isTaskInFuture, ListsNames, Task } from '@/data-classes/task';
 import { StatusFilterEnum, useFilterStore } from '@/store/filterStore';
 
 export function useApplyFilters(tasks: Task[]) {

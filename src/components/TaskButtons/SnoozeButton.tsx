@@ -1,4 +1,4 @@
-import { Task } from '@/classes/task';
+import { Task } from '@/data-classes/task';
 import { Button } from '@/components/ui/button';
 import { Clock } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';

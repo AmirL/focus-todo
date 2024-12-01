@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ListsNames, Task } from '@/classes/task';
+import { ListsNames, Task } from '@/data-classes/task';
 import { useTasksStore } from '@/store/tasksStore';
 import { Checkbox } from './ui/checkbox';
 import { Label } from './ui/label';

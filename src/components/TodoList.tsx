@@ -6,7 +6,7 @@ import { useTasksStore } from '@/store/tasksStore';
 import { TaskRow } from './Task';
 import { AddTaskForm } from './AddTaskForm';
 import { Filters, useApplyFilters } from './Filters';
-import { Task } from '@/classes/task';
+import { Task } from '@/data-classes/task';
 import { useUser } from '@auth0/nextjs-auth0/client';
 
 export function TodoList() {

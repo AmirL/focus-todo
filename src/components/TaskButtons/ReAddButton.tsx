@@ -1,4 +1,4 @@
-import { Task } from '@/classes/task';
+import { Task } from '@/data-classes/task';
 import { Button } from '@/components/ui/button';
 import { RotateCw } from 'lucide-react';
 import { useTasksStore } from '@/store/tasksStore';
