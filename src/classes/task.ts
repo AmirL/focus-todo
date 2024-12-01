@@ -32,21 +32,29 @@ export class Task {
   @Transform(transformDateToString, { toPlainOnly: true })
   deletedAt?: Date | null;
 
-  get isInFuture() {
-    return isFutureDate(this.date);
+  static clone(task: Task): Task {
+    return Object.assign(new Task(), task);
   }
 
-  get isActive() {
-    return !this.isInFuture;
+  static create(task: Partial<Task>): Task {
+    return Object.assign(new Task(), task);
   }
+}
 
-  get isDeleted() {
-    return !!this.deletedAt;
-  }
+export function isTaskInFuture(task: Task) {
+  return isFutureDate(task.date);
+}
 
-  get isCompletedAgo() {
-    return !!this.completedAt && dayjs(this.completedAt).isBefore(dayjs().subtract(1, 'day'));
-  }
+export function isTaskActive(task: Task) {
+  return !isTaskInFuture(task);
+}
+
+export function isTaskDeleted(task: Task) {
+  return !!task.deletedAt;
+}
+
+export function isTaskCompletedAgo(task: Task) {
+  return !!task.completedAt && dayjs(task.completedAt).isBefore(dayjs().subtract(1, 'day'));
 }
 
 function transformDateToString({ value }: { value: Date | null }) {

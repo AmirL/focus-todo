@@ -7,12 +7,11 @@ export function ReAddButton({ task }: { task: Task }) {
   const { createTask, updateTask } = useTasksStore();
 
   const reAddTask = async () => {
-    const newTask: Task = Object.assign(new Task(), {
+    const newTask = Task.clone({
       ...task,
-      id: undefined,
       completedAt: null,
       date: null,
-      selected: false,
+      starred: false,
     });
     createTask(newTask);
 

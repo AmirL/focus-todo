@@ -7,10 +7,10 @@ import { useTasksStore } from '@/store/tasksStore';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 
-export function snoozeTask(task: Task, date: Date) {
+export function snoozeTask(task: Task, date: Date): Partial<Task> {
   const dateIsAfterToday = dayjs(date).isAfter(dayjs().endOf('day'));
-  const selected = dateIsAfterToday ? false : task.starred;
-  return { date, selected };
+  const starred = dateIsAfterToday ? false : task.starred;
+  return { date, starred };
 }
 
 export function SnoozeButton({ task }: { task: Task }) {

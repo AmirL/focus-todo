@@ -17,7 +17,7 @@ export function AddTaskForm() {
   const addTodo = async () => {
     const todoTexts = newTodo.split('\n').filter((text) => text.trim() !== '');
     todoTexts.forEach(async (text) => {
-      const newTask = Object.assign(new Task(), { name: text, list: selectedList, selected: isStarred });
+      const newTask = Task.create({ name: text, list: selectedList, starred: isStarred });
       await createTask(newTask);
     });
     setNewTodo('');

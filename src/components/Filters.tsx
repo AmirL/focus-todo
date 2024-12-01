@@ -1,12 +1,12 @@
 import { Button } from '@/components/ui/button';
-import { ListsNames, Task } from '@/classes/task';
+import { isTaskActive, isTaskCompletedAgo, isTaskDeleted, isTaskInFuture, ListsNames, Task } from '@/classes/task';
 import { StatusFilterEnum, useFilterStore } from '@/store/filterStore';
 
 export function useApplyFilters(tasks: Task[]) {
   const { statusFilter, list } = useFilterStore();
 
   return tasks
-    .filter((task) => !task.isDeleted && !task.isCompletedAgo)
+    .filter((task) => !isTaskDeleted(task) && !isTaskCompletedAgo(task))
     .filter((task) => applyStatusFilter(task, statusFilter))
     .filter((task) => list === '' || task.list === list);
 }
@@ -14,9 +14,9 @@ export function useApplyFilters(tasks: Task[]) {
 function applyStatusFilter(task: Task, filter: StatusFilterEnum) {
   switch (filter) {
     case StatusFilterEnum.ACTIVE:
-      return task.isActive;
+      return isTaskActive(task);
     case StatusFilterEnum.FUTURE:
-      return task.isInFuture;
+      return isTaskInFuture(task);
     case StatusFilterEnum.SELECTED:
       return task.starred;
   }
