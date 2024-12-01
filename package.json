@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -p 8000",
     "test": "vitest",
-    "build": "next build",
+    "build": "vitest && next build",
     "start": "next start",
     "lint": "next lint"
   },
