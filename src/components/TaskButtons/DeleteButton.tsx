@@ -4,7 +4,7 @@ import { Trash2 } from 'lucide-react';
 import { useTasksStore } from '@/store/tasksStore';
 
 export function DeleteButton({ task }: { task: Task }) {
-  const { updateTask } = useTasksStore();
+  const updateTask = useTasksStore((state) => state.updateTask);
 
   const handleDelete = () => {
     updateTask(task.id, { deletedAt: new Date() });

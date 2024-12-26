@@ -14,7 +14,7 @@ import ReactMarkdown from 'react-markdown';
 import { useState } from 'react';
 
 export function TaskRow({ task }: { task: Task }) {
-  const { updateTask } = useTasksStore();
+  const updateTask = useTasksStore((state) => state.updateTask);
 
   const toggleCompleted = () => {
     const completedAt = task.completedAt ? null : new Date();

@@ -12,13 +12,14 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 export function TodoList() {
   const { user, error, isLoading } = useUser();
 
-  const { fetchTasks, tasks: allTasks } = useTasksStore();
+  const fetchTasks = useTasksStore((state) => state.fetchTasks);
+  const allTasks = useTasksStore((state) => state.tasks);
+
+  const tasks = useApplyFilters(allTasks);
 
   useEffect(() => {
     if (tasks.length === 0) fetchTasks();
-  }, []);
-
-  const tasks = useApplyFilters(allTasks);
+  }, [fetchTasks, tasks.length]);
 
   const hasTasks = tasks.length > 0;
 
@@ -55,6 +56,7 @@ function ErrorMessagesArea() {
 }
 
 function Tasks({ tasks }: { tasks: Task[] }) {
+  console.log('Rendering tasks');
   return (
     <ul className="space-y-2">
       {tasks.map((task) => (

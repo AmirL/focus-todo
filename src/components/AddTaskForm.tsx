@@ -9,18 +9,18 @@ import { Label } from './ui/label';
 import { PlusCircle, Star } from 'lucide-react';
 
 export function AddTaskForm() {
-  const { createTask } = useTasksStore();
-  const [newTodo, setNewTodo] = useState('');
+  const createTask = useTasksStore((state) => state.createTask);
+  const createTaskInput = useTasksStore((state) => state.createTaskInput);
+  const setCreateTaskInput = useTasksStore((state) => state.setCreateTaskInput);
   const [selectedList, setSelectedList] = useState('Personal');
   const [isStarred, setIsStarred] = useState(false);
 
   const addTodo = async () => {
-    const todoTexts = newTodo.split('\n').filter((text) => text.trim() !== '');
+    const todoTexts = createTaskInput.split('\n').filter((text) => text.trim() !== '');
     todoTexts.forEach(async (text) => {
       const newTask = Task.create({ name: text, list: selectedList, starred: isStarred });
       await createTask(newTask);
     });
-    setNewTodo('');
   };
 
   return (
@@ -31,8 +31,8 @@ export function AddTaskForm() {
       <Textarea
         id="new-task"
         placeholder="Enter your task here..."
-        value={newTodo}
-        onChange={(e) => setNewTodo(e.target.value)}
+        value={createTaskInput}
+        onChange={(e) => setCreateTaskInput(e.target.value)}
         className="min-h-[100px]"
       />
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">

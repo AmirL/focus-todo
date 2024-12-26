@@ -1,12 +1,13 @@
 import { Task } from '@/data-classes/task';
-import { API } from '@/components/api';
-import { plainToInstance } from 'class-transformer';
+import { API } from '@/lib/api';
 import { create } from 'zustand';
 
 type TasksState = {
   tasks: Task[];
   error: string | null;
   isLoading: boolean;
+  createTaskInput: string;
+  setCreateTaskInput: (input: string) => void;
   fetchTasks: () => Promise<void>;
   createTask: (task: Task) => Promise<void>;
   updateTask: (id: string, updates: Partial<Task>) => Promise<void>;
@@ -16,15 +17,22 @@ export const useTasksStore = create<TasksState>((set, get) => ({
   tasks: [],
   error: null,
   isLoading: true,
+  createTaskInput: '',
+  setCreateTaskInput: (input: string) => {
+    set({ createTaskInput: input });
+  },
   fetchTasks: async () => {
     set({ isLoading: true });
     const data = await API.getTasks();
-    set({ tasks: plainToInstance(Task, data.results as unknown[]), error: null, isLoading: false });
+    set({ tasks: Task.toInstanceArray(data.results), error: null, isLoading: false });
   },
   createTask: async (task: Task) => {
-    const response = await API.createTask(task);
-    const createdTask = plainToInstance(Task, response);
-    set((state) => ({ tasks: [...state.tasks, createdTask] }));
+    try {
+      const response = await API.createTask(task);
+      const createdTask = Task.toInstance(response);
+      set((state) => ({ tasks: [...state.tasks, createdTask] }));
+      set({ createTaskInput: '' });
+    } catch (error) {}
   },
   updateTask: async (id: string, updates: Partial<Task>) => {
     const task = get().tasks.find((task) => task.id == id);
@@ -36,7 +44,7 @@ export const useTasksStore = create<TasksState>((set, get) => ({
     }));
 
     const response = await API.updateTask(id, updatedTask);
-    const fetchedTask = plainToInstance(Task, response);
+    const fetchedTask = Task.toInstance(response);
     set((state) => ({
       tasks: state.tasks.map((task) => (task.id === id ? fetchedTask : task)),
     }));

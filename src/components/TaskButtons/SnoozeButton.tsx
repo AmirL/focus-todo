@@ -14,7 +14,7 @@ export function snoozeTask(task: Task, date: Date): Partial<Task> {
 }
 
 export function SnoozeButton({ task }: { task: Task }) {
-  const { updateTask } = useTasksStore();
+  const updateTask = useTasksStore((state) => state.updateTask);
   const [popoverOpen, setPopoverOpen] = useState(false);
 
   const onDateSelect = (date: Date) => {

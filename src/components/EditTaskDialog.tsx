@@ -10,7 +10,7 @@ import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 export function EditTaskDialog({ task, children }: { task: Task; children: React.ReactNode }) {
-  const { updateTask } = useTasksStore();
+  const updateTask = useTasksStore((state) => state.updateTask);
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();

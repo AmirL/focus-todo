@@ -4,7 +4,7 @@ import { Star } from 'lucide-react';
 import { useTasksStore } from '@/store/tasksStore';
 
 export function StarButton({ task }: { task: Task }) {
-  const { updateTask } = useTasksStore();
+  const updateTask = useTasksStore((state) => state.updateTask);
 
   const toggleTodayTask = (task: Task) => {
     const starred = !task.starred;

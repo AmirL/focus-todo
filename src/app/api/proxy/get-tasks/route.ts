@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { validateUserSession } from '../user-auth';
 import { handleBaseRowRequest } from '../baserow';
 
+const STATUS_OK = 200;
+
 export async function POST(req: NextRequest) {
   await validateUserSession();
 
@@ -16,12 +18,12 @@ async function fetchAllPages() {
   let result;
   do {
     result = await handleBaseRowRequest('GET', null, `?page=${page}`);
-    if (result.status !== 200) return result;
+    if (result.status !== STATUS_OK) return result;
 
     tasks.push(...result.response.results);
 
     page++;
   } while (result.response.next > '');
 
-  return { results: tasks, status: 200 };
+  return { results: tasks, status: STATUS_OK };
 }

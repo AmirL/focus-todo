@@ -1,8 +1,19 @@
 import { isFutureDate } from '@/lib/utils';
-import { Expose, Transform } from 'class-transformer';
+import { Expose, instanceToPlain, plainToInstance, Transform } from 'class-transformer';
 import dayjs from 'dayjs';
 
 export const ListsNames = ['Work', 'Personal'];
+
+export type TaskPlain = {
+  id: string;
+  field_2869962: string;
+  field_2869964: string;
+  field_2910918: boolean;
+  field_2869965: string | null;
+  field_2872650: string | null;
+  field_2872651: string;
+  field_3017209: string | null;
+};
 
 export class Task {
   @Expose()
@@ -38,6 +49,18 @@ export class Task {
 
   static create(task: Partial<Task>): Task {
     return Object.assign(new Task(), task);
+  }
+
+  static toInstance(data: TaskPlain): Task {
+    return plainToInstance(Task, data);
+  }
+
+  static toInstanceArray(data: TaskPlain[]): Task[] {
+    return data.map((task) => this.toInstance(task));
+  }
+
+  static toPlain(task: Task): TaskPlain {
+    return instanceToPlain(task) as TaskPlain;
   }
 }
 

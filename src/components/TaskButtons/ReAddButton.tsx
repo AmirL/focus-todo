@@ -4,7 +4,8 @@ import { RotateCw } from 'lucide-react';
 import { useTasksStore } from '@/store/tasksStore';
 
 export function ReAddButton({ task }: { task: Task }) {
-  const { createTask, updateTask } = useTasksStore();
+  const createTask = useTasksStore((state) => state.createTask);
+  const updateTask = useTasksStore((state) => state.updateTask);
 
   const reAddTask = async () => {
     const newTask = Task.clone({
