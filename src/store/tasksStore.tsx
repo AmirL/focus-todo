@@ -1,5 +1,5 @@
 import { Task } from '@/data-classes/task';
-import { apiRequest } from '@/components/api';
+import { API, apiRequest } from '@/components/api';
 import { plainToInstance } from 'class-transformer';
 import { create } from 'zustand';
 
@@ -10,7 +10,6 @@ type TasksState = {
   fetchTasks: () => Promise<void>;
   createTask: (task: Task) => Promise<void>;
   updateTask: (id: string, updates: Partial<Task>) => Promise<void>;
-  deleteTask: (id: string) => Promise<void>;
 };
 
 export const useTasksStore = create<TasksState>((set, get) => ({
@@ -19,11 +18,12 @@ export const useTasksStore = create<TasksState>((set, get) => ({
   isLoading: true,
   fetchTasks: async () => {
     set({ isLoading: true });
-    const data = await apiRequest('');
+    const data = await API.getTasks();
     set({ tasks: plainToInstance(Task, data.results as unknown[]), error: null, isLoading: false });
   },
   createTask: async (task: Task) => {
-    const createdTask = plainToInstance(Task, await apiRequest('', 'POST', task));
+    const response = await API.createTask(task);
+    const createdTask = plainToInstance(Task, response);
     set((state) => ({ tasks: [...state.tasks, createdTask] }));
   },
   updateTask: async (id: string, updates: Partial<Task>) => {
@@ -35,16 +35,10 @@ export const useTasksStore = create<TasksState>((set, get) => ({
       tasks: state.tasks.map((task) => (task.id === id ? updatedTask : task)),
     }));
 
-    const fetchedTask = plainToInstance(Task, await apiRequest(`${id}/`, 'PATCH', updatedTask));
+    const response = await API.updateTask(id, updatedTask);
+    const fetchedTask = plainToInstance(Task, response);
     set((state) => ({
       tasks: state.tasks.map((task) => (task.id === id ? fetchedTask : task)),
     }));
-  },
-
-  deleteTask: async (id: string) => {
-    set((state) => ({
-      tasks: state.tasks.filter((task) => task.id !== id),
-    }));
-    await apiRequest(`${id}/`, 'DELETE');
   },
 }));

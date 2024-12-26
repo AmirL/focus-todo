@@ -22,3 +22,9 @@ export async function apiRequest(endpoint: string, method = 'GET', body: object 
     throw error;
   }
 }
+
+export const API = {
+  getTasks: async () => apiRequest(''),
+  createTask: async (task: object) => apiRequest('', 'POST', task),
+  updateTask: async (id: string, task: object) => apiRequest(`${id}/`, 'PATCH', task),
+};
