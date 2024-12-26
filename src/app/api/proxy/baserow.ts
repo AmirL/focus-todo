@@ -4,6 +4,7 @@ const API_URL = `https://api.baserow.io/api/database/rows/table/${TABLE_ID}/`;
 
 export async function handleBaseRowRequest(method: string, body: object | null, endpoint: string) {
   try {
+    console.log(`Sending API request to Baserow: ${method} ${API_URL}${endpoint}`, body);
     const { ok, data, status } = await sendApiRequest(method, body, endpoint);
 
     if (!ok) {

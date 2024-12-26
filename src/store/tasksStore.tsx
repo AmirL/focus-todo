@@ -1,5 +1,5 @@
 import { Task } from '@/data-classes/task';
-import { API, apiRequest } from '@/components/api';
+import { API } from '@/components/api';
 import { plainToInstance } from 'class-transformer';
 import { create } from 'zustand';
 
