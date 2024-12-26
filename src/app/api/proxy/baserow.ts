@@ -1,10 +1,10 @@
 const BASEROW_TOKEN = process.env.BASEROW_TOKEN;
 const TABLE_ID = 379718;
-const API_URL = `https://api.baserow.io/api/database/rows/table/${TABLE_ID}/`;
+const API_URL = `https://api.baserow.io/api/database/rows/table/${TABLE_ID}`;
 
 export async function handleBaseRowRequest(method: string, body: object | null, endpoint: string) {
   try {
-    console.log(`Sending API request to Baserow: ${method} ${API_URL}${endpoint}`, body);
+    console.log(`Sending API request to Baserow: ${method} ${API_URL}/${endpoint}`, body);
     const { ok, data, status } = await sendApiRequest(method, body, endpoint);
 
     if (!ok) {
@@ -32,7 +32,7 @@ async function sendApiRequest(method: string, body: object | null, endpoint: str
     body: body ? JSON.stringify(body) : undefined,
   };
 
-  const response = await fetch(`${API_URL}${endpoint}`, options);
+  const response = await fetch(`${API_URL}/${endpoint}`, options);
   const data = await response.text();
   return { ok: response.ok, data, status: response.status };
 }

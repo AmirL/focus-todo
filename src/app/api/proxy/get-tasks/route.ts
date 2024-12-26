@@ -5,6 +5,23 @@ import { handleBaseRowRequest } from '../baserow';
 export async function POST(req: NextRequest) {
   await validateUserSession();
 
-  const result = await handleBaseRowRequest('GET', null, '');
-  return NextResponse.json(result.response, { status: result.status });
+  const result = await fetchAllPages();
+
+  return NextResponse.json(result, { status: result.status });
+}
+
+async function fetchAllPages() {
+  let page = 1;
+  const tasks = [];
+  let result;
+  do {
+    result = await handleBaseRowRequest('GET', null, `?page=${page}`);
+    if (result.status !== 200) return result;
+
+    tasks.push(...result.response.results);
+
+    page++;
+  } while (result.response.next > '');
+
+  return { results: tasks, status: 200 };
 }
