@@ -27,13 +27,15 @@ export const useTasksStore = create<TasksState>((set, get) => ({
     set({ tasks: Task.fromPlainArray(data.tasks), isLoading: false });
   },
   createTask: async (task: Task) => {
+    const inputValue = get().createTaskInput;
     try {
+      set({ createTaskInput: '' });
       const response = await API.createTask(task);
       const createdTask = Task.toInstance(response);
       set((state) => ({ tasks: [...state.tasks, createdTask] }));
-      set({ createTaskInput: '' });
     } catch (error) {
       // error message was shown in the toast
+      set({ createTaskInput: inputValue });
     }
   },
   updateTask: async (id: string, updates: Partial<Task>) => {

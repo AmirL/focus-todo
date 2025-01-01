@@ -36,6 +36,8 @@ export function TodoList() {
       {/* <Actions tasks={tasks} /> */}
       <Filters />
       <Tasks tasks={tasks} />
+      <Filters />
+      <AddTaskForm />
     </>
   );
 }
