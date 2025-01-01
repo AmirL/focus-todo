@@ -1,5 +1,5 @@
 import { Task } from '@/data-classes/task';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/lib/ui/button';
 import { Trash2 } from 'lucide-react';
 import { useTasksStore } from '@/store/tasksStore';
 

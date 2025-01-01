@@ -1,6 +1,7 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/lib/ui/button';
 import { isTaskActive, isTaskCompletedAgo, isTaskDeleted, isTaskInFuture, ListsNames, Task } from '@/data-classes/task';
 import { StatusFilterEnum, useFilterStore } from '@/store/filterStore';
+import { MainBlock } from './MainBlock';
 
 export function useApplyFilters(tasks: Task[]) {
   const { statusFilter, list } = useFilterStore();
@@ -24,10 +25,10 @@ function applyStatusFilter(task: Task, filter: StatusFilterEnum) {
 
 export function Filters() {
   return (
-    <div className="my-4 flex flex-wrap items-center justify-between gap-4">
+    <MainBlock title="Filters">
       <SpecialFiltersGroup />
       <ListFiltersGroup />
-    </div>
+    </MainBlock>
   );
 }
 

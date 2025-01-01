@@ -1,9 +1,9 @@
 import { Task } from '@/data-classes/task';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/lib/ui/button';
 import { RotateCw } from 'lucide-react';
 import { useTasksStore } from '@/store/tasksStore';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/lib/ui/popover';
+import { Calendar } from '@/lib/ui/calendar';
 import { useState } from 'react';
 
 export function ReAddButton({ task }: { task: Task }) {

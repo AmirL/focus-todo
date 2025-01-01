@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/lib/ui/alert';
 import { useTasksStore } from '@/store/tasksStore';
-import { TaskRow } from './Task';
-import { AddTaskForm } from './AddTaskForm';
-import { Filters, useApplyFilters } from './Filters';
+import { TaskRow } from '../Task';
 import { Task } from '@/data-classes/task';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { Filters, useApplyFilters } from './Filters';
+import { AddTaskForm } from '../Task/AddTaskForm';
 
 export function TodoList() {
   const { user, error, isLoading } = useUser();

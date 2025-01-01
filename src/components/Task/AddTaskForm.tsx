@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/lib/ui/textarea';
+import { Button } from '@/lib/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/lib/ui/select';
 import { ListsNames, Task } from '@/data-classes/task';
 import { useTasksStore } from '@/store/tasksStore';
-import { Checkbox } from './ui/checkbox';
-import { Label } from './ui/label';
 import { PlusCircle, Star } from 'lucide-react';
+import { Label } from '@/lib/ui/label';
+import { Checkbox } from '@/lib/ui/checkbox';
 
 export function AddTaskForm() {
   const createTask = useTasksStore((state) => state.createTask);
