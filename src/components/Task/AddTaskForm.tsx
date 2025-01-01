@@ -18,7 +18,7 @@ export function AddTaskForm() {
   const addTodo = async () => {
     const todoTexts = createTaskInput.split('\n').filter((text) => text.trim() !== '');
     todoTexts.forEach(async (text) => {
-      const newTask = Task.create({ name: text, list: selectedList, starred: isStarred });
+      const newTask = Task.create({ name: text, list: selectedList, selectedAt: new Date() });
       await createTask(newTask);
     });
   };

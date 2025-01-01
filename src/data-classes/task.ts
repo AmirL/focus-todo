@@ -25,8 +25,8 @@ export class Task {
   // @Expose({ name: 'field_2869964' })
   details!: string;
 
-  @Expose({ name: 'selected' })
-  starred!: boolean;
+  @Transform(transformDateToString, { toPlainOnly: true })
+  selectedAt?: Date | null;
 
   // @Expose({ name: 'field_2869965' })
   @Transform(transformDateToString, { toPlainOnly: true })
@@ -78,6 +78,10 @@ export function isTaskDeleted(task: Task) {
 
 export function isTaskCompletedAgo(task: Task) {
   return !!task.completedAt && dayjs(task.completedAt).isBefore(dayjs().subtract(1, 'day'));
+}
+
+export function isTaskSelected(task: Task) {
+  return !!task.selectedAt && dayjs(task.selectedAt).isSame(dayjs(), 'day');
 }
 
 function transformDateToString({ value }: { value: Date | null }) {

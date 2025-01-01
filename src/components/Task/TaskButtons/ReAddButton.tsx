@@ -17,7 +17,7 @@ export function ReAddButton({ task }: { task: Task }) {
       ...task,
       completedAt: null,
       date,
-      starred: false,
+      selectedAt: null,
     });
     createTask(newTask);
 

@@ -4,21 +4,14 @@ import { Clock } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/lib/ui/popover';
 import { Calendar } from '@/lib/ui/calendar';
 import { useTasksStore } from '@/store/tasksStore';
-import dayjs from 'dayjs';
 import { useState } from 'react';
-
-export function snoozeTask(task: Task, date: Date): Partial<Task> {
-  const dateIsAfterToday = dayjs(date).isAfter(dayjs().endOf('day'));
-  const starred = dateIsAfterToday ? false : task.starred;
-  return { date, starred };
-}
 
 export function SnoozeButton({ task }: { task: Task }) {
   const updateTask = useTasksStore((state) => state.updateTask);
   const [popoverOpen, setPopoverOpen] = useState(false);
 
   const onDateSelect = (date: Date) => {
-    updateTask(task.id, snoozeTask(task, date));
+    updateTask(task.id, { date, selectedAt: null });
     setPopoverOpen(false);
   };
 

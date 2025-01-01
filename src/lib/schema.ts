@@ -7,7 +7,7 @@ export const tasksTable = mysqlTable('tasks', {
   date: date('date'),
   completedAt: date('completed_at'),
   list: varchar('list', { length: 255 }).notNull(),
-  selected: boolean('selected').notNull().default(false),
+  selectedAt: date('selected_at'),
   uid: int('uid'),
   deletedAt: date('deleted_at'),
 });

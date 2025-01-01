@@ -1,7 +1,16 @@
 import { Button } from '@/lib/ui/button';
-import { isTaskActive, isTaskCompletedAgo, isTaskDeleted, isTaskInFuture, ListsNames, Task } from '@/data-classes/task';
+import {
+  isTaskActive,
+  isTaskCompletedAgo,
+  isTaskDeleted,
+  isTaskInFuture,
+  isTaskSelected,
+  ListsNames,
+  Task,
+} from '@/data-classes/task';
 import { StatusFilterEnum, useFilterStore } from '@/store/filterStore';
 import { MainBlock } from './MainBlock';
+import dayjs from 'dayjs';
 
 export function useApplyFilters(tasks: Task[]) {
   const { statusFilter, list } = useFilterStore();
@@ -19,7 +28,7 @@ function applyStatusFilter(task: Task, filter: StatusFilterEnum) {
     case StatusFilterEnum.FUTURE:
       return isTaskInFuture(task);
     case StatusFilterEnum.SELECTED:
-      return task.starred;
+      return isTaskSelected(task);
   }
 }
 
