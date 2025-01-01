@@ -24,7 +24,7 @@ export const useTasksStore = create<TasksState>((set, get) => ({
   fetchTasks: async () => {
     set({ isLoading: true });
     const data = await API.getTasks();
-    set({ tasks: Task.toInstanceArray(data.results), error: null, isLoading: false });
+    set({ tasks: Task.fromPlainArray(data.tasks), error: null, isLoading: false });
   },
   createTask: async (task: Task) => {
     try {

@@ -27,7 +27,7 @@ async function proxy(endpoint: string, body: object | undefined = undefined) {
 }
 
 export const API = {
-  getTasks: async () => proxy('get-tasks') as Promise<{ results: TaskPlain[] }>,
+  getTasks: async () => proxy('get-tasks') as Promise<{ tasks: TaskPlain[] }>,
   createTask: async (task: Task) => proxy('create-task', { task: Task.toPlain(task) }) as Promise<TaskPlain>,
   updateTask: async (id: string, task: Task) =>
     proxy(`update-task`, { id, task: Task.toPlain(task) }) as Promise<TaskPlain>,

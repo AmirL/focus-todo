@@ -19,27 +19,27 @@ export class Task {
   @Expose()
   id!: string;
 
-  @Expose({ name: 'field_2869962' })
+  // @Expose({ name: 'field_2869962' })
   name!: string;
 
-  @Expose({ name: 'field_2869964' })
+  // @Expose({ name: 'field_2869964' })
   details!: string;
 
-  @Expose({ name: 'field_2910918' })
+  @Expose({ name: 'selected' })
   starred!: boolean;
 
-  @Expose({ name: 'field_2869965' })
+  // @Expose({ name: 'field_2869965' })
   @Transform(transformDateToString, { toPlainOnly: true })
   date?: Date | null;
 
-  @Expose({ name: 'field_2872650' })
+  // @Expose({ name: 'field_2872650' })
   @Transform(transformDateToString, { toPlainOnly: true })
   completedAt?: Date | null;
 
-  @Expose({ name: 'field_2872651' })
+  // @Expose({ name: 'field_2872651' })
   list!: string;
 
-  @Expose({ name: 'field_3017209' })
+  // @Expose({ name: 'field_3017209' })
   @Transform(transformDateToString, { toPlainOnly: true })
   deletedAt?: Date | null;
 
@@ -55,7 +55,7 @@ export class Task {
     return plainToInstance(Task, data);
   }
 
-  static toInstanceArray(data: TaskPlain[]): Task[] {
+  static fromPlainArray(data: TaskPlain[]): Task[] {
     return data.map((task) => this.toInstance(task));
   }
 
