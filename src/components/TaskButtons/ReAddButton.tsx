@@ -2,25 +2,48 @@ import { Task } from '@/data-classes/task';
 import { Button } from '@/components/ui/button';
 import { RotateCw } from 'lucide-react';
 import { useTasksStore } from '@/store/tasksStore';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { useState } from 'react';
 
 export function ReAddButton({ task }: { task: Task }) {
   const createTask = useTasksStore((state) => state.createTask);
   const updateTask = useTasksStore((state) => state.updateTask);
 
-  const reAddTask = async () => {
+  const [popoverOpen, setPopoverOpen] = useState(false);
+
+  const reAddTask = async (date: Date) => {
     const newTask = Task.clone({
       ...task,
       completedAt: null,
-      date: null,
+      date,
       starred: false,
     });
     createTask(newTask);
 
     updateTask(task.id, { completedAt: new Date() });
   };
+
+  const onDateSelect = (date: Date) => {
+    reAddTask(date);
+    setPopoverOpen(false);
+  };
+
   return (
-    <Button variant="ghost" size="icon" onClick={reAddTask} className="text-primary">
-      <RotateCw className="h-4 w-4" />
-    </Button>
+    <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" size="icon" className="text-primary">
+          <RotateCw className="h-4 w-4" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="end">
+        <Calendar
+          mode="single"
+          selected={task.date ? task.date : undefined}
+          onSelect={(date) => date && onDateSelect(date)}
+          initialFocus
+        />
+      </PopoverContent>
+    </Popover>
   );
 }
