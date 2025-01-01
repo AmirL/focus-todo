@@ -1,3 +1,7 @@
 import { drizzle } from 'drizzle-orm/mysql2';
-// const db = drizzle(process.env.DATABASE_URL);
-export const DB = drizzle(`mysql://root:root@127.0.0.1/doable`);
+
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL is not defined');
+}
+
+export const DB = drizzle(process.env.DATABASE_URL);
