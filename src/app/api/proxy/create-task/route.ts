@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateUserSession } from '../user-auth';
-import { handleBaseRowRequest } from '../baserow';
+import { DB } from '@/lib/db';
+import { tasksTable } from '@/lib/schema';
+import { eq } from 'drizzle-orm';
 
 export async function POST(req: NextRequest) {
   await validateUserSession();
 
   const { task } = await req.json();
 
-  const result = await handleBaseRowRequest('POST', task, ``);
-  return NextResponse.json(result.response, { status: result.status });
+  const [{ id }] = await DB.insert(tasksTable).values(task).$returningId();
+  const [createdTask] = await DB.select().from(tasksTable).where(eq(tasksTable.id, id));
+
+  return NextResponse.json(createdTask, { status: 200 });
 }
