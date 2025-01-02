@@ -9,6 +9,8 @@ export async function POST(req: NextRequest) {
 
   const { task } = await req.json();
 
+  task.id = undefined;
+
   const [{ id }] = await DB.insert(tasksTable).values(task).$returningId();
   const [createdTask] = await DB.select().from(tasksTable).where(eq(tasksTable.id, id));
 
