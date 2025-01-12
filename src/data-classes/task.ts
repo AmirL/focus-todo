@@ -1,55 +1,40 @@
 import { isFutureDate } from '@/lib/utils';
-import { Expose, instanceToPlain, plainToInstance, Transform } from 'class-transformer';
+import { instanceToPlain, plainToInstance, Transform } from 'class-transformer';
 import dayjs from 'dayjs';
 
 export const ListsNames = ['Work', 'Personal'];
 
 export type TaskPlain = {
   id: string;
-  field_2869962: string;
-  field_2869964: string;
-  field_2910918: boolean;
-  field_2869965: string | null;
-  field_2872650: string | null;
-  field_2872651: string;
-  field_3017209: string | null;
+  name: string;
+  details: string;
+  selectedAt: string;
+  date: string;
+  completedAt: string;
+  list: string;
+  deletedAt: string;
 };
 
 export class Task {
-  @Expose()
   id!: string;
 
-  // @Expose({ name: 'field_2869962' })
   name!: string;
 
-  // @Expose({ name: 'field_2869964' })
   details!: string;
 
   @Transform(transformDateToString, { toPlainOnly: true })
   selectedAt?: Date | null;
 
-  // @Expose({ name: 'field_2869965' })
   @Transform(transformDateToString, { toPlainOnly: true })
   date?: Date | null;
 
-  // @Expose({ name: 'field_2872650' })
   @Transform(transformDateToString, { toPlainOnly: true })
   completedAt?: Date | null;
 
-  // @Expose({ name: 'field_2872651' })
   list!: string;
 
-  // @Expose({ name: 'field_3017209' })
   @Transform(transformDateToString, { toPlainOnly: true })
   deletedAt?: Date | null;
-
-  static clone(task: Task): Task {
-    return Object.assign(new Task(), task);
-  }
-
-  static create(task: Partial<Task>): Task {
-    return Object.assign(new Task(), task);
-  }
 
   static toInstance(data: TaskPlain): Task {
     return plainToInstance(Task, data);

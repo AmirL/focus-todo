@@ -7,6 +7,7 @@ import { useTasksStore } from '@/store/tasksStore';
 import { PlusCircle, Star } from 'lucide-react';
 import { Label } from '@/lib/ui/label';
 import { Checkbox } from '@/lib/ui/checkbox';
+import { createInstance } from '@/lib/instance-tools';
 
 export function AddTaskForm() {
   const createTask = useTasksStore((state) => state.createTask);
@@ -18,7 +19,11 @@ export function AddTaskForm() {
   const addTodo = async () => {
     const todoTexts = createTaskInput.split('\n').filter((text) => text.trim() !== '');
     todoTexts.forEach(async (text) => {
-      const newTask = Task.create({ name: text, list: selectedList, selectedAt: new Date() });
+      const newTask = createInstance(Task, {
+        name: text,
+        list: selectedList,
+        selectedAt: isStarred ? new Date() : null,
+      });
       await createTask(newTask);
     });
   };

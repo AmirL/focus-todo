@@ -5,6 +5,7 @@ import { useTasksStore } from '@/store/tasksStore';
 import { Popover, PopoverContent, PopoverTrigger } from '@/lib/ui/popover';
 import { Calendar } from '@/lib/ui/calendar';
 import { useState } from 'react';
+import { cloneInstance } from '@/lib/instance-tools';
 
 export function ReAddButton({ task }: { task: Task }) {
   const createTask = useTasksStore((state) => state.createTask);
@@ -13,12 +14,7 @@ export function ReAddButton({ task }: { task: Task }) {
   const [popoverOpen, setPopoverOpen] = useState(false);
 
   const reAddTask = async (date: Date) => {
-    const newTask = Task.clone({
-      ...task,
-      completedAt: null,
-      date,
-      selectedAt: null,
-    });
+    const newTask = cloneInstance(task, { completedAt: null, date, selectedAt: null });
     createTask(newTask);
 
     updateTask(task.id, { completedAt: new Date() });

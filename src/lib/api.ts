@@ -1,7 +1,8 @@
+import { GoalPlain } from '@/data-classes/goal';
 import { Task, TaskPlain } from '@/data-classes/task';
 import toast from 'react-hot-toast';
 
-async function proxy(endpoint: string, body: object | undefined = undefined) {
+async function api(endpoint: string, body: object | undefined = undefined) {
   const options = {
     method: 'POST',
     headers: {
@@ -10,6 +11,7 @@ async function proxy(endpoint: string, body: object | undefined = undefined) {
     body: JSON.stringify(body),
   };
 
+  console.log('endpoint', endpoint);
   try {
     const response = await fetch(`/api/${endpoint}`, options);
     if (!response.ok) {
@@ -27,8 +29,9 @@ async function proxy(endpoint: string, body: object | undefined = undefined) {
 }
 
 export const API = {
-  getTasks: async () => proxy('get-tasks') as Promise<{ tasks: TaskPlain[] }>,
-  createTask: async (task: Task) => proxy('create-task', { task: Task.toPlain(task) }) as Promise<TaskPlain>,
+  getGoals: async () => api('get-goals') as Promise<{ goals: GoalPlain[] }>,
+  getTasks: async () => api('get-tasks') as Promise<{ tasks: TaskPlain[] }>,
+  createTask: async (task: Task) => api('create-task', { task: Task.toPlain(task) }) as Promise<TaskPlain>,
   updateTask: async (id: string, task: Task) =>
-    proxy(`update-task`, { id, task: Task.toPlain(task) }) as Promise<TaskPlain>,
+    api(`update-task`, { id, task: Task.toPlain(task) }) as Promise<TaskPlain>,
 };

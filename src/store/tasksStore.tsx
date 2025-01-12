@@ -10,8 +10,6 @@ type TasksState = {
   fetchTasks: () => Promise<void>;
   createTask: (task: Task) => Promise<void>;
   updateTask: (id: string, updates: Partial<Task>) => Promise<void>;
-  clearSelectedTasks: () => void;
-  clearCompletedTasks: () => void;
 };
 
 export const useTasksStore = create<TasksState>((set, get) => ({
@@ -52,11 +50,5 @@ export const useTasksStore = create<TasksState>((set, get) => ({
     set((state) => ({
       tasks: state.tasks.map((task) => (task.id === id ? fetchedTask : task)),
     }));
-  },
-  clearSelectedTasks: () => {
-    // set({ tasks: get().tasks.filter((task) => !task.isSelected) });
-  },
-  clearCompletedTasks: () => {
-    // set({ tasks: get().tasks.filter((task) => !task.isCompleted) });
   },
 }));
