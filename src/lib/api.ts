@@ -11,7 +11,7 @@ async function proxy(endpoint: string, body: object | undefined = undefined) {
   };
 
   try {
-    const response = await fetch(`/api/proxy/${endpoint}`, options);
+    const response = await fetch(`/api/${endpoint}`, options);
     if (!response.ok) {
       const errorMessage = await response.text();
       throw new Error(`HTTP error! status: ${response.status}, message: ${errorMessage}`);
