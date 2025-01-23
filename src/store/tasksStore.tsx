@@ -1,6 +1,7 @@
 import { Task } from '@/data-classes/task';
 import { API } from '@/lib/api';
 import { create } from 'zustand';
+import toast from 'react-hot-toast';
 
 type TasksState = {
   tasks: Task[];
@@ -31,6 +32,7 @@ export const useTasksStore = create<TasksState>((set, get) => ({
       const response = await API.createTask(task);
       const createdTask = Task.toInstance(response);
       set((state) => ({ tasks: [...state.tasks, createdTask] }));
+      toast.success('Task created');
     } catch (error) {
       // error message was shown in the toast
       set({ createTaskInput: inputValue });
