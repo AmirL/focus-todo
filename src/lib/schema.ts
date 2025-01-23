@@ -10,6 +10,7 @@ export const tasksTable = mysqlTable('tasks', {
   selectedAt: date('selected_at'),
   uid: int('uid'),
   deletedAt: date('deleted_at'),
+  updatedAt: date('updated_at'),
 });
 
 export const goalsTable = mysqlTable('goals', {

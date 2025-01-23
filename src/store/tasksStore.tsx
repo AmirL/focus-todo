@@ -43,6 +43,7 @@ export const useTasksStore = create<TasksState>((set, get) => ({
     if (!task) return;
 
     const updatedTask = Object.assign(new Task(), { ...task, ...updates });
+    updatedTask.updatedAt = new Date();
     set((state) => ({
       tasks: state.tasks.map((task) => (task.id === id ? updatedTask : task)),
     }));

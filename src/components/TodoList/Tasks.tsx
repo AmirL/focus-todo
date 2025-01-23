@@ -6,6 +6,7 @@ import { useApplyFilters } from './Filters';
 export function Tasks() {
   const fetchTasks = useTasksStore((state) => state.fetchTasks);
   const allTasks = useTasksStore((state) => state.tasks);
+  const isLoading = useTasksStore((state) => state.isLoading);
 
   const tasks = useApplyFilters(allTasks);
 
@@ -13,9 +14,7 @@ export function Tasks() {
     if (allTasks.length === 0) fetchTasks();
   }, [fetchTasks, allTasks.length]);
 
-  const isLoading = useTasksStore((state) => state.isLoading);
-
-  if (isLoading) {
+  if (isLoading && allTasks.length === 0) {
     return <div className="flex justify-center items-center h-5">Loading...</div>;
   }
 

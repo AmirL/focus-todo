@@ -1,6 +1,8 @@
 import { isFutureDate } from '@/lib/utils';
 import { instanceToPlain, plainToInstance, Transform } from 'class-transformer';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 
 export const ListsNames = ['Work', 'Personal'];
 
@@ -36,6 +38,9 @@ export class Task {
   @Transform(transformDateToString, { toPlainOnly: true })
   deletedAt?: Date | null;
 
+  @Transform(transformDateToString, { toPlainOnly: true })
+  updatedAt!: Date;
+
   static toInstance(data: TaskPlain): Task {
     return plainToInstance(Task, data);
   }
@@ -70,5 +75,6 @@ export function isTaskSelected(task: Task) {
 }
 
 function transformDateToString({ value }: { value: Date | null }) {
-  return value ? dayjs(value).format('YYYY-MM-DD') : null;
+  if (!value) return null;
+  return dayjs(value).utc().format('YYYY-MM-DD HH:mm:ss');
 }
