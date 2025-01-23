@@ -13,6 +13,21 @@ type TasksState = {
   updateTask: (id: string, updates: Partial<Task>) => Promise<void>;
 };
 
+function syncTasks(existingTasks: Task[], fetchedTasks: Task[]): Task[] {
+  const mergedTasks = fetchedTasks.map((fetchedTask) => {
+    const existingTask = existingTasks.find((task) => task.id === fetchedTask.id);
+    if (existingTask) {
+      return existingTask.updatedAt > fetchedTask.updatedAt ? existingTask : fetchedTask;
+    }
+    return fetchedTask;
+  });
+
+  // Add any tasks that are in existingTasks but not in fetchedTasks
+  const newTasks = existingTasks.filter((task) => !fetchedTasks.some((fetchedTask) => fetchedTask.id === task.id));
+
+  return [...mergedTasks, ...newTasks];
+}
+
 export const useTasksStore = create<TasksState>((set, get) => ({
   tasks: [],
   isLoading: true,
@@ -21,9 +36,15 @@ export const useTasksStore = create<TasksState>((set, get) => ({
     set({ createTaskInput: input });
   },
   fetchTasks: async () => {
+    console.log('fetching tasks');
     set({ isLoading: true });
     const data = await API.getTasks();
-    set({ tasks: Task.fromPlainArray(data.tasks), isLoading: false });
+    const fetchedTasks = Task.fromPlainArray(data.tasks);
+
+    set((state) => ({
+      tasks: syncTasks(state.tasks, fetchedTasks),
+      isLoading: false,
+    }));
   },
   createTask: async (task: Task) => {
     const inputValue = get().createTaskInput;
