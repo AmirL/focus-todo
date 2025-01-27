@@ -38,7 +38,7 @@ export class Task {
   @Transform(transformDateToString, { toPlainOnly: true })
   deletedAt?: Date | null;
 
-  @Transform(transformDateToString, { toPlainOnly: true })
+  @Transform(transformDateToUTCString, { toPlainOnly: true })
   updatedAt!: Date;
 
   static toInstance(data: TaskPlain): Task {
@@ -75,6 +75,11 @@ export function isTaskSelected(task: Task) {
 }
 
 function transformDateToString({ value }: { value: Date | null }) {
+  if (!value) return null;
+  return dayjs(value).format('YYYY-MM-DD HH:mm:ss');
+}
+
+function transformDateToUTCString({ value }: { value: Date | null }) {
   if (!value) return null;
   return dayjs(value).utc().format('YYYY-MM-DD HH:mm:ss');
 }
