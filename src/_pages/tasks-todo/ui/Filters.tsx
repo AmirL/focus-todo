@@ -8,9 +8,9 @@ import {
   ListsNames,
   TaskModel,
 } from '@/entities/task/model/task';
-import { StatusFilterEnum, useFilterStore } from '@/store/filterStore';
+import { StatusFilterEnum, useFilterStore } from '@/_pages/tasks-todo/model/filterStore';
 import { MainBlock } from './MainBlock';
-import dayjs from 'dayjs';
+import { useTasksStore } from '@/entities/task/model/tasksStore';
 
 export function useApplyFilters(tasks: TaskModel[]) {
   const { statusFilter, list } = useFilterStore();
@@ -44,26 +44,27 @@ export function Filters() {
 function SpecialFiltersGroup() {
   const { statusFilter, setStatusFilter } = useFilterStore();
 
+  const handleSetActive = () => {
+    setStatusFilter(StatusFilterEnum.ACTIVE);
+  };
+
+  const handleSetSelected = () => {
+    setStatusFilter(StatusFilterEnum.SELECTED);
+  };
+
+  const handleSetFuture = () => {
+    setStatusFilter(StatusFilterEnum.FUTURE);
+  };
+
   return (
     <div className="flex gap-2">
-      <Button
-        variant={statusFilter === StatusFilterEnum.ACTIVE ? 'default' : 'outline'}
-        onClick={() => {
-          setStatusFilter(StatusFilterEnum.ACTIVE);
-        }}
-      >
+      <Button variant={statusFilter === StatusFilterEnum.ACTIVE ? 'default' : 'outline'} onClick={handleSetActive}>
         Active
       </Button>
-      <Button
-        variant={statusFilter === 'selected' ? 'default' : 'outline'}
-        onClick={() => setStatusFilter(StatusFilterEnum.SELECTED)}
-      >
+      <Button variant={statusFilter === StatusFilterEnum.SELECTED ? 'default' : 'outline'} onClick={handleSetSelected}>
         Selected
       </Button>
-      <Button
-        variant={statusFilter === 'future' ? 'default' : 'outline'}
-        onClick={() => setStatusFilter(StatusFilterEnum.FUTURE)}
-      >
+      <Button variant={statusFilter === StatusFilterEnum.FUTURE ? 'default' : 'outline'} onClick={handleSetFuture}>
         Future
       </Button>
     </div>
@@ -73,10 +74,26 @@ function SpecialFiltersGroup() {
 function ListFiltersGroup() {
   const { list, setList } = useFilterStore();
 
+  const setShowTaskList = useTasksStore((state) => state.setShowTaskList);
+
+  const handleSetList = (listName: string) => {
+    if (list != listName) {
+      setList(listName);
+      setShowTaskList(false);
+    } else {
+      setList('');
+      setShowTaskList(true);
+    }
+  };
+
   return (
     <div className="flex gap-2">
       {ListsNames.map((listName) => (
-        <Button key={listName} variant={list === listName ? 'default' : 'outline'} onClick={() => setList(listName)}>
+        <Button
+          key={listName}
+          variant={list === listName ? 'default' : 'outline'}
+          onClick={() => handleSetList(listName)}
+        >
           {listName}
         </Button>
       ))}

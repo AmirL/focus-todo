@@ -8,6 +8,8 @@ import { fetchAllTasks } from '../api/fetchAllTasks';
 type TasksState = {
   tasks: TaskModel[];
   isLoading: boolean;
+  showTaskList: boolean;
+  setShowTaskList: (show: boolean) => void;
   fetchTasks: () => Promise<void>;
   createTask: (task: TaskModel) => Promise<void>;
   updateTask: (id: string, updates: Partial<TaskModel>) => Promise<void>;
@@ -31,6 +33,8 @@ function syncTasks(existingTasks: TaskModel[], fetchedTasks: TaskModel[]): TaskM
 export const useTasksStore = create<TasksState>((set, get) => ({
   tasks: [],
   isLoading: true,
+  showTaskList: true,
+  setShowTaskList: (show: boolean) => set({ showTaskList: show }),
   fetchTasks: async () => {
     console.log('fetching tasks');
     set({ isLoading: true });

@@ -1,15 +1,9 @@
-import { useGoalsStore } from '@/entities/goal/model/goalsStore';
 import { MainBlock } from './MainBlock';
-import { useEffect } from 'react';
 import { Goal } from '@/entities/goal/ui/Goal';
+import { useGoalsLoader } from '../api/useGoalsLoader';
 
 export function Goals() {
-  const fetchGoals = useGoalsStore((state) => state.fetchGoals);
-  const goals = useGoalsStore((state) => state.goals);
-
-  useEffect(() => {
-    if (goals.length == 0) fetchGoals();
-  }, [fetchGoals, goals.length]);
+  const goals = useGoalsLoader();
 
   return (
     <>

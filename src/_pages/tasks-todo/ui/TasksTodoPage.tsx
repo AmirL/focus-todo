@@ -1,5 +1,5 @@
 'use client';
-import Profile from './Profile';
+import Profile from '@/entities/user/ui/Profile';
 import { TodoList } from './TodoList';
 
 export function TasksTodoPage() {
