@@ -11,6 +11,13 @@ import {
 import { StatusFilterEnum, useFilterStore } from '@/_pages/tasks-todo/model/filterStore';
 import { MainBlock } from './MainBlock';
 import { useTasksStore } from '@/entities/task/model/tasksStore';
+import dayjs from 'dayjs';
+
+export function useSortedTasks(tasks: TaskModel[]) {
+  const statusFilter = useFilterStore((store) => store.statusFilter);
+
+  return statusFilter == StatusFilterEnum.FUTURE ? sortTasksByDate(tasks) : tasks;
+}
 
 export function useApplyFilters(tasks: TaskModel[]) {
   const { statusFilter, list } = useFilterStore();
@@ -99,4 +106,12 @@ function ListFiltersGroup() {
       ))}
     </div>
   );
+}
+
+function sortTasksByDate(tasks: TaskModel[]) {
+  return tasks.sort((a, b) => unixTime(a.date) - unixTime(b.date));
+}
+
+function unixTime(date: Date | null | undefined) {
+  return date ? dayjs(date).unix() : 0;
 }

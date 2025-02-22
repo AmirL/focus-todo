@@ -1,11 +1,12 @@
-import { useApplyFilters } from './Filters';
+import { useApplyFilters, useSortedTasks } from './Filters';
 import { Task } from '@/entities/task/ui/Task';
 import { useTasksLoader } from '../api/useTasksLoader';
 
 export function Tasks() {
   const { allTasks, isLoading } = useTasksLoader();
 
-  const tasks = useApplyFilters(allTasks);
+  const filteredTasks = useApplyFilters(allTasks);
+  const tasks = useSortedTasks(filteredTasks);
 
   if (isLoading && allTasks.length === 0) {
     return <div className="flex justify-center items-center h-5">Loading...</div>;
