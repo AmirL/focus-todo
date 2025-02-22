@@ -1,4 +1,4 @@
-import { isFutureDate } from '@/lib/utils';
+import { isFutureDate } from '@/shared/lib/utils';
 import { instanceToPlain, plainToInstance, Transform } from 'class-transformer';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';

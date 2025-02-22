@@ -7,7 +7,7 @@ import { DeleteButton } from './TaskButtons/DeleteButton';
 import { ReAddButton } from './TaskButtons/ReAddButton';
 import { SnoozeButton } from './TaskButtons/SnoozeButton';
 import { useFilterStore } from '@/store/filterStore';
-import { cn, isFutureDate, isToday } from '@/lib/utils';
+import { cn, isFutureDate, isToday } from '@/shared/lib/utils';
 import dayjs from 'dayjs';
 import { EditTaskButton } from './TaskButtons/EditTaskButton';
 import ReactMarkdown from 'react-markdown';

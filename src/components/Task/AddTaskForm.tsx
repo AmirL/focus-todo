@@ -7,7 +7,7 @@ import { useTasksStore } from '@/store/tasksStore';
 import { PlusCircle, Star } from 'lucide-react';
 import { Label } from '@/shared/ui/label';
 import { Checkbox } from '@/shared/ui/checkbox';
-import { createInstance } from '@/lib/instance-tools';
+import { createInstance } from '@/shared/lib/instance-tools';
 
 export function AddTaskForm() {
   const createTask = useTasksStore((state) => state.createTask);

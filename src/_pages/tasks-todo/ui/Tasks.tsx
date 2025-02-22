@@ -1,6 +1,6 @@
 import { useTasksStore } from '@/store/tasksStore';
 import { useEffect } from 'react';
-import { TaskRow } from '../Task';
+import { TaskRow } from '../../../components/Task';
 import { useApplyFilters } from './Filters';
 
 export function Tasks() {

@@ -8,22 +8,22 @@ export type GoalPlain = {
   deletedAt: string;
 };
 
-export class Goal {
+export class GoalModel {
   id!: string;
   title!: string;
   progress!: number;
   list!: string;
   deletedAt!: string;
 
-  static toInstance(data: GoalPlain): Goal {
-    return plainToInstance(Goal, data);
+  static toInstance(data: GoalPlain): GoalModel {
+    return plainToInstance(GoalModel, data);
   }
 
-  static fromPlainArray(data: GoalPlain[]): Goal[] {
+  static fromPlainArray(data: GoalPlain[]): GoalModel[] {
     return data.map((task) => this.toInstance(task));
   }
 
-  static toPlain(task: Goal): GoalPlain {
+  static toPlain(task: GoalModel): GoalPlain {
     return instanceToPlain(task) as GoalPlain;
   }
 }

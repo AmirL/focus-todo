@@ -1,8 +1,7 @@
 import { useGoalsStore } from '@/store/goalsStore';
 import { MainBlock } from './MainBlock';
-import { useEffect, useState } from 'react';
-import { Goal } from '@/data-classes/goal';
-import { Progress } from '../ui/progress';
+import { useEffect } from 'react';
+import { Goal } from '@/entities/goal/ui/Goal';
 
 export function Goals() {
   const fetchGoals = useGoalsStore((state) => state.fetchGoals);
@@ -18,22 +17,11 @@ export function Goals() {
         <div className="flex flex-col w-max">
           {goals.map((goal) => (
             <>
-              <RenderGoal goal={goal} key={goal.id} />
+              <Goal goal={goal} key={goal.id} />
             </>
           ))}
         </div>
       </MainBlock>
-    </>
-  );
-}
-
-function RenderGoal({ goal }: { goal: Goal }) {
-  return (
-    <>
-      <div className="flex items-center">
-        <Progress value={goal.progress} className="mr-4 w-10" />
-        <span className="flex-grow truncate">{goal.title}</span>
-      </div>
     </>
   );
 }

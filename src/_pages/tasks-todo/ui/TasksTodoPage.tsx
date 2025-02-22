@@ -1,6 +1,6 @@
 'use client';
-import Profile from '@/components/Profile';
-import { TodoList } from '@/components/TodoList';
+import Profile from './Profile';
+import { TodoList } from './TodoList';
 
 export function TasksTodoPage() {
   return (

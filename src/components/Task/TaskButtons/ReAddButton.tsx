@@ -5,7 +5,7 @@ import { useTasksStore } from '@/store/tasksStore';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { Calendar } from '@/shared/ui/calendar';
 import { useState } from 'react';
-import { cloneInstance } from '@/lib/instance-tools';
+import { cloneInstance } from '@/shared/lib/instance-tools';
 
 export function ReAddButton({ task }: { task: Task }) {
   const createTask = useTasksStore((state) => state.createTask);

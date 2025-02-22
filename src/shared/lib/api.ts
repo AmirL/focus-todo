@@ -1,4 +1,4 @@
-import { GoalPlain } from '@/data-classes/goal';
+import { GoalPlain } from '@/entities/goal/model/goal';
 import { Task, TaskPlain } from '@/data-classes/task';
 import toast from 'react-hot-toast';
 

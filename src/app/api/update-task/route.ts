@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateUserSession } from '../user-auth';
-import { DB } from '@/lib/db';
-import { tasksTable } from '@/lib/schema';
+import { DB } from '@/shared/lib/db';
+import { tasksTable } from '@/shared/lib/schema';
 import { eq } from 'drizzle-orm';
 
 export async function POST(req: NextRequest) {

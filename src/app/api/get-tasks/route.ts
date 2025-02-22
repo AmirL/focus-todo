@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateUserSession } from '../user-auth';
-import { DB } from '@/lib/db';
-import { tasksTable } from '@/lib/schema';
+import { DB } from '@/shared/lib/db';
+import { tasksTable } from '@/shared/lib/schema';
 import { gt, isNull, lt, or } from 'drizzle-orm';
 import dayjs from 'dayjs';
 

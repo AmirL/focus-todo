@@ -1,5 +1,5 @@
 import { Task } from '@/data-classes/task';
-import { API } from '@/lib/api';
+import { API } from '@/shared/lib/api';
 import { create } from 'zustand';
 import toast from 'react-hot-toast';
 

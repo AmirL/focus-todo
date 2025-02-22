@@ -1,10 +1,9 @@
 'use client';
-
+import { AddTaskForm } from '@/components/Task/AddTaskForm';
+import { Filters } from '@/_pages/tasks-todo/ui/Filters';
+import { Goals } from '@/_pages/tasks-todo/ui/Goals';
+import { Tasks } from '@/_pages/tasks-todo/ui/Tasks';
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { Filters } from './Filters';
-import { AddTaskForm } from '../Task/AddTaskForm';
-import { Tasks } from './Tasks';
-import { Goals } from './Goals';
 
 export function TodoList() {
   const { user, error, isLoading } = useUser();
