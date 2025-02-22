@@ -1,11 +1,11 @@
 import { Task } from '@/data-classes/task';
 import { useTasksStore } from '@/store/tasksStore';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/lib/ui/dialog';
-import { Button } from '@/lib/ui/button';
-import { Input } from '@/lib/ui/input';
-import { Label } from '@/lib/ui/label';
-import { Textarea } from '@/lib/ui/textarea';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/lib/ui/tabs';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/shared/ui/dialog';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { Label } from '@/shared/ui/label';
+import { Textarea } from '@/shared/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 

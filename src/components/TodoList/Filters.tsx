@@ -1,4 +1,4 @@
-import { Button } from '@/lib/ui/button';
+import { Button } from '@/shared/ui/button';
 import {
   isTaskActive,
   isTaskCompletedAgo,

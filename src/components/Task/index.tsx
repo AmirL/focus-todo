@@ -1,6 +1,6 @@
 import { Task } from '@/data-classes/task';
-import { Checkbox } from '@/lib/ui/checkbox';
-import { Badge } from '@/lib/ui/badge';
+import { Checkbox } from '@/shared/ui/checkbox';
+import { Badge } from '@/shared/ui/badge';
 import { useTasksStore } from '@/store/tasksStore';
 import { StarButton } from './TaskButtons/StarButton';
 import { DeleteButton } from './TaskButtons/DeleteButton';

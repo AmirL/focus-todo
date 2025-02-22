@@ -1,5 +1,5 @@
 import { isTaskSelected, Task } from '@/data-classes/task';
-import { Button } from '@/lib/ui/button';
+import { Button } from '@/shared/ui/button';
 import { Star } from 'lucide-react';
 import { useTasksStore } from '@/store/tasksStore';
 

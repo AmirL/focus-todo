@@ -1,8 +1,8 @@
 import { Task } from '@/data-classes/task';
-import { Button } from '@/lib/ui/button';
+import { Button } from '@/shared/ui/button';
 import { Clock } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/lib/ui/popover';
-import { Calendar } from '@/lib/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
+import { Calendar } from '@/shared/ui/calendar';
 import { useTasksStore } from '@/store/tasksStore';
 import { useState } from 'react';
 

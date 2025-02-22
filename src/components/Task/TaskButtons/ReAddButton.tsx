@@ -1,9 +1,9 @@
 import { Task } from '@/data-classes/task';
-import { Button } from '@/lib/ui/button';
+import { Button } from '@/shared/ui/button';
 import { RotateCw } from 'lucide-react';
 import { useTasksStore } from '@/store/tasksStore';
-import { Popover, PopoverContent, PopoverTrigger } from '@/lib/ui/popover';
-import { Calendar } from '@/lib/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
+import { Calendar } from '@/shared/ui/calendar';
 import { useState } from 'react';
 import { cloneInstance } from '@/lib/instance-tools';
 

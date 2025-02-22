@@ -1,7 +1,7 @@
 import { Task } from '@/data-classes/task';
 import { Pencil } from 'lucide-react';
 import { EditTaskDialog } from '../EditTaskDialog';
-import { Button } from '@/lib/ui/button';
+import { Button } from '@/shared/ui/button';
 
 export function EditTaskButton({ task }: { task: Task }) {
   return (
