@@ -1,5 +1,5 @@
-import { TaskModel } from '@/entities/task/model/task';
-import { useTasksStore } from '@/entities/task/model/tasksStore';
+import { TaskModel } from '@/shared/model/task';
+import { useTasksStore } from '@/shared/model/tasksStore';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
 import { MarkdownAreaField } from './MarkdownAreaField';

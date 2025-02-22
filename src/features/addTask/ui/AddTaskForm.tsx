@@ -5,13 +5,13 @@ import { PlusCircle } from 'lucide-react';
 import { Label } from '@/shared/ui/label';
 import { SelectTaskCategory } from './SelectTaskCategory';
 import { StarCheckbox } from './StarCheckbox';
-import { useCreateMultipleTasks } from '@/entities/task/model/createMultipleTasks';
 import { useAddTasksStore } from '../model/addTaskStore';
+import { useTasksStore } from '@/shared/model/tasksStore';
 
 export function AddTaskForm() {
-  const createTasks = useCreateMultipleTasks();
-  const createTaskInput = useAddTasksStore((state) => state.createTaskInput);
+  const createTasks = useTasksStore((store) => store.createMultipleTasks);
 
+  const createTaskInput = useAddTasksStore((state) => state.createTaskInput);
   const setCreateTaskInput = useAddTasksStore((state) => state.setCreateTaskInput);
 
   const [selectedList, setSelectedList] = useState('Personal');

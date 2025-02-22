@@ -1,9 +1,10 @@
-import { TaskModel } from '@/entities/task/model/task';
+import { TaskModel } from '@/shared/model/task';
 import { create } from 'zustand';
 import toast from 'react-hot-toast';
+import { createInstance } from '@/shared/lib/instance-tools';
 import { createTaskQuery } from '../api/createTaskQuery';
-import { updateTaskQuery } from '../api/updateTaskQuery';
 import { fetchAllTasks } from '../api/fetchAllTasks';
+import { updateTaskQuery } from '../api/updateTaskQuery';
 
 type TasksState = {
   tasks: TaskModel[];
@@ -13,6 +14,7 @@ type TasksState = {
   fetchTasks: () => Promise<void>;
   createTask: (task: TaskModel) => Promise<void>;
   updateTask: (id: string, updates: Partial<TaskModel>) => Promise<void>;
+  createMultipleTasks: (todoTexts: string[], selectedList: string, isStarred: boolean) => Promise<void>;
 };
 
 function syncTasks(existingTasks: TaskModel[], fetchedTasks: TaskModel[]): TaskModel[] {
@@ -66,5 +68,15 @@ export const useTasksStore = create<TasksState>((set, get) => ({
     set((state) => ({
       tasks: state.tasks.map((task) => (task.id === id ? fetchedTask : task)),
     }));
+  },
+  createMultipleTasks: async (todoTexts: string[], selectedList: string, isStarred: boolean) => {
+    for (const text of todoTexts) {
+      const newTask = createInstance(TaskModel, {
+        name: text,
+        list: selectedList,
+        selectedAt: isStarred ? new Date() : null,
+      });
+      await get().createTask(newTask);
+    }
   },
 }));

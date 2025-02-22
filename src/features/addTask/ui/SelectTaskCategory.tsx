@@ -1,5 +1,5 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
-import { ListsNames } from '@/entities/task/model/task';
+import { ListsNames } from '@/shared/model/task';
 
 type Props = {
   selectedList: string;

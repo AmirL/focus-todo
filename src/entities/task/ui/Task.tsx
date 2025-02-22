@@ -1,18 +1,22 @@
-import { TaskModel } from '@/entities/task/model/task';
+import { TaskModel } from '@/shared/model/task';
 import { Checkbox } from '@/shared/ui/checkbox';
 import { Badge } from '@/shared/ui/badge';
-import { useTasksStore } from '@/entities/task/model/tasksStore';
-import { StarButton } from './StarButton';
-import { DeleteButton } from './DeleteButton';
-import { ReAddButton } from './ReAddButton';
-import { SnoozeButton } from './SnoozeButton';
+import { useTasksStore } from '@/shared/model/tasksStore';
+import { StarButton } from '@/features/taskActions/ui/StarButton';
+import { DeleteButton } from '@/features/taskActions/ui/DeleteButton';
+import { ReAddButton } from '@/features/taskActions/ui/ReAddButton';
+import { SnoozeButton } from '@/features/taskActions/ui/SnoozeButton';
 import { cn, isFutureDate, isToday } from '@/shared/lib/utils';
 import dayjs from 'dayjs';
-import { EditTaskButton } from './EditTaskButton';
 import ReactMarkdown from 'react-markdown';
 import { useState } from 'react';
 
-export function Task({ task }: { task: TaskModel }) {
+interface TaskProps {
+  task: TaskModel;
+  actionButtons: JSX.Element;
+}
+
+export function Task({ task, actionButtons }: TaskProps) {
   const updateTask = useTasksStore((state) => state.updateTask);
 
   const toggleCompleted = () => {
@@ -31,13 +35,7 @@ export function Task({ task }: { task: TaskModel }) {
         <div className="flex space-x-1">
           <TaskBadges task={task} />
         </div>
-        <div className="flex space-x-1">
-          <EditTaskButton task={task} />
-          <StarButton task={task} />
-          <SnoozeButton task={task} />
-          <ReAddButton task={task} />
-          <DeleteButton task={task} />
-        </div>
+        <div className="flex space-x-1">{actionButtons}</div>
       </div>
     </li>
   );

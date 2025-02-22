@@ -7,10 +7,10 @@ import {
   isTaskSelected,
   ListsNames,
   TaskModel,
-} from '@/entities/task/model/task';
+} from '@/shared/model/task';
 import { StatusFilterEnum, useFilterStore } from '@/_pages/tasks-todo/model/filterStore';
 import { MainBlock } from './MainBlock';
-import { useTasksStore } from '@/entities/task/model/tasksStore';
+import { useTasksStore } from '@/shared/model/tasksStore';
 import dayjs from 'dayjs';
 
 export function useSortedTasks(tasks: TaskModel[]) {

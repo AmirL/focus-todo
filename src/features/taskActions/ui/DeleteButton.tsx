@@ -1,7 +1,7 @@
-import { TaskModel } from '../model/task';
+import { TaskModel } from '@/shared/model/task';
 import { Button } from '@/shared/ui/button';
 import { Trash2 } from 'lucide-react';
-import { useTasksStore } from '../model/tasksStore';
+import { useTasksStore } from '@/shared/model/tasksStore';
 
 export function DeleteButton({ task }: { task: TaskModel }) {
   const updateTask = useTasksStore((state) => state.updateTask);

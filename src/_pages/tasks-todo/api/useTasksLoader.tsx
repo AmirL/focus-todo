@@ -1,4 +1,4 @@
-import { useTasksStore } from '@/entities/task/model/tasksStore';
+import { useTasksStore } from '@/shared/model/tasksStore';
 import { useEffect } from 'react';
 
 export function useTasksLoader() {

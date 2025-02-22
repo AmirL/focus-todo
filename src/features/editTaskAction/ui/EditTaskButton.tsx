@@ -1,6 +1,6 @@
-import { TaskModel } from '@/entities/task/model/task';
+import { TaskModel } from '@/shared/model/task';
 import { Pencil } from 'lucide-react';
-import { EditTaskDialog } from '../../../features/editTask/ui/EditTaskDialog';
+import { EditTaskDialog } from './EditTaskDialog';
 import { Button } from '@/shared/ui/button';
 
 export function EditTaskButton({ task }: { task: TaskModel }) {

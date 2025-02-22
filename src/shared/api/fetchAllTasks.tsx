@@ -1,5 +1,5 @@
 import { fetchBackend } from '@/shared/lib/api';
-import { TaskModel, TaskPlain } from '../model/task';
+import { TaskPlain, TaskModel } from '../model/task';
 
 export async function fetchAllTasks() {
   const data = (await fetchBackend('get-tasks')) as { tasks: TaskPlain[] };

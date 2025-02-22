@@ -1,4 +1,4 @@
-import { GoalModel } from '../model/goal';
+import { GoalModel } from '../../../shared/model/goal';
 import { Progress } from '@/shared/ui/progress';
 
 export function Goal({ goal }: { goal: GoalModel }) {

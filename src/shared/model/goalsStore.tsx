@@ -1,4 +1,4 @@
-import { GoalModel } from '@/entities/goal/model/goal';
+import { GoalModel } from '@/shared/model/goal';
 import { create } from 'zustand';
 import { fetchAllGoals } from '../api/fetchAllGoals';
 

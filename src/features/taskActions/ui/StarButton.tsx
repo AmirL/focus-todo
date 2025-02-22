@@ -1,7 +1,7 @@
-import { isTaskSelected, TaskModel } from '@/entities/task/model/task';
+import { isTaskSelected, TaskModel } from '@/shared/model/task';
 import { Button } from '@/shared/ui/button';
 import { Star } from 'lucide-react';
-import { useTasksStore } from '@/entities/task/model/tasksStore';
+import { useTasksStore } from '@/shared/model/tasksStore';
 
 export function StarButton({ task }: { task: TaskModel }) {
   const updateTask = useTasksStore((state) => state.updateTask);

@@ -1,6 +1,11 @@
 import { useApplyFilters, useSortedTasks } from './Filters';
 import { Task } from '@/entities/task/ui/Task';
 import { useTasksLoader } from '../api/useTasksLoader';
+import { EditTaskButton } from '@/features/editTaskAction/ui/EditTaskButton';
+import { DeleteButton } from '@/features/taskActions/ui/DeleteButton';
+import { ReAddButton } from '@/features/taskActions/ui/ReAddButton';
+import { SnoozeButton } from '@/features/taskActions/ui/SnoozeButton';
+import { StarButton } from '@/features/taskActions/ui/StarButton';
 
 export function Tasks() {
   const { allTasks, isLoading } = useTasksLoader();
@@ -20,7 +25,19 @@ export function Tasks() {
   return (
     <ul className="space-y-2">
       {tasks.map((task) => (
-        <Task key={task.id} task={task} />
+        <Task
+          key={task.id}
+          task={task}
+          actionButtons={
+            <>
+              <EditTaskButton key="edit" task={task} />
+              <StarButton task={task} />
+              <SnoozeButton task={task} />
+              <ReAddButton task={task} />
+              <DeleteButton task={task} />
+            </>
+          }
+        />
       ))}
     </ul>
   );
