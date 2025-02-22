@@ -11,8 +11,10 @@ export function EditTaskDialog({ task, children }: { task: TaskModel; children: 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const values = new FormData(e.target as HTMLFormElement);
+
     const name: string = values.get('name') as string;
     const details: string = values.get('details') as string;
+
     updateTask(task.id, { name, details });
   };
 

@@ -8,8 +8,6 @@ import { fetchAllTasks } from '../api/fetchAllTasks';
 type TasksState = {
   tasks: TaskModel[];
   isLoading: boolean;
-  createTaskInput: string;
-  setCreateTaskInput: (input: string) => void;
   fetchTasks: () => Promise<void>;
   createTask: (task: TaskModel) => Promise<void>;
   updateTask: (id: string, updates: Partial<TaskModel>) => Promise<void>;
@@ -33,10 +31,6 @@ function syncTasks(existingTasks: TaskModel[], fetchedTasks: TaskModel[]): TaskM
 export const useTasksStore = create<TasksState>((set, get) => ({
   tasks: [],
   isLoading: true,
-  createTaskInput: '',
-  setCreateTaskInput: (input: string) => {
-    set({ createTaskInput: input });
-  },
   fetchTasks: async () => {
     console.log('fetching tasks');
     set({ isLoading: true });
@@ -48,16 +42,9 @@ export const useTasksStore = create<TasksState>((set, get) => ({
     }));
   },
   createTask: async (task: TaskModel) => {
-    const inputValue = get().createTaskInput;
-    try {
-      set({ createTaskInput: '' });
-      const createdTask = await createTaskQuery(task);
-      set((state) => ({ tasks: [...state.tasks, createdTask] }));
-      toast.success('Task created');
-    } catch (error) {
-      // error message was shown in the toast
-      set({ createTaskInput: inputValue });
-    }
+    const createdTask = await createTaskQuery(task);
+    set((state) => ({ tasks: [...state.tasks, createdTask] }));
+    toast.success('Task created');
   },
   updateTask: async (id: string, updates: Partial<TaskModel>) => {
     const task = get().tasks.find((task) => task.id == id);
