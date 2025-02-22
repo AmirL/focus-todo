@@ -2,9 +2,11 @@
   "name": "focus-todo",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev -p 8000",
     "test": "vitest",
+    "fsd": "steiger ./src",
     "build": "vitest && next build",
     "start": "next start",
     "lint": "next lint"
@@ -55,6 +57,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.16",
     "postcss": "^8",
+    "steiger": "^0.5.5",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.7.3",
     "vitest": "^2.1.5"
