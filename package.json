@@ -7,6 +7,7 @@
     "dev": "next dev -p 8000",
     "test": "vitest",
     "fsd": "steiger ./src",
+    "deps": "fsd-cruise",
     "build": "vitest && next build",
     "start": "next start",
     "lint": "next lint"
@@ -53,6 +54,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "dependency-cruiser": "^16.10.0",
     "drizzle-kit": "^0.28.1",
     "eslint": "^8",
     "eslint-config-next": "14.2.16",
