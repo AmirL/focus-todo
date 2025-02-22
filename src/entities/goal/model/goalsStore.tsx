@@ -1,6 +1,6 @@
 import { GoalModel } from '@/entities/goal/model/goal';
-import { API } from '@/shared/lib/api';
 import { create } from 'zustand';
+import { fetchAllGoals } from '../api/fetchAllGoals';
 
 type GoalsState = {
   goals: GoalModel[];
@@ -13,7 +13,7 @@ export const useGoalsStore = create<GoalsState>((set, get) => ({
   isLoading: true,
   fetchGoals: async () => {
     set({ isLoading: true });
-    const data = await API.getGoals();
-    set({ goals: GoalModel.fromPlainArray(data.goals), isLoading: false });
+    const goals = await fetchAllGoals();
+    set({ goals: goals, isLoading: false });
   },
 }));

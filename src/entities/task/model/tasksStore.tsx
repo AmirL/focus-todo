@@ -1,19 +1,21 @@
-import { Task } from '@/data-classes/task';
-import { API } from '@/shared/lib/api';
+import { TaskModel } from '@/entities/task/model/task';
 import { create } from 'zustand';
 import toast from 'react-hot-toast';
+import { createTaskQuery } from '../api/createTaskQuery';
+import { updateTaskQuery } from '../api/updateTaskQuery';
+import { fetchAllTasks } from '../api/fetchAllTasks';
 
 type TasksState = {
-  tasks: Task[];
+  tasks: TaskModel[];
   isLoading: boolean;
   createTaskInput: string;
   setCreateTaskInput: (input: string) => void;
   fetchTasks: () => Promise<void>;
-  createTask: (task: Task) => Promise<void>;
-  updateTask: (id: string, updates: Partial<Task>) => Promise<void>;
+  createTask: (task: TaskModel) => Promise<void>;
+  updateTask: (id: string, updates: Partial<TaskModel>) => Promise<void>;
 };
 
-function syncTasks(existingTasks: Task[], fetchedTasks: Task[]): Task[] {
+function syncTasks(existingTasks: TaskModel[], fetchedTasks: TaskModel[]): TaskModel[] {
   const mergedTasks = fetchedTasks.map((fetchedTask) => {
     const existingTask = existingTasks.find((task) => task.id === fetchedTask.id);
     if (existingTask) {
@@ -38,20 +40,18 @@ export const useTasksStore = create<TasksState>((set, get) => ({
   fetchTasks: async () => {
     console.log('fetching tasks');
     set({ isLoading: true });
-    const data = await API.getTasks();
-    const fetchedTasks = Task.fromPlainArray(data.tasks);
+    const fetchedTasks = await fetchAllTasks();
 
     set((state) => ({
       tasks: syncTasks(state.tasks, fetchedTasks),
       isLoading: false,
     }));
   },
-  createTask: async (task: Task) => {
+  createTask: async (task: TaskModel) => {
     const inputValue = get().createTaskInput;
     try {
       set({ createTaskInput: '' });
-      const response = await API.createTask(task);
-      const createdTask = Task.toInstance(response);
+      const createdTask = await createTaskQuery(task);
       set((state) => ({ tasks: [...state.tasks, createdTask] }));
       toast.success('Task created');
     } catch (error) {
@@ -59,18 +59,19 @@ export const useTasksStore = create<TasksState>((set, get) => ({
       set({ createTaskInput: inputValue });
     }
   },
-  updateTask: async (id: string, updates: Partial<Task>) => {
+  updateTask: async (id: string, updates: Partial<TaskModel>) => {
     const task = get().tasks.find((task) => task.id == id);
     if (!task) return;
 
-    const updatedTask = Object.assign(new Task(), { ...task, ...updates });
+    const updatedTask = Object.assign(new TaskModel(), { ...task, ...updates });
     updatedTask.updatedAt = new Date();
+
     set((state) => ({
       tasks: state.tasks.map((task) => (task.id === id ? updatedTask : task)),
     }));
 
-    const response = await API.updateTask(id, updatedTask);
-    const fetchedTask = Task.toInstance(response);
+    const fetchedTask = await updateTaskQuery(id, updatedTask);
+
     set((state) => ({
       tasks: state.tasks.map((task) => (task.id === id ? fetchedTask : task)),
     }));

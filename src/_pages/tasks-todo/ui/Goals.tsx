@@ -1,4 +1,4 @@
-import { useGoalsStore } from '@/store/goalsStore';
+import { useGoalsStore } from '@/entities/goal/model/goalsStore';
 import { MainBlock } from './MainBlock';
 import { useEffect } from 'react';
 import { Goal } from '@/entities/goal/ui/Goal';

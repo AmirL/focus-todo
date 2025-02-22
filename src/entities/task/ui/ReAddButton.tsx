@@ -1,13 +1,13 @@
-import { Task } from '@/data-classes/task';
+import { TaskModel } from '@/entities/task/model/task';
 import { Button } from '@/shared/ui/button';
 import { RotateCw } from 'lucide-react';
-import { useTasksStore } from '@/store/tasksStore';
+import { useTasksStore } from '@/entities/task/model/tasksStore';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { Calendar } from '@/shared/ui/calendar';
 import { useState } from 'react';
 import { cloneInstance } from '@/shared/lib/instance-tools';
 
-export function ReAddButton({ task }: { task: Task }) {
+export function ReAddButton({ task }: { task: TaskModel }) {
   const createTask = useTasksStore((state) => state.createTask);
   const updateTask = useTasksStore((state) => state.updateTask);
 

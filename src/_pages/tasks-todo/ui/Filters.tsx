@@ -6,13 +6,13 @@ import {
   isTaskInFuture,
   isTaskSelected,
   ListsNames,
-  Task,
-} from '@/data-classes/task';
+  TaskModel,
+} from '@/entities/task/model/task';
 import { StatusFilterEnum, useFilterStore } from '@/store/filterStore';
 import { MainBlock } from './MainBlock';
 import dayjs from 'dayjs';
 
-export function useApplyFilters(tasks: Task[]) {
+export function useApplyFilters(tasks: TaskModel[]) {
   const { statusFilter, list } = useFilterStore();
 
   return tasks
@@ -21,7 +21,7 @@ export function useApplyFilters(tasks: Task[]) {
     .filter((task) => list === '' || task.list === list);
 }
 
-function applyStatusFilter(task: Task, filter: StatusFilterEnum) {
+function applyStatusFilter(task: TaskModel, filter: StatusFilterEnum) {
   switch (filter) {
     case StatusFilterEnum.ACTIVE:
       return isTaskActive(task);

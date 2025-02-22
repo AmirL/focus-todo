@@ -1,8 +1,6 @@
-import { GoalPlain } from '@/entities/goal/model/goal';
-import { Task, TaskPlain } from '@/data-classes/task';
 import toast from 'react-hot-toast';
 
-async function api(endpoint: string, body: object | undefined = undefined) {
+export async function fetchBackend(endpoint: string, body: object | undefined = undefined) {
   const options = {
     method: 'POST',
     headers: {
@@ -27,11 +25,3 @@ async function api(endpoint: string, body: object | undefined = undefined) {
     throw error;
   }
 }
-
-export const API = {
-  getGoals: async () => api('get-goals') as Promise<{ goals: GoalPlain[] }>,
-  getTasks: async () => api('get-tasks') as Promise<{ tasks: TaskPlain[] }>,
-  createTask: async (task: Task) => api('create-task', { task: Task.toPlain(task) }) as Promise<TaskPlain>,
-  updateTask: async (id: string, task: Task) =>
-    api(`update-task`, { id, task: Task.toPlain(task) }) as Promise<TaskPlain>,
-};

@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Textarea } from '@/shared/ui/textarea';
 import { Button } from '@/shared/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
-import { ListsNames, Task } from '@/data-classes/task';
-import { useTasksStore } from '@/store/tasksStore';
+import { ListsNames, TaskModel } from '@/entities/task/model/task';
+import { useTasksStore } from '@/entities/task/model/tasksStore';
 import { PlusCircle, Star } from 'lucide-react';
 import { Label } from '@/shared/ui/label';
 import { Checkbox } from '@/shared/ui/checkbox';
@@ -19,7 +19,7 @@ export function AddTaskForm() {
   const addTodo = async () => {
     const todoTexts = createTaskInput.split('\n').filter((text) => text.trim() !== '');
     todoTexts.forEach(async (text) => {
-      const newTask = createInstance(Task, {
+      const newTask = createInstance(TaskModel, {
         name: text,
         list: selectedList,
         selectedAt: isStarred ? new Date() : null,

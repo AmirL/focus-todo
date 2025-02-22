@@ -17,7 +17,7 @@ export type TaskPlain = {
   deletedAt: string;
 };
 
-export class Task {
+export class TaskModel {
   id!: string;
 
   name!: string;
@@ -41,36 +41,36 @@ export class Task {
   @Transform(transformDateToUTCString, { toPlainOnly: true })
   updatedAt!: Date;
 
-  static toInstance(data: TaskPlain): Task {
-    return plainToInstance(Task, data);
+  static toInstance(data: TaskPlain): TaskModel {
+    return plainToInstance(TaskModel, data);
   }
 
-  static fromPlainArray(data: TaskPlain[]): Task[] {
+  static fromPlainArray(data: TaskPlain[]): TaskModel[] {
     return data.map((task) => this.toInstance(task));
   }
 
-  static toPlain(task: Task): TaskPlain {
+  static toPlain(task: TaskModel): TaskPlain {
     return instanceToPlain(task) as TaskPlain;
   }
 }
 
-export function isTaskInFuture(task: Task) {
+export function isTaskInFuture(task: TaskModel) {
   return isFutureDate(task.date);
 }
 
-export function isTaskActive(task: Task) {
+export function isTaskActive(task: TaskModel) {
   return !isTaskInFuture(task);
 }
 
-export function isTaskDeleted(task: Task) {
+export function isTaskDeleted(task: TaskModel) {
   return !!task.deletedAt;
 }
 
-export function isTaskCompletedAgo(task: Task) {
+export function isTaskCompletedAgo(task: TaskModel) {
   return !!task.completedAt && dayjs(task.completedAt).isBefore(dayjs().subtract(1, 'day'));
 }
 
-export function isTaskSelected(task: Task) {
+export function isTaskSelected(task: TaskModel) {
   return !!task.selectedAt && dayjs(task.selectedAt).isSame(dayjs(), 'day');
 }
 

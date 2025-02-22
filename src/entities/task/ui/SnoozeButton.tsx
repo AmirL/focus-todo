@@ -1,12 +1,12 @@
-import { Task } from '@/data-classes/task';
+import { TaskModel } from '@/entities/task/model/task';
 import { Button } from '@/shared/ui/button';
 import { Clock } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { Calendar } from '@/shared/ui/calendar';
-import { useTasksStore } from '@/store/tasksStore';
+import { useTasksStore } from '@/entities/task/model/tasksStore';
 import { useState } from 'react';
 
-export function SnoozeButton({ task }: { task: Task }) {
+export function SnoozeButton({ task }: { task: TaskModel }) {
   const updateTask = useTasksStore((state) => state.updateTask);
   const [popoverOpen, setPopoverOpen] = useState(false);
 

@@ -1,5 +1,5 @@
 'use client';
-import { AddTaskForm } from '@/components/Task/AddTaskForm';
+import { AddTaskForm } from '@/_pages/tasks-todo/ui/AddTaskForm';
 import { Filters } from '@/_pages/tasks-todo/ui/Filters';
 import { Goals } from '@/_pages/tasks-todo/ui/Goals';
 import { Tasks } from '@/_pages/tasks-todo/ui/Tasks';

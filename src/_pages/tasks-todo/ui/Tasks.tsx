@@ -1,7 +1,7 @@
-import { useTasksStore } from '@/store/tasksStore';
+import { useTasksStore } from '@/entities/task/model/tasksStore';
 import { useEffect } from 'react';
-import { TaskRow } from '../../../components/Task';
 import { useApplyFilters } from './Filters';
+import { Task } from '@/entities/task/ui/Task';
 
 export function Tasks() {
   const fetchTasks = useTasksStore((state) => state.fetchTasks);
@@ -34,7 +34,7 @@ export function Tasks() {
   return (
     <ul className="space-y-2">
       {tasks.map((task) => (
-        <TaskRow key={task.id} task={task} />
+        <Task key={task.id} task={task} />
       ))}
     </ul>
   );

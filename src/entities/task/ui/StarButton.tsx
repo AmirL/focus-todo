@@ -1,14 +1,14 @@
-import { isTaskSelected, Task } from '@/data-classes/task';
+import { isTaskSelected, TaskModel } from '@/entities/task/model/task';
 import { Button } from '@/shared/ui/button';
 import { Star } from 'lucide-react';
-import { useTasksStore } from '@/store/tasksStore';
+import { useTasksStore } from '@/entities/task/model/tasksStore';
 
-export function StarButton({ task }: { task: Task }) {
+export function StarButton({ task }: { task: TaskModel }) {
   const updateTask = useTasksStore((state) => state.updateTask);
 
   const isSelected = isTaskSelected(task);
 
-  const toggleTodayTask = (task: Task) => {
+  const toggleTodayTask = (task: TaskModel) => {
     const selectedAt = isSelected ? null : new Date();
     updateTask(task.id, { selectedAt });
   };

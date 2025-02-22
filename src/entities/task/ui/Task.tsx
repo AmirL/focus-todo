@@ -1,19 +1,19 @@
-import { Task } from '@/data-classes/task';
+import { TaskModel } from '@/entities/task/model/task';
 import { Checkbox } from '@/shared/ui/checkbox';
 import { Badge } from '@/shared/ui/badge';
-import { useTasksStore } from '@/store/tasksStore';
-import { StarButton } from './TaskButtons/StarButton';
-import { DeleteButton } from './TaskButtons/DeleteButton';
-import { ReAddButton } from './TaskButtons/ReAddButton';
-import { SnoozeButton } from './TaskButtons/SnoozeButton';
+import { useTasksStore } from '@/entities/task/model/tasksStore';
+import { StarButton } from './StarButton';
+import { DeleteButton } from './DeleteButton';
+import { ReAddButton } from './ReAddButton';
+import { SnoozeButton } from './SnoozeButton';
 import { useFilterStore } from '@/store/filterStore';
 import { cn, isFutureDate, isToday } from '@/shared/lib/utils';
 import dayjs from 'dayjs';
-import { EditTaskButton } from './TaskButtons/EditTaskButton';
+import { EditTaskButton } from './EditTaskButton';
 import ReactMarkdown from 'react-markdown';
 import { useState } from 'react';
 
-export function TaskRow({ task }: { task: Task }) {
+export function Task({ task }: { task: TaskModel }) {
   const updateTask = useTasksStore((state) => state.updateTask);
 
   const toggleCompleted = () => {
@@ -44,7 +44,7 @@ export function TaskRow({ task }: { task: Task }) {
   );
 }
 
-export function TaskName({ task }: { task: Task }) {
+function TaskName({ task }: { task: TaskModel }) {
   return (
     <label
       htmlFor={`todo-${task.id}`}
@@ -55,7 +55,7 @@ export function TaskName({ task }: { task: Task }) {
   );
 }
 
-export function TaskBadges({ task }: { task: Task }) {
+function TaskBadges({ task }: { task: TaskModel }) {
   const { list } = useFilterStore();
   return (
     <>
