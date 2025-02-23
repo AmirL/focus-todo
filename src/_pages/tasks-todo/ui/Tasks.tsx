@@ -1,11 +1,11 @@
 import { useApplyFilters, useSortedTasks } from './Filters';
 import { Task } from '@/entities/task/ui/Task';
 import { useTasksLoader } from '../api/useTasksLoader';
-import { EditTaskButton } from '@/features/editTaskAction/ui/EditTaskButton';
-import { DeleteButton } from '@/features/taskActions/ui/DeleteButton';
-import { ReAddButton } from '@/features/taskActions/ui/ReAddButton';
-import { SnoozeButton } from '@/features/taskActions/ui/SnoozeButton';
-import { StarButton } from '@/features/taskActions/ui/StarButton';
+import { EditTaskButton } from '@/features/tasks/edit/ui/EditTaskButton';
+import { DeleteButton } from '@/features/tasks/actions/ui/DeleteButton';
+import { ReAddButton } from '@/features/tasks/actions/ui/ReAddButton';
+import { SnoozeButton } from '@/features/tasks/actions/ui/SnoozeButton';
+import { StarButton } from '@/features/tasks/actions/ui/StarButton';
 
 export function Tasks() {
   const { allTasks, isLoading } = useTasksLoader();

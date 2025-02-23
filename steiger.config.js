@@ -9,7 +9,7 @@ export default defineConfig([
     rules: {
       'fsd/public-api': 'off',
       'fsd/typo-in-layer-name': 'off',
-      'fsd/repetitive-naming': 'off',
+      // 'fsd/repetitive-naming': 'off',
       'fsd/no-public-api-sidestep': 'off',
       'fsd/insignificant-slice': 'off',
     },
