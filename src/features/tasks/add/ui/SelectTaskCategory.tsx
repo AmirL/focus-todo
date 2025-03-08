@@ -8,7 +8,10 @@ type Props = {
 
 export function SelectTaskCategory({ selectedList, setSelectedList }: Props) {
   return (
-    <div className="flex w-40">
+    <div className="flex-1">
+      <label htmlFor="task-category" className="text-sm font-medium block mb-1.5">
+        Category
+      </label>
       <Select value={selectedList} onValueChange={setSelectedList}>
         <SelectTrigger id="task-list" className="w-full">
           <SelectValue placeholder="Select a list" />

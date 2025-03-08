@@ -1,14 +1,28 @@
 import { useState } from 'react';
 import { Textarea } from '@/shared/ui/textarea';
 import { Button } from '@/shared/ui/button';
-import { PlusCircle } from 'lucide-react';
-import { Label } from '@/shared/ui/label';
+import { Plus, PlusCircle } from 'lucide-react';
 import { SelectTaskCategory } from './SelectTaskCategory';
 import { StarCheckbox } from './StarCheckbox';
 import { useAddTasksStore } from '../model/addTaskStore';
 import { useTasksStore } from '@/shared/model/tasksStore';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/shared/ui/dialog';
 
 export function AddTaskForm() {
+  const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
+
+  const handleDialogClose = (open: boolean) => {
+    setIsAddTaskOpen(open);
+  };
+
   const createTasks = useTasksStore((store) => store.createMultipleTasks);
 
   const createTaskInput = useAddTasksStore((state) => state.createTaskInput);
@@ -23,39 +37,71 @@ export function AddTaskForm() {
     const previousInputValue = createTaskInput;
 
     setCreateTaskInput('');
-    createTasks(todoTexts, selectedList, isStarred).catch(() => setCreateTaskInput(previousInputValue));
+    createTasks(todoTexts, selectedList, isStarred).catch(() => {
+      setCreateTaskInput(previousInputValue);
+      setIsAddTaskOpen(true);
+    });
+    setIsAddTaskOpen(false);
   };
 
   return (
-    <div className="space-y-4">
-      <Label htmlFor="new-task" className="text-lg font-semibold block">
-        Add a New Task
-      </Label>
-      <Textarea
-        id="new-task"
-        placeholder="Enter your task here..."
-        value={createTaskInput}
-        onChange={(e) => setCreateTaskInput(e.target.value)}
-        className="min-h-[100px]"
-      />
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-        <SelectTaskCategory selectedList={selectedList} setSelectedList={setSelectedList} />
-        <StarCheckbox isStarred={isStarred} setIsStarred={setIsStarred} />
-        <AddTaskButton addTodo={addTodo} />
-      </div>
-    </div>
+    <Dialog open={isAddTaskOpen} onOpenChange={handleDialogClose}>
+      <DialogTrigger asChild>
+        <Button
+          className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg"
+          onClick={() => setIsAddTaskOpen(true)}
+        >
+          <Plus className="h-6 w-6" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Add New Task</DialogTitle>
+          <DialogDescription>Create a new task for your todo list.</DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
+          <Textarea
+            id="new-task"
+            placeholder="Enter your task here..."
+            className="min-h-[100px] resize-none"
+            value={createTaskInput}
+            onChange={(e) => setCreateTaskInput(e.target.value)}
+            autoFocus
+          />
+
+          <div className="flex items-center gap-4">
+            <SelectTaskCategory selectedList={selectedList} setSelectedList={setSelectedList} />
+            <StarCheckbox isStarred={isStarred} setIsStarred={setIsStarred} />
+          </div>
+        </div>
+
+        <DialogFooterButtons
+          onCancel={() => setIsAddTaskOpen(false)}
+          onAdd={addTodo}
+          isAddDisabled={!createTaskInput.trim()}
+        />
+      </DialogContent>
+    </Dialog>
   );
 }
 
-interface AddTaskButtonProps {
-  addTodo: () => void;
+interface DialogFooterButtonsProps {
+  onCancel: () => void;
+  onAdd: () => void;
+  isAddDisabled: boolean;
 }
 
-function AddTaskButton({ addTodo }: AddTaskButtonProps) {
+function DialogFooterButtons({ onCancel, onAdd, isAddDisabled }: DialogFooterButtonsProps) {
   return (
-    <Button onClick={addTodo} className="flex-grow">
-      <PlusCircle className="w-4 h-4 mr-2" />
-      Add Task
-    </Button>
+    <DialogFooter className="flex sm:justify-between">
+      <Button variant="outline" onClick={onCancel}>
+        Cancel
+      </Button>
+      <Button onClick={onAdd} disabled={isAddDisabled}>
+        <PlusCircle className="h-4 w-4 mr-2" />
+        Add Task
+      </Button>
+    </DialogFooter>
   );
 }
