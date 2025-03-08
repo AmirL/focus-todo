@@ -9,7 +9,7 @@ export function TasksTodoPage() {
   return (
     <>
       <div className="max-w-xl mx-auto p-4 bg-gradient-to-b from-background to-background/80 min-h-screen">
-        <Card className="border-none shadow-lg bg-background/95 backdrop-blur">
+        <Card className="border-none shadow-lg bg-background/95">
           <CardHeader className="pb-2">
             <div className="flex justify-between items-center">
               <CardTitle className="text-2xl font-bold text-primary">Zero Resistance Todo List</CardTitle>
