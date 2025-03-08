@@ -7,8 +7,10 @@ import { useTasksStore } from '@/shared/model/tasksStore';
 export function Filters() {
   return (
     <ContentSection title="Filters">
-      <SpecialFiltersGroup />
-      <ListFiltersGroup />
+      <div className="flex flex-wrap justify-between gap-4">
+        <SpecialFiltersGroup />
+        <ListFiltersGroup />
+      </div>
     </ContentSection>
   );
 }
@@ -29,7 +31,7 @@ function SpecialFiltersGroup() {
   };
 
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-wrap gap-2">
       <Button variant={statusFilter === StatusFilterEnum.ACTIVE ? 'default' : 'outline'} onClick={handleSetActive}>
         Active
       </Button>

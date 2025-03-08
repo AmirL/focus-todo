@@ -1,7 +1,6 @@
 import { ContentSection } from './Section';
 import { Goal } from '@/entities/goal/ui/Goal';
 import { useGoalsLoader } from '../api/useGoalsLoader';
-import { Progress } from '@/shared/ui/progress';
 
 export function Goals() {
   const goals = useGoalsLoader();
