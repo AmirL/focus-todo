@@ -1,50 +1,15 @@
 import { Button } from '@/shared/ui/button';
-import {
-  isTaskActive,
-  isTaskCompletedAgo,
-  isTaskDeleted,
-  isTaskInFuture,
-  isTaskSelected,
-  ListsNames,
-  TaskModel,
-} from '@/shared/model/task';
+import { ListsNames } from '@/shared/model/task';
 import { StatusFilterEnum, useFilterStore } from '@/_pages/tasks-todo/model/filterStore';
-import { MainBlock } from './MainBlock';
+import { ContentSection } from './Section';
 import { useTasksStore } from '@/shared/model/tasksStore';
-import dayjs from 'dayjs';
-
-export function useSortedTasks(tasks: TaskModel[]) {
-  const statusFilter = useFilterStore((store) => store.statusFilter);
-
-  return statusFilter == StatusFilterEnum.FUTURE ? sortTasksByDate(tasks) : tasks;
-}
-
-export function useApplyFilters(tasks: TaskModel[]) {
-  const { statusFilter, list } = useFilterStore();
-
-  return tasks
-    .filter((task) => !isTaskDeleted(task) && !isTaskCompletedAgo(task))
-    .filter((task) => applyStatusFilter(task, statusFilter))
-    .filter((task) => list === '' || task.list === list);
-}
-
-function applyStatusFilter(task: TaskModel, filter: StatusFilterEnum) {
-  switch (filter) {
-    case StatusFilterEnum.ACTIVE:
-      return isTaskActive(task);
-    case StatusFilterEnum.FUTURE:
-      return isTaskInFuture(task);
-    case StatusFilterEnum.SELECTED:
-      return isTaskSelected(task);
-  }
-}
 
 export function Filters() {
   return (
-    <MainBlock title="Filters">
+    <ContentSection title="Filters">
       <SpecialFiltersGroup />
       <ListFiltersGroup />
-    </MainBlock>
+    </ContentSection>
   );
 }
 
@@ -106,12 +71,4 @@ function ListFiltersGroup() {
       ))}
     </div>
   );
-}
-
-function sortTasksByDate(tasks: TaskModel[]) {
-  return tasks.sort((a, b) => unixTime(a.date) - unixTime(b.date));
-}
-
-function unixTime(date: Date | null | undefined) {
-  return date ? dayjs(date).unix() : 0;
 }

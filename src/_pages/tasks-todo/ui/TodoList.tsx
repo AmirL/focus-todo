@@ -18,7 +18,6 @@ export function TodoList() {
 
   return (
     <>
-      <AddTaskForm />
       <Goals />
       <Filters />
       <Tasks />
