@@ -23,22 +23,24 @@ export function Tasks() {
 
   console.log('Rendering tasks');
   return (
-    <ul className="space-y-2">
-      {tasks.map((task) => (
-        <Task
-          key={task.id}
-          task={task}
-          actionButtons={
-            <>
-              <EditTaskButton key="edit" task={task} />
-              <StarButton task={task} />
-              <SnoozeButton task={task} />
-              <ReAddButton task={task} />
-              <DeleteButton task={task} />
-            </>
-          }
-        />
-      ))}
-    </ul>
+    <section>
+      <ul className="space-y-3">
+        {tasks.map((task) => (
+          <Task
+            key={task.id}
+            task={task}
+            actionButtons={
+              <>
+                <EditTaskButton key="edit" task={task} />
+                <StarButton task={task} />
+                <SnoozeButton task={task} />
+                <ReAddButton task={task} />
+                <DeleteButton task={task} />
+              </>
+            }
+          />
+        ))}
+      </ul>
+    </section>
   );
 }

@@ -21,17 +21,26 @@ export function Task({ task, actionButtons }: TaskProps) {
   };
 
   return (
-    <li key={task.id} className="flex flex-col  p-2 pt-4 pb-1 bg-muted rounded-md gap-2">
-      <div className="flex items-center space-x-2">
-        <Checkbox id={`todo-${task.id}`} checked={!!task.completedAt} onCheckedChange={toggleCompleted} />
-        <TaskName task={task} />
-      </div>
-      <TaskDetails details={task.details} />
-      <div className="flex justify-between">
-        <div className="flex space-x-1">
-          <TaskBadges task={task} />
+    <li
+      key={task.id}
+      className={cn(
+        'group relative rounded-lg transition-all duration-300 overflow-hidden',
+        task.completedAt ? 'bg-muted/50' : 'bg-muted/80 hover:bg-muted',
+        task.selectedAt && !task.completedAt && 'border-l-4 border-l-yellow-400'
+      )}
+    >
+      <div className="p-3 pb-2">
+        <div className="flex items-center space-x-2">
+          <Checkbox id={`todo-${task.id}`} checked={!!task.completedAt} onCheckedChange={toggleCompleted} />
+          <TaskName task={task} />
         </div>
-        <div className="flex space-x-1">{actionButtons}</div>
+        <TaskDetails details={task.details} />
+        <div className="flex justify-between">
+          <div className="flex space-x-1">
+            <TaskBadges task={task} />
+          </div>
+          <div className="flex space-x-1">{actionButtons}</div>
+        </div>
       </div>
     </li>
   );
@@ -41,7 +50,7 @@ function TaskName({ task }: { task: TaskModel }) {
   return (
     <label
       htmlFor={`todo-${task.id}`}
-      className={`${task.completedAt ? 'line-through text-muted-foreground' : 'text-primary'}`}
+      className={cn('flex-1 cursor-pointer', task.completedAt && 'line-through text-muted-foreground')}
     >
       {task.name}
     </label>

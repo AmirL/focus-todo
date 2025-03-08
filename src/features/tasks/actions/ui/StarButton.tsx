@@ -2,6 +2,7 @@ import { isTaskSelected, TaskModel } from '@/shared/model/task';
 import { Button } from '@/shared/ui/button';
 import { Star } from 'lucide-react';
 import { useTasksStore } from '@/shared/model/tasksStore';
+import { cn } from '@/shared/lib/utils';
 
 export function StarButton({ task }: { task: TaskModel }) {
   const updateTask = useTasksStore((state) => state.updateTask);
@@ -18,7 +19,10 @@ export function StarButton({ task }: { task: TaskModel }) {
       variant="ghost"
       size="icon"
       onClick={() => toggleTodayTask(task)}
-      className={isSelected ? 'text-yellow-500 hover:text-yellow-500' : 'text-muted-foreground'}
+      className={cn(
+        'h-8 w-8',
+        isSelected ? 'text-yellow-500 hover:text-yellow-600' : 'text-muted-foreground hover:text-yellow-500'
+      )}
     >
       <Star fill={isSelected ? '#E3B644' : 'none'} className="h-4 w-4" />
     </Button>

@@ -28,7 +28,7 @@ export function ReAddButton({ task }: { task: TaskModel }) {
   return (
     <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="text-primary">
+        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
           <RotateCw className="h-4 w-4" />
         </Button>
       </PopoverTrigger>
