@@ -1,6 +1,7 @@
 import { ContentSection } from './Section';
 import { Goal } from '@/entities/goal/ui/Goal';
 import { useGoalsLoader } from '../api/useGoalsLoader';
+import { Progress } from '@/shared/ui/progress';
 
 export function Goals() {
   const goals = useGoalsLoader();
@@ -8,11 +9,9 @@ export function Goals() {
   return (
     <>
       <ContentSection title="Goals">
-        <div className="flex flex-col w-max">
+        <div className="space-y-4">
           {goals.map((goal) => (
-            <>
-              <Goal goal={goal} key={goal.id} />
-            </>
+            <Goal goal={goal} key={goal.id} />
           ))}
         </div>
       </ContentSection>
