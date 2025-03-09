@@ -1,4 +1,4 @@
-import { GoalModel, GoalPlain } from '@/shared/model/goal';
+import { GoalModel, GoalPlain } from '@/entities/goal/model/goal';
 import { fetchBackend } from '@/shared/lib/api';
 
 export async function fetchAllGoals() {

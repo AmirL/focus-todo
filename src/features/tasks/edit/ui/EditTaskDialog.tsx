@@ -1,21 +1,23 @@
-import { TaskModel } from '@/shared/model/task';
-import { useTasksStore } from '@/shared/model/tasksStore';
+import { TaskModel } from '@/entities/task/model/task';
+import { useTasksStore } from '@/entities/task/model/tasksStore';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
 import { MarkdownAreaField } from './MarkdownAreaField';
 import { InputField } from './InputField';
+import { updateTaskMutation } from '@/shared/api/updateTask.mutation';
 
 export function EditTaskDialog({ task, children }: { task: TaskModel; children: React.ReactNode }) {
   const updateTask = useTasksStore((state) => state.updateTask);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const values = new FormData(e.target as HTMLFormElement);
 
     const name: string = values.get('name') as string;
     const details: string = values.get('details') as string;
 
-    updateTask(task.id, { name, details });
+    const updatedTask = updateTask(task.id, { name, details });
+    await updateTaskMutation(updatedTask);
   };
 
   return (

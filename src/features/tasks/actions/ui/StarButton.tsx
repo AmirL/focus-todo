@@ -1,7 +1,7 @@
-import { isTaskSelected, TaskModel } from '@/shared/model/task';
+import { isTaskSelected, TaskModel } from '@/entities/task/model/task';
 import { Button } from '@/shared/ui/button';
 import { Star } from 'lucide-react';
-import { useTasksStore } from '@/shared/model/tasksStore';
+import { useTasksStore } from '@/entities/task/model/tasksStore';
 import { cn } from '@/shared/lib/utils';
 
 export function StarButton({ task }: { task: TaskModel }) {

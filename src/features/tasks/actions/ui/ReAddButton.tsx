@@ -1,23 +1,26 @@
-import { TaskModel } from '@/shared/model/task';
+import { TaskModel } from '@/entities/task/model/task';
 import { Button } from '@/shared/ui/button';
 import { RotateCw } from 'lucide-react';
-import { useTasksStore } from '@/shared/model/tasksStore';
+import { useTasksStore } from '@/entities/task/model/tasksStore';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { Calendar } from '@/shared/ui/calendar';
 import { useState } from 'react';
 import { cloneInstance } from '@/shared/lib/instance-tools';
+import { createTaskMutation } from '@/shared/api/createTask.mutation';
+import { updateTaskMutation } from '@/shared/api/updateTask.mutation';
 
 export function ReAddButton({ task }: { task: TaskModel }) {
-  const createTask = useTasksStore((state) => state.createTask);
-  const updateTask = useTasksStore((state) => state.updateTask);
-
   const [popoverOpen, setPopoverOpen] = useState(false);
 
   const reAddTask = async (date: Date) => {
-    const newTask = cloneInstance(task, { completedAt: null, date, selectedAt: null });
-    createTask(newTask);
+    const store = useTasksStore.getState();
 
-    updateTask(task.id, { completedAt: new Date() });
+    const newTask = cloneInstance(task, { completedAt: null, date, selectedAt: null });
+    const created = await createTaskMutation(newTask);
+    store.addTask(created);
+
+    const updatedTask = store.updateTask(task.id, { completedAt: new Date() });
+    await updateTaskMutation(updatedTask);
   };
 
   const onDateSelect = (date: Date) => {

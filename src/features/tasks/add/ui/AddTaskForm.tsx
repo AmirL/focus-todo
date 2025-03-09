@@ -5,7 +5,7 @@ import { Plus, PlusCircle } from 'lucide-react';
 import { SelectTaskCategory } from './SelectTaskCategory';
 import { StarCheckbox } from './StarCheckbox';
 import { useAddTasksStore } from '../model/addTaskStore';
-import { useTasksStore } from '@/shared/model/tasksStore';
+import { useTasksStore } from '@/entities/task/model/tasksStore';
 import {
   Dialog,
   DialogContent,
@@ -15,6 +15,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/shared/ui/dialog';
+import { createInstance } from '@/shared/lib/instance-tools';
+import { TaskModel } from '@/entities/task/model/task';
+import { useShallow } from 'zustand/react/shallow';
+import { createTaskMutation } from '@/shared/api/createTask.mutation';
 
 export function AddTaskForm() {
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
@@ -23,22 +27,34 @@ export function AddTaskForm() {
     setIsAddTaskOpen(open);
   };
 
-  const createTasks = useTasksStore((store) => store.createMultipleTasks);
-
-  const createTaskInput = useAddTasksStore((state) => state.createTaskInput);
-  const setCreateTaskInput = useAddTasksStore((state) => state.setCreateTaskInput);
+  const taskInput = useAddTasksStore((state) => state.createTaskInput);
+  const setTaskInput = useAddTasksStore((state) => state.setCreateTaskInput);
 
   const [selectedList, setSelectedList] = useState('Personal');
   const [isStarred, setIsStarred] = useState(false);
 
-  const addTodo = async () => {
-    const todoTexts = createTaskInput.split('\n').filter((text) => text.trim() !== '');
+  const tasksStore = useTasksStore(useShallow((store) => ({ addTask: store.addTask })));
 
-    const previousInputValue = createTaskInput;
+  const handleAddTaskClick = async () => {
+    const todoTexts = taskInput.split('\n').filter((text) => text.trim() !== '');
 
-    setCreateTaskInput('');
-    createTasks(todoTexts, selectedList, isStarred).catch(() => {
-      setCreateTaskInput(previousInputValue);
+    const previousInputValue = taskInput;
+    setTaskInput('');
+
+    const createMultipleTasks = async () => {
+      for (const text of todoTexts) {
+        const newTask = createInstance(TaskModel, {
+          name: text,
+          list: selectedList,
+          selectedAt: isStarred ? new Date() : null,
+        });
+        const createdTask = await createTaskMutation(newTask);
+        tasksStore.addTask(createdTask);
+      }
+    };
+
+    createMultipleTasks().catch(() => {
+      setTaskInput(previousInputValue);
       setIsAddTaskOpen(true);
     });
     setIsAddTaskOpen(false);
@@ -65,8 +81,8 @@ export function AddTaskForm() {
             id="new-task"
             placeholder="Enter your task here..."
             className="min-h-[100px] resize-none"
-            value={createTaskInput}
-            onChange={(e) => setCreateTaskInput(e.target.value)}
+            value={taskInput}
+            onChange={(e) => setTaskInput(e.target.value)}
             autoFocus
           />
 
@@ -78,8 +94,8 @@ export function AddTaskForm() {
 
         <DialogFooterButtons
           onCancel={() => setIsAddTaskOpen(false)}
-          onAdd={addTodo}
-          isAddDisabled={!createTaskInput.trim()}
+          onAdd={handleAddTaskClick}
+          isAddDisabled={!taskInput.trim()}
         />
       </DialogContent>
     </Dialog>

@@ -1,21 +1,33 @@
-import { useTasksStore } from '@/shared/model/tasksStore';
+import { useTasksStore } from '@/entities/task/model/tasksStore';
+import { useShallow } from 'zustand/react/shallow';
+
 import { useEffect } from 'react';
+import { fetchBackend } from '@/shared/lib/api';
+import { TaskPlain, TaskModel } from '@/entities/task/model/task';
 
 export function useTasksLoader() {
-  const fetchTasks = useTasksStore((state) => state.fetchTasks);
   const allTasks = useTasksStore((state) => state.tasks);
-  const isLoading = useTasksStore((state) => state.isLoading);
+  const { isLoading, setLoading, syncTasks } = useTasksStore(
+    useShallow((state) => ({ isLoading: state.isLoading, setLoading: state.setLoading, syncTasks: state.syncTasks }))
+  );
 
   useEffect(() => {
-    if (allTasks.length === 0) fetchTasks();
+    const fetchTasks = async () => {
+      setLoading(true);
+      const data = (await fetchBackend('get-tasks')) as { tasks: TaskPlain[] };
+      const fetchedTasks = TaskModel.fromPlainArray(data.tasks);
+      syncTasks(fetchedTasks);
+      setLoading(false);
+    };
+
+    fetchTasks();
 
     // Set up an interval to fetch tasks periodically
-    const intervalId = setInterval(() => {
-      fetchTasks();
-    }, 60000); // Fetch tasks every 60 seconds
+    const intervalId = setInterval(fetchTasks, 60000); // Fetch tasks every 60 seconds
 
     // Clean up the interval on component unmount
     return () => clearInterval(intervalId);
-  }, [fetchTasks, allTasks.length]);
+  }, [setLoading, syncTasks]);
+
   return { allTasks, isLoading };
 }

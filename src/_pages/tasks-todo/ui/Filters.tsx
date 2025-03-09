@@ -1,8 +1,8 @@
 import { Button } from '@/shared/ui/button';
-import { ListsNames } from '@/shared/model/task';
+import { ListsNames } from '@/entities/task/model/task';
 import { StatusFilterEnum, useFilterStore } from '@/_pages/tasks-todo/model/filterStore';
 import { ContentSection } from './Section';
-import { useTasksStore } from '@/shared/model/tasksStore';
+import { useTasksStore } from '@/entities/task/model/tasksStore';
 
 export function Filters() {
   return (

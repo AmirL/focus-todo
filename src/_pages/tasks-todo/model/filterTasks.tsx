@@ -5,7 +5,7 @@ import {
   isTaskActive,
   isTaskInFuture,
   isTaskSelected,
-} from '@/shared/model/task';
+} from '@/entities/task/model/task';
 import dayjs from 'dayjs';
 import { useFilterStore, StatusFilterEnum } from './filterStore';
 

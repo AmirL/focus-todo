@@ -1,11 +1,12 @@
-import { isTaskSelected, TaskModel } from '@/shared/model/task';
+import { isTaskSelected, TaskModel } from '@/entities/task/model/task';
 import { Checkbox } from '@/shared/ui/checkbox';
 import { Badge } from '@/shared/ui/badge';
-import { useTasksStore } from '@/shared/model/tasksStore';
+import { useTasksStore } from '@/entities/task/model/tasksStore';
 import { cn, isFutureDate, isToday } from '@/shared/lib/utils';
 import dayjs from 'dayjs';
 import ReactMarkdown from 'react-markdown';
 import { useState } from 'react';
+import { toggleCompleted } from '../model/toggleCompleted';
 
 interface TaskProps {
   task: TaskModel;
@@ -13,13 +14,10 @@ interface TaskProps {
 }
 
 export function Task({ task, actionButtons }: TaskProps) {
-  const updateTask = useTasksStore((state) => state.updateTask);
-
   const isSelected = isTaskSelected(task);
 
-  const toggleCompleted = () => {
-    const completedAt = task.completedAt ? null : new Date();
-    updateTask(task.id, { completedAt });
+  const onCheckboxClick = async () => {
+    await toggleCompleted(task);
   };
 
   return (
@@ -33,7 +31,7 @@ export function Task({ task, actionButtons }: TaskProps) {
     >
       <div className="p-3 pb-2">
         <div className="flex items-center space-x-2">
-          <Checkbox id={`todo-${task.id}`} checked={!!task.completedAt} onCheckedChange={toggleCompleted} />
+          <Checkbox id={`todo-${task.id}`} checked={!!task.completedAt} onCheckedChange={onCheckboxClick} />
           <TaskName task={task} />
         </div>
         <TaskDetails details={task.details} />

@@ -1,4 +1,4 @@
-import { TaskModel } from '@/shared/model/task';
+import { TaskModel } from '@/entities/task/model/task';
 import { Pencil } from 'lucide-react';
 import { EditTaskDialog } from './EditTaskDialog';
 import { Button } from '@/shared/ui/button';

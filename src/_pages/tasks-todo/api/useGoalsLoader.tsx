@@ -1,4 +1,4 @@
-import { useGoalsStore } from '@/shared/model/goalsStore';
+import { useGoalsStore } from '@/entities/goal/model/goalsStore';
 import { useEffect } from 'react';
 
 export function useGoalsLoader() {
