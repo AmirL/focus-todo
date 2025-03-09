@@ -1,4 +1,4 @@
-import { TaskModel } from '@/shared/model/task';
+import { isTaskSelected, TaskModel } from '@/shared/model/task';
 import { Checkbox } from '@/shared/ui/checkbox';
 import { Badge } from '@/shared/ui/badge';
 import { useTasksStore } from '@/shared/model/tasksStore';
@@ -15,6 +15,8 @@ interface TaskProps {
 export function Task({ task, actionButtons }: TaskProps) {
   const updateTask = useTasksStore((state) => state.updateTask);
 
+  const isSelected = isTaskSelected(task);
+
   const toggleCompleted = () => {
     const completedAt = task.completedAt ? null : new Date();
     updateTask(task.id, { completedAt });
@@ -26,7 +28,7 @@ export function Task({ task, actionButtons }: TaskProps) {
       className={cn(
         'group relative rounded-lg transition-all duration-300 overflow-hidden',
         task.completedAt ? 'bg-muted/50' : 'bg-muted/80 hover:bg-muted',
-        task.selectedAt && !task.completedAt && 'border-l-4 border-l-yellow-400'
+        isSelected && !task.completedAt && 'border-l-4 border-l-yellow-400'
       )}
     >
       <div className="p-3 pb-2">
