@@ -1,4 +1,5 @@
-import { useApplyFilters, useSortedTasks } from '../model/filterTasks';
+import { useApplyFilters } from '../model/filterTasks';
+import { useSortedTasks } from '../model/sortTasks';
 import { Task } from '@/entities/task/ui/Task';
 import { useTasksLoader } from '../api/useTasksLoader';
 import { EditTaskButton } from '@/features/tasks/edit/ui/EditTaskButton';
