@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Textarea } from '@/shared/ui/textarea';
 import { Button } from '@/shared/ui/button';
-import { Plus, PlusCircle } from 'lucide-react';
+import { Plus, PlusCircle, Star, Users } from 'lucide-react';
 import { SelectTaskCategory } from './SelectTaskCategory';
-import { StarCheckbox } from './StarCheckbox';
+import { LabeledCheckbox } from './LabeledCheckbox';
 import { useAddTasksStore } from '../model/addTaskStore';
 import { useTasksStore } from '@/entities/task/model/tasksStore';
 import {
@@ -32,6 +32,7 @@ export function AddTaskForm() {
 
   const [selectedList, setSelectedList] = useState('Personal');
   const [isStarred, setIsStarred] = useState(false);
+  const [isDependency, setIsDependency] = useState(false);
 
   const tasksStore = useTasksStore(useShallow((store) => ({ addTask: store.addTask })));
 
@@ -47,6 +48,7 @@ export function AddTaskForm() {
           name: text,
           list: selectedList,
           selectedAt: isStarred ? new Date() : null,
+          isDependency,
         });
         const createdTask = await createTaskMutation(newTask);
         tasksStore.addTask(createdTask);
@@ -88,7 +90,24 @@ export function AddTaskForm() {
 
           <div className="flex items-center gap-4">
             <SelectTaskCategory selectedList={selectedList} setSelectedList={setSelectedList} />
-            <StarCheckbox isStarred={isStarred} setIsStarred={setIsStarred} />
+            <LabeledCheckbox
+              isChecked={isDependency}
+              setIsChecked={setIsDependency}
+              label={
+                <>
+                  <Users className="h-4 w-4 mr-1" /> Dependency
+                </>
+              }
+            />
+            <LabeledCheckbox
+              isChecked={isStarred}
+              setIsChecked={setIsStarred}
+              label={
+                <>
+                  <Star className="h-4 w-4 mr-1" /> Star
+                </>
+              }
+            />
           </div>
         </div>
 
