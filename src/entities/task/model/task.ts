@@ -73,7 +73,7 @@ export function isTaskCompletedAgo(task: TaskModel) {
 }
 
 export function isTaskSelected(task: TaskModel) {
-  return !!task.selectedAt && dayjs(task.selectedAt).isSame(dayjs(), 'day');
+  return !!task.selectedAt; // && dayjs(task.selectedAt).isSame(dayjs(), 'day');
 }
 
 function transformDateToString({ value }: { value: Date | null }) {
