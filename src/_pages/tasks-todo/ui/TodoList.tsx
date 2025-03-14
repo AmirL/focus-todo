@@ -21,7 +21,6 @@ export function TodoList() {
       <Goals />
       <Filters />
       <Tasks />
-      <Filters />
       <AddTaskForm />
     </>
   );
