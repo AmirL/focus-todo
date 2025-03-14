@@ -2,7 +2,7 @@ import {
   TaskModel,
   isTaskDeleted,
   isTaskCompletedAgo,
-  isTaskActive,
+  isTaskInBacklog,
   isTaskInFuture,
   isTaskSelected,
 } from '@/entities/task/model/task';
@@ -18,8 +18,8 @@ export function useApplyFilters(tasks: TaskModel[]) {
 }
 function applyStatusFilter(task: TaskModel, filter: StatusFilterEnum) {
   switch (filter) {
-    case StatusFilterEnum.ACTIVE:
-      return isTaskActive(task);
+    case StatusFilterEnum.BACKLOG:
+      return isTaskInBacklog(task);
     case StatusFilterEnum.FUTURE:
       return isTaskInFuture(task);
     case StatusFilterEnum.SELECTED:

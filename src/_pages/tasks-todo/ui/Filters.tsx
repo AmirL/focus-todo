@@ -19,7 +19,7 @@ function SpecialFiltersGroup() {
   const { statusFilter, setStatusFilter } = useFilterStore();
 
   const handleSetActive = () => {
-    setStatusFilter(StatusFilterEnum.ACTIVE);
+    setStatusFilter(StatusFilterEnum.BACKLOG);
   };
 
   const handleSetSelected = () => {
@@ -32,8 +32,8 @@ function SpecialFiltersGroup() {
 
   return (
     <div className="flex flex-wrap gap-2">
-      <Button variant={statusFilter === StatusFilterEnum.ACTIVE ? 'default' : 'outline'} onClick={handleSetActive}>
-        Active
+      <Button variant={statusFilter === StatusFilterEnum.BACKLOG ? 'default' : 'outline'} onClick={handleSetActive}>
+        Backlog
       </Button>
       <Button variant={statusFilter === StatusFilterEnum.SELECTED ? 'default' : 'outline'} onClick={handleSetSelected}>
         Selected

@@ -60,8 +60,8 @@ export function isTaskInFuture(task: TaskModel) {
   return isFutureDate(task.date);
 }
 
-export function isTaskActive(task: TaskModel) {
-  return !isTaskInFuture(task);
+export function isTaskInBacklog(task: TaskModel) {
+  return !isTaskInFuture(task) && !isTaskSelected(task);
 }
 
 export function isTaskDeleted(task: TaskModel) {

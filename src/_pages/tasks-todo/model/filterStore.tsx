@@ -3,7 +3,7 @@ import { create } from 'zustand';
 export enum StatusFilterEnum {
   SELECTED = 'selected',
   FUTURE = 'future',
-  ACTIVE = 'active',
+  BACKLOG = 'backlog',
 }
 
 type FilterState = {
@@ -14,11 +14,11 @@ type FilterState = {
 };
 
 export const useFilterStore = create<FilterState>((set, get) => ({
-  statusFilter: StatusFilterEnum.ACTIVE,
+  statusFilter: StatusFilterEnum.BACKLOG,
   list: '',
 
   setStatusFilter: (filter) => {
-    if (filter === get().statusFilter) return set({ statusFilter: StatusFilterEnum.ACTIVE });
+    if (filter === get().statusFilter) return set({ statusFilter: StatusFilterEnum.BACKLOG });
     return set({ statusFilter: filter });
   },
   setList: (list) => {
