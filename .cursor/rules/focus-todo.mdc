@@ -1,0 +1,68 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Focus Todo - Project Guide
+
+## Project Overview
+
+Focus Todo is a Next.js-based task management application that helps users manage their tasks and improve productivity. The application follows a feature-sliced design pattern for code organization.
+
+## Tech Stack
+
+- **Frontend Framework**: Next.js 14.2
+- **UI Components**: Custom components using Radix UI primitives
+- **Styling**: Tailwind CSS
+- **State Management**: Zustand
+- **Database**: MySQL with Drizzle ORM
+- **Authentication**: Auth0
+- **Testing**: Vitest
+
+## Project Structure
+
+The project follows a feature-sliced design architecture:
+
+```
+src/
+├── app/              # Next.js app router configuration and layouts
+├── entities/         # Domain entities (Task, User, etc.)
+├── features/         # Business features (add task, edit task, etc.)
+│   └── tasks/        # Task-related features
+│       ├── add/      # Add task functionality
+│       ├── edit/     # Edit task functionality
+│       └── actions/  # API actions for tasks
+├── shared/           # Shared utilities, UI components, and types
+└── _pages/           # Page components (if using pages router alongside app router)
+```
+
+## Key Dependencies
+
+- **UI Components**: Radix UI primitives (@radix-ui/*)
+- **Date Management**: dayjs
+- **Database ORM**: drizzle-orm with MySQL
+- **Markdown Support**: react-markdown
+- **State Management**: zustand
+- **Forms and Validation**: uses class-transformer and reflect-metadata
+
+## Development Commands
+
+- `npm run dev`: Start development server on port 8000
+- `npm run build`: Run tests and build production app
+- `npm run test`: Run Vitest tests
+- `npm run fsd`: Generate feature-sliced design documentation
+- `npm run deps`: Generate dependency graph visualization
+
+## Authentication
+
+The application uses Auth0 (@auth0/nextjs-auth0) for user authentication and session management.
+
+## Database
+
+The project uses MySQL with Drizzle ORM for database operations. The database schema and migrations are managed with drizzle-kit.
+
+## Project Patterns
+
+- **Feature-Sliced Design**: The application is organized following the Feature-Sliced Design (FSD) methodology, which organizes code into layers: app, entities, features, shared
+- **Component Design**: UI components are built using Radix UI primitives with Tailwind for styling
+- **State Management**: Zustand is used for global state management
