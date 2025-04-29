@@ -1,10 +1,14 @@
-import { RefreshCcw } from 'lucide-react';
+import { RefreshCcw, Copy, ClipboardCheck, ClipboardX } from 'lucide-react';
 import { ContentSection } from './Section';
 import { StatusFilterEnum, useFilterStore } from '@/_pages/tasks-todo/model/filterStore';
 import { ListsNames } from '@/entities/task/model/task';
 import { useTasksStore } from '@/entities/task/model/tasksStore';
 import { updateTaskMutation } from '@/shared/api/updateTask.mutation';
 import { Button } from '@/shared/ui/button';
+import { TaskModel } from '@/entities/task/model/task';
+import { useApplyFilters } from '../model/filterTasks';
+import { useSortedTasks } from '../model/sortTasks';
+import toast from 'react-hot-toast';
 
 export function Filters() {
   const { statusFilter } = useFilterStore();
@@ -16,6 +20,29 @@ export function Filters() {
   // Show reset button only when Selected filter is active and there are selected tasks
   const showResetButton = statusFilter === StatusFilterEnum.SELECTED && hasSelectedTasks;
 
+  const filteredTasks = useApplyFilters(tasksStore.tasks);
+  const tasks = useSortedTasks(filteredTasks);
+
+  const handleCopyAsJson = () => {
+    const tasksJson = JSON.stringify(
+      tasks.map((task) => TaskModel.toPlain(task)),
+      null,
+      2
+    );
+    navigator.clipboard
+      .writeText(tasksJson)
+      .then(() => {
+        toast.success('Tasks copied to clipboard', {
+          icon: <ClipboardCheck className="h-5 w-5" />,
+        });
+      })
+      .catch(() => {
+        toast.error('Failed to copy tasks', {
+          icon: <ClipboardX className="h-5 w-5" />,
+        });
+      });
+  };
+
   return (
     <>
       <ContentSection title="Filters">
@@ -26,7 +53,11 @@ export function Filters() {
       </ContentSection>
 
       {showResetButton && (
-        <div className="mt-3 flex justify-end">
+        <div className="mt-3 flex justify-end gap-2">
+          <Button variant="outline" size="sm" onClick={handleCopyAsJson} className="flex items-center gap-2">
+            <Copy className="h-4 w-4" />
+            Copy as JSON
+          </Button>
           <ResetSelectedButton />
         </div>
       )}

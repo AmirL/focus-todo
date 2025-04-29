@@ -23,7 +23,6 @@ export function Tasks() {
     return <p className="text-center text-muted-foreground">No tasks found.</p>;
   }
 
-  console.log('Rendering tasks');
   return (
     <section>
       <ul className="space-y-3">
