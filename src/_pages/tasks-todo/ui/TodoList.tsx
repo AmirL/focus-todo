@@ -18,10 +18,12 @@ export function TodoList() {
 
   return (
     <>
-      <Goals />
-      <Filters />
-      <Tasks />
-      <AddTaskForm />
+      <div className="space-y-8">
+        <Goals />
+        <Filters />
+        <Tasks />
+        <AddTaskForm />
+      </div>
     </>
   );
 }

@@ -24,22 +24,24 @@ export function Task({ task, actionButtons }: TaskProps) {
     <li
       key={task.id}
       className={cn(
-        'group relative rounded-lg transition-all duration-300 overflow-hidden',
-        task.completedAt ? 'bg-muted/50' : 'bg-muted/80 hover:bg-muted',
+        'group relative transition-all duration-300 overflow-hidden bg-white',
+        task.completedAt ? 'opacity-60' : '',
         isSelected && !task.completedAt && 'border-l-4 border-l-yellow-400'
       )}
     >
-      <div className="p-3 pb-2">
-        <div className="flex items-center space-x-2">
+      <div className="px-4 py-3">
+        <div className="flex items-center space-x-3">
           <Checkbox id={`todo-${task.id}`} checked={!!task.completedAt} onCheckedChange={onCheckboxClick} />
           <TaskName task={task} />
         </div>
         <TaskDetails details={task.details} />
-        <div className="flex justify-between">
-          <div className="flex space-x-1">
+        <div className="flex justify-between items-center mt-2">
+          <div className="flex space-x-2">
             <TaskBadges task={task} />
           </div>
-          <div className="flex space-x-1">{actionButtons}</div>
+          <div className="flex space-x-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+            {actionButtons}
+          </div>
         </div>
       </div>
     </li>
@@ -50,7 +52,7 @@ function TaskName({ task }: { task: TaskModel }) {
   return (
     <label
       htmlFor={`todo-${task.id}`}
-      className={cn('flex-1 cursor-pointer', task.completedAt && 'line-through text-muted-foreground')}
+      className={cn('flex-1 cursor-pointer font-medium', task.completedAt && 'line-through text-muted-foreground')}
     >
       {task.name}
     </label>
@@ -75,7 +77,7 @@ function TaskDetails({ details }: { details: string }) {
   if (!details) return <></>;
 
   return (
-    <div onClick={() => setFolded(!folded)}>
+    <div onClick={() => setFolded(!folded)} className="mt-1">
       <ReactMarkdown
         className={cn(
           'prose prose-sm text-muted-foreground cursor-pointer',

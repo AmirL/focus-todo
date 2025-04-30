@@ -7,9 +7,9 @@ type Props = {
 
 export function ContentSection({ children, title }: Props) {
   return (
-    <section className="space-y-3">
+    <section className="space-y-4">
       <h2 className="text-lg font-semibold text-primary">{title}</h2>
-      <Card className="bg-muted/40 border-muted">
+      <Card className="bg-white border-border/50">
         <CardContent className="p-4">{children}</CardContent>
       </Card>
     </section>

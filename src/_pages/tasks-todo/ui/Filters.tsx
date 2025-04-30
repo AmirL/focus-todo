@@ -46,14 +46,14 @@ export function Filters() {
   return (
     <>
       <ContentSection title="Filters">
-        <div className="flex flex-wrap justify-between gap-4">
+        <div className="flex flex-wrap justify-between gap-6">
           <StatusFiltersGroup />
           <ListFiltersGroup />
         </div>
       </ContentSection>
 
       {showActionButtons && (
-        <div className="mt-3 flex justify-end gap-2">
+        <div className="mt-4 flex justify-end gap-2">
           <Button variant="outline" size="sm" onClick={handleCopyAsJson} className="flex items-center gap-2">
             <Copy className="h-4 w-4" />
             Copy as JSON
@@ -105,17 +105,37 @@ function StatusFiltersGroup() {
   };
 
   return (
-    <div className="flex flex-wrap gap-2 items-center">
-      <Button variant={statusFilter === StatusFilterEnum.BACKLOG ? 'default' : 'outline'} onClick={handleSetActive}>
+    <div className="flex flex-wrap gap-3 items-center">
+      <Button
+        variant={statusFilter === StatusFilterEnum.BACKLOG ? 'default' : 'outline'}
+        onClick={handleSetActive}
+        size="sm"
+        className="px-4"
+      >
         Backlog
       </Button>
-      <Button variant={statusFilter === StatusFilterEnum.SELECTED ? 'default' : 'outline'} onClick={handleSetSelected}>
+      <Button
+        variant={statusFilter === StatusFilterEnum.SELECTED ? 'default' : 'outline'}
+        onClick={handleSetSelected}
+        size="sm"
+        className="px-4"
+      >
         Selected
       </Button>
-      <Button variant={statusFilter === StatusFilterEnum.TODAY ? 'default' : 'outline'} onClick={handleSetToday}>
+      <Button
+        variant={statusFilter === StatusFilterEnum.TODAY ? 'default' : 'outline'}
+        onClick={handleSetToday}
+        size="sm"
+        className="px-4"
+      >
         Today
       </Button>
-      <Button variant={statusFilter === StatusFilterEnum.FUTURE ? 'default' : 'outline'} onClick={handleSetFuture}>
+      <Button
+        variant={statusFilter === StatusFilterEnum.FUTURE ? 'default' : 'outline'}
+        onClick={handleSetFuture}
+        size="sm"
+        className="px-4"
+      >
         Future
       </Button>
     </div>
@@ -138,12 +158,14 @@ function ListFiltersGroup() {
   };
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-3">
       {ListsNames.map((listName) => (
         <Button
           key={listName}
           variant={list === listName ? 'default' : 'outline'}
           onClick={() => handleSetList(listName)}
+          size="sm"
+          className="px-4"
         >
           {listName}
         </Button>
