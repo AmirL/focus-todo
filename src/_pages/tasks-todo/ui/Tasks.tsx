@@ -25,7 +25,7 @@ export function Tasks() {
 
   return (
     <section>
-      <ul className="divide-y divide-border/50">
+      <ul>
         {tasks.map((task) => (
           <Task
             key={task.id}

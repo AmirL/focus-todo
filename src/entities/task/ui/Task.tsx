@@ -24,7 +24,7 @@ export function Task({ task, actionButtons }: TaskProps) {
     <li
       key={task.id}
       className={cn(
-        'group relative transition-all duration-300 overflow-hidden bg-white',
+        'group relative transition-all duration-300 overflow-hidden bg-white border-b border-border/50',
         task.completedAt ? 'opacity-60' : '',
         isSelected && !task.completedAt && 'border-l-4 border-l-yellow-400'
       )}
