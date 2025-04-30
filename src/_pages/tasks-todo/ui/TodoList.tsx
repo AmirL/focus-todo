@@ -1,6 +1,5 @@
 'use client';
 import { AddTaskForm } from '@/features/tasks/add/ui/AddTaskForm';
-import { Filters } from '@/_pages/tasks-todo/ui/Filters';
 import { Goals } from '@/_pages/tasks-todo/ui/Goals';
 import { Tasks } from '@/_pages/tasks-todo/ui/Tasks';
 import { useUser } from '@auth0/nextjs-auth0/client';
@@ -20,7 +19,6 @@ export function TodoList() {
     <>
       <div className="space-y-8">
         <Goals />
-        <Filters />
         <Tasks />
         <AddTaskForm />
       </div>
