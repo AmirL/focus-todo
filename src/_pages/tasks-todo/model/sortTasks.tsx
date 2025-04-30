@@ -9,7 +9,7 @@ export function useSortedTasks(tasks: TaskModel[]) {
     case StatusFilterEnum.FUTURE:
       return sortTasksByDate(tasks);
     case StatusFilterEnum.SELECTED:
-      return sortDependencyTasksBottom(tasks);
+      return sortBlockerTasksBottom(tasks);
     default:
       return tasks;
   }
@@ -23,6 +23,6 @@ function unixTime(date: Date | null | undefined) {
   return date ? dayjs(date).unix() : 0;
 }
 
-function sortDependencyTasksBottom(tasks: TaskModel[]) {
-  return tasks.sort((a, b) => Number(a.isDependency) - Number(b.isDependency));
+function sortBlockerTasksBottom(tasks: TaskModel[]) {
+  return tasks.sort((a, b) => Number(a.isBlocker) - Number(b.isBlocker));
 }

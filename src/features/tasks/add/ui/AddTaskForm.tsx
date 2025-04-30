@@ -32,7 +32,7 @@ export function AddTaskForm() {
 
   const [selectedList, setSelectedList] = useState('Personal');
   const [isStarred, setIsStarred] = useState(false);
-  const [isDependency, setIsDependency] = useState(false);
+  const [isBlocker, setIsBlocker] = useState(false);
 
   const tasksStore = useTasksStore(useShallow((store) => ({ addTask: store.addTask })));
 
@@ -48,7 +48,7 @@ export function AddTaskForm() {
           name: text,
           list: selectedList,
           selectedAt: isStarred ? new Date() : null,
-          isDependency,
+          isBlocker,
         });
         const createdTask = await createTaskMutation(newTask);
         tasksStore.addTask(createdTask);
@@ -91,11 +91,11 @@ export function AddTaskForm() {
           <div className="flex items-center gap-4">
             <SelectTaskCategory selectedList={selectedList} setSelectedList={setSelectedList} />
             <LabeledCheckbox
-              isChecked={isDependency}
-              setIsChecked={setIsDependency}
+              isChecked={isBlocker}
+              setIsChecked={setIsBlocker}
               label={
                 <>
-                  <Users className="h-4 w-4 mr-1" /> Dependency
+                  <Users className="h-4 w-4 mr-1" /> Blocker
                 </>
               }
             />

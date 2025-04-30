@@ -33,7 +33,7 @@ export class TaskModel {
   @Transform(transformDateToString, { toPlainOnly: true })
   completedAt?: Date | null;
 
-  isDependency: boolean = false;
+  isBlocker: boolean = false;
 
   list!: string;
 

@@ -7,7 +7,7 @@ import { DeleteButton } from '@/features/tasks/actions/ui/DeleteButton';
 import { ReAddButton } from '@/features/tasks/actions/ui/ReAddButton';
 import { SnoozeButton } from '@/features/tasks/actions/ui/SnoozeButton';
 import { StarButton } from '@/features/tasks/actions/ui/StarButton';
-import { DependencyButton } from '@/features/tasks/actions/ui/DependencyButton';
+import { BlockerButton } from '@/features/tasks/actions/ui/BlockerButton';
 
 export function Tasks() {
   const { allTasks, isLoading } = useTasksLoader();
@@ -33,7 +33,7 @@ export function Tasks() {
             actionButtons={
               <>
                 <EditTaskButton key="edit" task={task} />
-                <DependencyButton task={task} />
+                <BlockerButton task={task} />
                 <StarButton task={task} />
                 <SnoozeButton task={task} />
                 <ReAddButton task={task} />
