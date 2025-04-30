@@ -80,6 +80,10 @@ export function isTaskSelected(task: TaskModel) {
   return !!task.selectedAt; // && dayjs(task.selectedAt).isSame(dayjs(), 'day');
 }
 
+export function isTaskToday(task: TaskModel) {
+  return task.date && dayjs(task.date).isSame(dayjs(), 'day');
+}
+
 function transformDateToString({ value }: { value: Date | null }) {
   if (!value) return null;
   return dayjs(value).format('YYYY-MM-DD HH:mm:ss');

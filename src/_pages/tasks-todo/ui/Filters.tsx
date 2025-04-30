@@ -17,8 +17,8 @@ export function Filters() {
   // Check if there are any selected tasks
   const hasSelectedTasks = tasksStore.tasks.some((task) => task.selectedAt && !task.completedAt);
 
-  // Show reset button only when Selected filter is active and there are selected tasks
-  const showResetButton = statusFilter === StatusFilterEnum.SELECTED && hasSelectedTasks;
+  // Show action buttons when there are tasks to copy or reset
+  const showActionButtons = hasSelectedTasks || tasksStore.tasks.length > 0;
 
   const filteredTasks = useApplyFilters(tasksStore.tasks);
   const tasks = useSortedTasks(filteredTasks);
@@ -47,18 +47,18 @@ export function Filters() {
     <>
       <ContentSection title="Filters">
         <div className="flex flex-wrap justify-between gap-4">
-          <SpecialFiltersGroup />
+          <StatusFiltersGroup />
           <ListFiltersGroup />
         </div>
       </ContentSection>
 
-      {showResetButton && (
+      {showActionButtons && (
         <div className="mt-3 flex justify-end gap-2">
           <Button variant="outline" size="sm" onClick={handleCopyAsJson} className="flex items-center gap-2">
             <Copy className="h-4 w-4" />
             Copy as JSON
           </Button>
-          <ResetSelectedButton />
+          {statusFilter === StatusFilterEnum.SELECTED && hasSelectedTasks && <ResetSelectedButton />}
         </div>
       )}
     </>
@@ -85,7 +85,7 @@ function ResetSelectedButton() {
   );
 }
 
-function SpecialFiltersGroup() {
+function StatusFiltersGroup() {
   const { statusFilter, setStatusFilter } = useFilterStore();
 
   const handleSetActive = () => {
@@ -100,6 +100,10 @@ function SpecialFiltersGroup() {
     setStatusFilter(StatusFilterEnum.FUTURE);
   };
 
+  const handleSetToday = () => {
+    setStatusFilter(StatusFilterEnum.TODAY);
+  };
+
   return (
     <div className="flex flex-wrap gap-2 items-center">
       <Button variant={statusFilter === StatusFilterEnum.BACKLOG ? 'default' : 'outline'} onClick={handleSetActive}>
@@ -107,6 +111,9 @@ function SpecialFiltersGroup() {
       </Button>
       <Button variant={statusFilter === StatusFilterEnum.SELECTED ? 'default' : 'outline'} onClick={handleSetSelected}>
         Selected
+      </Button>
+      <Button variant={statusFilter === StatusFilterEnum.TODAY ? 'default' : 'outline'} onClick={handleSetToday}>
+        Today
       </Button>
       <Button variant={statusFilter === StatusFilterEnum.FUTURE ? 'default' : 'outline'} onClick={handleSetFuture}>
         Future
