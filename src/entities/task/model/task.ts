@@ -15,6 +15,7 @@ export type TaskPlain = {
   completedAt: string;
   list: string;
   deletedAt: string;
+  createdAt: string;
 };
 
 export class TaskModel {
@@ -42,6 +43,9 @@ export class TaskModel {
 
   @Transform(transformDateToUTCString, { toPlainOnly: true })
   updatedAt!: Date;
+
+  @Transform(transformDateToUTCString, { toPlainOnly: true })
+  createdAt!: Date;
 
   static toInstance(data: TaskPlain): TaskModel {
     return plainToInstance(TaskModel, data);

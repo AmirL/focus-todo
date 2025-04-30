@@ -1,4 +1,4 @@
-import { mysqlTable, int, varchar, text, date, boolean, tinyint } from 'drizzle-orm/mysql-core';
+import { mysqlTable, int, varchar, text, date, boolean, tinyint, timestamp } from 'drizzle-orm/mysql-core';
 
 export const tasksTable = mysqlTable('tasks', {
   id: int('id').autoincrement().primaryKey().notNull(),
@@ -12,6 +12,7 @@ export const tasksTable = mysqlTable('tasks', {
   uid: int('uid'),
   deletedAt: date('deleted_at'),
   updatedAt: date('updated_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const goalsTable = mysqlTable('goals', {
