@@ -64,7 +64,7 @@ function TaskBadges({ task }: { task: TaskModel }) {
     <>
       {showTaskList && <Badge variant="secondary">{task.list}</Badge>}
       {isToday(task.date) && <Badge variant="default">Today</Badge>}
-      {isFutureDate(task.date) && <Badge variant="outline">Snoozed: {dayjs(task.date).format('DD.MM.YY')}</Badge>}
+      {task.date && isFutureDate(task.date) && <Badge variant="outline">{dayjs(task.date).format('DD.MM.YY')}</Badge>}
     </>
   );
 }

@@ -12,7 +12,7 @@ import { updateTaskMutation } from '@/shared/api/updateTask.mutation';
 export function ReAddButton({ task }: { task: TaskModel }) {
   const [popoverOpen, setPopoverOpen] = useState(false);
 
-  const reAddTask = async (date: Date) => {
+  const reAddTask = async (date: Date | null) => {
     const store = useTasksStore.getState();
 
     const newTask = cloneInstance(task, { completedAt: null, date });
@@ -23,7 +23,7 @@ export function ReAddButton({ task }: { task: TaskModel }) {
     await updateTaskMutation(updatedTask);
   };
 
-  const onDateSelect = (date: Date) => {
+  const onDateSelect = (date: Date | null) => {
     reAddTask(date);
     setPopoverOpen(false);
   };
@@ -36,12 +36,19 @@ export function ReAddButton({ task }: { task: TaskModel }) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="end">
-        <Calendar
-          mode="single"
-          selected={task.date ? task.date : undefined}
-          onSelect={(date) => date && onDateSelect(date)}
-          initialFocus
-        />
+        <div className="flex flex-col">
+          <Button variant="ghost" className="w-full justify-start rounded-none" onClick={() => onDateSelect(null)}>
+            Re-add without date
+          </Button>
+          <div className="border-t">
+            <Calendar
+              mode="single"
+              selected={task.date ? task.date : undefined}
+              onSelect={(date) => date && onDateSelect(date)}
+              initialFocus
+            />
+          </div>
+        </div>
       </PopoverContent>
     </Popover>
   );
