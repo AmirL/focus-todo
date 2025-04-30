@@ -8,10 +8,10 @@ export async function POST(req: NextRequest) {
   await validateUserSession();
 
   const { task } = await req.json();
+  const { createdAt, ...taskWithoutCreatedAt } = task;
+  taskWithoutCreatedAt.id = undefined;
 
-  task.id = undefined;
-
-  const [{ id }] = await DB.insert(tasksTable).values(task).$returningId();
+  const [{ id }] = await DB.insert(tasksTable).values(taskWithoutCreatedAt).$returningId();
   const [createdTask] = await DB.select().from(tasksTable).where(eq(tasksTable.id, id));
 
   return NextResponse.json(createdTask, { status: 200 });

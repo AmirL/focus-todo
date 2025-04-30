@@ -15,7 +15,7 @@ export function ReAddButton({ task }: { task: TaskModel }) {
   const reAddTask = async (date: Date) => {
     const store = useTasksStore.getState();
 
-    const newTask = cloneInstance(task, { completedAt: null, date, selectedAt: null });
+    const newTask = cloneInstance(task, { completedAt: null, date });
     const created = await createTaskMutation(newTask);
     store.addTask(created);
 
