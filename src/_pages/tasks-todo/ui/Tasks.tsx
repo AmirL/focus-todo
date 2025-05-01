@@ -24,7 +24,7 @@ export function Tasks() {
   }
 
   return (
-    <section>
+    <section className="pb-20">
       <ul>
         {tasks.map((task) => (
           <Task

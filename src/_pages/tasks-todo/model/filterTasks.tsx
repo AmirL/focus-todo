@@ -1,6 +1,7 @@
 import {
   TaskModel,
   isTaskDeleted,
+  isTaskDeletedAgo,
   isTaskCompletedAgo,
   isTaskInBacklog,
   isTaskInFuture,
@@ -14,7 +15,7 @@ export function useApplyFilters(tasks: TaskModel[]) {
   const { statusFilter, list } = useFilterStore();
 
   return tasks
-    .filter((task) => !isTaskDeleted(task) && !isTaskCompletedAgo(task))
+    .filter((task) => !isTaskDeletedAgo(task) && !isTaskCompletedAgo(task))
     .filter((task) => applyStatusFilter(task, statusFilter))
     .filter((task) => list === '' || task.list === list);
 }
@@ -25,7 +26,7 @@ function applyStatusFilter(task: TaskModel, filter: StatusFilterEnum) {
     case StatusFilterEnum.FUTURE:
       return isTaskInFuture(task);
     case StatusFilterEnum.SELECTED:
-      return isTaskSelected(task);
+      return isTaskSelected(task) && !isTaskToday(task);
     case StatusFilterEnum.TODAY:
       return isTaskToday(task);
     case StatusFilterEnum.TOMORROW:

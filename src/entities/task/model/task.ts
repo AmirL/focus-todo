@@ -72,6 +72,10 @@ export function isTaskDeleted(task: TaskModel) {
   return !!task.deletedAt;
 }
 
+export function isTaskDeletedAgo(task: TaskModel) {
+  return !!task.deletedAt && dayjs(task.deletedAt).isBefore(dayjs().subtract(1, 'day'));
+}
+
 export function isTaskCompletedAgo(task: TaskModel) {
   return !!task.completedAt && dayjs(task.completedAt).isBefore(dayjs().subtract(1, 'day'));
 }

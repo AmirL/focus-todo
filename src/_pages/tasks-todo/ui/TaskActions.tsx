@@ -4,7 +4,7 @@ import { StatusFilterEnum, useFilterStore } from '@/_pages/tasks-todo/model/filt
 import { useTasksStore } from '@/entities/task/model/tasksStore';
 import { updateTaskMutation } from '@/shared/api/updateTask.mutation';
 import { Button } from '@/shared/ui/button';
-import { TaskModel } from '@/entities/task/model/task';
+import { TaskModel, isTaskDeleted } from '@/entities/task/model/task';
 import { useApplyFilters } from '../model/filterTasks';
 import { useSortedTasks } from '../model/sortTasks';
 import toast from 'react-hot-toast';
@@ -12,26 +12,32 @@ import toast from 'react-hot-toast';
 export function TaskActions() {
   const { statusFilter } = useFilterStore();
   const tasksStore = useTasksStore();
+  const allTasks = tasksStore.tasks;
 
-  // Check if there are any selected tasks
-  const hasSelectedTasks = tasksStore.tasks.some((task) => task.selectedAt && !task.completedAt);
+  const filteredTasksForDisplay = useApplyFilters(allTasks);
+  const sortedTasksForDisplay = useSortedTasks(filteredTasksForDisplay);
 
-  // Show action buttons when there are tasks to copy or reset
-  const showActionButtons = hasSelectedTasks || tasksStore.tasks.length > 0;
+  const hasSelectedTasks = sortedTasksForDisplay.some((task) => task.selectedAt && !task.completedAt);
 
-  const filteredTasks = useApplyFilters(tasksStore.tasks);
-  const tasks = useSortedTasks(filteredTasks);
+  const showActionButtons = hasSelectedTasks || sortedTasksForDisplay.length > 0;
 
   const handleCopyAsJson = () => {
+    const tasksToCopy = sortedTasksForDisplay.filter((task) => !isTaskDeleted(task));
+
+    if (tasksToCopy.length === 0) {
+      toast.error('No tasks in the current view to copy');
+      return;
+    }
+
     const tasksJson = JSON.stringify(
-      tasks.map((task) => TaskModel.toPlain(task)),
+      tasksToCopy.map((task) => TaskModel.toPlain(task)),
       null,
       2
     );
     navigator.clipboard
       .writeText(tasksJson)
       .then(() => {
-        toast.success('Tasks copied to clipboard', {
+        toast.success('Visible tasks copied to clipboard', {
           icon: <ClipboardCheck className="h-5 w-5" />,
         });
       })

@@ -1,4 +1,4 @@
-import { isTaskSelected, TaskModel } from '@/entities/task/model/task';
+import { isTaskSelected, TaskModel, isTaskDeleted } from '@/entities/task/model/task';
 import { Checkbox } from '@/shared/ui/checkbox';
 import { Badge } from '@/shared/ui/badge';
 import { useTasksStore } from '@/entities/task/model/tasksStore';
@@ -15,8 +15,10 @@ interface TaskProps {
 
 export function Task({ task, actionButtons }: TaskProps) {
   const isSelected = isTaskSelected(task);
+  const deleted = isTaskDeleted(task);
 
   const onCheckboxClick = async () => {
+    if (deleted) return;
     await toggleCompleted(task);
   };
 
@@ -26,12 +28,18 @@ export function Task({ task, actionButtons }: TaskProps) {
       className={cn(
         'group relative transition-all duration-300 overflow-hidden bg-white border-b border-border/50',
         task.completedAt ? 'opacity-60' : '',
-        isSelected && !task.completedAt && 'border-l-4 border-l-yellow-400'
+        isSelected && !task.completedAt && 'border-l-4 border-l-yellow-400',
+        deleted && 'opacity-50'
       )}
     >
       <div className="px-4 py-3">
         <div className="flex items-center space-x-3">
-          <Checkbox id={`todo-${task.id}`} checked={!!task.completedAt} onCheckedChange={onCheckboxClick} />
+          <Checkbox
+            id={`todo-${task.id}`}
+            checked={!!task.completedAt}
+            onCheckedChange={onCheckboxClick}
+            disabled={deleted}
+          />
           <TaskName task={task} />
         </div>
         <TaskDetails details={task.details} />
@@ -39,9 +47,11 @@ export function Task({ task, actionButtons }: TaskProps) {
           <div className="flex space-x-2">
             <TaskBadges task={task} />
           </div>
-          <div className="flex space-x-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-            {actionButtons}
-          </div>
+          {!deleted && (
+            <div className="flex space-x-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+              {actionButtons}
+            </div>
+          )}
         </div>
       </div>
     </li>
@@ -49,10 +59,15 @@ export function Task({ task, actionButtons }: TaskProps) {
 }
 
 function TaskName({ task }: { task: TaskModel }) {
+  const deleted = isTaskDeleted(task);
   return (
     <label
       htmlFor={`todo-${task.id}`}
-      className={cn('flex-1 cursor-pointer font-medium', task.completedAt && 'line-through text-muted-foreground')}
+      className={cn(
+        'flex-1 cursor-pointer font-medium',
+        task.completedAt && 'line-through text-muted-foreground',
+        deleted && 'line-through'
+      )}
     >
       {task.name}
     </label>

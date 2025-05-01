@@ -99,7 +99,7 @@ export function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
-        <div className="lg:hidden fixed top-4 left-4 z-50">
+        <div className="md:hidden fixed top-4 left-4 z-50">
           <MobileMenuButton />
         </div>
         <Sidebar>
