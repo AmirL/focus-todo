@@ -5,6 +5,7 @@ import { Tasks } from '@/_pages/tasks-todo/ui/Tasks';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useFilterStore } from '@/_pages/tasks-todo/model/filterStore';
 import { cn } from '@/shared/lib/utils';
+import { TaskActions } from './TaskActions';
 
 export function TodoList() {
   const { user, error, isLoading } = useUser();
@@ -25,6 +26,7 @@ export function TodoList() {
         <div className="px-2 sm:px-4">
           <h2 className="text-lg font-semibold text-primary flex items-center gap-2 capitalize">{statusFilter}</h2>
         </div>
+        <TaskActions />
         <Tasks />
         <AddTaskForm />
       </div>
