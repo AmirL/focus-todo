@@ -5,6 +5,7 @@ export enum StatusFilterEnum {
   FUTURE = 'future',
   BACKLOG = 'backlog',
   TODAY = 'today',
+  TOMORROW = 'tomorrow',
 }
 
 type FilterState = {

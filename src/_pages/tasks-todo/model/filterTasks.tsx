@@ -6,6 +6,7 @@ import {
   isTaskInFuture,
   isTaskSelected,
   isTaskToday,
+  isTaskTomorrow,
 } from '@/entities/task/model/task';
 import { useFilterStore, StatusFilterEnum } from './filterStore';
 
@@ -27,5 +28,7 @@ function applyStatusFilter(task: TaskModel, filter: StatusFilterEnum) {
       return isTaskSelected(task);
     case StatusFilterEnum.TODAY:
       return isTaskToday(task);
+    case StatusFilterEnum.TOMORROW:
+      return isTaskTomorrow(task);
   }
 }

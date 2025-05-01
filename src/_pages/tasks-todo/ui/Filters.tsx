@@ -131,6 +131,14 @@ function StatusFiltersGroup() {
         Today
       </Button>
       <Button
+        variant={statusFilter === StatusFilterEnum.TOMORROW ? 'default' : 'outline'}
+        onClick={() => setStatusFilter(StatusFilterEnum.TOMORROW)}
+        size="sm"
+        className="px-4"
+      >
+        Tomorrow
+      </Button>
+      <Button
         variant={statusFilter === StatusFilterEnum.FUTURE ? 'default' : 'outline'}
         onClick={handleSetFuture}
         size="sm"

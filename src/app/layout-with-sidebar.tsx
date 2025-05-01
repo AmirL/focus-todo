@@ -143,6 +143,13 @@ export function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
                       Today
                     </FilterButton>
                     <FilterButton
+                      filter={StatusFilterEnum.TOMORROW}
+                      active={statusFilter === StatusFilterEnum.TOMORROW}
+                      icon={Calendar}
+                    >
+                      Tomorrow
+                    </FilterButton>
+                    <FilterButton
                       filter={StatusFilterEnum.FUTURE}
                       active={statusFilter === StatusFilterEnum.FUTURE}
                       icon={Clock}
