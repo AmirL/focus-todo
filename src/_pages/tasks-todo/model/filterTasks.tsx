@@ -26,7 +26,7 @@ function applyStatusFilter(task: TaskModel, filter: StatusFilterEnum) {
     case StatusFilterEnum.FUTURE:
       return isTaskInFuture(task);
     case StatusFilterEnum.SELECTED:
-      return isTaskSelected(task) && !isTaskToday(task);
+      return isTaskSelected(task) && !isTaskToday(task) && !isTaskInFuture(task);
     case StatusFilterEnum.TODAY:
       return isTaskToday(task);
     case StatusFilterEnum.TOMORROW:
