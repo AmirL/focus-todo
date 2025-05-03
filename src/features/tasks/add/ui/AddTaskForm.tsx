@@ -3,7 +3,6 @@ import { Textarea } from '@/shared/ui/textarea';
 import { Button } from '@/shared/ui/button';
 import { Plus, PlusCircle, Star, Users } from 'lucide-react';
 import { SelectTaskCategory } from './SelectTaskCategory';
-import { LabeledCheckbox } from './LabeledCheckbox';
 import { useAddTasksStore } from '../model/addTaskStore';
 import { useTasksStore } from '@/entities/task/model/tasksStore';
 import {
@@ -20,6 +19,7 @@ import { TaskModel } from '@/entities/task/model/task';
 import { useShallow } from 'zustand/react/shallow';
 import { createTaskMutation } from '@/shared/api/createTask.mutation';
 import { DatePickerButton } from './DatePickerButton';
+import { IconButtonToggle } from '@/shared/ui/IconButtonToggle';
 
 export function AddTaskForm() {
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
@@ -115,22 +115,26 @@ export function AddTaskForm() {
                   <SelectTaskCategory selectedList={selectedList} setSelectedList={setSelectedList} />
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <LabeledCheckbox
-                    id="blocker-checkbox"
+                <div className="flex items-center gap-1">
+                  <IconButtonToggle
+                    icon={(isChecked) => <Users fill={isChecked ? '#2563eb' : 'none'} className="h-4 w-4" />}
+                    tooltipContent="Blocker"
                     isChecked={isBlocker}
-                    setIsChecked={setIsBlocker}
-                    label={<Users className="h-4 w-4" />}
-                    tooltipContent="Mark as Blocker"
-                    iconOnly={true}
+                    onCheckedChange={setIsBlocker}
+                    className={
+                      isBlocker ? 'text-blue-600 hover:text-blue-700' : 'text-muted-foreground hover:text-blue-600'
+                    }
                   />
-                  <LabeledCheckbox
-                    id="starred-checkbox"
+                  <IconButtonToggle
+                    icon={(isChecked) => <Star fill={isChecked ? '#E3B644' : 'none'} className="h-4 w-4" />}
+                    tooltipContent="Selected"
                     isChecked={isStarred}
-                    setIsChecked={setIsStarred}
-                    label={<Star className="h-4 w-4" />}
-                    tooltipContent="Mark as Starred (Selected)"
-                    iconOnly={true}
+                    onCheckedChange={setIsStarred}
+                    className={
+                      isStarred
+                        ? 'text-yellow-500 hover:text-yellow-600'
+                        : 'text-muted-foreground hover:text-yellow-500'
+                    }
                   />
                   <DatePickerButton selectedDate={selectedDate} onDateChange={setSelectedDate} />
                 </div>
