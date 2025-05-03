@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateUserSession } from '../user-auth';
 import { DB } from '@/shared/lib/db';
-import { tasksTable } from '@/shared/lib/schema';
 import { gt, isNull, lt, or } from 'drizzle-orm';
 import dayjs from 'dayjs';
+import { tasksTable } from '@/shared/lib/drizzle/migrations/schema';
 
 export async function POST(req: NextRequest) {
   await validateUserSession();

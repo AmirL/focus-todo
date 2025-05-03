@@ -1,18 +1,21 @@
-import { mysqlTable, int, varchar, text, date, boolean, tinyint, timestamp } from 'drizzle-orm/mysql-core';
+import { sql } from 'drizzle-orm';
+import { mysqlTable, int, varchar, text, date, boolean, tinyint, timestamp, datetime } from 'drizzle-orm/mysql-core';
 
 export const tasksTable = mysqlTable('tasks', {
   id: int('id').autoincrement().primaryKey().notNull(),
   name: varchar('name', { length: 300 }).notNull(),
   details: text('details'),
   date: date('date'),
-  completedAt: date('completed_at'),
+  completedAt: datetime('completed_at'),
   list: varchar('list', { length: 255 }).notNull(),
   isBlocker: boolean('is_blocker').default(false),
   selectedAt: date('selected_at'),
   uid: int('uid'),
-  deletedAt: date('deleted_at'),
-  updatedAt: date('updated_at'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
+  deletedAt: datetime('deleted_at'),
+  updatedAt: datetime('updated_at'),
+  createdAt: datetime('created_at')
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
 });
 
 export const goalsTable = mysqlTable('goals', {
