@@ -3,7 +3,7 @@ import { validateUserSession } from '../user-auth';
 import { DB } from '@/shared/lib/db';
 import { gt, isNull, lt, or } from 'drizzle-orm';
 import dayjs from 'dayjs';
-import { tasksTable } from '@/shared/lib/drizzle/migrations/schema';
+import { tasksTable } from '@/shared/lib/drizzle/schema';
 
 export async function POST(req: NextRequest) {
   await validateUserSession();

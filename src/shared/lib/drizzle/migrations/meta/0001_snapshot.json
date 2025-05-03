@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "06a86fb0-27ff-496c-9cf2-439226af960a",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "bfc816c0-aadd-43d2-a940-ef7db073b1ac",
+  "prevId": "06a86fb0-27ff-496c-9cf2-439226af960a",
   "tables": {
     "goals": {
       "name": "goals",
@@ -84,6 +84,13 @@
         "date": {
           "name": "date",
           "type": "date",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "estimated_duration": {
+          "name": "estimated_duration",
+          "type": "int",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false

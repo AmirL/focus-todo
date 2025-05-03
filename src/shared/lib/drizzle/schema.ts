@@ -6,6 +6,7 @@ export const tasksTable = mysqlTable('tasks', {
   name: varchar('name', { length: 300 }).notNull(),
   details: text('details'),
   date: date('date'),
+  estimatedDuration: int('estimated_duration'),
   completedAt: datetime('completed_at'),
   list: varchar('list', { length: 255 }).notNull(),
   isBlocker: boolean('is_blocker').default(false),
