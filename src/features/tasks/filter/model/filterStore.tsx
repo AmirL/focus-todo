@@ -20,7 +20,6 @@ export const useFilterStore = create<FilterState>((set, get) => ({
   list: '',
 
   setStatusFilter: (filter) => {
-    if (filter === get().statusFilter) return set({ statusFilter: StatusFilterEnum.BACKLOG });
     return set({ statusFilter: filter });
   },
   setList: (list) => {

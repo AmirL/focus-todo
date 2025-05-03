@@ -4,6 +4,7 @@ import { Button } from '@/shared/ui/button';
 import { CheckSquare2, Calendar, Clock, ListTodo, Tag } from 'lucide-react';
 import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
 import { ListsNames } from '@/entities/task/model/task';
+import { cn } from '@/shared/lib/utils';
 
 function FilterButton({
   filter,
@@ -20,8 +21,11 @@ function FilterButton({
 
   return (
     <Button
-      variant={active ? 'secondary' : 'ghost'}
-      className="w-full justify-start"
+      variant={'ghost'}
+      className={cn(
+        'w-full justify-start',
+        active && 'text-primary  bg-primary/10 hover:bg-primary/20 hover:text-primary'
+      )}
       onClick={() => setStatusFilter(filter)}
     >
       <Icon className="mr-2 h-4 w-4" />
@@ -34,7 +38,14 @@ function CategoryButton({ category, active }: { category: string; active: boolea
   const { setList } = useFilterStore();
 
   return (
-    <Button variant={active ? 'secondary' : 'ghost'} className="w-full justify-start" onClick={() => setList(category)}>
+    <Button
+      variant={'ghost'}
+      className={cn(
+        'w-full justify-start',
+        active && 'text-primary  bg-primary/10 hover:bg-primary/20 hover:text-primary'
+      )}
+      onClick={() => setList(category)}
+    >
       <Tag className="mr-2 h-4 w-4" />
       {category}
     </Button>
