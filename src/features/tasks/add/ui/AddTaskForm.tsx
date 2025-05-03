@@ -20,18 +20,31 @@ import { useShallow } from 'zustand/react/shallow';
 import { createTaskMutation } from '@/shared/api/createTask.mutation';
 import { DatePickerButton } from './DatePickerButton';
 import { IconButtonToggle } from '@/shared/ui/IconButtonToggle';
+import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
+import dayjs from 'dayjs';
 
 export function AddTaskForm() {
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
 
   const handleDialogClose = (open: boolean) => {
     if (open === false) {
-      return;
+      // Reset states when dialog closes
+      setSelectedList('Personal');
+      setIsStarred(false);
+      setIsBlocker(false);
+      setSelectedDate(null);
+      setTaskInput(''); // Optionally reset input text too
     }
     setIsAddTaskOpen(open);
   };
 
   const closeDialog = () => {
+    // Reset states when dialog is explicitly closed
+    setSelectedList('Personal');
+    setIsStarred(false);
+    setIsBlocker(false);
+    setSelectedDate(null);
+    setTaskInput(''); // Optionally reset input text too
     setIsAddTaskOpen(false);
   };
 
@@ -44,6 +57,24 @@ export function AddTaskForm() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   const tasksStore = useTasksStore(useShallow((store) => ({ addTask: store.addTask })));
+  const { statusFilter } = useFilterStore();
+
+  useEffect(() => {
+    if (isAddTaskOpen) {
+      // Reset to defaults first
+      setSelectedDate(null);
+      setIsStarred(false);
+
+      // Apply filter-based defaults
+      if (statusFilter === StatusFilterEnum.TODAY) {
+        setSelectedDate(new Date());
+      } else if (statusFilter === StatusFilterEnum.TOMORROW) {
+        setSelectedDate(dayjs().add(1, 'day').toDate());
+      } else if (statusFilter === StatusFilterEnum.SELECTED) {
+        setIsStarred(true);
+      }
+    }
+  }, [isAddTaskOpen, statusFilter]); // Rerun effect if dialog opens or filter changes while open
 
   const handleAddTaskClick = async () => {
     const todoTexts = taskInput.split('\n').filter((text) => text.trim() !== '');
@@ -67,10 +98,13 @@ export function AddTaskForm() {
 
     createMultipleTasks().catch(() => {
       setTaskInput(previousInputValue);
-      setIsAddTaskOpen(true);
+      // Don't reopen dialog on error, let user retry or cancel
+      // setIsAddTaskOpen(true);
     });
-    closeDialog();
-    setSelectedDate(null);
+    // Don't close dialog immediately on click, wait for API response (or handle errors)
+    // closeDialog();
+    // setSelectedDate(null); // Resetting is handled by closeDialog now
+    setIsAddTaskOpen(false); // Close dialog after processing
   };
 
   return (
