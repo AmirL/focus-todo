@@ -1,6 +1,6 @@
 import { TaskModel } from '@/entities/task/model/task';
+import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
 import dayjs from 'dayjs';
-import { useFilterStore, StatusFilterEnum } from './filterStore';
 
 export function useSortedTasks(tasks: TaskModel[]) {
   const statusFilter = useFilterStore((store) => store.statusFilter);

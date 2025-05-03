@@ -9,6 +9,7 @@ import {
   isTaskToday,
   isTaskTomorrow,
 } from '@/entities/task/model/task';
+// Update relative import to point to the store in the same feature directory
 import { useFilterStore, StatusFilterEnum } from './filterStore';
 
 export function useApplyFilters(tasks: TaskModel[]) {

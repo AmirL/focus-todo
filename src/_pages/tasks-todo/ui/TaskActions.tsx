@@ -1,11 +1,10 @@
 import { RefreshCcw, Copy, ClipboardCheck, ClipboardX } from 'lucide-react';
-import { ContentSection } from './Section';
-import { StatusFilterEnum, useFilterStore } from '@/_pages/tasks-todo/model/filterStore';
+import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
 import { useTasksStore } from '@/entities/task/model/tasksStore';
 import { updateTaskMutation } from '@/shared/api/updateTask.mutation';
 import { Button } from '@/shared/ui/button';
 import { TaskModel, isTaskDeleted } from '@/entities/task/model/task';
-import { useApplyFilters } from '../model/filterTasks';
+import { useApplyFilters } from '@/features/tasks/filter/model/filterTasks';
 import { useSortedTasks } from '../model/sortTasks';
 import toast from 'react-hot-toast';
 

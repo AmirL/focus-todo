@@ -6,7 +6,6 @@ import { Calendar } from '@/shared/ui/calendar';
 import { useTasksStore } from '@/entities/task/model/tasksStore';
 import { useState } from 'react';
 import { updateTaskMutation } from '@/shared/api/updateTask.mutation';
-import dayjs from 'dayjs';
 
 export function SnoozeButton({ task }: { task: TaskModel }) {
   const updateTask = useTasksStore((state) => state.updateTask);
