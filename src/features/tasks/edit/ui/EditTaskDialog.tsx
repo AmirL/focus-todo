@@ -2,9 +2,21 @@ import { TaskModel } from '@/entities/task/model/task';
 import { useTasksStore } from '@/entities/task/model/tasksStore';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
+import { Label } from '@/shared/ui/label';
 import { MarkdownAreaField } from './MarkdownAreaField';
 import { InputField } from './InputField';
 import { updateTaskMutation } from '@/shared/api/updateTask.mutation';
+
+const DURATION_OPTIONS = [
+  { value: 15, label: '15 minutes' },
+  { value: 30, label: '30 minutes' },
+  { value: 60, label: '1 hour' },
+  { value: 90, label: '1.5 hours' },
+  { value: 150, label: '2.5 hours' },
+  { value: 240, label: '4 hours' },
+  { value: 480, label: '1 day' },
+];
 
 export function EditTaskDialog({ task, children }: { task: TaskModel; children: React.ReactNode }) {
   const updateTask = useTasksStore((state) => state.updateTask);
@@ -15,8 +27,10 @@ export function EditTaskDialog({ task, children }: { task: TaskModel; children: 
 
     const name: string = values.get('name') as string;
     const details: string = values.get('details') as string;
+    const estimatedDurationStr = values.get('estimatedDuration') as string | null;
+    const estimatedDuration = estimatedDurationStr ? parseInt(estimatedDurationStr, 10) : undefined;
 
-    const updatedTask = updateTask(task.id, { name, details });
+    const updatedTask = updateTask(task.id, { name, details, estimatedDuration });
     await updateTaskMutation(updatedTask);
   };
 
@@ -30,7 +44,9 @@ export function EditTaskDialog({ task, children }: { task: TaskModel; children: 
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <InputField label="Name" id="name" value={task.name} />
-            <MarkdownAreaField label="Details" id="details" value={task.details} />
+            <EstimateDuration task={task} />
+            <MarkdownAreaField label="Details" id="details" value={task.details ?? ''} />
+            <div className="grid grid-cols-4 items-center gap-4"></div>
           </div>
           <DialogFooter>
             <DialogTrigger asChild>
@@ -40,5 +56,28 @@ export function EditTaskDialog({ task, children }: { task: TaskModel; children: 
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function EstimateDuration({ task }: { task: TaskModel }) {
+  return (
+    <div>
+      <Label htmlFor="estimatedDuration" className="text-right">
+        Est. Duration
+      </Label>
+      <Select name="estimatedDuration" defaultValue={task.estimatedDuration?.toString()}>
+        <SelectTrigger id="estimatedDuration" className="col-span-3">
+          <SelectValue placeholder="Select duration" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={' '}>—</SelectItem>
+          {DURATION_OPTIONS.map((option) => (
+            <SelectItem key={option.value} value={option.value.toString()}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 }

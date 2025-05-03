@@ -31,6 +31,8 @@ export class TaskModel {
   @Transform(transformDateToString, { toPlainOnly: true })
   date?: Date | null;
 
+  estimatedDuration!: number | null;
+
   @Transform(transformDateToString, { toPlainOnly: true })
   completedAt?: Date | null;
 

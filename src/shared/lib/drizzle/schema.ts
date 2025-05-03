@@ -5,7 +5,7 @@ export const tasksTable = mysqlTable('tasks', {
   id: int('id').autoincrement().primaryKey().notNull(),
   name: varchar('name', { length: 300 }).notNull(),
   details: text('details'),
-  date: date('date'),
+  date: datetime('date'),
   estimatedDuration: int('estimated_duration'),
   completedAt: datetime('completed_at'),
   list: varchar('list', { length: 255 }).notNull(),
