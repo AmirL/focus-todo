@@ -66,12 +66,16 @@ export function AddTaskForm() {
       setIsStarred(false);
 
       // Apply filter-based defaults
-      if (statusFilter === StatusFilterEnum.TODAY) {
-        setSelectedDate(new Date());
-      } else if (statusFilter === StatusFilterEnum.TOMORROW) {
-        setSelectedDate(dayjs().add(1, 'day').toDate());
-      } else if (statusFilter === StatusFilterEnum.SELECTED) {
-        setIsStarred(true);
+      switch (statusFilter) {
+        case StatusFilterEnum.TODAY:
+          setSelectedDate(new Date());
+          break;
+        case StatusFilterEnum.TOMORROW:
+          setSelectedDate(dayjs().add(1, 'day').toDate());
+          break;
+        case StatusFilterEnum.SELECTED:
+          setIsStarred(true);
+          break;
       }
     }
   }, [isAddTaskOpen, statusFilter]); // Rerun effect if dialog opens or filter changes while open

@@ -65,7 +65,7 @@ export function isTaskInFuture(task: TaskModel) {
 }
 
 export function isTaskInBacklog(task: TaskModel) {
-  return !isTaskInFuture(task) && !isTaskSelected(task);
+  return !task.date || dayjs(task.date).isBefore(dayjs(), 'day');
 }
 
 export function isTaskDeleted(task: TaskModel) {
