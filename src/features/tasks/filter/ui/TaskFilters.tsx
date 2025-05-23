@@ -3,8 +3,10 @@
 import { Button } from '@/shared/ui/button';
 import { CheckSquare2, Calendar, Clock, ListTodo, Tag } from 'lucide-react';
 import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
-import { ListsNames } from '@/entities/task/model/task';
+import { ListsNames, isTaskToday, isTaskTomorrow, isTaskOverdue } from '@/entities/task/model/task';
 import { cn } from '@/shared/lib/utils';
+import { useTasksStore } from '@/entities/task/model/tasksStore';
+import { calculateTotalEstimatedTime, formatTotalDuration } from '../model/calculateTotalEstimatedTime';
 
 function FilterButton({
   filter,
@@ -30,6 +32,51 @@ function FilterButton({
     >
       <Icon className="mr-2 h-4 w-4" />
       {children}
+    </Button>
+  );
+}
+
+function FilterButtonWithTime({
+  filter,
+  active,
+  children,
+  icon: Icon,
+}: {
+  filter: StatusFilterEnum;
+  active: boolean;
+  children: React.ReactNode;
+  icon: React.ElementType;
+}) {
+  const { setStatusFilter } = useFilterStore();
+  const allTasks = useTasksStore((state) => state.tasks);
+
+  // Calculate estimated time for this specific filter
+  const filteredTasks = allTasks.filter((task) => {
+    if (filter === StatusFilterEnum.TODAY) {
+      return isTaskToday(task) || isTaskOverdue(task);
+    } else if (filter === StatusFilterEnum.TOMORROW) {
+      return isTaskTomorrow(task);
+    }
+    return false;
+  });
+
+  const totalMinutes = calculateTotalEstimatedTime(filteredTasks);
+  const formattedTime = formatTotalDuration(totalMinutes);
+
+  return (
+    <Button
+      variant={'ghost'}
+      className={cn(
+        'w-full justify-between',
+        active && 'text-primary  bg-primary/10 hover:bg-primary/20 hover:text-primary'
+      )}
+      onClick={() => setStatusFilter(filter)}
+    >
+      <div className="flex items-center">
+        <Icon className="mr-2 h-4 w-4" />
+        {children}
+      </div>
+      {formattedTime && <span className="text-xs text-muted-foreground">{formattedTime}</span>}
     </Button>
   );
 }
@@ -74,20 +121,20 @@ export function TaskFilters() {
           >
             Selected
           </FilterButton>
-          <FilterButton
+          <FilterButtonWithTime
             filter={StatusFilterEnum.TODAY}
             active={statusFilter === StatusFilterEnum.TODAY}
             icon={Calendar}
           >
             Today
-          </FilterButton>
-          <FilterButton
+          </FilterButtonWithTime>
+          <FilterButtonWithTime
             filter={StatusFilterEnum.TOMORROW}
             active={statusFilter === StatusFilterEnum.TOMORROW}
             icon={Calendar}
           >
             Tomorrow
-          </FilterButton>
+          </FilterButtonWithTime>
           <FilterButton filter={StatusFilterEnum.FUTURE} active={statusFilter === StatusFilterEnum.FUTURE} icon={Clock}>
             Future
           </FilterButton>
