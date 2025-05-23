@@ -1,4 +1,4 @@
-import { isTaskSelected, TaskModel, isTaskDeleted } from '@/entities/task/model/task';
+import { isTaskSelected, TaskModel, isTaskDeleted, isTaskOverdue } from '@/entities/task/model/task';
 import { Checkbox } from '@/shared/ui/checkbox';
 import { Badge } from '@/shared/ui/badge';
 import { useTasksStore } from '@/entities/task/model/tasksStore';
@@ -129,6 +129,11 @@ function TaskBadges({ task }: { task: TaskModel }) {
       {showTaskList && <Badge variant="secondary">{task.list}</Badge>}
       {isToday(task.date) && <Badge variant="default">Today</Badge>}
       {task.date && isFutureDate(task.date) && <Badge variant="outline">{dayjs(task.date).format('DD.MM.YY')}</Badge>}
+      {isTaskOverdue(task) && !isTaskDeleted(task) && (
+        <Badge variant="destructive" className="text-red-50 bg-red-600">
+          {dayjs(task.date).format('DD.MM.YY')} (Overdue)
+        </Badge>
+      )}
     </>
   );
 }

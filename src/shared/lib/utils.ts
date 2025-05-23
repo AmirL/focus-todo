@@ -16,6 +16,11 @@ export function isToday(date: Date | null | undefined) {
   return dayjs(date).isSame(dayjs(), 'day');
 }
 
+export function isOverdue(date: Date | null | undefined) {
+  if (!date) return false;
+  return dayjs(date).isBefore(dayjs(), 'day');
+}
+
 export const TaskDateKeys = ['completedAt', 'date', 'selectedAt', 'deletedAt', 'updatedAt'] as const;
 
 export function parseDateFields<T extends Record<string, unknown>, K extends keyof T>(obj: T, fields: readonly K[]): T {

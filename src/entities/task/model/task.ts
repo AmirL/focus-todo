@@ -67,7 +67,7 @@ export function isTaskInFuture(task: TaskModel) {
 }
 
 export function isTaskInBacklog(task: TaskModel) {
-  return !task.date || dayjs(task.date).isBefore(dayjs(), 'day');
+  return !task.date && !task.selectedAt;
 }
 
 export function isTaskDeleted(task: TaskModel) {
@@ -92,6 +92,10 @@ export function isTaskToday(task: TaskModel) {
 
 export function isTaskTomorrow(task: TaskModel) {
   return task.date && dayjs(task.date).isSame(dayjs().add(1, 'day'), 'day');
+}
+
+export function isTaskOverdue(task: TaskModel) {
+  return task.date && dayjs(task.date).isBefore(dayjs(), 'day') && !task.completedAt;
 }
 
 function transformDateToString({ value }: { value: Date | null }) {
