@@ -1,10 +1,21 @@
-import { updateTaskMutation } from '@/shared/api/updateTask.mutation';
+import { useUpdateTaskMutation } from '@/shared/api/tasks';
 import { TaskModel } from './task';
-import { useTasksStore } from './tasksStore';
+import { createInstance } from '@/shared/lib/instance-tools';
 
-export async function toggleCompleted(task: TaskModel) {
-  const store = useTasksStore.getState();
-  const completedAt = task.completedAt ? null : new Date();
-  const updatedTask = store.updateTask(task.id, { completedAt });
-  await updateTaskMutation(updatedTask);
+export function useToggleTaskCompleted() {
+  const updateTaskMutation = useUpdateTaskMutation();
+
+  return {
+    mutate: (task: TaskModel) => {
+      const completedAt = task.completedAt ? null : new Date();
+      const updatedTask = createInstance(TaskModel, { ...task, completedAt, updatedAt: new Date() });
+      updateTaskMutation.mutate(updatedTask);
+    },
+    mutateAsync: async (task: TaskModel) => {
+      const completedAt = task.completedAt ? null : new Date();
+      const updatedTask = createInstance(TaskModel, { ...task, completedAt, updatedAt: new Date() });
+      return updateTaskMutation.mutateAsync(updatedTask);
+    },
+    isLoading: updateTaskMutation.isPending,
+  };
 }

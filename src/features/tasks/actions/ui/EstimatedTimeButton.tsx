@@ -1,7 +1,7 @@
 import { TaskModel } from '@/entities/task/model/task';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { useTasksStore } from '@/entities/task/model/tasksStore';
-import { updateTaskMutation } from '@/shared/api/updateTask.mutation';
+import { useUpdateTaskMutation } from '@/shared/api/tasks';
+import { createInstance } from '@/shared/lib/instance-tools';
 
 const DURATION_OPTIONS = [
   { value: 15, label: '15 minutes' },
@@ -44,11 +44,11 @@ interface EstimatedTimeButtonProps {
 }
 
 export function EstimatedTimeButton({ task }: EstimatedTimeButtonProps) {
-  const updateTask = useTasksStore((state) => state.updateTask);
+  const updateTaskMutation = useUpdateTaskMutation();
 
   const handleDurationChange = async (minutes: number | null) => {
-    const updatedTask = updateTask(task.id, { estimatedDuration: minutes });
-    await updateTaskMutation(updatedTask);
+    const updatedTask = createInstance(TaskModel, { ...task, estimatedDuration: minutes, updatedAt: new Date() });
+    updateTaskMutation.mutate(updatedTask);
   };
 
   if (!task.estimatedDuration) {

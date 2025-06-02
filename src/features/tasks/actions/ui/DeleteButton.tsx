@@ -1,15 +1,15 @@
 import { TaskModel } from '@/entities/task/model/task';
 import { Button } from '@/shared/ui/button';
 import { Trash2 } from 'lucide-react';
-import { useTasksStore } from '@/entities/task/model/tasksStore';
-import { updateTaskMutation } from '@/shared/api/updateTask.mutation';
+import { useUpdateTaskMutation } from '@/shared/api/tasks';
+import { createInstance } from '@/shared/lib/instance-tools';
 
 export function DeleteButton({ task }: { task: TaskModel }) {
-  const updateTask = useTasksStore((state) => state.updateTask);
+  const updateTaskMutation = useUpdateTaskMutation();
 
   const handleDelete = async () => {
-    const updatedTask = updateTask(task.id, { deletedAt: new Date() });
-    await updateTaskMutation(updatedTask);
+    const updatedTask = createInstance(TaskModel, { ...task, deletedAt: new Date(), updatedAt: new Date() });
+    updateTaskMutation.mutate(updatedTask);
   };
 
   return (

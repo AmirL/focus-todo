@@ -1,12 +1,6 @@
-import { useGoalsStore } from '@/entities/goal/model/goalsStore';
-import { useEffect } from 'react';
+import { useGoalsQuery } from '@/shared/api/goals';
 
 export function useGoalsLoader() {
-  const fetchGoals = useGoalsStore((state) => state.fetchGoals);
-  const goals = useGoalsStore((state) => state.goals);
-
-  useEffect(() => {
-    if (goals.length == 0) fetchGoals();
-  }, [fetchGoals, goals.length]);
+  const { data: goals = [] } = useGoalsQuery();
   return goals;
 }

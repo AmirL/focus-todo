@@ -1,19 +1,18 @@
 import { isTaskSelected, TaskModel } from '@/entities/task/model/task';
 import { Button } from '@/shared/ui/button';
 import { Star } from 'lucide-react';
-import { useTasksStore } from '@/entities/task/model/tasksStore';
 import { cn } from '@/shared/lib/utils';
-import { updateTaskMutation } from '@/shared/api/updateTask.mutation';
+import { useUpdateTaskMutation } from '@/shared/api/tasks';
+import { createInstance } from '@/shared/lib/instance-tools';
 
 export function StarButton({ task }: { task: TaskModel }) {
-  const updateTask = useTasksStore((state) => state.updateTask);
-
+  const updateTaskMutation = useUpdateTaskMutation();
   const isSelected = isTaskSelected(task);
 
   const toggleTodayTask = async (task: TaskModel) => {
     const selectedAt = isSelected ? null : new Date();
-    const updatedTask = updateTask(task.id, { selectedAt });
-    await updateTaskMutation(updatedTask);
+    const updatedTask = createInstance(TaskModel, { ...task, selectedAt, updatedAt: new Date() });
+    updateTaskMutation.mutate(updatedTask);
   };
 
   return (

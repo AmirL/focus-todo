@@ -1,17 +1,16 @@
 import { RefreshCcw, Copy, ClipboardCheck, ClipboardX } from 'lucide-react';
 import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
-import { useTasksStore } from '@/entities/task/model/tasksStore';
-import { updateTaskMutation } from '@/shared/api/updateTask.mutation';
+import { useTasksQuery, useUpdateTaskMutation } from '@/shared/api/tasks';
 import { Button } from '@/shared/ui/button';
 import { TaskModel, isTaskDeleted } from '@/entities/task/model/task';
 import { useApplyFilters } from '@/features/tasks/filter/model/filterTasks';
 import { useSortedTasks } from '../model/sortTasks';
 import toast from 'react-hot-toast';
+import { createInstance } from '@/shared/lib/instance-tools';
 
 export function TaskActions() {
   const { statusFilter } = useFilterStore();
-  const tasksStore = useTasksStore();
-  const allTasks = tasksStore.tasks;
+  const { data: allTasks = [] } = useTasksQuery();
 
   const filteredTasksForDisplay = useApplyFilters(allTasks);
   const sortedTasksForDisplay = useSortedTasks(filteredTasksForDisplay);
@@ -63,14 +62,15 @@ export function TaskActions() {
 }
 
 function ResetSelectedButton() {
-  const tasksStore = useTasksStore();
+  const { data: allTasks = [] } = useTasksQuery();
+  const updateTaskMutation = useUpdateTaskMutation();
 
   const resetAllSelected = async () => {
-    const selectedTasks = tasksStore.tasks.filter((task) => task.selectedAt && !task.completedAt);
+    const selectedTasks = allTasks.filter((task) => task.selectedAt && !task.completedAt);
 
     for (const task of selectedTasks) {
-      const updatedTask = tasksStore.updateTask(task.id, { selectedAt: null });
-      await updateTaskMutation(updatedTask);
+      const updatedTask = createInstance(TaskModel, { ...task, selectedAt: null, updatedAt: new Date() });
+      updateTaskMutation.mutate(updatedTask);
     }
   };
 

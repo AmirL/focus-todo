@@ -6,7 +6,7 @@ import { cn, isFutureDate, isToday } from '@/shared/lib/utils';
 import dayjs from 'dayjs';
 import ReactMarkdown from 'react-markdown';
 import { useState } from 'react';
-import { toggleCompleted } from '../model/toggleCompleted';
+import { useToggleTaskCompleted } from '../model/toggleCompleted';
 import { EstimatedTimeButton } from '@/features/tasks/actions/ui/EstimatedTimeButton';
 
 interface TaskProps {
@@ -17,10 +17,11 @@ interface TaskProps {
 export function Task({ task, actionButtons }: TaskProps) {
   const isSelected = isTaskSelected(task);
   const deleted = isTaskDeleted(task);
+  const toggleTaskCompleted = useToggleTaskCompleted();
 
   const onCheckboxClick = async () => {
     if (deleted) return;
-    await toggleCompleted(task);
+    toggleTaskCompleted.mutate(task);
   };
 
   return (

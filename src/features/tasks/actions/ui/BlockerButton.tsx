@@ -1,25 +1,27 @@
 import { TaskModel } from '@/entities/task/model/task';
+import { Button } from '@/shared/ui/button';
 import { Users } from 'lucide-react';
-import { useTasksStore } from '@/entities/task/model/tasksStore';
-import { updateTaskMutation } from '@/shared/api/updateTask.mutation';
+import { useUpdateTaskMutation } from '@/shared/api/tasks';
+import { createInstance } from '@/shared/lib/instance-tools';
 
 export function BlockerButton({ task }: { task: TaskModel }) {
-  const toggleIsBlocker = async (isBlocker: boolean) => {
-    const updateTask = useTasksStore.getState().updateTask;
+  const updateTaskMutation = useUpdateTaskMutation();
 
-    const updatedTask = updateTask(task.id, { isBlocker });
-    await updateTaskMutation(updatedTask);
+  const handleToggleBlocker = async () => {
+    const updatedTask = createInstance(TaskModel, { ...task, isBlocker: !task.isBlocker, updatedAt: new Date() });
+    updateTaskMutation.mutate(updatedTask);
   };
 
   return (
-    <button
-      onClick={() => toggleIsBlocker(!task.isBlocker)}
-      className={
-        'flex items-center gap-1 rounded-md px-2 py-1 text-sm transition-colors' +
-        (task.isBlocker ? ' hover:text-blue-700 text-blue-600' : 'text-muted-foreground hover:text-blue-600')
-      }
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={handleToggleBlocker}
+      className={`h-8 w-8 ${
+        task.isBlocker ? 'text-blue-600 hover:text-blue-700' : 'text-muted-foreground hover:text-blue-600'
+      }`}
     >
       <Users fill={task.isBlocker ? '#2563eb' : 'none'} className="h-4 w-4" />
-    </button>
+    </Button>
   );
 }

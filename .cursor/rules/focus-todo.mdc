@@ -19,6 +19,9 @@ Focus Todo is a Next.js-based task management application that helps users manag
 - **Authentication**: Auth0
 - **Testing**: Vitest
 
+## Linter
+ - Use `npx tsc --noEmit` for linting the project
+
 App is always available at http://localhost:8000/
 
 ## Project Structure

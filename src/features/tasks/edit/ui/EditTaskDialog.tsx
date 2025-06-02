@@ -1,12 +1,12 @@
 import { TaskModel } from '@/entities/task/model/task';
-import { useTasksStore } from '@/entities/task/model/tasksStore';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
 import { Label } from '@/shared/ui/label';
 import { MarkdownAreaField } from './MarkdownAreaField';
 import { InputField } from './InputField';
-import { updateTaskMutation } from '@/shared/api/updateTask.mutation';
+import { useUpdateTaskMutation } from '@/shared/api/tasks';
+import { createInstance } from '@/shared/lib/instance-tools';
 
 const DURATION_OPTIONS = [
   { value: 15, label: '15 minutes' },
@@ -19,7 +19,7 @@ const DURATION_OPTIONS = [
 ];
 
 export function EditTaskDialog({ task, children }: { task: TaskModel; children: React.ReactNode }) {
-  const updateTask = useTasksStore((state) => state.updateTask);
+  const updateTaskMutation = useUpdateTaskMutation();
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,8 +30,8 @@ export function EditTaskDialog({ task, children }: { task: TaskModel; children: 
     const estimatedDurationStr = values.get('estimatedDuration') as string | null;
     const estimatedDuration = estimatedDurationStr ? parseInt(estimatedDurationStr, 10) : undefined;
 
-    const updatedTask = updateTask(task.id, { name, details, estimatedDuration });
-    await updateTaskMutation(updatedTask);
+    const updatedTask = createInstance(TaskModel, { ...task, name, details, estimatedDuration, updatedAt: new Date() });
+    updateTaskMutation.mutate(updatedTask);
   };
 
   return (

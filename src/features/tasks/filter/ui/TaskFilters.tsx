@@ -5,7 +5,7 @@ import { CheckSquare2, Calendar, Clock, ListTodo, Tag } from 'lucide-react';
 import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
 import { ListsNames, isTaskToday, isTaskTomorrow, isTaskOverdue } from '@/entities/task/model/task';
 import { cn } from '@/shared/lib/utils';
-import { useTasksStore } from '@/entities/task/model/tasksStore';
+import { useTasksQuery } from '@/shared/api/tasks';
 import { calculateTotalEstimatedTime, formatTotalDuration } from '../model/calculateTotalEstimatedTime';
 
 function FilterButton({
@@ -48,7 +48,7 @@ function FilterButtonWithTime({
   icon: React.ElementType;
 }) {
   const { setStatusFilter } = useFilterStore();
-  const allTasks = useTasksStore((state) => state.tasks);
+  const { data: allTasks = [] } = useTasksQuery();
 
   // Calculate estimated time for this specific filter
   const filteredTasks = allTasks.filter((task) => {

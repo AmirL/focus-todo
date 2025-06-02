@@ -3,18 +3,18 @@ import { Button } from '@/shared/ui/button';
 import { Clock, X } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { Calendar } from '@/shared/ui/calendar';
-import { useTasksStore } from '@/entities/task/model/tasksStore';
 import { useState } from 'react';
-import { updateTaskMutation } from '@/shared/api/updateTask.mutation';
+import { useUpdateTaskMutation } from '@/shared/api/tasks';
+import { createInstance } from '@/shared/lib/instance-tools';
 
 export function SnoozeButton({ task }: { task: TaskModel }) {
-  const updateTask = useTasksStore((state) => state.updateTask);
   const [popoverOpen, setPopoverOpen] = useState(false);
+  const updateTaskMutation = useUpdateTaskMutation();
 
   const onDateSelect = async (date: Date | null) => {
-    const updatedTask = updateTask(task.id, { date });
+    const updatedTask = createInstance(TaskModel, { ...task, date, updatedAt: new Date() });
+    updateTaskMutation.mutate(updatedTask);
     setPopoverOpen(false);
-    await updateTaskMutation(updatedTask);
   };
 
   const clearDate = () => {

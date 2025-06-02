@@ -4,7 +4,6 @@ import { Button } from '@/shared/ui/button';
 import { Plus, PlusCircle, Star, Users } from 'lucide-react';
 import { SelectTaskCategory } from './SelectTaskCategory';
 import { useAddTasksStore } from '../model/addTaskStore';
-import { useTasksStore } from '@/entities/task/model/tasksStore';
 import {
   Dialog,
   DialogContent,
@@ -16,8 +15,7 @@ import {
 } from '@/shared/ui/dialog';
 import { createInstance } from '@/shared/lib/instance-tools';
 import { TaskModel } from '@/entities/task/model/task';
-import { useShallow } from 'zustand/react/shallow';
-import { createTaskMutation } from '@/shared/api/createTask.mutation';
+import { useCreateTaskMutation } from '@/shared/api/tasks';
 import { DatePickerButton } from './DatePickerButton';
 import { IconButtonToggle } from '@/shared/ui/IconButtonToggle';
 import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
@@ -25,6 +23,7 @@ import dayjs from 'dayjs';
 
 export function AddTaskForm() {
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
+  const createTaskMutation = useCreateTaskMutation();
 
   const handleDialogClose = (open: boolean) => {
     if (open === false) {
@@ -56,7 +55,6 @@ export function AddTaskForm() {
   const [isBlocker, setIsBlocker] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-  const tasksStore = useTasksStore(useShallow((store) => ({ addTask: store.addTask })));
   const { statusFilter } = useFilterStore();
 
   useEffect(() => {
@@ -95,8 +93,7 @@ export function AddTaskForm() {
           isBlocker,
           date: selectedDate,
         });
-        const createdTask = await createTaskMutation(newTask);
-        tasksStore.addTask(createdTask);
+        await createTaskMutation.mutateAsync(newTask);
       }
     };
 
