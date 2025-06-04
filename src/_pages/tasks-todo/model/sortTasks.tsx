@@ -16,7 +16,7 @@ export function useSortedTasks(tasks: TaskModel[]) {
 }
 
 function sortTasksByDate(tasks: TaskModel[]) {
-  return tasks.sort((a, b) => unixTime(a.date) - unixTime(b.date));
+  return [...tasks].sort((a, b) => unixTime(a.date) - unixTime(b.date));
 }
 
 function unixTime(date: Date | null | undefined) {
@@ -24,5 +24,5 @@ function unixTime(date: Date | null | undefined) {
 }
 
 function sortBlockerTasksBottom(tasks: TaskModel[]) {
-  return tasks.sort((a, b) => Number(a.isBlocker) - Number(b.isBlocker));
+  return [...tasks].sort((a, b) => Number(a.isBlocker) - Number(b.isBlocker));
 }
