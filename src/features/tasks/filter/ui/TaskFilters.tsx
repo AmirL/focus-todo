@@ -7,6 +7,7 @@ import { ListsNames, isTaskToday, isTaskTomorrow, isTaskOverdue } from '@/entiti
 import { cn } from '@/shared/lib/utils';
 import { useTasksQuery } from '@/shared/api/tasks';
 import { calculateTotalEstimatedTime, formatTotalDuration } from '../model/calculateTotalEstimatedTime';
+import { useSidebar } from '@/shared/ui/sidebar';
 
 function FilterButton({
   filter,
@@ -20,6 +21,7 @@ function FilterButton({
   icon: React.ElementType;
 }) {
   const { setStatusFilter } = useFilterStore();
+  const { isMobile, toggleSidebar } = useSidebar();
 
   return (
     <Button
@@ -28,7 +30,10 @@ function FilterButton({
         'w-full justify-start',
         active && 'text-primary  bg-primary/10 hover:bg-primary/20 hover:text-primary'
       )}
-      onClick={() => setStatusFilter(filter)}
+      onClick={() => {
+        setStatusFilter(filter);
+        if (isMobile) toggleSidebar();
+      }}
     >
       <Icon className="mr-2 h-4 w-4" />
       {children}
@@ -49,6 +54,7 @@ function FilterButtonWithTime({
 }) {
   const { setStatusFilter } = useFilterStore();
   const { data: allTasks = [] } = useTasksQuery();
+  const { isMobile, toggleSidebar } = useSidebar();
 
   // Calculate estimated time for this specific filter
   const filteredTasks = allTasks.filter((task) => {
@@ -70,7 +76,10 @@ function FilterButtonWithTime({
         'w-full justify-between',
         active && 'text-primary  bg-primary/10 hover:bg-primary/20 hover:text-primary'
       )}
-      onClick={() => setStatusFilter(filter)}
+      onClick={() => {
+        setStatusFilter(filter);
+        if (isMobile) toggleSidebar();
+      }}
     >
       <div className="flex items-center">
         <Icon className="mr-2 h-4 w-4" />
@@ -83,6 +92,7 @@ function FilterButtonWithTime({
 
 function CategoryButton({ category, active }: { category: string; active: boolean }) {
   const { setList } = useFilterStore();
+  const { isMobile, toggleSidebar } = useSidebar();
 
   return (
     <Button
@@ -91,7 +101,10 @@ function CategoryButton({ category, active }: { category: string; active: boolea
         'w-full justify-start',
         active && 'text-primary  bg-primary/10 hover:bg-primary/20 hover:text-primary'
       )}
-      onClick={() => setList(category)}
+      onClick={() => {
+        setList(category);
+        if (isMobile) toggleSidebar();
+      }}
     >
       <Tag className="mr-2 h-4 w-4" />
       {category}
