@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "next dev -p 8000",
-    "test": "vitest",
+    "test": "vitest run",
     "fsd": "steiger ./src",
     "deps": "fsd-cruise",
-    "build": "vitest && next build",
+    "build": "vitest run && next build",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "npx drizzle-kit generate",
@@ -48,7 +48,8 @@
     "reflect-metadata": "^0.2.2",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
-    "zustand": "^5.0.0"
+    "zustand": "^5.0.0",
+    "next-pwa": "^5.6.0"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.18.6",

@@ -8,6 +8,8 @@ import { ReactQueryProvider } from '@/shared/lib/react-query';
 
 export const metadata: Metadata = {
   title: 'Doable Tasks',
+  manifest: '/manifest.json',
+  themeColor: '#ffffff',
 };
 
 export default function RootLayout({

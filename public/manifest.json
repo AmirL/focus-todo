@@ -1,0 +1,9 @@
+{
+  "name": "Doable Tasks",
+  "short_name": "Doable",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "description": "Task management with focus."
+}
