@@ -7,6 +7,7 @@ import { useApplyFilters } from '@/features/tasks/filter/model/filterTasks';
 import { useSortedTasks } from '../model/sortTasks';
 import toast from 'react-hot-toast';
 import { createInstance } from '@/shared/lib/instance-tools';
+import { PrintButton } from '@/features/tasks/print/ui/PrintButton';
 
 export function TaskActions() {
   const { statusFilter } = useFilterStore();
@@ -50,6 +51,7 @@ export function TaskActions() {
     <>
       {showActionButtons && (
         <div className="mt-4 flex justify-end gap-2">
+          <PrintButton tasks={sortedTasksForDisplay} />
           <Button variant="outline" size="sm" onClick={handleCopyAsJson} className="flex items-center gap-2">
             <Copy className="h-4 w-4" />
             Copy as JSON
