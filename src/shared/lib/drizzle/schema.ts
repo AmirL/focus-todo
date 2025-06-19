@@ -12,6 +12,7 @@ export const tasksTable = mysqlTable('tasks', {
   isBlocker: boolean('is_blocker').default(false),
   selectedAt: date('selected_at'),
   uid: int('uid'),
+  userId: varchar('user_id', { length: 36 }).notNull().references(() => user.id, { onDelete: 'cascade' }),
   deletedAt: datetime('deleted_at'),
   updatedAt: datetime('updated_at'),
   createdAt: datetime('created_at')
@@ -24,6 +25,7 @@ export const goalsTable = mysqlTable('goals', {
   title: varchar('title', { length: 255 }),
   progress: tinyint('progress').default(0),
   list: varchar('list', { length: 255 }),
+  userId: varchar('user_id', { length: 36 }).notNull().references(() => user.id, { onDelete: 'cascade' }),
   deletedAt: date('deleted_at'),
 });
 

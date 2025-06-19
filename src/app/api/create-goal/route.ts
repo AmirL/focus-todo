@@ -5,11 +5,13 @@ import { eq } from 'drizzle-orm';
 import { goalsTable } from '@/shared/lib/drizzle/schema';
 
 export async function POST(req: NextRequest) {
-  await validateUserSession();
+  const session = await validateUserSession();
 
   const { goal } = await req.json();
 
-  const [{ id }] = await DB.insert(goalsTable).values(goal).$returningId();
+  const goalWithUser = { ...goal, userId: session.user.id };
+
+  const [{ id }] = await DB.insert(goalsTable).values(goalWithUser).$returningId();
   const [createdGoal] = await DB.select().from(goalsTable).where(eq(goalsTable.id, id));
 
   return NextResponse.json(createdGoal, { status: 200 });

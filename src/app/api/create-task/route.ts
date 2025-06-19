@@ -6,11 +6,16 @@ import { tasksTable } from '@/shared/lib/drizzle/schema';
 import { parseDateFields, TaskDateKeys } from '@/shared/lib/utils';
 
 export async function POST(req: NextRequest) {
-  await validateUserSession();
+  const session = await validateUserSession();
 
   const { task } = await req.json();
 
-  const processedTask = parseDateFields({ ...task, createdAt: undefined, id: undefined }, TaskDateKeys);
+  const processedTask = parseDateFields({ 
+    ...task, 
+    createdAt: undefined, 
+    id: undefined,
+    userId: session.user.id
+  }, TaskDateKeys);
 
   const [{ id }] = await DB.insert(tasksTable).values(processedTask).$returningId();
   const [createdTask] = await DB.select().from(tasksTable).where(eq(tasksTable.id, id));
