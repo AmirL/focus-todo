@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
 
-import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { Toaster } from 'react-hot-toast';
 import { LayoutWithSidebar } from './layout-with-sidebar';
 import { ReactQueryProvider } from '@/shared/lib/react-query';
@@ -9,8 +8,6 @@ import { ReactQueryProvider } from '@/shared/lib/react-query';
 export const metadata: Metadata = {
   title: 'Doable Tasks',
   manifest: '/manifest.json',
-  themeColor: '#ffffff',
-  viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no',
   icons: {
     icon: [
       { url: '/icons/icon-48x48.png', sizes: '48x48', type: 'image/png' },
@@ -40,6 +37,13 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  shrinkToFit: 'no',
+  themeColor: '#ffffff',
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -47,14 +51,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <UserProvider>
-        <body>
-          <ReactQueryProvider>
-            <LayoutWithSidebar>{children}</LayoutWithSidebar>
-            <Toaster />
-          </ReactQueryProvider>
-        </body>
-      </UserProvider>
+      <body>
+        <ReactQueryProvider>
+          <LayoutWithSidebar>{children}</LayoutWithSidebar>
+          <Toaster />
+        </ReactQueryProvider>
+      </body>
     </html>
   );
 }

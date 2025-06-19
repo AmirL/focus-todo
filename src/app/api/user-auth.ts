@@ -1,13 +1,16 @@
-import { getSession } from '@auth0/nextjs-auth0';
-const APP_NAMESPACE = 'https://doable-tasks.vercel.app';
+import { auth } from '@/shared/lib/auth';
+import { headers } from 'next/headers';
 
 export async function validateUserSession() {
-  const session = await getSession();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  
   invariant(session, 'No session found');
   invariant(session.user, 'No user found in session');
-
-  const roles = session.user[`${APP_NAMESPACE}/roles`] || [];
-  invariant(roles.includes('admin'), 'User is not an admin');
+  invariant(session.user.role === 'admin', 'User is not an admin');
+  
+  return session;
 }
 
 function invariant(condition: unknown, message: string): asserts condition {

@@ -15,7 +15,6 @@
     "db:migrate": "npx drizzle-kit migrate"
   },
   "dependencies": {
-    "@auth0/nextjs-auth0": "^3.5.0",
     "@babel/runtime": "^7.26.0",
     "@radix-ui/react-checkbox": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.11",
@@ -32,6 +31,7 @@
     "@tailwindcss/typography": "^0.5.15",
     "@tanstack/react-query": "^5.79.2",
     "@tanstack/react-query-devtools": "^5.79.2",
+    "better-auth": "^1.2.9",
     "class-transformer": "^0.5.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -40,6 +40,7 @@
     "lucide-react": "^0.453.0",
     "mysql2": "^3.11.5",
     "next": "14.2.16",
+    "next-pwa": "^5.6.0",
     "react": "^18",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18",
@@ -48,8 +49,7 @@
     "reflect-metadata": "^0.2.2",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
-    "zustand": "^5.0.0",
-    "next-pwa": "^5.6.0"
+    "zustand": "^5.0.0"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.18.6",

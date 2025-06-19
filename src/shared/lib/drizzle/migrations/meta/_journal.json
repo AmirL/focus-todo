@@ -15,6 +15,20 @@
       "when": 1746290497498,
       "tag": "0001_careless_killmonger",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1750275717281,
+      "tag": "0002_spicy_franklin_richards",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1750317380530,
+      "tag": "0003_adorable_husk",
+      "breakpoints": true
     }
   ]
 }

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider, useSidebar } from '@/shared/ui/sidebar';
 import { Separator } from '@/shared/ui/separator';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useSession, signOut } from '@/shared/lib/auth-client';
 import { TaskFilters } from '@/features/tasks/filter/ui/TaskFilters';
 
 function MobileMenuButton() {
@@ -20,32 +20,35 @@ function MobileMenuButton() {
 }
 
 function UserSection() {
-  const { user } = useUser();
+  const { data: session } = useSession();
   const router = useRouter();
 
-  if (!user) {
+  if (!session) {
     return (
       <div className="p-4">
         <Button variant="outline" className="w-full" asChild>
-          <Link href="/api/auth/login">Login</Link>
+          <Link href="/login">Login</Link>
         </Button>
       </div>
     );
   }
 
-  const logout = () => router.push('/api/auth/logout');
+  const logout = async () => {
+    await signOut();
+    router.refresh();
+  };
 
   return (
     <div className="flex items-center gap-2 p-4">
-      {user.picture ? (
-        <img src={user.picture} alt={user.name || ''} className="h-8 w-8 rounded-full" />
+      {session.user.image ? (
+        <img src={session.user.image} alt={session.user.name || ''} className="h-8 w-8 rounded-full" />
       ) : (
         <div className="h-8 w-8 rounded-full bg-muted" />
       )}
       <div className="flex flex-1 items-center justify-between">
         <div>
-          <p className="text-sm font-medium">{user.name?.split(' ')[0]}</p>
-          <p className="text-xs text-muted-foreground">{user.email}</p>
+          <p className="text-sm font-medium">{session.user.name?.split(' ')[0]}</p>
+          <p className="text-xs text-muted-foreground">{session.user.email}</p>
         </div>
         <Button variant="ghost" size="icon" onClick={logout}>
           <LogOut className="h-4 w-4" />

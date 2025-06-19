@@ -2,18 +2,18 @@
 import { AddTaskForm } from '@/features/tasks/add/ui/AddTaskForm';
 import { Goals } from '@/_pages/tasks-todo/ui/Goals';
 import { Tasks } from '@/_pages/tasks-todo/ui/Tasks';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useSession } from '@/shared/lib/auth-client';
 import { useFilterStore } from '@/features/tasks/filter/model/filterStore';
 import { TaskActions } from './TaskActions';
 
 export function TodoList() {
-  const { user, error, isLoading } = useUser();
+  const { data: session, isPending } = useSession();
   const { statusFilter } = useFilterStore();
 
-  if (!user) {
+  if (!session) {
     return (
       <div className="flex justify-center items-center h-5">
-        {isLoading ? 'Loading...' : 'Please login in to see your tasks.'}
+        {isPending ? 'Loading...' : 'Please login in to see your tasks.'}
       </div>
     );
   }

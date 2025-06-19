@@ -1,30 +1,33 @@
 'use client';
 
 import { Button } from '@/shared/ui/button';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useSession, signOut } from '@/shared/lib/auth-client';
 import { LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function Profile() {
-  const { user, error, isLoading } = useUser();
+  const { data: session, isPending } = useSession();
   const router = useRouter();
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>{error.message}</div>;
+  if (isPending) return <div>Loading...</div>;
 
-  const logout = () => router.push('/api/auth/logout');
+  const logout = async () => {
+    await signOut();
+    router.refresh();
+  };
 
   return (
     <>
-      {user && (
+      {session && (
         <>
-          {user.name && <span className="text-sm font-medium">{user.name.split(' ')[0]}</span>}
+          {session.user.name && <span className="text-sm font-medium">{session.user.name.split(' ')[0]}</span>}
           <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary" onClick={logout}>
             <LogOut className="h-4 w-4 mr-1" />
           </Button>
         </>
       )}
-      {!user && <a href="/api/auth/login">Login</a>}
+      {!session && <Link href="/login">Login</Link>}
     </>
   );
 }

@@ -2,7 +2,16 @@
   "permissions": {
     "allow": [
       "Bash(npm run lint)",
-      "Bash(pnpm run lint:*)"
+      "Bash(pnpm run lint:*)",
+      "Bash(pnpm add:*)",
+      "WebFetch(domain:www.better-auth.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(npx @better-auth/cli generate:*)",
+      "Bash(find:*)",
+      "Bash(pnpm remove:*)",
+      "Bash(pnpm tsc:*)",
+      "Bash(pnpm run:*)",
+      "Bash(openssl rand:*)"
     ],
     "deny": []
   }
