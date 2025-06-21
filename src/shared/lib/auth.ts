@@ -13,6 +13,7 @@ invariant(process.env.BETTER_AUTH_SECRET, "BETTER_AUTH_SECRET environment variab
 
 export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
+  baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8000",
   database: drizzleAdapter(DB, {
     provider: "mysql",
     schema: schema,
