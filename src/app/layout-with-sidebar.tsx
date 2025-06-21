@@ -20,8 +20,22 @@ function MobileMenuButton() {
 }
 
 function UserSection() {
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const router = useRouter();
+
+  if (isPending) {
+    return (
+      <div className="p-4">
+        <div className="flex items-center gap-2">
+          <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
+          <div className="flex-1">
+            <div className="h-4 bg-muted rounded animate-pulse mb-1" />
+            <div className="h-3 bg-muted rounded animate-pulse w-2/3" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!session) {
     return (

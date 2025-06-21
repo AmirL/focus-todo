@@ -10,10 +10,18 @@ export function TodoList() {
   const { data: session, isPending } = useSession();
   const { statusFilter } = useFilterStore();
 
+  if (isPending) {
+    return (
+      <div className="flex justify-center items-center py-8">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
   if (!session) {
     return (
-      <div className="flex justify-center items-center h-5">
-        {isPending ? 'Loading...' : 'Please login in to see your tasks.'}
+      <div className="flex justify-center items-center py-8">
+        <div className="text-muted-foreground">Please login to see your tasks.</div>
       </div>
     );
   }
