@@ -50,11 +50,11 @@ export function TaskActions() {
   return (
     <>
       {showActionButtons && (
-        <div className="mt-4 flex justify-end gap-2">
+        <div className="mt-4 flex flex-col sm:flex-row justify-end gap-2">
           <PrintButton tasks={sortedTasksForDisplay} />
-          <Button variant="outline" size="sm" onClick={handleCopyAsJson} className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleCopyAsJson} className="flex items-center gap-2 text-xs sm:text-sm">
             <Copy className="h-4 w-4" />
-            Copy as JSON
+            <span className="hidden xs:inline sm:inline">Copy as</span> JSON
           </Button>
           {statusFilter === StatusFilterEnum.SELECTED && hasSelectedTasks && <ResetSelectedButton />}
         </div>

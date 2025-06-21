@@ -47,9 +47,9 @@ export function PrintButton({ tasks }: PrintButtonProps) {
   if (printableTasks.length === 0) return null;
 
   return (
-    <Button variant="outline" size="sm" className="gap-2" onClick={handlePrint}>
+    <Button variant="outline" size="sm" className="gap-2 text-xs sm:text-sm" onClick={handlePrint}>
       <Printer className="h-4 w-4" />
-      Print Tasks
+      <span className="hidden xs:inline sm:inline">Print</span> Tasks
     </Button>
   );
 }
