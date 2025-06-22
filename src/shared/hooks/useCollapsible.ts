@@ -20,6 +20,13 @@ export function useCollapsible() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        // Don't collapse if clicking inside a dialog
+        const target = event.target as Element;
+        if (target.closest('[data-radix-popper-content-wrapper]') || 
+            target.closest('[role="dialog"]') || 
+            target.closest('[data-state="open"]')) {
+          return;
+        }
         collapse();
       }
     };
