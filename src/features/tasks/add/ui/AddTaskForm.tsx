@@ -84,24 +84,17 @@ export function AddTaskForm() {
     const previousInputValue = taskInput;
     setTaskInput('');
 
-    const createMultipleTasks = async () => {
-      for (const text of todoTexts) {
-        const newTask = createInstance(TaskModel, {
-          name: text,
-          list: selectedList,
-          selectedAt: isStarred ? new Date() : null,
-          isBlocker,
-          date: selectedDate,
-        });
-        await createTaskMutation.mutateAsync(newTask);
-      }
-    };
-
-    createMultipleTasks().catch(() => {
-      setTaskInput(previousInputValue);
-      // Don't reopen dialog on error, let user retry or cancel
-      // setIsAddTaskOpen(true);
-    });
+    // Create all tasks optimistically at once
+    for (const text of todoTexts) {
+      const newTask = createInstance(TaskModel, {
+        name: text,
+        list: selectedList,
+        selectedAt: isStarred ? new Date() : null,
+        isBlocker,
+        date: selectedDate,
+      });
+      createTaskMutation.mutate(newTask);
+    }
     // Don't close dialog immediately on click, wait for API response (or handle errors)
     // closeDialog();
     // setSelectedDate(null); // Resetting is handled by closeDialog now
