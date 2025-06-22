@@ -34,16 +34,32 @@ export function useCreateTaskMutation() {
       const response = (await fetchBackend('create-task', { task: TaskModel.toPlain(task) })) as TaskPlain;
       return TaskModel.toInstance(response);
     },
-    onSuccess: (createdTask) => {
-      // Optimistically update the cache
+    onMutate: async (newTask) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: taskKeys.all });
+
+      // Snapshot the previous value
+      const previousTasks = queryClient.getQueryData<TaskModel[]>(taskKeys.all);
+
+      // Optimistically update to the new value
       queryClient.setQueryData<TaskModel[]>(taskKeys.all, (old) => {
-        if (!old) return [createdTask];
-        return [...old, createdTask];
+        if (!old) return [newTask];
+        return [...old, newTask];
       });
+
+      // Return a context object with the snapshotted value
+      return { previousTasks };
+    },
+    onError: (err, newTask, context) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      queryClient.setQueryData<TaskModel[]>(taskKeys.all, context?.previousTasks);
+    },
+    onSuccess: (createdTask) => {
       toast.success('Task created');
     },
-    onError: () => {
-      // Error is handled by the global error handler in ReactQueryProvider
+    onSettled: () => {
+      // Always refetch after error or success to ensure we have the latest data
+      queryClient.invalidateQueries({ queryKey: taskKeys.all });
     },
   });
 }
@@ -57,12 +73,34 @@ export function useUpdateTaskMutation() {
       const response = (await fetchBackend(`update-task`, { id: task.id, task: TaskModel.toPlain(task) })) as TaskPlain;
       return TaskModel.toInstance(response);
     },
-    onSuccess: (updatedTask) => {
-      // Optimistically update the cache
+    onMutate: async (updatedTask) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: taskKeys.all });
+
+      // Snapshot the previous value
+      const previousTasks = queryClient.getQueryData<TaskModel[]>(taskKeys.all);
+
+      // Optimistically update to the new value
       queryClient.setQueryData<TaskModel[]>(taskKeys.all, (old) => {
         if (!old) return [updatedTask];
+        
+        // Always update the task in the cache (keep deleted tasks visible)
         return old.map((task) => (task.id === updatedTask.id ? updatedTask : task));
       });
+
+      // Return a context object with the snapshotted value
+      return { previousTasks };
+    },
+    onError: (err, updatedTask, context) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      queryClient.setQueryData<TaskModel[]>(taskKeys.all, context?.previousTasks);
+    },
+    onSuccess: (updatedTask) => {
+      // No need to update cache here since it was already done optimistically
+    },
+    onSettled: () => {
+      // Always refetch after error or success to ensure we have the latest data
+      queryClient.invalidateQueries({ queryKey: taskKeys.all });
     },
   });
 }

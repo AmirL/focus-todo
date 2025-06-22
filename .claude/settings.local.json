@@ -11,7 +11,10 @@
       "Bash(pnpm remove:*)",
       "Bash(pnpm tsc:*)",
       "Bash(pnpm run:*)",
-      "Bash(openssl rand:*)"
+      "Bash(openssl rand:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   }

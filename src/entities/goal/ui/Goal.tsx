@@ -4,7 +4,7 @@ import { CollapsibleActions } from '@/shared/ui/collapsible-actions';
 
 export function Goal({ goal, actionButtons }: { goal: GoalModel; actionButtons?: JSX.Element }) {
   return (
-    <div className="space-y-1.5">
+    <div className="group space-y-1.5">
       <div className="flex items-center justify-between text-sm">
         <span className="font-medium">{goal.title}</span>
         {actionButtons && (

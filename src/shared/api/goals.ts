@@ -28,11 +28,32 @@ export function useCreateGoalMutation() {
       const response = (await fetchBackend('create-goal', { goal: GoalModel.toPlain(goal) })) as GoalPlain;
       return GoalModel.toInstance(response);
     },
-    onSuccess: (createdGoal) => {
+    onMutate: async (newGoal) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: goalKeys.all });
+
+      // Snapshot the previous value
+      const previousGoals = queryClient.getQueryData<GoalModel[]>(goalKeys.all);
+
+      // Optimistically update to the new value
       queryClient.setQueryData<GoalModel[]>(goalKeys.all, (old) => {
-        if (!old) return [createdGoal];
-        return [...old, createdGoal];
+        if (!old) return [newGoal];
+        return [...old, newGoal];
       });
+
+      // Return a context object with the snapshotted value
+      return { previousGoals };
+    },
+    onError: (err, newGoal, context) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      queryClient.setQueryData<GoalModel[]>(goalKeys.all, context?.previousGoals);
+    },
+    onSuccess: (createdGoal) => {
+      // No need to update cache here since it was already done optimistically
+    },
+    onSettled: () => {
+      // Always refetch after error or success to ensure we have the latest data
+      queryClient.invalidateQueries({ queryKey: goalKeys.all });
     },
   });
 }
@@ -49,18 +70,34 @@ export function useUpdateGoalMutation() {
       })) as GoalPlain;
       return GoalModel.toInstance(response);
     },
-    onSuccess: (updatedGoal) => {
+    onMutate: async (updatedGoal) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: goalKeys.all });
+
+      // Snapshot the previous value
+      const previousGoals = queryClient.getQueryData<GoalModel[]>(goalKeys.all);
+
+      // Optimistically update to the new value
       queryClient.setQueryData<GoalModel[]>(goalKeys.all, (old) => {
-        if (!old) return updatedGoal.deletedAt ? [] : [updatedGoal];
+        if (!old) return [updatedGoal];
         
-        // If goal is deleted, remove it from the cache
-        if (updatedGoal.deletedAt) {
-          return old.filter((g) => g.id !== updatedGoal.id);
-        }
-        
-        // Otherwise update the goal
+        // Always update the goal in the cache (keep deleted goals visible)
         return old.map((g) => (g.id === updatedGoal.id ? updatedGoal : g));
       });
+
+      // Return a context object with the snapshotted value
+      return { previousGoals };
+    },
+    onError: (err, updatedGoal, context) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      queryClient.setQueryData<GoalModel[]>(goalKeys.all, context?.previousGoals);
+    },
+    onSuccess: (updatedGoal) => {
+      // No need to update cache here since it was already done optimistically
+    },
+    onSettled: () => {
+      // Always refetch after error or success to ensure we have the latest data
+      queryClient.invalidateQueries({ queryKey: goalKeys.all });
     },
   });
 }

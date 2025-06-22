@@ -49,11 +49,9 @@ export function Task({ task, actionButtons }: TaskProps) {
             <TaskBadges task={task} />
             <EstimatedTimeButton task={task} />
           </div>
-          {!deleted && (
-            <CollapsibleActions>
-              {actionButtons}
-            </CollapsibleActions>
-          )}
+          <CollapsibleActions>
+            {actionButtons}
+          </CollapsibleActions>
         </div>
       </div>
     </li>
