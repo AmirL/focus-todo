@@ -31,7 +31,7 @@ This is a Next.js 14 todo/task management application using Feature-Sliced Desig
 ### Database & State Management
 - **Database**: MySQL with Drizzle ORM, schema at `src/shared/lib/drizzle/schema.ts`
 - **State**: React Query for server state, Zustand stores for client state
-- **Auth**: Auth0 integration with admin role validation
+- **Auth**: Better Auth integration with admin role validation
 
 ### Key Technical Details
 - **Lists**: Tasks/goals are categorized into "Work" and "Personal" lists
@@ -46,7 +46,7 @@ API routes follow RESTful patterns:
 - POST `/api/create-task` and `/api/create-goal` 
 - PUT `/api/update-task` and `/api/update-goal`
 
-All API routes require admin authentication via Auth0.
+All API routes require admin authentication via Better Auth.
 
 ### Development Notes
 - **Package Manager**: This project uses pnpm, not npm
