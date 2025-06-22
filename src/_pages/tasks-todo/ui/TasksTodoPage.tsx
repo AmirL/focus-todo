@@ -1,8 +1,16 @@
 'use client';
+import { useEffect } from 'react';
 import { TodoList } from './TodoList';
 import { Card, CardContent } from '@/shared/ui/card';
+import { useFilterStore } from '@/features/tasks/filter/model/filterStore';
 
 export function TasksTodoPage() {
+  const { initializeFromURL } = useFilterStore();
+
+  useEffect(() => {
+    initializeFromURL();
+  }, [initializeFromURL]);
+
   return (
     <>
       <div className="w-full min-h-screen flex-1">
