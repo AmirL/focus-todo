@@ -2,6 +2,7 @@ import { TaskModel } from '@/entities/task/model/task';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { useUpdateTaskMutation } from '@/shared/api/tasks';
 import { createInstance } from '@/shared/lib/instance-tools';
+import { formatDuration } from '@/shared/lib/format-duration';
 
 const DURATION_OPTIONS = [
   { value: 15, label: '15 minutes' },
@@ -13,31 +14,6 @@ const DURATION_OPTIONS = [
   { value: 480, label: '1 day' },
 ];
 
-// Helper function to format duration
-function formatDuration(minutes: number | null | undefined): string | null {
-  if (minutes === null || minutes === undefined || minutes <= 0) {
-    return null;
-  }
-  if (minutes === 15) return '15 min';
-  if (minutes === 30) return '30 min';
-  if (minutes === 60) return '1 hour';
-  if (minutes === 90) return '1.5 hours';
-  if (minutes === 150) return '2.5 hours';
-  if (minutes === 240) return '4 hours';
-  if (minutes === 480) return '1 day';
-  if (minutes === 390) return '1 day';
-
-  const hours = Math.floor(minutes / 60);
-  const remainingMinutes = minutes % 60;
-  let formatted = '';
-  if (hours > 0) {
-    formatted += `${hours}h`;
-  }
-  if (remainingMinutes > 0) {
-    formatted += `${remainingMinutes}m`;
-  }
-  return formatted || null;
-}
 
 interface EstimatedTimeButtonProps {
   task: TaskModel;

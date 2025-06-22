@@ -6,7 +6,8 @@ import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/
 import { ListsNames, isTaskToday, isTaskTomorrow, isTaskOverdue } from '@/entities/task/model/task';
 import { cn } from '@/shared/lib/utils';
 import { useTasksQuery } from '@/shared/api/tasks';
-import { calculateTotalEstimatedTime, formatTotalDuration } from '../model/calculateTotalEstimatedTime';
+import { calculateTotalEstimatedTime } from '../model/calculateTotalEstimatedTime';
+import { formatTotalDuration } from '@/shared/lib/format-duration';
 import { useSidebar } from '@/shared/ui/sidebar';
 
 function FilterButton({
