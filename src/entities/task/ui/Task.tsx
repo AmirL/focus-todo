@@ -3,9 +3,9 @@ import { Checkbox } from '@/shared/ui/checkbox';
 import { cn } from '@/shared/lib/utils';
 import { useToggleTaskCompleted } from '../model/toggleCompleted';
 import { EstimatedTimeButton } from '@/features/tasks/actions/ui/EstimatedTimeButton';
+import { CollapsibleActions } from '@/shared/ui/collapsible-actions';
 import { TaskBadges } from './TaskBadges';
 import { TaskDetails } from './TaskDetails';
-import { TaskActions } from './TaskActions';
 import { TaskName } from './TaskName';
 
 interface TaskProps {
@@ -49,7 +49,11 @@ export function Task({ task, actionButtons }: TaskProps) {
             <TaskBadges task={task} />
             <EstimatedTimeButton task={task} />
           </div>
-          <TaskActions actionButtons={actionButtons} deleted={deleted} />
+          {!deleted && (
+            <CollapsibleActions>
+              {actionButtons}
+            </CollapsibleActions>
+          )}
         </div>
       </div>
     </li>
