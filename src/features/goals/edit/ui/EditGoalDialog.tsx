@@ -3,18 +3,19 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Button } from '@/shared/ui/button';
 import { Label } from '@/shared/ui/label';
 import { Input } from '@/shared/ui/input';
+import { Slider } from '@/shared/ui/slider';
 import { createInstance } from '@/shared/lib/instance-tools';
 import { useUpdateGoalMutation } from '@/shared/api/goals';
+import { useState } from 'react';
 
 export function EditGoalDialog({ goal, children }: { goal: GoalModel; children: React.ReactNode }) {
   const updateGoalMutation = useUpdateGoalMutation();
+  const [progress, setProgress] = useState(goal.progress || 0);
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const values = new FormData(e.target as HTMLFormElement);
     const title = values.get('title') as string;
-    const progressStr = values.get('progress') as string;
-    const progress = parseInt(progressStr, 10);
 
     const updatedGoal = createInstance(GoalModel, { ...goal, title, progress });
     updateGoalMutation.mutate(updatedGoal);
@@ -34,8 +35,16 @@ export function EditGoalDialog({ goal, children }: { goal: GoalModel; children: 
               <Input id="title" name="title" defaultValue={goal.title} />
             </div>
             <div>
-              <Label htmlFor="progress">Progress</Label>
-              <Input id="progress" name="progress" type="number" min="0" max="100" defaultValue={goal.progress} />
+              <Label htmlFor="progress">Progress: {progress}%</Label>
+              <Slider
+                id="progress"
+                min={0}
+                max={100}
+                step={5}
+                value={[progress]}
+                onValueChange={(value) => setProgress(value[0])}
+                className="mt-2"
+              />
             </div>
           </div>
           <DialogFooter>
