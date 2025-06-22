@@ -51,7 +51,14 @@ export function useUpdateGoalMutation() {
     },
     onSuccess: (updatedGoal) => {
       queryClient.setQueryData<GoalModel[]>(goalKeys.all, (old) => {
-        if (!old) return [updatedGoal];
+        if (!old) return updatedGoal.deletedAt ? [] : [updatedGoal];
+        
+        // If goal is deleted, remove it from the cache
+        if (updatedGoal.deletedAt) {
+          return old.filter((g) => g.id !== updatedGoal.id);
+        }
+        
+        // Otherwise update the goal
         return old.map((g) => (g.id === updatedGoal.id ? updatedGoal : g));
       });
     },

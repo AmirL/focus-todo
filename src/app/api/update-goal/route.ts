@@ -9,8 +9,14 @@ export async function POST(req: NextRequest) {
 
   const { id, goal } = await req.json();
 
+  // Convert deletedAt string to Date object if present
+  const goalData = { ...goal };
+  if (goalData.deletedAt && typeof goalData.deletedAt === 'string') {
+    goalData.deletedAt = new Date(goalData.deletedAt);
+  }
+
   await DB.update(goalsTable)
-    .set(goal)
+    .set(goalData)
     .where(and(eq(goalsTable.id, id), eq(goalsTable.userId, session.user.id)));
     
   const [updatedGoal] = await DB.select()

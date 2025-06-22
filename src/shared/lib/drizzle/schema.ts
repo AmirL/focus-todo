@@ -26,7 +26,7 @@ export const goalsTable = mysqlTable('goals', {
   progress: tinyint('progress').default(0),
   list: varchar('list', { length: 255 }),
   userId: varchar('user_id', { length: 36 }).notNull().references(() => user.id, { onDelete: 'cascade' }),
-  deletedAt: date('deleted_at'),
+  deletedAt: datetime('deleted_at'),
 });
 
 // BetterAuth tables
