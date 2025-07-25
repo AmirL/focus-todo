@@ -6,15 +6,23 @@ import dayjs from 'dayjs';
 import { tasksTable } from '@/shared/lib/drizzle/schema';
 
 export async function POST(req: NextRequest) {
-  const session = await validateUserSession();
+  try {
+    const session = await validateUserSession();
 
-  const yesterday = dayjs().subtract(1, 'day').toDate();
-  const tasks = await DB.select()
-    .from(tasksTable)
-    .where(and(
-      eq(tasksTable.userId, session.user.id),
-      or(isNull(tasksTable.deletedAt), gt(tasksTable.deletedAt, yesterday))
-    ));
+    const yesterday = dayjs().subtract(1, 'day').toDate();
+    const tasks = await DB.select()
+      .from(tasksTable)
+      .where(and(
+        eq(tasksTable.userId, session.user.id),
+        or(isNull(tasksTable.deletedAt), gt(tasksTable.deletedAt, yesterday))
+      ));
 
-  return NextResponse.json({ tasks }, { status: 200 });
+    return NextResponse.json({ tasks }, { status: 200 });
+  } catch (error) {
+    console.error('Error in get-tasks:', error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Unknown error occurred' },
+      { status: 500 }
+    );
+  }
 }

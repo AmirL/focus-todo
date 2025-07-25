@@ -20,8 +20,8 @@ export function useTasksQuery() {
       const data = (await fetchBackend('get-tasks')) as { tasks: TaskPlain[] };
       return TaskModel.fromPlainArray(data.tasks);
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchInterval: 60 * 1000, // Refetch every 60 seconds
+    staleTime: 1 * 60 * 1000, // 1 minute
+    refetchInterval: 1 * 60 * 1000, // Refetch every 1 minute
   });
 }
 
@@ -34,31 +34,9 @@ export function useCreateTaskMutation() {
       const response = (await fetchBackend('create-task', { task: TaskModel.toPlain(task) })) as TaskPlain;
       return TaskModel.toInstance(response);
     },
-    onMutate: async (newTask) => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: taskKeys.all });
-
-      // Snapshot the previous value
-      const previousTasks = queryClient.getQueryData<TaskModel[]>(taskKeys.all);
-
-      // Optimistically update to the new value
-      queryClient.setQueryData<TaskModel[]>(taskKeys.all, (old) => {
-        if (!old) return [newTask];
-        return [...old, newTask];
-      });
-
-      // Return a context object with the snapshotted value
-      return { previousTasks };
-    },
-    onError: (err, newTask, context) => {
-      // If the mutation fails, use the context returned from onMutate to roll back
-      queryClient.setQueryData<TaskModel[]>(taskKeys.all, context?.previousTasks);
-    },
-    onSuccess: (createdTask) => {
+    onSuccess: () => {
       toast.success('Task created');
-    },
-    onSettled: () => {
-      // Always refetch after error or success to ensure we have the latest data
+      // Refetch to get the latest data with proper server-assigned IDs
       queryClient.invalidateQueries({ queryKey: taskKeys.all });
     },
   });
@@ -91,11 +69,11 @@ export function useUpdateTaskMutation() {
       // Return a context object with the snapshotted value
       return { previousTasks };
     },
-    onError: (err, updatedTask, context) => {
+    onError: (_err, _updatedTask, context) => {
       // If the mutation fails, use the context returned from onMutate to roll back
       queryClient.setQueryData<TaskModel[]>(taskKeys.all, context?.previousTasks);
     },
-    onSuccess: (updatedTask) => {
+    onSuccess: () => {
       // No need to update cache here since it was already done optimistically
     },
     onSettled: () => {

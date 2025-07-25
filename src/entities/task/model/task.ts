@@ -10,12 +10,15 @@ export type TaskPlain = {
   id: string;
   name: string;
   details: string;
-  selectedAt: string;
-  date: string;
-  completedAt: string;
+  selectedAt: string | null;
+  date: string | null;
+  completedAt: string | null;
   list: string;
-  deletedAt: string;
+  deletedAt: string | null;
   createdAt: string;
+  estimatedDuration?: number | null;
+  isBlocker?: boolean;
+  updatedAt?: string;
 };
 
 export class TaskModel {

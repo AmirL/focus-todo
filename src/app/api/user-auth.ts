@@ -2,19 +2,27 @@ import { auth } from '@/shared/lib/auth';
 import { headers } from 'next/headers';
 
 export async function validateUserSession() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-  
-  invariant(session, 'No session found');
-  invariant(session.user, 'No user found in session');
-  invariant(session.user.role === 'admin', 'User is not an admin');
-  
-  return session;
-}
+  try {
+    const headerValues = headers();
+    
+    const session = await auth.api.getSession({
+      headers: headerValues,
+    });
 
-function invariant(condition: unknown, message: string): asserts condition {
-  if (!condition) {
-    throw new Error(message);
+    if (!session) {
+      throw new Error('No session found');
+    }
+
+    if (!session.user) {
+      throw new Error('No user found in session');
+    }
+
+    return session;
+  } catch (error) {
+    console.error('Session validation failed:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString(),
+    });
+    throw error;
   }
 }

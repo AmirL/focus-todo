@@ -74,6 +74,10 @@ function UserSection() {
 
 export function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { data: session, isPending } = useSession();
+  
+  // Hide sidebar content on login page or when not authenticated
+  const shouldShowSidebarContent = !pathname.includes('/login') && (session || isPending);
 
   return (
     <SidebarProvider>
@@ -96,7 +100,13 @@ export function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
             </SidebarHeader>
 
             <SidebarContent>
-              <TaskFilters />
+              {shouldShowSidebarContent ? (
+                <TaskFilters />
+              ) : (
+                <div className="p-4 text-sm text-muted-foreground text-center">
+                  Please login to see your tasks.
+                </div>
+              )}
             </SidebarContent>
 
             <div className="mt-auto">

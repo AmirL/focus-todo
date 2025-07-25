@@ -84,7 +84,7 @@ export function AddTaskForm() {
     const previousInputValue = taskInput;
     setTaskInput('');
 
-    // Create all tasks optimistically at once
+    // Create all tasks sequentially
     for (const text of todoTexts) {
       const newTask = createInstance(TaskModel, {
         name: text,

@@ -5,7 +5,9 @@ export type GoalPlain = {
   title: string;
   progress: number;
   list: string;
-  deletedAt: string;
+  deletedAt: string | null;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export class GoalModel {

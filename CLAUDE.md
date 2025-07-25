@@ -55,3 +55,6 @@ All API routes require admin authentication via Better Auth.
 - Database changes require running migrations via `pnpm run db:generate` and `pnpm run db:migrate`
 - Always run `pnpm tsc --noEmit` before committing to ensure TypeScript compliance
 - The steiger config has specific FSD rules disabled - follow existing patterns rather than strict FSD compliance
+
+### Testing Guidelines
+- When finish task, use playwright mcp to test it

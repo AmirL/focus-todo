@@ -10,10 +10,21 @@ import { StarButton } from '@/features/tasks/actions/ui/StarButton';
 import { BlockerButton } from '@/features/tasks/actions/ui/BlockerButton';
 
 export function Tasks() {
-  const { allTasks, isLoading } = useTasksLoader();
+  const { allTasks, isLoading, error } = useTasksLoader();
 
   const filteredTasks = useApplyFilters(allTasks);
   const tasks = useSortedTasks(filteredTasks);
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-20 text-red-500">
+        <div className="text-center">
+          <p className="font-semibold">Error loading tasks</p>
+          <p className="text-sm">{error instanceof Error ? error.message : 'Unknown error occurred'}</p>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading && allTasks.length === 0) {
     return <div className="flex justify-center items-center h-5">Loading...</div>;

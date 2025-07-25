@@ -14,7 +14,10 @@ export function ReAddButton({ task }: { task: TaskModel }) {
   const updateTaskMutation = useUpdateTaskMutation();
 
   const reAddTask = (date: Date | null) => {
-    const newTask = cloneInstance(task, { completedAt: null, date });
+    const newTask = cloneInstance(task, { 
+      completedAt: null, 
+      date
+    });
     createTaskMutation.mutate(newTask);
 
     const updatedTask = createInstance(TaskModel, { ...task, completedAt: new Date(), updatedAt: new Date() });

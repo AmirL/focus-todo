@@ -1,6 +1,6 @@
 import { useGoalsQuery } from '@/shared/api/goals';
 
 export function useGoalsLoader() {
-  const { data: goals = [] } = useGoalsQuery();
-  return goals;
+  const { data: goals = [], isLoading, error } = useGoalsQuery();
+  return { goals, isLoading, error };
 }
