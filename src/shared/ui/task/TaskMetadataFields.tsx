@@ -1,20 +1,9 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
-import { Label } from '@/shared/ui/label';
 import { Star, Users } from 'lucide-react';
-import { ListsNames } from '@/entities/task/model/task';
 import { IconButtonToggle } from '@/shared/ui/IconButtonToggle';
 import { DatePickerButton } from './DatePickerButton';
 import { SelectTaskCategory } from './SelectTaskCategory';
+import { EstimatedDurationSelector } from './EstimatedDurationSelector';
 
-const DURATION_OPTIONS = [
-  { value: 15, label: '15 minutes' },
-  { value: 30, label: '30 minutes' },
-  { value: 60, label: '1 hour' },
-  { value: 90, label: '1.5 hours' },
-  { value: 150, label: '2.5 hours' },
-  { value: 240, label: '4 hours' },
-  { value: 480, label: '1 day' },
-];
 
 interface TaskMetadataFieldsProps {
   // Estimated Duration
@@ -48,24 +37,22 @@ export function TaskMetadataFields({
   selectedDate,
   onDateChange,
 }: TaskMetadataFieldsProps) {
-  const handleDurationChange = (value: string) => {
-    if (value === ' ') {
-      onDurationChange(null);
-    } else {
-      onDurationChange(parseInt(value, 10));
-    }
-  };
 
   return (
     <div className="space-y-2">
       {/* Category and Toggles Row */}
       <div className="text-sm text-muted-foreground font-medium">Category</div>
       <div className="flex items-center">
-        <div className="mr-auto">
+        <div className="flex items-center gap-2">
           <SelectTaskCategory selectedList={selectedList} setSelectedList={onListChange} />
+          <EstimatedDurationSelector
+            value={selectedDuration ?? null}
+            onChange={onDurationChange}
+            showLabel={false}
+          />
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 ml-auto">
           <IconButtonToggle
             icon={(isChecked) => <Users fill={isChecked ? '#2563eb' : 'none'} className="h-4 w-4" />}
             tooltipContent="Blocker"
@@ -88,26 +75,6 @@ export function TaskMetadataFields({
           />
           <DatePickerButton selectedDate={selectedDate} onDateChange={onDateChange} />
         </div>
-      </div>
-
-      {/* Estimated Duration Row */}
-      <div>
-        <Label htmlFor="estimatedDuration" className="text-sm text-muted-foreground font-medium">
-          Est. Duration
-        </Label>
-        <Select value={selectedDuration?.toString() || ''} onValueChange={handleDurationChange}>
-          <SelectTrigger id="estimatedDuration" className="mt-1">
-            <SelectValue placeholder="Select duration" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={' '}>—</SelectItem>
-            {DURATION_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value.toString()}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
     </div>
   );
