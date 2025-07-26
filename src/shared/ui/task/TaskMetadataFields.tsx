@@ -40,11 +40,16 @@ export function TaskMetadataFields({
 
   return (
     <div className="space-y-2">
-      {/* Category and Toggles Row */}
+      {/* Category Label */}
       <div className="text-sm text-muted-foreground font-medium">Category</div>
-      <div className="flex items-center">
+      
+      {/* Responsive layout: single row on desktop, two rows on mobile */}
+      <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:space-y-0 sm:gap-3">
+        {/* First section: Category and Duration */}
         <div className="flex items-center gap-2">
-          <SelectTaskCategory selectedList={selectedList} setSelectedList={onListChange} />
+          <div className="flex-1 sm:flex-none">
+            <SelectTaskCategory selectedList={selectedList} setSelectedList={onListChange} />
+          </div>
           <EstimatedDurationSelector
             value={selectedDuration ?? null}
             onChange={onDurationChange}
@@ -52,14 +57,15 @@ export function TaskMetadataFields({
           />
         </div>
 
-        <div className="flex items-center gap-1 ml-auto">
+        {/* Second section: Action buttons */}
+        <div className="flex items-center gap-1 sm:ml-auto">
           <IconButtonToggle
             icon={(isChecked) => <Users fill={isChecked ? '#2563eb' : 'none'} className="h-4 w-4" />}
             tooltipContent="Blocker"
             isChecked={isBlocker}
             onCheckedChange={onBlockerChange}
             className={
-              isBlocker ? 'text-blue-600 hover:text-blue-700' : 'text-muted-foreground hover:text-blue-600'
+              isBlocker ? 'text-blue-600 hover:text-blue-700 p-2 sm:p-1' : 'text-muted-foreground hover:text-blue-600 p-2 sm:p-1'
             }
           />
           <IconButtonToggle
@@ -69,8 +75,8 @@ export function TaskMetadataFields({
             onCheckedChange={onStarredChange}
             className={
               isStarred
-                ? 'text-yellow-500 hover:text-yellow-600'
-                : 'text-muted-foreground hover:text-yellow-500'
+                ? 'text-yellow-500 hover:text-yellow-600 p-2 sm:p-1'
+                : 'text-muted-foreground hover:text-yellow-500 p-2 sm:p-1'
             }
           />
           <DatePickerButton selectedDate={selectedDate} onDateChange={onDateChange} />

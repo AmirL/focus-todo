@@ -33,18 +33,33 @@ interface PopoverContentProps {
 }
 
 const DurationPopoverContent = ({ onChange, value, onOpenChange }: PopoverContentProps) => (
-  <PopoverContent className="w-48 p-0 z-50 relative" align="end">
+  <PopoverContent 
+    className="w-48 p-0 z-50 relative" 
+    align="end"
+    side="bottom"
+    sideOffset={8}
+    avoidCollisions={true}
+    sticky="always"
+  >
     <div
       className="relative z-50"
       style={{
         pointerEvents: 'auto',
         position: 'relative',
-        touchAction: 'none',
+        touchAction: 'manipulation',
+        WebkitTouchCallout: 'none',
+        WebkitUserSelect: 'none',
+        userSelect: 'none',
       }}
       onClick={(e) => {
         e.stopPropagation();
+        e.preventDefault();
       }}
       onMouseDown={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}
+      onTouchStart={(e) => {
         e.stopPropagation();
       }}
     >
@@ -69,7 +84,15 @@ const DurationPopoverContent = ({ onChange, value, onOpenChange }: PopoverConten
           variant="ghost"
           size="sm"
           className="w-full justify-start text-sm"
-          onClick={() => {
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onChange(null);
+            onOpenChange(false);
+          }}
+          onTouchEnd={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
             onChange(null);
             onOpenChange(false);
           }}
@@ -82,7 +105,15 @@ const DurationPopoverContent = ({ onChange, value, onOpenChange }: PopoverConten
             variant="ghost"
             size="sm"
             className="w-full justify-start text-sm"
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onChange(option.value);
+              onOpenChange(false);
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               onChange(option.value);
               onOpenChange(false);
             }}
@@ -124,14 +155,20 @@ export function EstimatedDurationSelector({
             'inline-flex items-center justify-between cursor-pointer bg-white border border-slate-200 transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1',
             showLabel 
               ? 'w-full px-3 py-2 text-sm rounded-md h-10 mt-1' 
-              : 'w-auto px-2 py-1.5 text-xs rounded min-w-[80px] h-8',
+              : 'w-auto px-3 py-2 text-sm rounded min-w-[90px] h-10',
             value ? 'text-slate-900' : 'text-gray-400'
           )}
+          style={{
+            WebkitTouchCallout: 'none',
+            WebkitUserSelect: 'none',
+            userSelect: 'none',
+            touchAction: 'manipulation'
+          }}
         >
           <div className="flex items-center">
             <Clock 
-              size={showLabel ? 16 : 12} 
-              className={cn(showLabel ? 'mr-2' : 'mr-1')} 
+              size={16} 
+              className="mr-2" 
             />
             <span>
               {value 
@@ -142,7 +179,7 @@ export function EstimatedDurationSelector({
               }
             </span>
           </div>
-          <ChevronDown size={showLabel ? 16 : 12} />
+          <ChevronDown size={16} />
         </PopoverTrigger>
 
         <DurationPopoverContent 

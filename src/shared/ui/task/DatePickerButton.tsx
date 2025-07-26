@@ -39,29 +39,68 @@ export function DatePickerButton({ selectedDate, onDateChange }: DatePickerButto
   return (
     <Popover open={calendarOpen} onOpenChange={handleCalendarOpenChange}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" className="flex h-8 items-center gap-1">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="flex h-10 items-center gap-2 px-3 text-sm"
+          style={{
+            WebkitTouchCallout: 'none',
+            WebkitUserSelect: 'none',
+            userSelect: 'none',
+            touchAction: 'manipulation'
+          }}
+        >
           <Clock className="h-4 w-4" />
           {getDateButtonLabel()}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0 z-50 relative" align="end">
+      <PopoverContent 
+        className="w-auto p-0 z-50 relative" 
+        align="end"
+        side="bottom"
+        sideOffset={8}
+        avoidCollisions={true}
+        sticky="always"
+      >
         <div
           className="relative z-50"
           style={{
             pointerEvents: 'auto',
             position: 'relative',
-            touchAction: 'none',
+            touchAction: 'manipulation',
+            WebkitTouchCallout: 'none',
+            WebkitUserSelect: 'none',
+            userSelect: 'none',
           }}
           onClick={(e) => {
             e.stopPropagation();
+            e.preventDefault();
           }}
           onMouseDown={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+          onTouchStart={(e) => {
             e.stopPropagation();
           }}
         >
           <div className="p-2 border-b border-border flex justify-end h-[44px]">
             {selectedDate && (
-              <Button variant="ghost" size="sm" onClick={clearDate} className="text-muted-foreground cursor-pointer">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  clearDate();
+                }} 
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  clearDate();
+                }}
+                className="text-muted-foreground cursor-pointer"
+              >
                 <X className="h-4 w-4 mr-1" /> Clear Date
               </Button>
             )}
