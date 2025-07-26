@@ -27,10 +27,6 @@ export function EstimatedTimeButton({ task }: EstimatedTimeButtonProps) {
     updateTaskMutation.mutate(updatedTask);
   };
 
-  if (!task.estimatedDuration) {
-    return null;
-  }
-
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
@@ -44,6 +40,7 @@ export function EstimatedTimeButton({ task }: EstimatedTimeButtonProps) {
             borderRadius: '4px',
             background: 'white',
             cursor: 'pointer',
+            color: task.estimatedDuration ? 'inherit' : '#999',
           }}
         >
           <svg
@@ -61,7 +58,7 @@ export function EstimatedTimeButton({ task }: EstimatedTimeButtonProps) {
             <circle cx="12" cy="12" r="10"></circle>
             <polyline points="12 6 12 12 16 14"></polyline>
           </svg>
-          {formatDuration(task.estimatedDuration)}
+          {task.estimatedDuration ? formatDuration(task.estimatedDuration) : 'Set time'}
         </button>
       </DropdownMenu.Trigger>
 

@@ -80,7 +80,9 @@ All API routes require admin authentication via Better Auth.
 - Always run `pnpm tsc --noEmit` before committing to ensure TypeScript compliance
 - The steiger config has specific FSD rules disabled - follow existing patterns rather than strict FSD compliance
 
-### Testing Guidelines
+### Workflow
 
-- When finish task, use playwright mcp to test it
-- When finish task you need acceptance from the reviewer agent
+- First work on the task,
+- When you consider your work is finished, use playwright mcp to test it
+- When test is finished, task you need acceptance from the reviewer agent
+- Only after that the workflow is finished.
