@@ -1,85 +1,37 @@
-import { Star, Users } from 'lucide-react';
-import { IconButtonToggle } from '@/shared/ui/IconButtonToggle';
-import { DatePickerButton } from './DatePickerButton';
-import { SelectTaskCategory } from './SelectTaskCategory';
-import { EstimatedDurationSelector } from './EstimatedDurationSelector';
-
+import { TaskMetadata } from './useTaskMetadata';
+import { CategorySelector } from './CategorySelector';
+import { DurationSelector } from './DurationSelector';
+import { BlockerToggle } from './BlockerToggle';
+import { StarredToggle } from './StarredToggle';
+import { TaskDatePicker } from './TaskDatePicker';
 
 interface TaskMetadataFieldsProps {
-  // Estimated Duration
-  selectedDuration?: number | null;
-  onDurationChange: (duration: number | null) => void;
-  
-  // Category/List
-  selectedList: string;
-  onListChange: (list: string) => void;
-  
-  // Toggles
-  isStarred: boolean;
-  onStarredChange: (starred: boolean) => void;
-  isBlocker: boolean;
-  onBlockerChange: (blocker: boolean) => void;
-  
-  // Date
-  selectedDate: Date | null;
-  onDateChange: (date: Date | null) => void;
+  metadata: TaskMetadata;
+  onMetadataChange: (updates: Partial<TaskMetadata>) => void;
 }
 
-export function TaskMetadataFields({
-  selectedDuration,
-  onDurationChange,
-  selectedList,
-  onListChange,
-  isStarred,
-  onStarredChange,
-  isBlocker,
-  onBlockerChange,
-  selectedDate,
-  onDateChange,
-}: TaskMetadataFieldsProps) {
-
+export function TaskMetadataFields({ metadata, onMetadataChange }: TaskMetadataFieldsProps) {
   return (
     <div className="space-y-2">
-      {/* Category Label */}
       <div className="text-sm text-muted-foreground font-medium">Category</div>
-      
-      {/* Responsive layout: single row on desktop, two rows on mobile */}
       <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:space-y-0 sm:gap-3">
-        {/* First section: Category and Duration */}
+        {/* Mobile: Category only, Desktop: Category + Duration */}
         <div className="flex items-center gap-2">
           <div className="flex-1 sm:flex-none">
-            <SelectTaskCategory selectedList={selectedList} setSelectedList={onListChange} />
+            <CategorySelector metadata={metadata} onMetadataChange={onMetadataChange} />
           </div>
-          <EstimatedDurationSelector
-            value={selectedDuration ?? null}
-            onChange={onDurationChange}
-            showLabel={false}
-          />
+          <div className="hidden sm:block">
+            <DurationSelector metadata={metadata} onMetadataChange={onMetadataChange} />
+          </div>
         </div>
-
-        {/* Second section: Action buttons */}
+        {/* Mobile: Duration + Action buttons, Desktop: Action buttons only */}
         <div className="flex items-center gap-1 sm:ml-auto">
-          <IconButtonToggle
-            icon={(isChecked) => <Users fill={isChecked ? '#2563eb' : 'none'} className="h-4 w-4" />}
-            tooltipContent="Blocker"
-            isChecked={isBlocker}
-            onCheckedChange={onBlockerChange}
-            className={
-              isBlocker ? 'text-blue-600 hover:text-blue-700 p-2 sm:p-1' : 'text-muted-foreground hover:text-blue-600 p-2 sm:p-1'
-            }
-          />
-          <IconButtonToggle
-            icon={(isChecked) => <Star fill={isChecked ? '#E3B644' : 'none'} className="h-4 w-4" />}
-            tooltipContent="Selected"
-            isChecked={isStarred}
-            onCheckedChange={onStarredChange}
-            className={
-              isStarred
-                ? 'text-yellow-500 hover:text-yellow-600 p-2 sm:p-1'
-                : 'text-muted-foreground hover:text-yellow-500 p-2 sm:p-1'
-            }
-          />
-          <DatePickerButton selectedDate={selectedDate} onDateChange={onDateChange} />
+          <div className="block sm:hidden">
+            <DurationSelector metadata={metadata} onMetadataChange={onMetadataChange} />
+          </div>
+          <BlockerToggle metadata={metadata} onMetadataChange={onMetadataChange} />
+          <StarredToggle metadata={metadata} onMetadataChange={onMetadataChange} />
+          <TaskDatePicker metadata={metadata} onMetadataChange={onMetadataChange} />
         </div>
       </div>
     </div>

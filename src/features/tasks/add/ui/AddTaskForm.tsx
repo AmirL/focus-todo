@@ -17,6 +17,7 @@ import { TaskModel } from '@/entities/task/model/task';
 import { useCreateTaskMutation } from '@/shared/api/tasks';
 import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
 import { TaskMetadataFields } from '@/shared/ui/task/TaskMetadataFields';
+import { useTaskMetadata } from '@/shared/ui/task/useTaskMetadata';
 import dayjs from 'dayjs';
 
 export function AddTaskForm() {
@@ -26,11 +27,7 @@ export function AddTaskForm() {
   const handleDialogClose = (open: boolean) => {
     if (open === false) {
       // Reset states when dialog closes
-      setSelectedList('Personal');
-      setIsStarred(false);
-      setIsBlocker(false);
-      setSelectedDate(null);
-      setSelectedDuration(null);
+      resetMetadata();
       setTaskInput(''); // Optionally reset input text too
     }
     setIsAddTaskOpen(open);
@@ -38,11 +35,7 @@ export function AddTaskForm() {
 
   const closeDialog = () => {
     // Reset states when dialog is explicitly closed
-    setSelectedList('Personal');
-    setIsStarred(false);
-    setIsBlocker(false);
-    setSelectedDate(null);
-    setSelectedDuration(null);
+    resetMetadata();
     setTaskInput(''); // Optionally reset input text too
     setIsAddTaskOpen(false);
   };
@@ -50,34 +43,28 @@ export function AddTaskForm() {
   const taskInput = useAddTasksStore((state) => state.createTaskInput);
   const setTaskInput = useAddTasksStore((state) => state.setCreateTaskInput);
 
-  const [selectedList, setSelectedList] = useState('Personal');
-  const [isStarred, setIsStarred] = useState(false);
-  const [isBlocker, setIsBlocker] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [selectedDuration, setSelectedDuration] = useState<number | null>(null);
-
+  const { metadata, updateMetadata, resetMetadata } = useTaskMetadata();
   const { statusFilter } = useFilterStore();
 
   useEffect(() => {
     if (isAddTaskOpen) {
       // Reset to defaults first
-      setSelectedDate(null);
-      setIsStarred(false);
+      resetMetadata();
 
       // Apply filter-based defaults
       switch (statusFilter) {
         case StatusFilterEnum.TODAY:
-          setSelectedDate(new Date());
+          updateMetadata({ selectedDate: new Date() });
           break;
         case StatusFilterEnum.TOMORROW:
-          setSelectedDate(dayjs().add(1, 'day').toDate());
+          updateMetadata({ selectedDate: dayjs().add(1, 'day').toDate() });
           break;
         case StatusFilterEnum.SELECTED:
-          setIsStarred(true);
+          updateMetadata({ isStarred: true });
           break;
       }
     }
-  }, [isAddTaskOpen, statusFilter]); // Rerun effect if dialog opens or filter changes while open
+  }, [isAddTaskOpen, statusFilter, resetMetadata, updateMetadata]); // Rerun effect if dialog opens or filter changes while open
 
   const handleAddTaskClick = async () => {
     const todoTexts = taskInput.split('\n').filter((text) => text.trim() !== '');
@@ -88,11 +75,11 @@ export function AddTaskForm() {
     for (const text of todoTexts) {
       const newTask = createInstance(TaskModel, {
         name: text,
-        list: selectedList,
-        selectedAt: isStarred ? new Date() : null,
-        isBlocker,
-        date: selectedDate,
-        estimatedDuration: selectedDuration,
+        list: metadata.selectedList,
+        selectedAt: metadata.isStarred ? new Date() : null,
+        isBlocker: metadata.isBlocker,
+        date: metadata.selectedDate,
+        estimatedDuration: metadata.selectedDuration,
       });
       createTaskMutation.mutate(newTask);
     }
@@ -112,7 +99,7 @@ export function AddTaskForm() {
           <Plus className="h-6 w-6" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <div
           className="w-full"
           tabIndex={0}
@@ -138,16 +125,8 @@ export function AddTaskForm() {
             />
 
             <TaskMetadataFields
-              selectedDuration={selectedDuration}
-              onDurationChange={setSelectedDuration}
-              selectedList={selectedList}
-              onListChange={setSelectedList}
-              isStarred={isStarred}
-              onStarredChange={setIsStarred}
-              isBlocker={isBlocker}
-              onBlockerChange={setIsBlocker}
-              selectedDate={selectedDate}
-              onDateChange={setSelectedDate}
+              metadata={metadata}
+              onMetadataChange={updateMetadata}
             />
           </div>
         </div>

@@ -8,6 +8,7 @@ import { MarkdownAreaField } from './MarkdownAreaField';
 import { useUpdateTaskMutation } from '@/shared/api/tasks';
 import { createInstance } from '@/shared/lib/instance-tools';
 import { TaskMetadataFields } from '@/shared/ui/task/TaskMetadataFields';
+import { useTaskMetadata } from '@/shared/ui/task/useTaskMetadata';
 
 export function EditTaskDialog({ task, children }: { task: TaskModel; children: React.ReactNode }) {
   const updateTaskMutation = useUpdateTaskMutation();
@@ -15,11 +16,13 @@ export function EditTaskDialog({ task, children }: { task: TaskModel; children: 
   // Initialize state with task values
   const [name, setName] = useState(task.name);
   const [details, setDetails] = useState(task.details ?? '');
-  const [selectedDuration, setSelectedDuration] = useState<number | null>(task.estimatedDuration ?? null);
-  const [selectedList, setSelectedList] = useState(task.list);
-  const [isStarred, setIsStarred] = useState(!!task.selectedAt);
-  const [isBlocker, setIsBlocker] = useState(task.isBlocker);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(task.date ?? null);
+  const { metadata, updateMetadata } = useTaskMetadata({
+    selectedDuration: task.estimatedDuration ?? null,
+    selectedList: task.list,
+    isStarred: !!task.selectedAt,
+    isBlocker: task.isBlocker,
+    selectedDate: task.date ?? null,
+  });
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,11 +31,11 @@ export function EditTaskDialog({ task, children }: { task: TaskModel; children: 
       ...task,
       name,
       details,
-      estimatedDuration: selectedDuration,
-      list: selectedList,
-      selectedAt: isStarred ? (task.selectedAt || new Date()) : null,
-      isBlocker,
-      date: selectedDate,
+      estimatedDuration: metadata.selectedDuration,
+      list: metadata.selectedList,
+      selectedAt: metadata.isStarred ? (task.selectedAt || new Date()) : null,
+      isBlocker: metadata.isBlocker,
+      date: metadata.selectedDate,
       updatedAt: new Date()
     });
     updateTaskMutation.mutate(updatedTask);
@@ -58,16 +61,8 @@ export function EditTaskDialog({ task, children }: { task: TaskModel; children: 
             </div>
             
             <TaskMetadataFields
-              selectedDuration={selectedDuration}
-              onDurationChange={setSelectedDuration}
-              selectedList={selectedList}
-              onListChange={setSelectedList}
-              isStarred={isStarred}
-              onStarredChange={setIsStarred}
-              isBlocker={isBlocker}
-              onBlockerChange={setIsBlocker}
-              selectedDate={selectedDate}
-              onDateChange={setSelectedDate}
+              metadata={metadata}
+              onMetadataChange={updateMetadata}
             />
             
             <div>
