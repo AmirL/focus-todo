@@ -36,7 +36,8 @@
       "mcp__playwright__browser_wait_for",
       "mcp__playwright__browser_close",
       "mcp__playwright__browser_install",
-      "mcp__playwright__browser_evaluate"
+      "mcp__playwright__browser_evaluate",
+      "WebFetch(domain:feature-sliced.design)"
     ],
     "deny": []
   }

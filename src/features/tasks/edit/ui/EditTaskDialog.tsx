@@ -1,36 +1,40 @@
+import { useState } from 'react';
 import { TaskModel } from '@/entities/task/model/task';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
 import { Label } from '@/shared/ui/label';
+import { Input } from '@/shared/ui/input';
 import { MarkdownAreaField } from './MarkdownAreaField';
-import { InputField } from './InputField';
 import { useUpdateTaskMutation } from '@/shared/api/tasks';
 import { createInstance } from '@/shared/lib/instance-tools';
-
-const DURATION_OPTIONS = [
-  { value: 15, label: '15 minutes' },
-  { value: 30, label: '30 minutes' },
-  { value: 60, label: '1 hour' },
-  { value: 90, label: '1.5 hours' },
-  { value: 150, label: '2.5 hours' },
-  { value: 240, label: '4 hours' },
-  { value: 480, label: '1 day' },
-];
+import { TaskMetadataFields } from '@/shared/ui/task/TaskMetadataFields';
 
 export function EditTaskDialog({ task, children }: { task: TaskModel; children: React.ReactNode }) {
   const updateTaskMutation = useUpdateTaskMutation();
+  
+  // Initialize state with task values
+  const [name, setName] = useState(task.name);
+  const [details, setDetails] = useState(task.details ?? '');
+  const [selectedDuration, setSelectedDuration] = useState<number | null>(task.estimatedDuration ?? null);
+  const [selectedList, setSelectedList] = useState(task.list);
+  const [isStarred, setIsStarred] = useState(!!task.selectedAt);
+  const [isBlocker, setIsBlocker] = useState(task.isBlocker);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(task.date ?? null);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const values = new FormData(e.target as HTMLFormElement);
-
-    const name: string = values.get('name') as string;
-    const details: string = values.get('details') as string;
-    const estimatedDurationStr = values.get('estimatedDuration') as string | null;
-    const estimatedDuration = estimatedDurationStr ? parseInt(estimatedDurationStr, 10) : undefined;
-
-    const updatedTask = createInstance(TaskModel, { ...task, name, details, estimatedDuration, updatedAt: new Date() });
+    
+    const updatedTask = createInstance(TaskModel, {
+      ...task,
+      name,
+      details,
+      estimatedDuration: selectedDuration,
+      list: selectedList,
+      selectedAt: isStarred ? (task.selectedAt || new Date()) : null,
+      isBlocker,
+      date: selectedDate,
+      updatedAt: new Date()
+    });
     updateTaskMutation.mutate(updatedTask);
   };
 
@@ -43,10 +47,38 @@ export function EditTaskDialog({ task, children }: { task: TaskModel; children: 
             <DialogTitle>Edit task</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <InputField label="Name" id="name" value={task.name} />
-            <EstimateDuration task={task} />
-            <MarkdownAreaField label="Details" id="details" value={task.details ?? ''} />
-            <div className="grid grid-cols-4 items-center gap-4"></div>
+            <div>
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            
+            <TaskMetadataFields
+              selectedDuration={selectedDuration}
+              onDurationChange={setSelectedDuration}
+              selectedList={selectedList}
+              onListChange={setSelectedList}
+              isStarred={isStarred}
+              onStarredChange={setIsStarred}
+              isBlocker={isBlocker}
+              onBlockerChange={setIsBlocker}
+              selectedDate={selectedDate}
+              onDateChange={setSelectedDate}
+            />
+            
+            <div>
+              <Label htmlFor="details">Details</Label>
+              <MarkdownAreaField 
+                label="" 
+                id="details" 
+                value={details}
+                onChange={setDetails}
+              />
+            </div>
           </div>
           <DialogFooter>
             <DialogTrigger asChild>
@@ -59,25 +91,3 @@ export function EditTaskDialog({ task, children }: { task: TaskModel; children: 
   );
 }
 
-function EstimateDuration({ task }: { task: TaskModel }) {
-  return (
-    <div>
-      <Label htmlFor="estimatedDuration" className="text-right">
-        Est. Duration
-      </Label>
-      <Select name="estimatedDuration" defaultValue={task.estimatedDuration?.toString()}>
-        <SelectTrigger id="estimatedDuration" className="col-span-3">
-          <SelectValue placeholder="Select duration" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={' '}>—</SelectItem>
-          {DURATION_OPTIONS.map((option) => (
-            <SelectItem key={option.value} value={option.value.toString()}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-  );
-}

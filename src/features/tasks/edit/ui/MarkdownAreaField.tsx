@@ -4,13 +4,20 @@ import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Label } from '@/shared/ui/label';
 
-export function MarkdownAreaField(props: { label: string; id: string; value: string }) {
-  const { label, id, value: initialValue, ...rest } = props;
+export function MarkdownAreaField(props: { 
+  label: string; 
+  id: string; 
+  value: string; 
+  onChange?: (value: string) => void;
+}) {
+  const { label, id, value, onChange: onChangeParent, ...rest } = props;
   const [activeTab, setActiveTab] = useState('view');
-  const [value, setValue] = useState(initialValue);
 
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setValue(e.target.value);
+    const newValue = e.target.value;
+    if (onChangeParent) {
+      onChangeParent(newValue);
+    }
   };
 
   return (
@@ -30,7 +37,6 @@ export function MarkdownAreaField(props: { label: string; id: string; value: str
           <ReactMarkdown className="prose prose-sm min-h-[200px]">{value}</ReactMarkdown>
         </TabsContent>
       </Tabs>
-      <input type="hidden" name={id} value={value} />
     </div>
   );
 }

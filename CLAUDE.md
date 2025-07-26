@@ -17,11 +17,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a Next.js 14 todo/task management application using Feature-Sliced Design (FSD) architecture with these key layers:
 
 ### FSD Architecture Structure
+This project follows **Feature-Sliced Design (FSD)** architecture. For complete FSD guidelines, see [`docs/FSD_ARCHITECTURE.md`](./docs/FSD_ARCHITECTURE.md).
+
+**Layer hierarchy** (top to bottom):
 - **app/**: Next.js App Router pages and API routes
 - **_pages/**: Composed pages combining multiple features  
 - **features/**: Business logic features (goals, tasks with add/edit/actions/filter)
 - **entities/**: Core domain models (task, goal, user)
 - **shared/**: Reusable utilities, UI components, and infrastructure
+
+**Key FSD Rules:**
+- **Import Rule**: Only import from layers strictly below your current layer
+- **Public API Rule**: Every slice/segment must provide a public API via `index.ts`
+- **No shared/ in features/**: This violates FSD - use top-level `shared/` instead
+
+**Component Organization:**
+- **shared/ui/task/**: Task-specific reusable components
+- **shared/ui/goal/**: Goal-specific reusable components  
+- **shared/ui/**: Generic reusable components
+- **features/[feature]/ui/**: Feature-specific components (NOT reused elsewhere)
 
 ### Core Domain Models
 - **TaskModel**: Main entity with properties like name, details, date, estimatedDuration, list, isBlocker, selectedAt

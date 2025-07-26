@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Textarea } from '@/shared/ui/textarea';
 import { Button } from '@/shared/ui/button';
-import { Plus, PlusCircle, Star, Users } from 'lucide-react';
-import { SelectTaskCategory } from './SelectTaskCategory';
+import { Plus, PlusCircle } from 'lucide-react';
 import { useAddTasksStore } from '../model/addTaskStore';
 import {
   Dialog,
@@ -16,9 +15,8 @@ import {
 import { createInstance } from '@/shared/lib/instance-tools';
 import { TaskModel } from '@/entities/task/model/task';
 import { useCreateTaskMutation } from '@/shared/api/tasks';
-import { DatePickerButton } from './DatePickerButton';
-import { IconButtonToggle } from '@/shared/ui/IconButtonToggle';
 import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
+import { TaskMetadataFields } from '@/shared/ui/task/TaskMetadataFields';
 import dayjs from 'dayjs';
 
 export function AddTaskForm() {
@@ -32,6 +30,7 @@ export function AddTaskForm() {
       setIsStarred(false);
       setIsBlocker(false);
       setSelectedDate(null);
+      setSelectedDuration(null);
       setTaskInput(''); // Optionally reset input text too
     }
     setIsAddTaskOpen(open);
@@ -43,6 +42,7 @@ export function AddTaskForm() {
     setIsStarred(false);
     setIsBlocker(false);
     setSelectedDate(null);
+    setSelectedDuration(null);
     setTaskInput(''); // Optionally reset input text too
     setIsAddTaskOpen(false);
   };
@@ -54,6 +54,7 @@ export function AddTaskForm() {
   const [isStarred, setIsStarred] = useState(false);
   const [isBlocker, setIsBlocker] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDuration, setSelectedDuration] = useState<number | null>(null);
 
   const { statusFilter } = useFilterStore();
 
@@ -81,7 +82,6 @@ export function AddTaskForm() {
   const handleAddTaskClick = async () => {
     const todoTexts = taskInput.split('\n').filter((text) => text.trim() !== '');
 
-    const previousInputValue = taskInput;
     setTaskInput('');
 
     // Create all tasks sequentially
@@ -92,6 +92,7 @@ export function AddTaskForm() {
         selectedAt: isStarred ? new Date() : null,
         isBlocker,
         date: selectedDate,
+        estimatedDuration: selectedDuration,
       });
       createTaskMutation.mutate(newTask);
     }
@@ -136,38 +137,18 @@ export function AddTaskForm() {
               autoFocus
             />
 
-            <div className="space-y-2">
-              <div className="text-sm text-muted-foreground font-medium">Category</div>
-              <div className="flex items-center">
-                <div className="mr-auto">
-                  <SelectTaskCategory selectedList={selectedList} setSelectedList={setSelectedList} />
-                </div>
-
-                <div className="flex items-center gap-1">
-                  <IconButtonToggle
-                    icon={(isChecked) => <Users fill={isChecked ? '#2563eb' : 'none'} className="h-4 w-4" />}
-                    tooltipContent="Blocker"
-                    isChecked={isBlocker}
-                    onCheckedChange={setIsBlocker}
-                    className={
-                      isBlocker ? 'text-blue-600 hover:text-blue-700' : 'text-muted-foreground hover:text-blue-600'
-                    }
-                  />
-                  <IconButtonToggle
-                    icon={(isChecked) => <Star fill={isChecked ? '#E3B644' : 'none'} className="h-4 w-4" />}
-                    tooltipContent="Selected"
-                    isChecked={isStarred}
-                    onCheckedChange={setIsStarred}
-                    className={
-                      isStarred
-                        ? 'text-yellow-500 hover:text-yellow-600'
-                        : 'text-muted-foreground hover:text-yellow-500'
-                    }
-                  />
-                  <DatePickerButton selectedDate={selectedDate} onDateChange={setSelectedDate} />
-                </div>
-              </div>
-            </div>
+            <TaskMetadataFields
+              selectedDuration={selectedDuration}
+              onDurationChange={setSelectedDuration}
+              selectedList={selectedList}
+              onListChange={setSelectedList}
+              isStarred={isStarred}
+              onStarredChange={setIsStarred}
+              isBlocker={isBlocker}
+              onBlockerChange={setIsBlocker}
+              selectedDate={selectedDate}
+              onDateChange={setSelectedDate}
+            />
           </div>
         </div>
 
