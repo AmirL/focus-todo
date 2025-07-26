@@ -11,6 +11,9 @@ function invariant(condition: unknown, message: string): asserts condition {
 
 invariant(process.env.BETTER_AUTH_SECRET, "BETTER_AUTH_SECRET environment variable is required");
 
+const SESSION_DURATION = 60 * 60 * 24 * 30; // 30 days
+const SESSION_REFRESH_INTERVAL = 60 * 60 * 24; // 1 day
+
 export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8000",
@@ -45,11 +48,11 @@ export const auth = betterAuth({
     },
   },
   session: {
-    expiresIn: 60 * 60 * 24 * 7, // 7 days (gets refreshed automatically)
-    updateAge: 60 * 60 * 24, // 1 day
+    expiresIn: SESSION_DURATION, // 30 days (gets refreshed automatically)
+    updateAge: SESSION_REFRESH_INTERVAL, // 1 day
     cookieCache: {
       enabled: true,
-      maxAge: 60 * 60 * 24 * 30 * 6, // 6 months - stay logged in
+      maxAge: SESSION_DURATION, // 30 days - stay logged in
     },
   },
 });
