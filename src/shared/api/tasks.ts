@@ -34,9 +34,31 @@ export function useCreateTaskMutation() {
       const response = (await fetchBackend('create-task', { task: TaskModel.toPlain(task) })) as TaskPlain;
       return TaskModel.toInstance(response);
     },
+    onMutate: async (newTask) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: taskKeys.all });
+
+      // Snapshot the previous value
+      const previousTasks = queryClient.getQueryData<TaskModel[]>(taskKeys.all);
+
+      // Optimistically add the new task to the cache
+      queryClient.setQueryData<TaskModel[]>(taskKeys.all, (old) => {
+        if (!old) return [newTask];
+        return [...old, newTask];
+      });
+
+      // Return a context object with the snapshotted value
+      return { previousTasks };
+    },
+    onError: (_err, _newTask, context) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      queryClient.setQueryData<TaskModel[]>(taskKeys.all, context?.previousTasks);
+    },
     onSuccess: () => {
       toast.success('Task created');
-      // Refetch to get the latest data with proper server-assigned IDs
+    },
+    onSettled: () => {
+      // Always refetch after error or success to ensure we have the latest data with proper server-assigned IDs
       queryClient.invalidateQueries({ queryKey: taskKeys.all });
     },
   });

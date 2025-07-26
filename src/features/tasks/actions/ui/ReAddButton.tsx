@@ -13,15 +13,21 @@ export function ReAddButton({ task }: { task: TaskModel }) {
   const createTaskMutation = useCreateTaskMutation();
   const updateTaskMutation = useUpdateTaskMutation();
 
-  const reAddTask = (date: Date | null) => {
+  const reAddTask = async (date: Date | null) => {
     const newTask = cloneInstance(task, { 
       completedAt: null, 
       date
     });
-    createTaskMutation.mutate(newTask);
-
+    
     const updatedTask = createInstance(TaskModel, { ...task, completedAt: new Date(), updatedAt: new Date() });
-    updateTaskMutation.mutate(updatedTask);
+    
+    // First update the current task to mark it as completed (with optimistic update)
+    updateTaskMutation.mutate(updatedTask, {
+      onSuccess: () => {
+        // Then create the new task after the current one is marked as completed
+        createTaskMutation.mutate(newTask);
+      }
+    });
   };
 
   const onDateSelect = (date: Date | null) => {
