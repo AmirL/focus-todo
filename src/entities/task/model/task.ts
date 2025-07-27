@@ -4,8 +4,6 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
-export const ListsNames = ['Work', 'Personal'];
-
 export type TaskPlain = {
   id: string;
   name: string;

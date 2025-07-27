@@ -3,9 +3,10 @@
 import { Button } from '@/shared/ui/button';
 import { CheckSquare2, Calendar, Clock, ListTodo, Tag } from 'lucide-react';
 import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
-import { ListsNames, isTaskToday, isTaskTomorrow, isTaskOverdue } from '@/entities/task/model/task';
+import { isTaskToday, isTaskTomorrow, isTaskOverdue } from '@/entities/task/model/task';
 import { cn } from '@/shared/lib/utils';
 import { useTasksQuery } from '@/shared/api/tasks';
+import { useListsQuery } from '@/shared/api/lists';
 import { calculateTotalEstimatedTime } from '../model/calculateTotalEstimatedTime';
 import { formatTotalDuration } from '@/shared/lib/format-duration';
 import { useSidebar } from '@/shared/ui/sidebar';
@@ -115,6 +116,7 @@ function CategoryButton({ category, active }: { category: string; active: boolea
 
 export function TaskFilters() {
   const { statusFilter, list } = useFilterStore();
+  const { data: lists = [], isLoading } = useListsQuery();
 
   return (
     <div className="space-y-4">
@@ -158,9 +160,13 @@ export function TaskFilters() {
       <div className="px-2">
         <h2 className="mb-2 px-2 text-xs font-semibold tracking-tight text-muted-foreground">Categories</h2>
         <div className="space-y-1">
-          {ListsNames.map((category) => (
-            <CategoryButton key={category} category={category} active={list === category} />
-          ))}
+          {isLoading ? (
+            <div className="px-2 text-sm text-muted-foreground">Loading...</div>
+          ) : (
+            lists.map((listItem) => (
+              <CategoryButton key={listItem.id} category={listItem.name} active={list === listItem.name} />
+            ))
+          )}
         </div>
       </div>
     </div>

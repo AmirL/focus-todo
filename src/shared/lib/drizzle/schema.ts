@@ -8,7 +8,8 @@ export const tasksTable = mysqlTable('tasks', {
   date: datetime('date'),
   estimatedDuration: int('estimated_duration'),
   completedAt: datetime('completed_at'),
-  list: varchar('list', { length: 255 }).notNull(),
+  list: varchar('list', { length: 255 }).notNull(), // Keep for backward compatibility during migration
+  listId: int('list_id').references(() => listsTable.id, { onDelete: 'restrict' }),
   isBlocker: boolean('is_blocker').default(false),
   selectedAt: date('selected_at'),
   uid: int('uid'),
@@ -24,9 +25,22 @@ export const goalsTable = mysqlTable('goals', {
   id: int('id').autoincrement().primaryKey().notNull(),
   title: varchar('title', { length: 255 }),
   progress: tinyint('progress').default(0),
-  list: varchar('list', { length: 255 }),
+  list: varchar('list', { length: 255 }), // Keep for backward compatibility during migration
+  listId: int('list_id').references(() => listsTable.id, { onDelete: 'restrict' }),
   userId: varchar('user_id', { length: 36 }).notNull().references(() => user.id, { onDelete: 'cascade' }),
   deletedAt: datetime('deleted_at'),
+});
+
+export const listsTable = mysqlTable('lists', {
+  id: int('id').autoincrement().primaryKey().notNull(),
+  name: varchar('name', { length: 255 }).notNull(),
+  userId: varchar('user_id', { length: 36 }).notNull().references(() => user.id, { onDelete: 'cascade' }),
+  isDefault: boolean('is_default').default(false),
+  createdAt: datetime('created_at')
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: datetime('updated_at')
+    .default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`),
 });
 
 // BetterAuth tables

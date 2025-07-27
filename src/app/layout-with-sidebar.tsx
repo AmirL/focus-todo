@@ -2,7 +2,7 @@
 
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button';
-import { Menu, ChevronDown, CheckSquare2, LogOut, Calendar, Clock, ListTodo, Tag } from 'lucide-react';
+import { Menu, ChevronDown, CheckSquare2, LogOut, Calendar, Clock, ListTodo, Tag, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider, useSidebar } from '@/shared/ui/sidebar';
@@ -101,7 +101,24 @@ export function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
 
             <SidebarContent>
               {shouldShowSidebarContent ? (
-                <TaskFilters />
+                <div className="space-y-4">
+                  <TaskFilters />
+                  <div className="px-2">
+                    <Separator />
+                    <div className="mt-4">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start"
+                        asChild
+                      >
+                        <Link href="/settings">
+                          <Settings className="mr-2 h-4 w-4" />
+                          Settings
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               ) : (
                 <div className="p-4 text-sm text-muted-foreground text-center">
                   Please login to see your tasks.

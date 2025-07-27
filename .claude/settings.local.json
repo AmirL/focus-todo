@@ -41,7 +41,8 @@
       "mcp__playwright__browser_press_key",
       "mcp__playwright__browser_resize",
       "mcp__playwright__browser_tab_list",
-      "mcp__playwright__browser_tab_close"
+      "mcp__playwright__browser_tab_close",
+      "mcp__playwright__browser_network_requests"
     ],
     "deny": []
   }

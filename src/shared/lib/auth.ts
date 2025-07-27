@@ -9,6 +9,16 @@ function invariant(condition: unknown, message: string): asserts condition {
   }
 }
 
+interface BetterAuthContext {
+  path?: string;
+  request?: { url?: string };
+  body?: {
+    user?: {
+      id: string;
+    };
+  };
+}
+
 invariant(process.env.BETTER_AUTH_SECRET, "BETTER_AUTH_SECRET environment variable is required");
 
 const SESSION_DURATION = 60 * 60 * 24 * 30; // 30 days
@@ -55,6 +65,35 @@ export const auth = betterAuth({
       maxAge: SESSION_DURATION, // 30 days - stay logged in
     },
   },
+  plugins: [
+    {
+      id: "create-default-lists",
+      hooks: {
+        after: [
+          {
+            matcher: (context: BetterAuthContext) => {
+              const path = context?.path || context?.request?.url;
+              return Boolean(path === "/api/auth/sign-up" || path?.endsWith("/sign-up") || path?.includes("sign-up"));
+            },
+            handler: async (context: BetterAuthContext) => {
+              if (context?.body?.user?.id) {
+                try {
+                  // Create default lists for new user
+                  const defaultLists = [
+                    { name: 'Work', userId: context.body.user.id, isDefault: true },
+                    { name: 'Personal', userId: context.body.user.id, isDefault: true }
+                  ];
+                  await DB.insert(schema.listsTable).values(defaultLists);
+                } catch (error) {
+                  console.error('Failed to create default lists:', error);
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
 });
 
 export type Session = typeof auth.$Infer.Session;
