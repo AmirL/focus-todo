@@ -39,7 +39,9 @@
       "mcp__playwright__browser_evaluate",
       "WebFetch(domain:feature-sliced.design)",
       "mcp__playwright__browser_press_key",
-      "mcp__playwright__browser_resize"
+      "mcp__playwright__browser_resize",
+      "mcp__playwright__browser_tab_list",
+      "mcp__playwright__browser_tab_close"
     ],
     "deny": []
   }

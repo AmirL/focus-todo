@@ -32,6 +32,7 @@ export function Task({ task, actionButtons }: TaskProps) {
         isSelected && !task.completedAt && 'border-l-4 border-l-yellow-400',
         deleted && 'opacity-50'
       )}
+      data-testid={`task-${task.id}`}
     >
       <div className="px-4 py-3">
         <div className="flex items-center space-x-3">

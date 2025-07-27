@@ -86,3 +86,7 @@ All API routes require admin authentication via Better Auth.
 - When you consider your work is finished, use playwright mcp to test it
 - When test is finished, task you need acceptance from the reviewer agent
 - Only after that the workflow is finished.
+
+### Recommended Practices
+
+- Use proactively qa agent and code review agent.

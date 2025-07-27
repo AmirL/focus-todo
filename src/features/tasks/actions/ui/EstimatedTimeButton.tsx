@@ -42,6 +42,7 @@ export function EstimatedTimeButton({ task }: EstimatedTimeButtonProps) {
             cursor: 'pointer',
             color: task.estimatedDuration ? 'inherit' : '#999',
           }}
+          data-testid={`estimated-time-task-${task.id}`}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

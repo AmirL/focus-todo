@@ -20,6 +20,7 @@ export function BlockerButton({ task }: { task: TaskModel }) {
       className={`h-8 w-8 ${
         task.isBlocker ? 'text-blue-600 hover:text-blue-700' : 'text-muted-foreground hover:text-blue-600'
       }`}
+      data-testid={`blocker-task-${task.id}`}
     >
       <Users fill={task.isBlocker ? '#2563eb' : 'none'} className="h-4 w-4" />
     </Button>

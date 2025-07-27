@@ -72,12 +72,13 @@ export function EditTaskDialog({ task, children }: { task: TaskModel; children: 
                 id="details" 
                 value={details}
                 onChange={setDetails}
+                data-testid="task-details-input"
               />
             </div>
           </div>
           <DialogFooter>
             <DialogTrigger asChild>
-              <Button type="submit">Save changes</Button>
+              <Button type="submit" data-testid="save-task-changes-button">Save changes</Button>
             </DialogTrigger>
           </DialogFooter>
         </form>

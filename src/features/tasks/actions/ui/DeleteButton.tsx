@@ -24,6 +24,7 @@ export function DeleteButton({ task }: { task: TaskModel }) {
           ? 'text-muted-foreground hover:text-green-600' 
           : 'text-muted-foreground hover:text-destructive'
       }`}
+      data-testid={`delete-task-${task.id}`}
     >
       {isDeleted ? <Undo2 className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
     </Button>

@@ -9,15 +9,14 @@ export function TaskName({ task }: TaskNameProps) {
   const deleted = isTaskDeleted(task);
   
   return (
-    <label
-      htmlFor={`todo-${task.id}`}
+    <div
       className={cn(
-        'flex-1 cursor-pointer font-medium',
+        'flex-1 font-medium',
         task.completedAt && 'line-through text-muted-foreground',
         deleted && 'line-through'
       )}
     >
       {task.name}
-    </label>
+    </div>
   );
 }
