@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/shared/ui/button';
 import { Clock, X } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { Calendar as CalendarComponent } from '@/shared/ui/calendar';
 import dayjs from 'dayjs';
+import { hasSafariDialogIssues } from '@/shared/lib/safari-detection';
 
 interface DatePickerButtonProps {
   selectedDate: Date | null;
@@ -14,6 +15,12 @@ interface DatePickerButtonProps {
 
 export function DatePickerButton({ selectedDate, onDateChange }: DatePickerButtonProps) {
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [isSafari, setIsSafari] = useState(false);
+
+  // Detect Safari browser for conditional fixes
+  useEffect(() => {
+    setIsSafari(hasSafariDialogIssues());
+  }, []);
 
   const handleCalendarOpenChange = (open: boolean) => {
     setCalendarOpen(open);
@@ -37,7 +44,11 @@ export function DatePickerButton({ selectedDate, onDateChange }: DatePickerButto
   };
 
   return (
-    <Popover open={calendarOpen} onOpenChange={handleCalendarOpenChange}>
+    <Popover 
+      open={calendarOpen} 
+      onOpenChange={handleCalendarOpenChange}
+      modal={!isSafari} // Disable modal mode for Safari to fix dialog focus issues
+    >
       <PopoverTrigger asChild>
         <Button 
           variant="ghost" 
@@ -71,6 +82,14 @@ export function DatePickerButton({ selectedDate, onDateChange }: DatePickerButto
             WebkitTouchCallout: 'none',
             WebkitUserSelect: 'none',
             userSelect: 'none',
+            // Safari-specific focus fixes
+            ...(isSafari && {
+              WebkitTransform: 'translateZ(0)',
+              transform: 'translateZ(0)',
+              isolation: 'isolate',
+              backfaceVisibility: 'hidden',
+              WebkitBackfaceVisibility: 'hidden'
+            })
           }}
           onClick={(e) => {
             e.stopPropagation();
@@ -105,7 +124,12 @@ export function DatePickerButton({ selectedDate, onDateChange }: DatePickerButto
               </Button>
             )}
           </div>
-          <CalendarComponent mode="single" selected={selectedDate ?? undefined} onSelect={onDateSelect} initialFocus />
+          <CalendarComponent 
+            mode="single" 
+            selected={selectedDate ?? undefined} 
+            onSelect={onDateSelect} 
+            initialFocus={!isSafari} // Disable initialFocus for Safari to prevent focus conflicts
+          />
         </div>
       </PopoverContent>
     </Popover>
