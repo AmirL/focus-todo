@@ -1,59 +1,39 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { validateUserSession } from '../user-auth';
+import { NextRequest } from 'next/server';
 import { DB } from '@/shared/lib/db';
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { listsTable } from '@/shared/lib/drizzle/schema';
+import { withAuthAndErrorHandling, createErrorResponse, createSuccessResponse } from '@/shared/lib/api/route-wrapper';
+import { validateCreateListRequest } from '@/shared/lib/validation/list-validation';
+import { findUserListByName } from '@/shared/lib/db/list-queries';
 
-export async function POST(req: NextRequest) {
-  try {
-    const session = await validateUserSession();
-    const { name } = await req.json();
+async function createListHandler(req: NextRequest, session: { user: { id: string } }) {
+  const requestBody = await req.json();
+  const validation = validateCreateListRequest(requestBody);
 
-    if (!name || typeof name !== 'string' || name.trim().length === 0) {
-      return NextResponse.json(
-        { error: 'List name is required' },
-        { status: 400 }
-      );
-    }
-
-    if (name.trim().length > 255) {
-      return NextResponse.json(
-        { error: 'List name must be 255 characters or less' },
-        { status: 400 }
-      );
-    }
-
-    // Check if list with same name already exists for this user
-    const existingList = await DB.select()
-      .from(listsTable)
-      .where(and(
-        eq(listsTable.userId, session.user.id),
-        eq(listsTable.name, name.trim())
-      ));
-
-    if (existingList.length > 0) {
-      return NextResponse.json(
-        { error: 'A list with this name already exists' },
-        { status: 409 }
-      );
-    }
-
-    const [{ id }] = await DB.insert(listsTable).values({
-      name: name.trim(),
-      userId: session.user.id,
-      isDefault: false
-    }).$returningId();
-
-    const [createdList] = await DB.select()
-      .from(listsTable)
-      .where(eq(listsTable.id, id));
-
-    return NextResponse.json(createdList, { status: 201 });
-  } catch (error) {
-    console.error('Error in create-list:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unknown error occurred' },
-      { status: 500 }
-    );
+  if (!validation.isValid) {
+    return createErrorResponse(validation.error!, 400);
   }
+
+  const { name } = validation;
+
+  // Check if list with same name already exists for this user
+  const existingList = await findUserListByName(session.user.id, name!);
+
+  if (existingList.length > 0) {
+    return createErrorResponse('A list with this name already exists', 409);
+  }
+
+  const [{ id }] = await DB.insert(listsTable).values({
+    name: name!,
+    userId: session.user.id,
+    isDefault: false
+  }).$returningId();
+
+  const [createdList] = await DB.select()
+    .from(listsTable)
+    .where(eq(listsTable.id, id));
+
+  return createSuccessResponse(createdList, 201);
 }
+
+export const POST = withAuthAndErrorHandling(createListHandler, 'create-list');

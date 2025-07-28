@@ -3,6 +3,75 @@ import { ListModel, ListPlain } from '@/entities/list';
 import { fetchBackend } from '@/shared/lib/api';
 import toast from 'react-hot-toast';
 
+// Context type for optimistic mutations
+interface OptimisticMutationContext {
+  previousLists: ListModel[] | undefined;
+}
+
+// Generic optimistic mutation hook types
+interface OptimisticMutationOptions<TData, TVariables> {
+  mutationFn: (variables: TVariables) => Promise<TData>;
+  queryKey: readonly unknown[];
+  optimisticUpdate: (old: ListModel[] | undefined, variables: TVariables) => ListModel[];
+  onSuccess?: (data: TData, variables: TVariables, context: OptimisticMutationContext | undefined) => void;
+  onError?: (error: unknown, variables: TVariables, context: OptimisticMutationContext | undefined) => void;
+  onSettled?: (data: TData | undefined, error: unknown | null, variables: TVariables, context: OptimisticMutationContext | undefined) => void;
+  successMessage?: string;
+  errorMessage?: string;
+}
+
+// Generic optimistic mutation hook
+function useOptimisticMutation<TData, TVariables>({
+  mutationFn,
+  queryKey,
+  optimisticUpdate,
+  onSuccess,
+  onError,
+  onSettled,
+  successMessage,
+  errorMessage,
+}: OptimisticMutationOptions<TData, TVariables>) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn,
+    onMutate: async (variables): Promise<OptimisticMutationContext> => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey });
+
+      // Snapshot the previous value
+      const previousLists = queryClient.getQueryData<ListModel[]>(queryKey);
+
+      // Apply optimistic update
+      queryClient.setQueryData<ListModel[]>(queryKey, (old) => optimisticUpdate(old, variables));
+
+      // Return context object with the snapshotted value
+      return { previousLists };
+    },
+    onError: (err, variables, context) => {
+      // Roll back to previous state
+      if (context?.previousLists) {
+        queryClient.setQueryData<ListModel[]>(queryKey, context.previousLists);
+      }
+      if (errorMessage) {
+        toast.error(errorMessage);
+      }
+      onError?.(err, variables, context);
+    },
+    onSuccess: (data, variables, context) => {
+      if (successMessage) {
+        toast.success(successMessage);
+      }
+      onSuccess?.(data, variables, context);
+    },
+    onSettled: (data, error, variables, context) => {
+      // Always refetch after error or success to ensure we have the latest data
+      queryClient.invalidateQueries({ queryKey });
+      onSettled?.(data, error, variables, context);
+    },
+  });
+}
+
 // Query Keys
 export const listKeys = {
   all: ['lists'] as const,
@@ -25,20 +94,13 @@ export function useListsQuery() {
 
 // Create List Mutation
 export function useCreateListMutation() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+  return useOptimisticMutation({
     mutationFn: async (name: string) => {
       const response = (await fetchBackend('create-list', { name })) as ListPlain;
       return ListModel.toInstance(response);
     },
-    onMutate: async (name) => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: listKeys.all });
-
-      // Snapshot the previous value
-      const previousLists = queryClient.getQueryData<ListModel[]>(listKeys.all);
-
+    queryKey: listKeys.all,
+    optimisticUpdate: (old, name) => {
       // Optimistically add the new list to the cache
       const optimisticList = {
         id: 'temp-' + Date.now(),
@@ -49,68 +111,30 @@ export function useCreateListMutation() {
         updatedAt: null,
       } as unknown as ListModel;
 
-      queryClient.setQueryData<ListModel[]>(listKeys.all, (old) => {
-        if (!old) return [optimisticList];
-        return [...old, optimisticList];
-      });
-
-      // Return a context object with the snapshotted value
-      return { previousLists };
+      if (!old) return [optimisticList];
+      return [...old, optimisticList];
     },
-    onError: (_err, _name, context) => {
-      // If the mutation fails, use the context returned from onMutate to roll back
-      queryClient.setQueryData<ListModel[]>(listKeys.all, context?.previousLists);
-      toast.error('Failed to create list');
-    },
-    onSuccess: () => {
-      toast.success('List created');
-    },
-    onSettled: () => {
-      // Always refetch after error or success to ensure we have the latest data
-      queryClient.invalidateQueries({ queryKey: listKeys.all });
-    },
+    successMessage: 'List created',
+    errorMessage: 'Failed to create list',
   });
 }
 
 // Update List Mutation
 export function useUpdateListMutation() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+  return useOptimisticMutation({
     mutationFn: async ({ id, name }: { id: string; name: string }) => {
       const response = (await fetchBackend('update-list', { id, name })) as ListPlain;
       return ListModel.toInstance(response);
     },
-    onMutate: async ({ id, name }) => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: listKeys.all });
-
-      // Snapshot the previous value
-      const previousLists = queryClient.getQueryData<ListModel[]>(listKeys.all);
-
-      // Optimistically update the list in the cache
-      queryClient.setQueryData<ListModel[]>(listKeys.all, (old) => {
-        if (!old) return [];
-        return old.map((list) =>
-          list.id === id ? { ...list, name, updatedAt: new Date() } : list
-        );
-      });
-
-      // Return a context object with the snapshotted value
-      return { previousLists };
+    queryKey: listKeys.all,
+    optimisticUpdate: (old, { id, name }) => {
+      if (!old) return [];
+      return old.map((list) =>
+        list.id === id ? { ...list, name, updatedAt: new Date() } : list
+      );
     },
-    onError: (_err, _variables, context) => {
-      // If the mutation fails, use the context returned from onMutate to roll back
-      queryClient.setQueryData<ListModel[]>(listKeys.all, context?.previousLists);
-      toast.error('Failed to update list');
-    },
-    onSuccess: () => {
-      toast.success('List updated');
-    },
-    onSettled: () => {
-      // Always refetch after error or success to ensure we have the latest data
-      queryClient.invalidateQueries({ queryKey: listKeys.all });
-    },
+    successMessage: 'List updated',
+    errorMessage: 'Failed to update list',
   });
 }
 
@@ -118,41 +142,22 @@ export function useUpdateListMutation() {
 export function useDeleteListMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useOptimisticMutation({
     mutationFn: async ({ id, reassignToListId }: { id: string; reassignToListId?: string }) => {
       await fetchBackend('delete-list', { id, reassignToListId });
       return id;
     },
-    onMutate: async ({ id }) => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: listKeys.all });
-
-      // Snapshot the previous value
-      const previousLists = queryClient.getQueryData<ListModel[]>(listKeys.all);
-
-      // Optimistically remove the list from the cache
-      queryClient.setQueryData<ListModel[]>(listKeys.all, (old) => {
-        if (!old) return [];
-        return old.filter((list) => list.id !== id);
-      });
-
-      // Return a context object with the snapshotted value
-      return { previousLists };
+    queryKey: listKeys.all,
+    optimisticUpdate: (old, { id }) => {
+      if (!old) return [];
+      return old.filter((list) => list.id !== id);
     },
-    onError: (_err, _variables, context) => {
-      // If the mutation fails, use the context returned from onMutate to roll back
-      queryClient.setQueryData<ListModel[]>(listKeys.all, context?.previousLists);
-      toast.error('Failed to delete list');
-    },
+    successMessage: 'List deleted',
+    errorMessage: 'Failed to delete list',
     onSuccess: () => {
-      toast.success('List deleted');
       // Also invalidate tasks and goals queries since they might be affected
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['goals'] });
-    },
-    onSettled: () => {
-      // Always refetch after error or success to ensure we have the latest data
-      queryClient.invalidateQueries({ queryKey: listKeys.all });
     },
   });
 }

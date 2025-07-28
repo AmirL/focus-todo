@@ -1,78 +1,47 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { validateUserSession } from '../user-auth';
+import { NextRequest } from 'next/server';
 import { DB } from '@/shared/lib/db';
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { listsTable } from '@/shared/lib/drizzle/schema';
+import { withAuthAndErrorHandling, createErrorResponse, createSuccessResponse } from '@/shared/lib/api/route-wrapper';
+import { validateUpdateListRequest } from '@/shared/lib/validation/list-validation';
+import { findUserListById, findUserListByName, userListFilter } from '@/shared/lib/db/list-queries';
 
-export async function POST(req: NextRequest) {
-  try {
-    const session = await validateUserSession();
-    const { id, name } = await req.json();
+async function updateListHandler(req: NextRequest, session: { user: { id: string } }) {
+  const requestBody = await req.json();
+  const validation = validateUpdateListRequest(requestBody);
 
-    if (!id || !name || typeof name !== 'string' || name.trim().length === 0) {
-      return NextResponse.json(
-        { error: 'List ID and name are required' },
-        { status: 400 }
-      );
-    }
-
-    if (name.trim().length > 255) {
-      return NextResponse.json(
-        { error: 'List name must be 255 characters or less' },
-        { status: 400 }
-      );
-    }
-
-    // Check if the list exists and belongs to the user
-    const [existingList] = await DB.select()
-      .from(listsTable)
-      .where(and(
-        eq(listsTable.id, id),
-        eq(listsTable.userId, session.user.id)
-      ));
-
-    if (!existingList) {
-      return NextResponse.json(
-        { error: 'List not found' },
-        { status: 404 }
-      );
-    }
-
-    // Check if another list with the same name already exists for this user
-    const duplicateList = await DB.select()
-      .from(listsTable)
-      .where(and(
-        eq(listsTable.userId, session.user.id),
-        eq(listsTable.name, name.trim())
-      ));
-
-    if (duplicateList.length > 0 && duplicateList[0].id !== id) {
-      return NextResponse.json(
-        { error: 'A list with this name already exists' },
-        { status: 409 }
-      );
-    }
-
-    await DB.update(listsTable)
-      .set({ 
-        name: name.trim(),
-        updatedAt: new Date()
-      })
-      .where(and(
-        eq(listsTable.id, id),
-        eq(listsTable.userId, session.user.id)
-      ));
-
-    const [updatedList] = await DB.select()
-      .from(listsTable)
-      .where(eq(listsTable.id, id));
-
-    return NextResponse.json(updatedList, { status: 200 });
-  } catch (error) {
-    console.error('Error in update-list:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unknown error occurred' },
-      { status: 500 }
-    );
+  if (!validation.isValid) {
+    return createErrorResponse(validation.error!, 400);
   }
+
+  const { id, name } = validation;
+
+  // Check if the list exists and belongs to the user
+  const existingList = await findUserListById(session.user.id, id!);
+
+  if (!existingList) {
+    return createErrorResponse('List not found', 404);
+  }
+
+  // Check if another list with the same name already exists for this user
+  const duplicateList = await findUserListByName(session.user.id, name!);
+
+  if (duplicateList.length > 0 && duplicateList[0].id !== id) {
+    return createErrorResponse('A list with this name already exists', 409);
+  }
+
+  await DB.update(listsTable)
+    .set({ 
+      name: name!,
+      updatedAt: new Date()
+    })
+    .where(userListFilter(session.user.id, id!));
+
+  const [updatedList] = await DB.select()
+    .from(listsTable)
+    .where(eq(listsTable.id, id!));
+
+  return createSuccessResponse(updatedList, 200);
 }
+
+export const POST = withAuthAndErrorHandling(updateListHandler, 'update-list');
