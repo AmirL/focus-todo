@@ -2,18 +2,23 @@
 
 import { Button } from '@/shared/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/shared/ui/alert-dialog';
-import { DialogTrigger } from '@/shared/ui/dialog';
 import { ListModel } from '@/entities/list';
 import { Edit, Trash2 } from 'lucide-react';
+import { useDeleteList } from '../api/useDeleteList';
+import { ListFormDialog } from './ListFormDialog';
+import { useState } from 'react';
 
 interface ListItemProps {
   list: ListModel;
-  onEdit: (list: ListModel) => void;
-  onDelete: (list: ListModel) => void;
-  isDeleting?: boolean;
 }
 
-export function ListItem({ list, onEdit, onDelete, isDeleting = false }: ListItemProps) {
+export function ListItem({ list }: ListItemProps) {
+  const { deleteList, isDeleting } = useDeleteList();
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+
+  const handleDelete = async () => {
+    await deleteList(list.id);
+  };
   return (
     <div className="flex items-center justify-between p-3 border rounded-lg">
       <div className="flex items-center space-x-2">
@@ -25,15 +30,13 @@ export function ListItem({ list, onEdit, onDelete, isDeleting = false }: ListIte
         )}
       </div>
       <div className="flex items-center space-x-2">
-        <DialogTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onEdit(list)}
-          >
-            <Edit className="h-4 w-4" />
-          </Button>
-        </DialogTrigger>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setEditDialogOpen(true)}
+        >
+          <Edit className="h-4 w-4" />
+        </Button>
 
         {!list.isDefault && (
           <AlertDialog>
@@ -53,7 +56,7 @@ export function ListItem({ list, onEdit, onDelete, isDeleting = false }: ListIte
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={() => onDelete(list)}
+                  onClick={handleDelete}
                   className="bg-red-600 hover:bg-red-700"
                   disabled={isDeleting}
                 >
@@ -64,6 +67,14 @@ export function ListItem({ list, onEdit, onDelete, isDeleting = false }: ListIte
           </AlertDialog>
         )}
       </div>
+      
+      <ListFormDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        onCancel={() => setEditDialogOpen(false)}
+        mode="edit"
+        listId={list.id}
+      />
     </div>
   );
 }
