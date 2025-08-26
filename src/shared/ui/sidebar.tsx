@@ -1,21 +1,14 @@
 'use client';
 
 import * as React from 'react';
-import { Slot } from '@radix-ui/react-slot';
-import { VariantProps, cva } from 'class-variance-authority';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/shared/lib/utils';
-import { Button } from '@/shared/ui/button';
-import { Input } from '@/shared/ui/input';
-import { Separator } from '@/shared/ui/separator';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/shared/ui/sheet';
-import { Skeleton } from '@/shared/ui/skeleton';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/shared/ui/tooltip';
-import { ViewVerticalIcon } from '@radix-ui/react-icons';
+import { TooltipProvider } from '@/shared/ui/tooltip';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
-const SIDEBAR_WIDTH = '16rem';
+const SIDEBAR_WIDTH = '12rem';
 const SIDEBAR_WIDTH_MOBILE = '18rem';
 const SIDEBAR_WIDTH_ICON = '3rem';
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
@@ -217,7 +210,7 @@ Sidebar.displayName = 'Sidebar';
 const SidebarHeader = React.forwardRef<HTMLDivElement, React.ComponentProps<'div'>>(
   ({ className, children, ...props }, ref) => {
     return (
-      <div ref={ref} className={cn('flex h-12 items-center px-4', className)} {...props}>
+      <div ref={ref} className={cn('flex h-12 items-center px-2', className)} {...props}>
         {children}
       </div>
     );
@@ -228,7 +221,7 @@ SidebarHeader.displayName = 'SidebarHeader';
 const SidebarContent = React.forwardRef<HTMLDivElement, React.ComponentProps<'div'>>(
   ({ className, children, ...props }, ref) => {
     return (
-      <div ref={ref} className={cn('flex-1 overflow-y-auto px-4', className)} {...props}>
+      <div ref={ref} className={cn('flex-1 overflow-y-auto px-2', className)} {...props}>
         {children}
       </div>
     );
