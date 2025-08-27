@@ -44,14 +44,14 @@ export function AddTaskForm() {
   const setTaskInput = useAddTasksStore((state) => state.setCreateTaskInput);
 
   const { metadata, updateMetadata, resetMetadata } = useTaskMetadata();
-  const { statusFilter } = useFilterStore();
+  const { statusFilter, list } = useFilterStore();
 
   useEffect(() => {
     if (isAddTaskOpen) {
       // Reset to defaults first
       resetMetadata();
 
-      // Apply filter-based defaults
+      // Apply status-based defaults
       switch (statusFilter) {
         case StatusFilterEnum.TODAY:
           updateMetadata({ selectedDate: new Date() });
@@ -63,8 +63,13 @@ export function AddTaskForm() {
           updateMetadata({ isStarred: true });
           break;
       }
+
+      // Apply list filter default, if any
+      if (list) {
+        updateMetadata({ selectedList: list });
+      }
     }
-  }, [isAddTaskOpen, statusFilter, resetMetadata, updateMetadata]); // Rerun effect if dialog opens or filter changes while open
+  }, [isAddTaskOpen, statusFilter, list, resetMetadata, updateMetadata]); // Rerun effect if dialog opens or filters change while open
 
   const handleAddTaskClick = async () => {
     const todoTexts = taskInput.split('\n').filter((text) => text.trim() !== '');
