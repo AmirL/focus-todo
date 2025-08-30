@@ -23,7 +23,7 @@ function clamp(n: number, min: number, max: number) {
 export async function GET(req: NextRequest) {
   try {
     // Accept API key via Authorization/X-Api-Key only (no session fallback)
-    const userId = await getUserIdFromApiKey();
+    const userId = await getUserIdFromApiKey(req);
 
     const { searchParams } = new URL(req.url);
     // Date filters by task "date" field (not updatedAt)
@@ -43,7 +43,13 @@ export async function GET(req: NextRequest) {
       // no condition
     } else if (includeRecentlyDeleted) {
       const yesterday = dayjs().subtract(1, 'day').toDate();
-      conditions.push(or(isNull(tasksTable.deletedAt), gt(tasksTable.deletedAt, yesterday)));
+      const notDeletedOrRecent = or(
+        isNull(tasksTable.deletedAt),
+        gt(tasksTable.deletedAt, yesterday)
+      );
+      if (notDeletedOrRecent) {
+        conditions.push(notDeletedOrRecent);
+      }
     } else {
       conditions.push(isNull(tasksTable.deletedAt));
     }
@@ -101,10 +107,13 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ tasks }, { status: 200 });
   } catch (error) {
-    console.error('Error in GET /api/tasks:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unknown error occurred' },
-      { status: 500 }
-    );
+    const msg = error instanceof Error ? error.message : 'Unknown error occurred';
+    const lower = msg.toLowerCase();
+    const isAuth = lower.includes('api key required') || lower.includes('invalid or revoked api key');
+    const status = isAuth ? 401 : 500;
+    if (!isAuth) {
+      console.error('Error in GET /api/tasks:', error);
+    }
+    return NextResponse.json({ error: msg }, { status });
   }
 }

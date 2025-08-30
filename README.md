@@ -51,9 +51,10 @@ Requirements:
 Endpoint:
 - `GET /api/tasks`
 
-Headers (choose one):
-- `Authorization: Bearer <api_key>`
-- `X-Api-Key: <api_key>`
+Auth (choose one):
+- Query param: `?apiKey=<api_key>`
+- Header: `Authorization: Bearer <api_key>`
+- Header: `X-Api-Key: <api_key>`
 
 Query params (by task `date`):
 - `on`: `YYYY-MM-DD` or `today` or `tomorrow` (filters to that day)
@@ -69,15 +70,12 @@ Examples:
 
 ```bash
 curl -s \
-  -H "Authorization: Bearer $API_KEY" \
-  "https://your.app/api/tasks?since=2025-01-01T00:00:00Z&limit=200"
+  "https://your.app/api/tasks?since=2025-01-01T00:00:00Z&limit=200&apiKey=$API_KEY"
 
 curl -s \
-  -H "X-Api-Key: $API_KEY" \
-  "https://your.app/api/tasks?listId=3&includeRecentlyDeleted=true"
+  "https://your.app/api/tasks?listId=3&includeRecentlyDeleted=true&apiKey=$API_KEY"
 
 # Query tasks for tomorrow
 curl -s \
-  -H "Authorization: Bearer $API_KEY" \
-  "https://your.app/api/tasks?on=tomorrow"
+  "https://your.app/api/tasks?on=tomorrow&apiKey=$API_KEY"
 ```

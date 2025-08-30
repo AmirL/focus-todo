@@ -1,4 +1,5 @@
 import { headers } from 'next/headers';
+import type { NextRequest } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { apiKeysTable } from '@/shared/lib/drizzle/schema';
 import { and, eq, isNull } from 'drizzle-orm';
@@ -16,6 +17,17 @@ export function getApiKeyFromHeaders(): string | null {
   return null;
 }
 
+export function getApiKeyFromRequest(req: NextRequest): string | null {
+  // Prefer explicit query param first for simple integrations
+  try {
+    const url = new URL(req.url);
+    const qp = url.searchParams.get('apiKey');
+    if (qp && qp.trim().length > 0) return qp.trim();
+  } catch {}
+  // Fallback to headers
+  return getApiKeyFromHeaders();
+}
+
 export function hashApiKey(key: string) {
   const secret = process.env.API_KEY_SECRET;
   if (!secret) {
@@ -24,8 +36,8 @@ export function hashApiKey(key: string) {
   return crypto.createHmac('sha256', secret).update(key).digest('hex');
 }
 
-export async function getUserIdFromApiKey(): Promise<string> {
-  const apiKey = getApiKeyFromHeaders();
+export async function getUserIdFromApiKey(req: NextRequest): Promise<string> {
+  const apiKey = getApiKeyFromRequest(req);
   if (!apiKey) {
     throw new Error('API key required');
   }
@@ -44,4 +56,3 @@ export async function getUserIdFromApiKey(): Promise<string> {
   } catch {}
   return key.userId as string;
 }
-
