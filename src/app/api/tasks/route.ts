@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { DB } from '@/shared/lib/db';
-import { and, eq, gt, isNull, lt, or } from 'drizzle-orm';
+import { and, eq, gt, isNull, lt, or, isNotNull } from 'drizzle-orm';
 import dayjs from 'dayjs';
 import { tasksTable } from '@/shared/lib/drizzle/schema';
 import { getUserIdFromApiKey } from '@/app/api/api-auth';
@@ -26,8 +26,10 @@ export async function GET(req: NextRequest) {
     const userId = await getUserIdFromApiKey();
 
     const { searchParams } = new URL(req.url);
-    const sinceParam = searchParams.get('since'); // ISO date string, filters by updatedAt >= since
-    const untilParam = searchParams.get('until'); // ISO date string, filters by updatedAt < until
+    // Date filters by task "date" field (not updatedAt)
+    const onParam = searchParams.get('on'); // YYYY-MM-DD | today | tomorrow
+    const sinceParam = searchParams.get('since'); // ISO date string, filters by date >= since
+    const untilParam = searchParams.get('until'); // ISO date string, filters by date < until
     const listIdParam = searchParams.get('listId'); // number
     const includeDeleted = parseBool(searchParams.get('includeDeleted'), false);
     const includeRecentlyDeleted = parseBool(searchParams.get('includeRecentlyDeleted'), false);
@@ -46,14 +48,32 @@ export async function GET(req: NextRequest) {
       conditions.push(isNull(tasksTable.deletedAt));
     }
 
-    // Date filters against updatedAt when available
-    const since = parseDate(sinceParam);
-    if (since) {
-      conditions.push(gt(tasksTable.updatedAt, since));
-    }
-    const until = parseDate(untilParam);
-    if (until) {
-      conditions.push(lt(tasksTable.updatedAt, until));
+    // Date filters against task 'date' column
+    if (onParam) {
+      // Support 'today'/'tomorrow' shortcuts or YYYY-MM-DD (ISO date)
+      let start: Date | null = null;
+      if (onParam === 'today') {
+        start = dayjs().startOf('day').toDate();
+      } else if (onParam === 'tomorrow') {
+        start = dayjs().add(1, 'day').startOf('day').toDate();
+      } else if (/^\d{4}-\d{2}-\d{2}$/.test(onParam)) {
+        const parsed = dayjs(onParam);
+        if (parsed.isValid()) start = parsed.startOf('day').toDate();
+      }
+      if (start) {
+        const end = dayjs(start).add(1, 'day').toDate();
+        conditions.push(gt(tasksTable.date, start));
+        conditions.push(lt(tasksTable.date, end));
+      }
+    } else {
+      const since = parseDate(sinceParam);
+      if (since) {
+        conditions.push(gt(tasksTable.date, since));
+      }
+      const until = parseDate(untilParam);
+      if (until) {
+        conditions.push(lt(tasksTable.date, until));
+      }
     }
 
     // List filter
@@ -66,9 +86,7 @@ export async function GET(req: NextRequest) {
 
     // Completed filter
     if (completed === 'true') {
-      // completedAt not null
-      // Drizzle doesn't support NOT NULL operator directly in conditions; emulate via or
-      // We'll filter client-side as a safe fallback if needed
+      conditions.push(isNotNull(tasksTable.completedAt));
     } else if (completed === 'false') {
       conditions.push(isNull(tasksTable.completedAt));
     }
@@ -76,14 +94,10 @@ export async function GET(req: NextRequest) {
     // Limit
     const limit = clamp(Number(limitParam || 100), 1, 500);
 
-    let tasks = await DB.select()
+    const tasks = await DB.select()
       .from(tasksTable)
       .where(and(...conditions))
       .limit(limit);
-
-    if (completed === 'true') {
-      tasks = tasks.filter((t: any) => t.completedAt != null);
-    }
 
     return NextResponse.json({ tasks }, { status: 200 });
   } catch (error) {

@@ -55,9 +55,10 @@ Headers (choose one):
 - `Authorization: Bearer <api_key>`
 - `X-Api-Key: <api_key>`
 
-Query params:
-- `since`: ISO date; filters `updatedAt > since`
-- `until`: ISO date; filters `updatedAt < until`
+Query params (by task `date`):
+- `on`: `YYYY-MM-DD` or `today` or `tomorrow` (filters to that day)
+- `since`: ISO date; filters `date > since`
+- `until`: ISO date; filters `date < until`
 - `listId`: number; filters by list
 - `includeDeleted`: `true|false` (default `false`)
 - `includeRecentlyDeleted`: `true|false` (deleted within last 24h)
@@ -74,4 +75,9 @@ curl -s \
 curl -s \
   -H "X-Api-Key: $API_KEY" \
   "https://your.app/api/tasks?listId=3&includeRecentlyDeleted=true"
+
+# Query tasks for tomorrow
+curl -s \
+  -H "Authorization: Bearer $API_KEY" \
+  "https://your.app/api/tasks?on=tomorrow"
 ```
