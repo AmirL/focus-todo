@@ -5,6 +5,8 @@ import { Button } from '@/shared/ui/button';
 import { Menu, ChevronDown, CheckSquare2, LogOut, Calendar, Clock, ListTodo, Tag, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useFilterStore } from '@/features/tasks/filter/model/filterStore';
+import { buildHomeHref } from '@/features/tasks/filter/model/filterUrl';
 import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider, useSidebar } from '@/shared/ui/sidebar';
 import { Separator } from '@/shared/ui/separator';
 import { useSession, signOut } from '@/shared/lib/auth-client';
@@ -75,6 +77,7 @@ function UserSection() {
 export function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session, isPending } = useSession();
+  const { statusFilter, list } = useFilterStore();
   
   // Hide sidebar content on login page or when not authenticated
   const shouldShowSidebarContent = !pathname.includes('/login') && (session || isPending);
@@ -88,15 +91,20 @@ export function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
         <Sidebar>
           <div className="flex flex-col h-full">
             <SidebarHeader>
-              <div className="flex items-center gap-2 px-2 w-full">
-                <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">
-                  <CheckSquare2 className="h-5 w-5" />
-                </div>
-                <div>
-                  <h1 className="text-lg font-semibold">Focus Todo</h1>
-                  <p className="text-xs text-muted-foreground">Stay productive</p>
-                </div>
-              </div>
+              {(() => {
+                const homeHref = buildHomeHref(statusFilter, list);
+                return (
+                  <Link href={homeHref} className="flex items-center gap-2 px-2 w-full">
+                    <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">
+                      <CheckSquare2 className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h1 className="text-lg font-semibold">Focus Todo</h1>
+                      <p className="text-xs text-muted-foreground">Stay productive</p>
+                    </div>
+                   </Link>
+                 );
+              })()}
             </SidebarHeader>
 
             <SidebarContent>

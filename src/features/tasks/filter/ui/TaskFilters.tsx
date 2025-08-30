@@ -10,6 +10,8 @@ import { useListsQuery } from '@/shared/api/lists';
 import { calculateTotalEstimatedTime } from '../model/calculateTotalEstimatedTime';
 import { formatTotalDuration } from '@/shared/lib/format-duration';
 import { useSidebar } from '@/shared/ui/sidebar';
+import { usePathname, useRouter } from 'next/navigation';
+import { navigateHome } from '@/features/tasks/filter/model/filterUrl';
 
 function FilterButton({
   filter,
@@ -22,8 +24,10 @@ function FilterButton({
   children: React.ReactNode;
   icon: React.ElementType;
 }) {
-  const { setStatusFilter } = useFilterStore();
+  const { setStatusFilter, list } = useFilterStore();
   const { isMobile, toggleSidebar } = useSidebar();
+  const router = useRouter();
+  const pathname = usePathname();
 
   return (
     <Button
@@ -34,6 +38,7 @@ function FilterButton({
       )}
       onClick={() => {
         setStatusFilter(filter);
+        navigateHome(router, pathname, filter, list);
         if (isMobile) toggleSidebar();
       }}
     >
@@ -54,9 +59,11 @@ function FilterButtonWithTime({
   children: React.ReactNode;
   icon: React.ElementType;
 }) {
-  const { setStatusFilter } = useFilterStore();
+  const { setStatusFilter, list } = useFilterStore();
   const { data: allTasks = [] } = useTasksQuery();
   const { isMobile, toggleSidebar } = useSidebar();
+  const router = useRouter();
+  const pathname = usePathname();
 
   // Calculate estimated time for this specific filter
   const filteredTasks = allTasks.filter((task) => {
@@ -80,6 +87,7 @@ function FilterButtonWithTime({
       )}
       onClick={() => {
         setStatusFilter(filter);
+        navigateHome(router, pathname, filter, list);
         if (isMobile) toggleSidebar();
       }}
     >
@@ -93,8 +101,10 @@ function FilterButtonWithTime({
 }
 
 function CategoryButton({ category, active }: { category: string; active: boolean }) {
-  const { setList } = useFilterStore();
+  const { setList, statusFilter } = useFilterStore();
   const { isMobile, toggleSidebar } = useSidebar();
+  const router = useRouter();
+  const pathname = usePathname();
 
   return (
     <Button
@@ -104,7 +114,9 @@ function CategoryButton({ category, active }: { category: string; active: boolea
         active && 'text-primary  bg-primary/10 hover:bg-primary/20 hover:text-primary'
       )}
       onClick={() => {
+        const nextList = active ? '' : category;
         setList(category);
+        navigateHome(router, pathname, statusFilter, nextList);
         if (isMobile) toggleSidebar();
       }}
     >
