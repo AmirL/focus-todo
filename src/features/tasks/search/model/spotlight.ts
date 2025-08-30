@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { TaskModel, isTaskDeleted } from '@/entities/task/model/task';
+import dayjs from 'dayjs';
 
 // Global shortcut: Cmd/Ctrl+K to open Spotlight
 export function useSpotlightShortcut(setOpen: (o: boolean) => void) {
@@ -49,12 +50,18 @@ export function rankTasks(tasks: TaskModel[], query: string): TaskModel[] {
       const nameScore = fuzzyScore(q, t.name ?? '');
       const detailsScore = fuzzyScore(q, t.details ?? '');
       const score = [nameScore, detailsScore].filter((s): s is number => s !== null).sort((a, b) => a - b)[0];
-      return { t, score: score ?? Number.POSITIVE_INFINITY };
+      const isCompleted = !!t.completedAt;
+      const updatedTs = dayjs(t.updatedAt ?? t.createdAt ?? 0).valueOf();
+      return { t, score: score ?? Number.POSITIVE_INFINITY, isCompleted, updatedTs };
     })
     .filter((r) => Number.isFinite(r.score))
-    .sort((a, b) => a.score - b.score)
+    // Sort: active first, then updated desc, then better fuzzy score
+    .sort((a, b) => {
+      if (a.isCompleted !== b.isCompleted) return a.isCompleted ? 1 : -1;
+      if (a.updatedTs !== b.updatedTs) return b.updatedTs - a.updatedTs;
+      return a.score - b.score;
+    })
     .map((r) => r.t);
 
   return ranked;
 }
-
