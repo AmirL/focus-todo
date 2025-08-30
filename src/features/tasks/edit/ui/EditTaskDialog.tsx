@@ -9,10 +9,19 @@ import { useUpdateTaskMutation } from '@/shared/api/tasks';
 import { createInstance } from '@/shared/lib/instance-tools';
 import { TaskMetadataFields } from '@/shared/ui/task/TaskMetadataFields';
 import { useTaskMetadata } from '@/shared/ui/task/useTaskMetadata';
+import { ReAddButton } from '@/features/tasks/actions/ui/ReAddButton';
 
-export function EditTaskDialog({ task, open, onOpenChange }: { task: TaskModel; open: boolean; onOpenChange: (open: boolean) => void }) {
+export function EditTaskDialog({
+  task,
+  open,
+  onOpenChange,
+}: {
+  task: TaskModel;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
   const updateTaskMutation = useUpdateTaskMutation();
-  
+
   // Initialize state with task values
   const [name, setName] = useState(task.name);
   const [details, setDetails] = useState(task.details ?? '');
@@ -33,17 +42,17 @@ export function EditTaskDialog({ task, open, onOpenChange }: { task: TaskModel; 
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const updatedTask = createInstance(TaskModel, {
       ...task,
       name,
       details,
       estimatedDuration: metadata.selectedDuration,
       list: metadata.selectedList,
-      selectedAt: metadata.isStarred ? (task.selectedAt || new Date()) : null,
+      selectedAt: metadata.isStarred ? task.selectedAt || new Date() : null,
       isBlocker: metadata.isBlocker,
       date: metadata.selectedDate,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     });
     updateTaskMutation.mutate(updatedTask);
     onOpenChange(false);
@@ -54,29 +63,23 @@ export function EditTaskDialog({ task, open, onOpenChange }: { task: TaskModel; 
       <DialogContent>
         <form onSubmit={onSubmit}>
           <DialogHeader>
-            <DialogTitle>Edit task</DialogTitle>
+            <div className="flex items-center justify-between">
+              <DialogTitle>Edit task</DialogTitle>
+            </div>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div>
               <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="mt-1"
-              />
+              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="mt-1" />
             </div>
-            
-            <TaskMetadataFields
-              metadata={metadata}
-              onMetadataChange={updateMetadata}
-            />
-            
+
+            <TaskMetadataFields metadata={metadata} onMetadataChange={updateMetadata} />
+
             <div>
               <Label htmlFor="details">Details</Label>
-              <MarkdownAreaField 
-                label="" 
-                id="details" 
+              <MarkdownAreaField
+                label=""
+                id="details"
                 value={details}
                 onChange={setDetails}
                 data-testid="task-details-input"
@@ -84,7 +87,10 @@ export function EditTaskDialog({ task, open, onOpenChange }: { task: TaskModel; 
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit" data-testid="save-task-changes-button">Save changes</Button>
+            <ReAddButton task={task} />
+            <Button type="submit" data-testid="save-task-changes-button">
+              Save changes
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
