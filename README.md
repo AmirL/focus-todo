@@ -65,7 +65,7 @@ Query params (by task `date`):
 - `includeRecentlyDeleted`: `true|false` (deleted within last 24h)
 - `completed`: `true|false`
 - `limit`: 1–500 (default 100)
-- `tzOffset`: minutes offset from UTC to interpret `on` locally (e.g., `-120` for UTC+2). If omitted, server timezone is used.
+- `tzOffset`: minutes offset from UTC to interpret `on` locally (e.g., `-120` for UTC+2). If provided, response date fields are serialized using this offset.
 
 Examples:
 

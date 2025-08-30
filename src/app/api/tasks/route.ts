@@ -58,13 +58,10 @@ export async function GET(req: NextRequest) {
     // Date filters against task 'date' column
     const offsetMin = Number.isFinite(Number(tzOffsetParam)) ? Number(tzOffsetParam) : 0;
 
-    const toUtcFromLocal = (d: Date): Date => new Date(d.getTime() - offsetMin * 60000);
-    const startOfLocalDay = (base: Date) => {
-      const shifted = new Date(base.getTime() + offsetMin * 60000);
-      const localStart = new Date(shifted.getFullYear(), shifted.getMonth(), shifted.getDate(), 0, 0, 0);
-      return toUtcFromLocal(localStart);
-    };
-    const nextDay = (utcStart: Date) => new Date(utcStart.getTime() + 24 * 60 * 60000);
+    // Helper to compute UTC day boundaries for a client-local day using dayjs
+    const startOfLocalDay = (base: Date) =>
+      dayjs(base).add(offsetMin, 'minute').startOf('day').subtract(offsetMin, 'minute').toDate();
+    const nextDay = (utcStart: Date) => dayjs(utcStart).add(1, 'day').toDate();
     if (onParam) {
       // Support 'today'/'tomorrow' or YYYY-MM-DD in the caller's local timezone defined by tzOffset
       let startUtc: Date | null = null;
@@ -76,9 +73,12 @@ export async function GET(req: NextRequest) {
       } else if (/^\d{4}-\d{2}-\d{2}$/.test(onParam)) {
         const [y, m, d] = onParam.split('-').map((s) => Number(s));
         if (Number.isInteger(y) && Number.isInteger(m) && Number.isInteger(d)) {
-          // Construct local midnight and convert to UTC using tzOffset
-          const localStart = new Date(y, m - 1, d, 0, 0, 0);
-          startUtc = toUtcFromLocal(localStart);
+          const localStart = dayjs(new Date(y, m - 1, d, 0, 0, 0))
+            .add(offsetMin, 'minute')
+            .startOf('day')
+            .subtract(offsetMin, 'minute')
+            .toDate();
+          startUtc = localStart;
         }
       }
       if (startUtc) {
@@ -120,7 +120,55 @@ export async function GET(req: NextRequest) {
       .where(and(...conditions))
       .limit(limit);
 
-    return NextResponse.json({ tasks }, { status: 200 });
+    // Serialize date fields considering tzOffset so clients see the expected local times.
+    type TaskRow = typeof tasksTable.$inferSelect;
+    type ApiTask = Omit<
+      TaskRow,
+      'date' | 'completedAt' | 'deletedAt' | 'selectedAt' | 'updatedAt' | 'createdAt'
+    > & {
+      date: string | null;
+      completedAt: string | null;
+      deletedAt: string | null;
+      selectedAt: string | null;
+      updatedAt: string | null;
+      createdAt: string | null;
+    };
+
+    const toLocal = (d: Date | null | undefined): string | null => {
+      if (!d) return null;
+      // Shift UTC -> client local using minutes offset, format with dayjs
+      const local = dayjs(d).add(-offsetMin, 'minute');
+      const time = local.format('YYYY-MM-DDTHH:mm:ss');
+      // Build offset suffix from provided tz offset
+      const total = -offsetMin; // invert to display conventional sign
+      const sign = total >= 0 ? '+' : '-';
+      const abs = Math.abs(total);
+      const oh = String(Math.floor(abs / 60)).padStart(2, '0');
+      const om = String(abs % 60).padStart(2, '0');
+      return `${time}${sign}${oh}:${om}`;
+    };
+
+    const ensureDate = (v: unknown): Date | null => {
+      if (v == null) return null;
+      if (v instanceof Date) return v;
+      if (typeof v === 'string') {
+        const d = new Date(v);
+        return isNaN(d.getTime()) ? null : d;
+      }
+      return null;
+    };
+
+    const apiTasks: ApiTask[] = tasks.map((t) => ({
+      ...t,
+      date: toLocal(ensureDate((t as TaskRow).date)),
+      completedAt: toLocal(ensureDate((t as TaskRow).completedAt)),
+      deletedAt: toLocal(ensureDate((t as TaskRow).deletedAt)),
+      selectedAt: toLocal(ensureDate((t as TaskRow).selectedAt)),
+      updatedAt: toLocal(ensureDate((t as TaskRow).updatedAt)),
+      createdAt: toLocal(ensureDate((t as TaskRow).createdAt)),
+    }));
+
+    return NextResponse.json({ tasks: apiTasks }, { status: 200 });
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Unknown error occurred';
     const lower = msg.toLowerCase();
