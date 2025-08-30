@@ -7,6 +7,7 @@ import { useFilterStore } from '@/features/tasks/filter/model/filterStore';
 import { TaskActions } from './TaskActions';
 import { EditTaskModalRoot } from '@/features/tasks/edit/ui/EditTaskModalRoot';
 import { Spotlight } from '@/features/tasks/search/ui/Spotlight';
+import { ReAddModalRoot } from '@/features/tasks/actions/ui/ReAddModalRoot';
 
 // Loading state component
 function LoadingState() {
@@ -50,6 +51,7 @@ function TodoListContent({ statusFilter }: { statusFilter: string }) {
       <Tasks />
       <AddTaskForm />
       <EditTaskModalRoot />
+      <ReAddModalRoot />
     </div>
   );
 }

@@ -54,8 +54,8 @@ export function useCreateTaskMutation() {
       // If the mutation fails, use the context returned from onMutate to roll back
       queryClient.setQueryData<TaskModel[]>(taskKeys.all, context?.previousTasks);
     },
-    onSuccess: () => {
-      toast.success('Task created');
+    onSuccess: (createdTask) => {
+      toast.success(`Task created: ${createdTask.name}`);
     },
     onSettled: () => {
       // Always refetch after error or success to ensure we have the latest data with proper server-assigned IDs
