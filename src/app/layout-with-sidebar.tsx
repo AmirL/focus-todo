@@ -9,6 +9,7 @@ import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider, useSidebar } f
 import { Separator } from '@/shared/ui/separator';
 import { useSession, signOut } from '@/shared/lib/auth-client';
 import { TaskFilters } from '@/features/tasks/filter/ui/TaskFilters';
+import { Spotlight } from '@/features/tasks/search/ui/Spotlight';
 
 function MobileMenuButton() {
   const { toggleSidebar } = useSidebar();
@@ -88,13 +89,16 @@ export function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
         <Sidebar>
           <div className="flex flex-col h-full">
             <SidebarHeader>
-              <div className="flex items-center gap-2 px-2">
+              <div className="flex items-center gap-2 px-2 w-full">
                 <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">
                   <CheckSquare2 className="h-5 w-5" />
                 </div>
                 <div>
                   <h1 className="text-lg font-semibold">Focus Todo</h1>
                   <p className="text-xs text-muted-foreground">Stay productive</p>
+                </div>
+                <div className="ml-auto">
+                  <Spotlight buttonClassName="h-8 w-8" />
                 </div>
               </div>
             </SidebarHeader>
