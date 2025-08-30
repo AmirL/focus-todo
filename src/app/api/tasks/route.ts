@@ -59,8 +59,10 @@ export async function GET(req: NextRequest) {
     const offsetMin = Number.isFinite(Number(tzOffsetParam)) ? Number(tzOffsetParam) : 0;
 
     // Helper to compute UTC day boundaries for a client-local day using dayjs
+    // Convert UTC -> local by adding (-offsetMin), take startOf('day') in local,
+    // then convert back to UTC by adding (+offsetMin).
     const startOfLocalDay = (base: Date) =>
-      dayjs(base).add(offsetMin, 'minute').startOf('day').subtract(offsetMin, 'minute').toDate();
+      dayjs(base).add(-offsetMin, 'minute').startOf('day').add(offsetMin, 'minute').toDate();
     const nextDay = (utcStart: Date) => dayjs(utcStart).add(1, 'day').toDate();
     if (onParam) {
       // Support 'today'/'tomorrow' or YYYY-MM-DD in the caller's local timezone defined by tzOffset
@@ -73,10 +75,11 @@ export async function GET(req: NextRequest) {
       } else if (/^\d{4}-\d{2}-\d{2}$/.test(onParam)) {
         const [y, m, d] = onParam.split('-').map((s) => Number(s));
         if (Number.isInteger(y) && Number.isInteger(m) && Number.isInteger(d)) {
-          const localStart = dayjs(new Date(y, m - 1, d, 0, 0, 0))
-            .add(offsetMin, 'minute')
+          const base = new Date(Date.UTC(y, (m as number) - 1, d as number, 0, 0, 0));
+          const localStart = dayjs(base)
+            .add(-offsetMin, 'minute')
             .startOf('day')
-            .subtract(offsetMin, 'minute')
+            .add(offsetMin, 'minute')
             .toDate();
           startUtc = localStart;
         }
