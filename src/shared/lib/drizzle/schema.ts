@@ -90,3 +90,19 @@ export const verification = mysqlTable("verification", {
   createdAt: timestamp('created_at').$defaultFn(() => new Date()),
   updatedAt: timestamp('updated_at').$defaultFn(() => new Date())
 });
+
+// API Keys for programmatic access
+export const apiKeysTable = mysqlTable('api_keys', {
+  id: int('id').autoincrement().primaryKey().notNull(),
+  userId: varchar('user_id', { length: 36 }).notNull().references(() => user.id, { onDelete: 'cascade' }),
+  name: varchar('name', { length: 100 }),
+  // Store only a secure hash of the key; never the plaintext
+  hashedKey: varchar('hashed_key', { length: 128 }).notNull(),
+  // First few chars of the plaintext key for display/debug
+  prefix: varchar('prefix', { length: 16 }).notNull(),
+  // Last 4 chars for display so users can identify keys
+  lastFour: varchar('last_four', { length: 4 }).notNull(),
+  createdAt: datetime('created_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
+  lastUsedAt: datetime('last_used_at'),
+  revokedAt: datetime('revoked_at'),
+});
