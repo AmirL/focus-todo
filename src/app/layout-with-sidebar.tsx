@@ -9,7 +9,6 @@ import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider, useSidebar } f
 import { Separator } from '@/shared/ui/separator';
 import { useSession, signOut } from '@/shared/lib/auth-client';
 import { TaskFilters } from '@/features/tasks/filter/ui/TaskFilters';
-import { Spotlight } from '@/features/tasks/search/ui/Spotlight';
 
 function MobileMenuButton() {
   const { toggleSidebar } = useSidebar();
@@ -96,9 +95,6 @@ export function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
                 <div>
                   <h1 className="text-lg font-semibold">Focus Todo</h1>
                   <p className="text-xs text-muted-foreground">Stay productive</p>
-                </div>
-                <div className="ml-auto">
-                  <Spotlight buttonClassName="h-8 w-8" />
                 </div>
               </div>
             </SidebarHeader>

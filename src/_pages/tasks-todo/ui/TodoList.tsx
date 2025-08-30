@@ -5,6 +5,7 @@ import { Tasks } from '@/_pages/tasks-todo/ui/Tasks';
 import { useSession } from '@/shared/lib/auth-client';
 import { useFilterStore } from '@/features/tasks/filter/model/filterStore';
 import { TaskActions } from './TaskActions';
+import { Spotlight } from '@/features/tasks/search/ui/Spotlight';
 
 // Loading state component
 function LoadingState() {
@@ -28,9 +29,12 @@ function UnauthenticatedState() {
 function StatusFilterHeader({ statusFilter }: { statusFilter: string }) {
   return (
     <div className="px-2 sm:px-4">
-      <h2 className="text-lg font-semibold text-primary flex items-center gap-2 capitalize">
-        {statusFilter}
-      </h2>
+      <div className="flex items-center gap-2">
+        <h2 className="text-lg font-semibold text-primary capitalize">{statusFilter}</h2>
+        <div className="ml-auto">
+          <Spotlight buttonClassName="h-8 w-8" />
+        </div>
+      </div>
     </div>
   );
 }
