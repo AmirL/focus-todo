@@ -1,31 +1,29 @@
 'use client';
 
 import * as React from 'react';
-import { TaskModel } from '@/entities/task/model/task';
 
-export function useSpotlightSelection(results: TaskModel[], onSelect: (t: TaskModel) => void) {
+export function useSpotlightSelection<T>(items: T[], onSelect: (t: T) => void) {
   const [activeIndex, setActiveIndex] = React.useState<number>(-1);
 
   React.useEffect(() => {
-    setActiveIndex(results.length > 0 ? 0 : -1);
-  }, [results.length]);
+    setActiveIndex(items.length > 0 ? 0 : -1);
+  }, [items.length]);
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'ArrowDown') {
         e.preventDefault();
-        setActiveIndex((i) => Math.min((i < 0 ? -1 : i) + 1, results.length - 1));
+        setActiveIndex((i) => Math.min((i < 0 ? -1 : i) + 1, items.length - 1));
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
         setActiveIndex((i) => Math.max((i < 0 ? 0 : i) - 1, 0));
-      } else if (e.key === 'Enter' && activeIndex >= 0 && activeIndex < results.length) {
+      } else if (e.key === 'Enter' && activeIndex >= 0 && activeIndex < items.length) {
         e.preventDefault();
-        onSelect(results[activeIndex]);
+        onSelect(items[activeIndex]);
       }
     },
-    [results, activeIndex, onSelect]
+    [items, activeIndex, onSelect]
   );
 
   return { activeIndex, setActiveIndex, handleKeyDown } as const;
 }
-

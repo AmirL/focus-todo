@@ -8,6 +8,7 @@ import { useSpotlightOpen } from '../model/useSpotlightOpen';
 import { useSpotlightQuery } from '../model/useSpotlightQuery';
 import { useSpotlightSelection } from '../model/useSpotlightSelection';
 import { useSpotlightSelectTask } from '../model/useSpotlightSelectTask';
+import { buildSpotlightDisplay, SpotlightDisplayItem } from '../model/spotlight';
 import { SpotlightHeader } from './SpotlightHeader';
 import { SpotlightResults } from './SpotlightResults';
 
@@ -20,7 +21,11 @@ export function Spotlight({ buttonClassName }: SpotlightProps) {
   const { open, setOpen } = useSpotlightOpen();
   const { query, setQuery, results, isLoading } = useSpotlightQuery();
   const { selectTask } = useSpotlightSelectTask(setOpen);
-  const { activeIndex, setActiveIndex, handleKeyDown } = useSpotlightSelection(results, selectTask);
+  const items = React.useMemo(() => buildSpotlightDisplay(results), [results]);
+  const { activeIndex, setActiveIndex, handleKeyDown } = useSpotlightSelection<SpotlightDisplayItem>(
+    items,
+    (item) => (item.type === 'active' ? selectTask(item.task) : selectTask(item.newestTask))
+  );
 
   React.useEffect(() => {
     if (open) {
@@ -52,7 +57,7 @@ export function Spotlight({ buttonClassName }: SpotlightProps) {
             <div className="p-4 text-sm text-muted-foreground">No matching tasks</div>
           ) : (
             <SpotlightResults
-              results={results}
+              items={items}
               activeIndex={activeIndex}
               onHoverIndex={setActiveIndex}
               onSelect={selectTask}

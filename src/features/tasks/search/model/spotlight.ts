@@ -65,3 +65,41 @@ export function rankTasks(tasks: TaskModel[], query: string): TaskModel[] {
 
   return ranked;
 }
+
+export type SpotlightDisplayItem =
+  | { type: 'active'; task: TaskModel }
+  | { type: 'completedGroup'; name: string; count: number; newestTask: TaskModel };
+
+export function buildSpotlightDisplay(results: TaskModel[]): SpotlightDisplayItem[] {
+  const display: SpotlightDisplayItem[] = [];
+  const groupMap = new Map<string, { index: number; count: number; newestTask: TaskModel; newestTs: number }>();
+
+  const getUpdatedTs = (t: TaskModel) => dayjs(t.updatedAt ?? t.createdAt ?? 0).valueOf();
+
+  for (const t of results) {
+    const isCompleted = !!t.completedAt;
+    if (!isCompleted) {
+      display.push({ type: 'active', task: t });
+      continue;
+    }
+    const key = t.name.trim() || '(untitled)';
+    const existing = groupMap.get(key);
+    const ts = getUpdatedTs(t);
+    if (!existing) {
+      const index = display.length;
+      display.push({ type: 'completedGroup', name: key, count: 1, newestTask: t });
+      groupMap.set(key, { index, count: 1, newestTask: t, newestTs: ts });
+    } else {
+      existing.count += 1;
+      if (ts > existing.newestTs) {
+        existing.newestTs = ts;
+        existing.newestTask = t;
+      }
+      const group = display[existing.index] as { type: 'completedGroup'; name: string; count: number; newestTask: TaskModel };
+      group.count = existing.count;
+      group.newestTask = existing.newestTask;
+    }
+  }
+
+  return display;
+}
