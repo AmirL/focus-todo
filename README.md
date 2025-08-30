@@ -65,6 +65,7 @@ Query params (by task `date`):
 - `includeRecentlyDeleted`: `true|false` (deleted within last 24h)
 - `completed`: `true|false`
 - `limit`: 1–500 (default 100)
+- `tzOffset`: minutes offset from UTC to interpret `on` locally (e.g., `-120` for UTC+2). If omitted, server timezone is used.
 
 Examples:
 
@@ -77,5 +78,5 @@ curl -s \
 
 # Query tasks for tomorrow
 curl -s \
-  "https://your.app/api/tasks?on=tomorrow&apiKey=$API_KEY"
+  "https://your.app/api/tasks?on=tomorrow&tzOffset=$(node -e 'process.stdout.write(String(-new Date().getTimezoneOffset()))')&apiKey=$API_KEY"
 ```

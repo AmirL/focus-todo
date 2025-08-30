@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { DB } from '@/shared/lib/db';
-import { and, eq, gt, isNull, lt, or, isNotNull } from 'drizzle-orm';
+import { and, eq, gt, gte, isNull, lt, or, isNotNull } from 'drizzle-orm';
 import dayjs from 'dayjs';
 import { tasksTable } from '@/shared/lib/drizzle/schema';
 import { getUserIdFromApiKey } from '@/app/api/api-auth';
@@ -31,6 +31,7 @@ export async function GET(req: NextRequest) {
     const sinceParam = searchParams.get('since'); // ISO date string, filters by date >= since
     const untilParam = searchParams.get('until'); // ISO date string, filters by date < until
     const listIdParam = searchParams.get('listId'); // number
+    const tzOffsetParam = searchParams.get('tzOffset'); // minutes offset from UTC (e.g., -120 for UTC+2)
     const includeDeleted = parseBool(searchParams.get('includeDeleted'), false);
     const includeRecentlyDeleted = parseBool(searchParams.get('includeRecentlyDeleted'), false);
     const completed = searchParams.get('completed'); // true|false
@@ -55,21 +56,35 @@ export async function GET(req: NextRequest) {
     }
 
     // Date filters against task 'date' column
+    const offsetMin = Number.isFinite(Number(tzOffsetParam)) ? Number(tzOffsetParam) : 0;
+
+    const toUtcFromLocal = (d: Date): Date => new Date(d.getTime() - offsetMin * 60000);
+    const startOfLocalDay = (base: Date) => {
+      const shifted = new Date(base.getTime() + offsetMin * 60000);
+      const localStart = new Date(shifted.getFullYear(), shifted.getMonth(), shifted.getDate(), 0, 0, 0);
+      return toUtcFromLocal(localStart);
+    };
+    const nextDay = (utcStart: Date) => new Date(utcStart.getTime() + 24 * 60 * 60000);
     if (onParam) {
-      // Support 'today'/'tomorrow' shortcuts or YYYY-MM-DD (ISO date)
-      let start: Date | null = null;
+      // Support 'today'/'tomorrow' or YYYY-MM-DD in the caller's local timezone defined by tzOffset
+      let startUtc: Date | null = null;
       if (onParam === 'today') {
-        start = dayjs().startOf('day').toDate();
+        startUtc = startOfLocalDay(new Date());
       } else if (onParam === 'tomorrow') {
-        start = dayjs().add(1, 'day').startOf('day').toDate();
+        const todayStart = startOfLocalDay(new Date());
+        startUtc = nextDay(todayStart);
       } else if (/^\d{4}-\d{2}-\d{2}$/.test(onParam)) {
-        const parsed = dayjs(onParam);
-        if (parsed.isValid()) start = parsed.startOf('day').toDate();
+        const [y, m, d] = onParam.split('-').map((s) => Number(s));
+        if (Number.isInteger(y) && Number.isInteger(m) && Number.isInteger(d)) {
+          // Construct local midnight and convert to UTC using tzOffset
+          const localStart = new Date(y, m - 1, d, 0, 0, 0);
+          startUtc = toUtcFromLocal(localStart);
+        }
       }
-      if (start) {
-        const end = dayjs(start).add(1, 'day').toDate();
-        conditions.push(gt(tasksTable.date, start));
-        conditions.push(lt(tasksTable.date, end));
+      if (startUtc) {
+        const endUtc = nextDay(startUtc);
+        conditions.push(gte(tasksTable.date, startUtc));
+        conditions.push(lt(tasksTable.date, endUtc));
       }
     } else {
       const since = parseDate(sinceParam);
