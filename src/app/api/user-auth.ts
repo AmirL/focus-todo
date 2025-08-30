@@ -1,10 +1,11 @@
 import { auth } from '@/shared/lib/auth';
 import { headers } from 'next/headers';
+// Session-based auth helpers only. API-key helpers live in './api-auth'.
 
 export async function validateUserSession() {
   try {
     const headerValues = headers();
-    
+
     const session = await auth.api.getSession({
       headers: headerValues,
     });

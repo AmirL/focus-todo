@@ -40,3 +40,38 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## API Access
+
+Generate an API key in Settings → API Keys, then call the read-only tasks endpoint with the key. API keys are hashed server-side and can be revoked in Settings.
+
+Requirements:
+- Set `API_KEY_SECRET` in your environment. The server throws if it is not set.
+
+Endpoint:
+- `GET /api/tasks`
+
+Headers (choose one):
+- `Authorization: Bearer <api_key>`
+- `X-Api-Key: <api_key>`
+
+Query params:
+- `since`: ISO date; filters `updatedAt > since`
+- `until`: ISO date; filters `updatedAt < until`
+- `listId`: number; filters by list
+- `includeDeleted`: `true|false` (default `false`)
+- `includeRecentlyDeleted`: `true|false` (deleted within last 24h)
+- `completed`: `true|false`
+- `limit`: 1–500 (default 100)
+
+Examples:
+
+```bash
+curl -s \
+  -H "Authorization: Bearer $API_KEY" \
+  "https://your.app/api/tasks?since=2025-01-01T00:00:00Z&limit=200"
+
+curl -s \
+  -H "X-Api-Key: $API_KEY" \
+  "https://your.app/api/tasks?listId=3&includeRecentlyDeleted=true"
+```

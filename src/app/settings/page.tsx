@@ -1,6 +1,7 @@
 'use client';
 
 import { ListManager } from '@/features/lists';
+import { ApiKeysManager } from '@/features/api-keys';
 
 export default function SettingsPage() {
   return (
@@ -12,8 +13,9 @@ export default function SettingsPage() {
             Manage your preferences and customize your workflow.
           </p>
         </div>
-        
         <ListManager />
+
+        <ApiKeysManager />
       </div>
     </div>
   );
