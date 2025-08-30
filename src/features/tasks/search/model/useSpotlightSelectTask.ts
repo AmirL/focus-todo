@@ -2,15 +2,18 @@
 
 import * as React from 'react';
 import { TaskModel } from '@/entities/task/model/task';
+import { useEditTaskModalStore } from '@/features/tasks/edit/model/editTaskModalStore';
 
 export function useSpotlightSelectTask(setOpen: (o: boolean) => void) {
-  const selectTask = React.useCallback((task: TaskModel) => {
-    setOpen(false);
-    setTimeout(() => {
-      const btn = document.querySelector<HTMLButtonElement>(`[data-testid="edit-task-${task.id}"]`);
-      btn?.click();
-    }, 120);
-  }, [setOpen]);
+  const openEdit = useEditTaskModalStore((s) => s.openWithTask);
+  const selectTask = React.useCallback(
+    (task: TaskModel) => {
+      setOpen(false);
+      // Delay to avoid overlapping dialog animations
+      setTimeout(() => openEdit(task), 120);
+    },
+    [setOpen, openEdit]
+  );
 
   return { selectTask } as const;
 }

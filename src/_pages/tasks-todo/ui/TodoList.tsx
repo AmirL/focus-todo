@@ -5,6 +5,7 @@ import { Tasks } from '@/_pages/tasks-todo/ui/Tasks';
 import { useSession } from '@/shared/lib/auth-client';
 import { useFilterStore } from '@/features/tasks/filter/model/filterStore';
 import { TaskActions } from './TaskActions';
+import { EditTaskModalRoot } from '@/features/tasks/edit/ui/EditTaskModalRoot';
 import { Spotlight } from '@/features/tasks/search/ui/Spotlight';
 
 // Loading state component
@@ -48,6 +49,7 @@ function TodoListContent({ statusFilter }: { statusFilter: string }) {
       <TaskActions />
       <Tasks />
       <AddTaskForm />
+      <EditTaskModalRoot />
     </div>
   );
 }

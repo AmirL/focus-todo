@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TaskModel } from '@/entities/task/model/task';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/shared/ui/dialog';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
 import { Label } from '@/shared/ui/label';
 import { Input } from '@/shared/ui/input';
@@ -10,19 +10,26 @@ import { createInstance } from '@/shared/lib/instance-tools';
 import { TaskMetadataFields } from '@/shared/ui/task/TaskMetadataFields';
 import { useTaskMetadata } from '@/shared/ui/task/useTaskMetadata';
 
-export function EditTaskDialog({ task, children }: { task: TaskModel; children: React.ReactNode }) {
+export function EditTaskDialog({ task, open, onOpenChange }: { task: TaskModel; open: boolean; onOpenChange: (open: boolean) => void }) {
   const updateTaskMutation = useUpdateTaskMutation();
   
   // Initialize state with task values
   const [name, setName] = useState(task.name);
   const [details, setDetails] = useState(task.details ?? '');
-  const { metadata, updateMetadata } = useTaskMetadata({
+  const { metadata, updateMetadata, resetMetadata } = useTaskMetadata({
     selectedDuration: task.estimatedDuration ?? null,
     selectedList: task.list,
     isStarred: !!task.selectedAt,
     isBlocker: task.isBlocker,
     selectedDate: task.date ?? null,
   });
+
+  // Reset form values when task changes or dialog opens in controlled mode
+  useEffect(() => {
+    setName(task.name);
+    setDetails(task.details ?? '');
+    resetMetadata();
+  }, [task.id, open]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,11 +46,11 @@ export function EditTaskDialog({ task, children }: { task: TaskModel; children: 
       updatedAt: new Date()
     });
     updateTaskMutation.mutate(updatedTask);
+    onOpenChange(false);
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <form onSubmit={onSubmit}>
           <DialogHeader>
@@ -77,13 +84,10 @@ export function EditTaskDialog({ task, children }: { task: TaskModel; children: 
             </div>
           </div>
           <DialogFooter>
-            <DialogTrigger asChild>
-              <Button type="submit" data-testid="save-task-changes-button">Save changes</Button>
-            </DialogTrigger>
+            <Button type="submit" data-testid="save-task-changes-button">Save changes</Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
   );
 }
-
