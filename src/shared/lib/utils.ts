@@ -28,7 +28,11 @@ export function parseDateFields<T extends Record<string, unknown>, K extends key
 
   for (const key of fields) {
     const value = parsed[key];
-    if (value) parsed[key] = new Date(value as string) as T[K];
+    if (value) {
+      // Use dayjs to parse the date string and convert to Date object
+      // This ensures consistent timezone handling
+      parsed[key] = dayjs(value as string).toDate() as T[K];
+    }
   }
 
   return parsed;
