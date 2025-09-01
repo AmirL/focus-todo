@@ -1,6 +1,9 @@
 import { clsx, type ClassValue } from 'clsx';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import { twMerge } from 'tailwind-merge';
+
+dayjs.extend(utc);
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -29,9 +32,9 @@ export function parseDateFields<T extends Record<string, unknown>, K extends key
   for (const key of fields) {
     const value = parsed[key];
     if (value) {
-      // Use dayjs to parse the date string and convert to Date object
-      // This ensures consistent timezone handling
-      parsed[key] = dayjs(value as string).toDate() as T[K];
+      // Parse all incoming date strings as UTC to ensure consistent timezone handling
+      // regardless of server timezone
+      parsed[key] = dayjs.utc(value as string).toDate() as T[K];
     }
   }
 

@@ -26,22 +26,22 @@ export class TaskModel {
 
   details!: string;
 
-  @Transform(transformDateToString, { toPlainOnly: true })
+  @Transform(transformDateToUTCString, { toPlainOnly: true })
   selectedAt?: Date | null;
 
-  @Transform(transformDateToString, { toPlainOnly: true })
+  @Transform(transformDateToUTCString, { toPlainOnly: true })
   date?: Date | null;
 
   estimatedDuration!: number | null;
 
-  @Transform(transformDateToString, { toPlainOnly: true })
+  @Transform(transformDateToUTCString, { toPlainOnly: true })
   completedAt?: Date | null;
 
   isBlocker: boolean = false;
 
   list!: string;
 
-  @Transform(transformDateToString, { toPlainOnly: true })
+  @Transform(transformDateToUTCString, { toPlainOnly: true })
   deletedAt?: Date | null;
 
   @Transform(transformDateToUTCString, { toPlainOnly: true })
@@ -97,11 +97,6 @@ export function isTaskTomorrow(task: TaskModel) {
 
 export function isTaskOverdue(task: TaskModel) {
   return task.date && dayjs(task.date).isBefore(dayjs(), 'day') && !task.completedAt;
-}
-
-function transformDateToString({ value }: { value: Date | null }) {
-  if (!value) return null;
-  return dayjs(value).format('YYYY-MM-DD HH:mm:ss');
 }
 
 function transformDateToUTCString({ value }: { value: Date | null }) {
