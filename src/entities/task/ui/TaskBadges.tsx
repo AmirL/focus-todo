@@ -2,10 +2,8 @@ import { Badge } from '@/shared/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
 import { AlertTriangle } from 'lucide-react';
 import { TaskModel, isTaskDeleted, isTaskOverdue } from '@/entities/task/model/task';
-import { useTasksStore } from '@/entities/task/model/tasksStore';
 import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
-import { useSidebar } from '@/shared/ui/sidebar';
-import { cn, isFutureDate, isToday } from '@/shared/lib/utils';
+import { isFutureDate, isToday } from '@/shared/lib/utils';
 import dayjs from 'dayjs';
 
 interface TaskBadgesProps {
@@ -13,20 +11,14 @@ interface TaskBadgesProps {
 }
 
 export function TaskBadges({ task }: TaskBadgesProps) {
-  const showTaskList = useTasksStore((store) => store.showTaskList);
   const { statusFilter } = useFilterStore();
-  const { isMobile } = useSidebar();
 
   // Hide redundant date badges when on Today/Tomorrow tabs
   const isOnTodayTab = statusFilter === StatusFilterEnum.TODAY;
   const isOnTomorrowTab = statusFilter === StatusFilterEnum.TOMORROW;
 
-  // Show abbreviated list name on mobile
-  const listDisplayName = isMobile ? task.list.charAt(0) : task.list;
-
   return (
     <>
-      {showTaskList && <Badge variant="secondary">{listDisplayName}</Badge>}
       {/* Hide "Today" badge when already on Today tab */}
       {isToday(task.date) && !isOnTodayTab && <Badge variant="default">Today</Badge>}
       {/* Hide date badges when on Tomorrow tab */}
