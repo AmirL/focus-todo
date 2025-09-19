@@ -19,6 +19,7 @@ export const tasksTable = mysqlTable('tasks', {
   createdAt: datetime('created_at')
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
+  sortOrder: int('sort_order').default(0),
 });
 
 export const goalsTable = mysqlTable('goals', {

@@ -17,6 +17,7 @@ export type TaskPlain = {
   estimatedDuration?: number | null;
   isBlocker?: boolean;
   updatedAt?: string;
+  sortOrder?: number;
 };
 
 export class TaskModel {
@@ -49,6 +50,8 @@ export class TaskModel {
 
   @Transform(transformDateToUTCString, { toPlainOnly: true })
   createdAt!: Date;
+
+  sortOrder: number = 0;
 
   static toInstance(data: TaskPlain): TaskModel {
     return plainToInstance(TaskModel, data);
