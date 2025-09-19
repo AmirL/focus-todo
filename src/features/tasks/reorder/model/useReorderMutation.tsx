@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { TaskModel } from '@/entities/task/model/task';
+import { TaskModel, TaskPlain } from '@/entities/task/model/task';
 import { useReorderStore } from './reorderStore';
 
 interface ReorderTasksParams {
@@ -12,7 +12,7 @@ interface ReorderTasksParams {
 
 interface ReorderResponse {
   success: boolean;
-  tasks: unknown[];
+  tasks: TaskPlain[];
   message: string;
 }
 
@@ -40,8 +40,16 @@ export function useReorderMutation() {
   return useMutation({
     mutationFn: reorderTasks,
     onSuccess: (data) => {
-      // Invalidate tasks query to refetch latest data
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      // Update query cache with new task data instead of invalidating
+      const updatedTasks = data.tasks.map(task => TaskModel.toInstance(task));
+      queryClient.setQueryData(['tasks'], (oldData: TaskModel[] | undefined) => {
+        if (!oldData) return updatedTasks;
+
+        // Update only the reordered tasks in the cache
+        const taskMap = new Map(updatedTasks.map(task => [task.id, task]));
+        return oldData.map(task => taskMap.get(task.id) || task);
+      });
+
       clearOptimisticTasks();
       setIsDragging(false);
     },

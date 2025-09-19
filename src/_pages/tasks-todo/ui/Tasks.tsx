@@ -102,18 +102,23 @@ export function Tasks() {
     // Create optimistic reordered tasks for this group
     const reorderedGroupTasks = arrayMove(activeGroupTasks, oldIndex, newIndex);
 
-    // Update optimistic state for all tasks
-    const optimisticAllTasks = allTasks.map((task) => {
-      if (task.list === activeGroup.name) {
-        const reorderedIndex = reorderedGroupTasks.findIndex((t) => t.id === task.id);
-        if (reorderedIndex !== -1) {
-          return { ...task, sortOrder: reorderedIndex };
-        }
-      }
-      return task;
-    });
+    // Create optimistic update by reconstructing the entire task list with reordered group
+    const optimisticTasks = [];
+    const processedGroups = new Set();
 
-    setOptimisticTasks(optimisticAllTasks);
+    for (const task of tasks) {
+      if (task.list === activeGroup.name && !processedGroups.has(task.list)) {
+        // Add all reordered tasks for this group
+        optimisticTasks.push(...reorderedGroupTasks);
+        processedGroups.add(task.list);
+      } else if (task.list !== activeGroup.name) {
+        // Add tasks from other groups as-is
+        optimisticTasks.push(task);
+      }
+      // Skip remaining tasks from the reordered group (already added)
+    }
+
+    setOptimisticTasks(optimisticTasks);
 
     // Prepare API call
     const reorderedTaskIds = reorderedGroupTasks.map((task) => task.id);

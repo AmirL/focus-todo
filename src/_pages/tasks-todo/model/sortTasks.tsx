@@ -5,10 +5,10 @@ import dayjs from 'dayjs';
 
 export function useSortedTasks(tasks: TaskModel[]) {
   const statusFilter = useFilterStore((store) => store.statusFilter);
-  const { optimisticTasks } = useReorderStore();
+  const { optimisticTasks, isDragging } = useReorderStore();
 
-  // Use optimistic tasks if available (during drag operations)
-  const tasksToSort = optimisticTasks || tasks;
+  // Use optimistic tasks only during active dragging and only if they match current filter context
+  const tasksToSort = (isDragging && optimisticTasks) ? optimisticTasks : tasks;
 
   switch (statusFilter) {
     case StatusFilterEnum.FUTURE:
