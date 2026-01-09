@@ -8,6 +8,8 @@ import { TaskActions } from './TaskActions';
 import { EditTaskModalRoot } from '@/features/tasks/edit/ui/EditTaskModalRoot';
 import { Spotlight } from '@/features/tasks/search/ui/Spotlight';
 import { ReAddModalRoot } from '@/features/tasks/actions/ui/ReAddModalRoot';
+import { LastSelectedTaskHeader } from './LastSelectedTaskHeader';
+import { useTasksLoader } from '../api/useTasksLoader';
 
 // Loading state component
 function LoadingState() {
@@ -43,16 +45,21 @@ function StatusFilterHeader({ statusFilter }: { statusFilter: string }) {
 
 // Main todo list content component
 function TodoListContent({ statusFilter }: { statusFilter: string }) {
+  const { allTasks } = useTasksLoader();
+
   return (
-    <div className="space-y-8">
-      <Goals />
-      <StatusFilterHeader statusFilter={statusFilter} />
-      <TaskActions />
-      <Tasks />
-      <AddTaskForm />
-      <EditTaskModalRoot />
-      <ReAddModalRoot />
-    </div>
+    <>
+      <LastSelectedTaskHeader tasks={allTasks || []} />
+      <div className="space-y-8">
+        <Goals />
+        <StatusFilterHeader statusFilter={statusFilter} />
+        <TaskActions />
+        <Tasks />
+        <AddTaskForm />
+        <EditTaskModalRoot />
+        <ReAddModalRoot />
+      </div>
+    </>
   );
 }
 

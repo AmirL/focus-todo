@@ -7,6 +7,7 @@ import { useReorderStore, useReorderMutation } from '@/features/tasks/reorder';
 import { ErrorState } from './ErrorState';
 import { TaskWithActions } from './TaskWithActions';
 import { TaskModel } from '@/entities/task/model/task';
+import { useTempSelectStore } from '@/features/tasks/temp-select';
 import {
   DndContext,
   DragEndEvent,
@@ -23,18 +24,24 @@ import {
   verticalListSortingStrategy,
   arrayMove,
 } from '@dnd-kit/sortable';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function Tasks() {
   const { allTasks, isLoading, error } = useTasksLoader();
   const { statusFilter, list: selectedList } = useFilterStore();
   const { setOptimisticTasks, setIsDragging } = useReorderStore();
+  const { clearSelections } = useTempSelectStore();
   const reorderMutation = useReorderMutation();
   const [activeTask, setActiveTask] = useState<TaskModel | null>(null);
 
   const filteredTasks = useApplyFilters(allTasks);
   const tasks = useSortedTasks(filteredTasks);
   const groups = useGroupedTasksByList(tasks);
+
+  // Clear temp selections when filter changes
+  useEffect(() => {
+    clearSelections();
+  }, [statusFilter, selectedList, clearSelections]);
 
   // Configure sensors for touch and mouse
   const sensors = useSensors(
