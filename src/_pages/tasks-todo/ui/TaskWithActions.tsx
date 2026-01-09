@@ -10,15 +10,8 @@ import type { TaskModel } from '@/entities/task/model/task';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
-import { cn } from '@/shared/lib/utils';
 
-export function TaskWithActions({
-  task,
-  isTempSelected = false,
-}: {
-  task: TaskModel;
-  isTempSelected?: boolean;
-}) {
+export function TaskWithActions({ task }: { task: TaskModel }) {
   const { isDragging } = useReorderStore();
   const {
     attributes,
