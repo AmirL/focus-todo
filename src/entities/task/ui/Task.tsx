@@ -7,6 +7,7 @@ import { CollapsibleActions } from '@/shared/ui/collapsible-actions';
 import { TaskBadges } from './TaskBadges';
 import { TaskDetails } from './TaskDetails';
 import { TaskName } from './TaskName';
+import { useTempSelectStore } from '@/features/tasks/temp-select';
 
 interface TaskProps {
   task: TaskModel;
@@ -20,20 +21,40 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
   const deleted = isTaskDeleted(task);
   const toggleTaskCompleted = useToggleTaskCompleted();
 
+  const { toggleSelection, isSelected: isTempSelected } = useTempSelectStore();
+  const isTempSelectedTask = isTempSelected(task.id);
+
   const onCheckboxClick = async () => {
     if (deleted) return;
     toggleTaskCompleted.mutate(task);
   };
 
+  const handleTaskClick = (e: React.MouseEvent<HTMLLIElement>) => {
+    // Prevent selection when clicking interactive elements
+    const target = e.target as HTMLElement;
+    const isInteractive =
+      target.closest('button') ||
+      target.closest('input') ||
+      target.closest('a') ||
+      target.closest('[data-testid="task-details"]');
+
+    if (!isInteractive && !deleted) {
+      toggleSelection(task.id);
+    }
+  };
+
   return (
     <li
       key={task.id}
+      onClick={handleTaskClick}
       className={cn(
         'group relative transition-all duration-300 overflow-hidden bg-white border-b border-border/50',
         task.completedAt ? 'opacity-60' : '',
         isSelected && !task.completedAt && 'border-l-4 border-l-yellow-400',
+        isTempSelectedTask && !task.completedAt && 'bg-blue-50 hover:bg-blue-100',
         deleted && 'opacity-50',
-        isDragging && 'opacity-30 shadow-lg scale-105 z-50'
+        isDragging && 'opacity-30 shadow-lg scale-105 z-50',
+        !deleted && 'cursor-pointer'
       )}
       data-testid={`task-${task.id}`}
     >

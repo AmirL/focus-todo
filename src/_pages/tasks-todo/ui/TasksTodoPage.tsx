@@ -13,7 +13,7 @@ export function TasksTodoPage() {
 
   return (
     <>
-      <div className="w-full min-h-screen flex-1">
+      <div className="w-full h-screen flex-1 overflow-y-auto">
         <Card className="border-none shadow-none bg-transparent w-full">
           <CardContent className="space-y-6 px-2 sm:px-4">
             <TodoList />

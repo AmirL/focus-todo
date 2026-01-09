@@ -4,9 +4,11 @@ import { useTasksLoader } from '../api/useTasksLoader';
 import { useGroupedTasksByList } from '../model/groupTasks';
 import { useFilterStore } from '@/features/tasks/filter/model/filterStore';
 import { useReorderStore, useReorderMutation } from '@/features/tasks/reorder';
+import { useTempSelectStore } from '@/features/tasks/temp-select';
 import { ErrorState } from './ErrorState';
 import { TaskWithActions } from './TaskWithActions';
 import { TaskModel } from '@/entities/task/model/task';
+import { cn } from '@/shared/lib/utils';
 import {
   DndContext,
   DragEndEvent,
@@ -23,18 +25,24 @@ import {
   verticalListSortingStrategy,
   arrayMove,
 } from '@dnd-kit/sortable';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function Tasks() {
   const { allTasks, isLoading, error } = useTasksLoader();
   const { statusFilter, list: selectedList } = useFilterStore();
   const { setOptimisticTasks, setIsDragging } = useReorderStore();
+  const { clearSelections, isSelected } = useTempSelectStore();
   const reorderMutation = useReorderMutation();
   const [activeTask, setActiveTask] = useState<TaskModel | null>(null);
 
   const filteredTasks = useApplyFilters(allTasks);
   const tasks = useSortedTasks(filteredTasks);
   const groups = useGroupedTasksByList(tasks);
+
+  // Clear temporary selections when filter changes
+  useEffect(() => {
+    clearSelections();
+  }, [statusFilter, selectedList, clearSelections]);
 
   // Configure sensors for touch and mouse
   const sensors = useSensors(
@@ -160,9 +168,19 @@ export function Tasks() {
               strategy={verticalListSortingStrategy}
             >
               <ul>
-                {group.tasks.map((task) => (
-                  <TaskWithActions key={task.id} task={task} />
-                ))}
+                {group.tasks.map((task) => {
+                  const isTaskTempSelected = isSelected(task.id);
+                  return (
+                    <div
+                      key={task.id}
+                      className={cn(
+                        isTaskTempSelected && 'sticky top-0 z-10 shadow-md'
+                      )}
+                    >
+                      <TaskWithActions task={task} />
+                    </div>
+                  );
+                })}
               </ul>
             </SortableContext>
           </div>
