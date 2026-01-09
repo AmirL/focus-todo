@@ -6,7 +6,7 @@ export function Goal({ goal, actionButtons }: { goal: GoalModel; actionButtons?:
   return (
     <div className="group space-y-1.5">
       <div className="flex items-center justify-between text-sm">
-        <span className="font-medium break-words flex-1">{goal.title}</span>
+        <span className="font-medium break-all flex-1">{goal.title}</span>
         {actionButtons && (
           <CollapsibleActions>
             {actionButtons}
