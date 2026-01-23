@@ -5,9 +5,17 @@ on:
 
 jobs:
   cypress-run:
-    if: github.event.deployment_status.state == 'success'
+    # Run only when Vercel deployment succeeds (Preview or Production)
+    if: github.event.deployment_status.state == 'success' && contains(github.event.deployment_status.environment_url, 'vercel.app')
     runs-on: ubuntu-latest
     steps:
+      - name: Debug deployment info
+        run: |
+          echo "Deployment state: ${{ github.event.deployment_status.state }}"
+          echo "Environment: ${{ github.event.deployment_status.environment }}"
+          echo "Target URL: ${{ github.event.deployment_status.target_url }}"
+          echo "Environment URL: ${{ github.event.deployment_status.environment_url }}"
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -36,3 +44,15 @@ jobs:
           CYPRESS_VERCEL_BYPASS: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Debug job that always runs to show deployment status
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show deployment status
+        run: |
+          echo "State: ${{ github.event.deployment_status.state }}"
+          echo "Environment: ${{ github.event.deployment_status.environment }}"
+          echo "Target URL: ${{ github.event.deployment_status.target_url }}"
+          echo "Environment URL: ${{ github.event.deployment_status.environment_url }}"
+          echo "Description: ${{ github.event.deployment_status.description }}"
