@@ -5,19 +5,14 @@ on:
 
 jobs:
   cypress-run:
-    # Run only when Vercel deployment succeeds (Preview or Production)
+    # Run only when Vercel deployment succeeds
     if: github.event.deployment_status.state == 'success' && contains(github.event.deployment_status.environment_url, 'vercel.app')
     runs-on: ubuntu-latest
     steps:
-      - name: Debug deployment info
-        run: |
-          echo "Deployment state: ${{ github.event.deployment_status.state }}"
-          echo "Environment: ${{ github.event.deployment_status.environment }}"
-          echo "Target URL: ${{ github.event.deployment_status.target_url }}"
-          echo "Environment URL: ${{ github.event.deployment_status.environment_url }}"
-
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.deployment_status.deployment.ref }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
@@ -36,23 +31,12 @@ jobs:
       - name: Cypress run against preview deployment
         uses: cypress-io/github-action@v6
         with:
-          wait-on: '${{ github.event.deployment_status.target_url }}?x-vercel-protection-bypass=${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}'
+          wait-on: ${{ github.event.deployment_status.target_url }}
           wait-on-timeout: 120
           record: true
         env:
           CYPRESS_BASE_URL: ${{ github.event.deployment_status.target_url }}
-          CYPRESS_VERCEL_BYPASS: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # Debug job that always runs to show deployment status
-  debug:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Show deployment status
-        run: |
-          echo "State: ${{ github.event.deployment_status.state }}"
-          echo "Environment: ${{ github.event.deployment_status.environment }}"
-          echo "Target URL: ${{ github.event.deployment_status.target_url }}"
-          echo "Environment URL: ${{ github.event.deployment_status.environment_url }}"
-          echo "Description: ${{ github.event.deployment_status.description }}"
+          COMMIT_INFO_BRANCH: ${{ github.event.deployment_status.deployment.ref }}
+          COMMIT_INFO_SHA: ${{ github.event.deployment_status.deployment.sha }}

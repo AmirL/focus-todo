@@ -24,10 +24,7 @@ Cypress.on("uncaught:exception", (err) => {
   return false;
 });
 
-// Set Vercel protection bypass cookie for preview deployments
+// Login before each test
 beforeEach(() => {
-  const bypassToken = Cypress.env("VERCEL_BYPASS");
-  if (bypassToken) {
-    cy.setCookie("x-vercel-protection-bypass", bypassToken);
-  }
+  cy.login();
 });

@@ -23,22 +23,14 @@ declare global {
       navigateToFilter(
         filter: "backlog" | "selected" | "today" | "tomorrow" | "future"
       ): Chainable<void>;
+
+      /**
+       * Login to the application
+       */
+      login(): Chainable<void>;
     }
   }
 }
-
-// Override cy.visit to add Vercel protection bypass
-Cypress.Commands.overwrite(
-  "visit",
-  (originalFn, url: string, options?: Partial<Cypress.VisitOptions>) => {
-    const bypassToken = Cypress.env("VERCEL_BYPASS");
-    if (bypassToken && typeof url === "string") {
-      const separator = url.includes("?") ? "&" : "?";
-      url = `${url}${separator}x-vercel-protection-bypass=${bypassToken}`;
-    }
-    return originalFn(url, options);
-  }
-);
 
 // Wait for the application to fully load
 Cypress.Commands.add("waitForAppLoad", () => {
@@ -64,6 +56,30 @@ Cypress.Commands.add("navigateToFilter", (filter) => {
   };
 
   cy.contains("button", filterMap[filter]).click();
+});
+
+// Login command - uses session to preserve login state across tests
+Cypress.Commands.add("login", () => {
+  cy.session(
+    "user-session",
+    () => {
+      cy.visit("/");
+      // Use cy.prompt to handle login flow
+      cy.prompt([
+        "Look for a login or sign in button and click it",
+        "Enter test credentials or use social login if available",
+        "Complete the authentication flow",
+        "Verify that you are logged in by checking for user profile or dashboard",
+      ]);
+    },
+    {
+      validate: () => {
+        // Validate session is still valid
+        cy.visit("/");
+        cy.get("body").should("be.visible");
+      },
+    }
+  );
 });
 
 export {};
