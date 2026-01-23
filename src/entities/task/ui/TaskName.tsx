@@ -11,7 +11,7 @@ export function TaskName({ task }: TaskNameProps) {
   return (
     <div
       className={cn(
-        'flex-1 font-medium break-all',
+        'flex-1 min-w-0 font-medium break-words overflow-hidden',
         task.completedAt && 'line-through text-muted-foreground',
         deleted && 'line-through'
       )}
