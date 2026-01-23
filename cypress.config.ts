@@ -12,6 +12,7 @@ export default defineConfig({
     video: true,
     screenshotOnRunFailure: true,
     experimentalStudio: true,
+    experimentalPromptCommand: true,
     setupNodeEvents(on, config) {
       // implement node event listeners here
     },
