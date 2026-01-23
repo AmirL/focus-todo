@@ -23,3 +23,11 @@ Cypress.on("uncaught:exception", (err) => {
   console.error("Uncaught exception:", err.message);
   return false;
 });
+
+// Set Vercel protection bypass cookie for preview deployments
+beforeEach(() => {
+  const bypassToken = Cypress.env("VERCEL_BYPASS");
+  if (bypassToken) {
+    cy.setCookie("x-vercel-protection-bypass", bypassToken);
+  }
+});
