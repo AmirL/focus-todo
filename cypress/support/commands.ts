@@ -28,7 +28,6 @@ declare global {
 }
 
 // Override cy.visit to add Vercel protection bypass
-const originalVisit = Cypress.Commands._commands.visit;
 Cypress.Commands.overwrite(
   "visit",
   (originalFn, url: string, options?: Partial<Cypress.VisitOptions>) => {
