@@ -27,6 +27,20 @@ declare global {
   }
 }
 
+// Override cy.visit to add Vercel protection bypass
+const originalVisit = Cypress.Commands._commands.visit;
+Cypress.Commands.overwrite(
+  "visit",
+  (originalFn, url: string, options?: Partial<Cypress.VisitOptions>) => {
+    const bypassToken = Cypress.env("VERCEL_BYPASS");
+    if (bypassToken && typeof url === "string") {
+      const separator = url.includes("?") ? "&" : "?";
+      url = `${url}${separator}x-vercel-protection-bypass=${bypassToken}`;
+    }
+    return originalFn(url, options);
+  }
+);
+
 // Wait for the application to fully load
 Cypress.Commands.add("waitForAppLoad", () => {
   // Wait for the main layout to be visible
