@@ -22,10 +22,10 @@ export function TaskDetails({ details }: TaskDetailsProps) {
   };
 
   return (
-    <div 
+    <div
       onClick={handleToggle}
       onKeyDown={handleKeyDown}
-      className="mt-1" 
+      className="mt-1 overflow-hidden"
       data-testid="task-details"
       role="button"
       tabIndex={0}
@@ -34,7 +34,7 @@ export function TaskDetails({ details }: TaskDetailsProps) {
     >
       <ReactMarkdown
         className={cn(
-          'prose prose-sm text-muted-foreground cursor-pointer',
+          'prose prose-sm text-muted-foreground cursor-pointer break-words [&_a]:break-all',
           folded ? 'line-clamp-1' : 'line-clamp-none'
         )}
         remarkPlugins={[remarkGfm]}

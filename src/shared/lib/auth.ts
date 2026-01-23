@@ -24,9 +24,17 @@ invariant(process.env.BETTER_AUTH_SECRET, "BETTER_AUTH_SECRET environment variab
 const SESSION_DURATION = 60 * 60 * 24 * 30; // 30 days
 const SESSION_REFRESH_INTERVAL = 60 * 60 * 24; // 1 day
 
+// Determine the base URL for auth - support Vercel preview deployments
+const getBaseURL = () => {
+  if (process.env.BETTER_AUTH_URL) return process.env.BETTER_AUTH_URL;
+  if (process.env.NEXT_PUBLIC_BASE_URL) return process.env.NEXT_PUBLIC_BASE_URL;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return "http://localhost:8000";
+};
+
 export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8000",
+  baseURL: getBaseURL(),
   database: drizzleAdapter(DB, {
     provider: "mysql",
     schema: schema,

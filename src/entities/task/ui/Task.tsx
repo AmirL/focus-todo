@@ -64,8 +64,8 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
       )}
       data-testid={`task-${task.id}`}
     >
-      <div className="px-4 py-3">
-        <div className="flex items-center space-x-3">
+      <div className="px-2 sm:px-4 py-3">
+        <div className="flex items-center space-x-2 sm:space-x-3">
           {dragHandle && (
             <div className="flex-shrink-0">
               {dragHandle}
@@ -80,14 +80,16 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
           <TaskName task={task} />
         </div>
         <TaskDetails details={task.details} />
-        <div className="flex justify-between items-center mt-2">
-          <div className="flex space-x-2 items-center">
+        <div className="flex justify-between items-center mt-2 gap-2">
+          <div className="flex space-x-2 items-center min-w-0 flex-shrink overflow-hidden">
             <TaskBadges task={task} />
             <EstimatedTimeButton task={task} />
           </div>
-          <CollapsibleActions>
-            {actionButtons}
-          </CollapsibleActions>
+          <div className="flex-shrink-0">
+            <CollapsibleActions>
+              {actionButtons}
+            </CollapsibleActions>
+          </div>
         </div>
       </div>
     </li>
