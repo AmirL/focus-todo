@@ -9,10 +9,20 @@ jobs:
     if: github.event.deployment_status.state == 'success' && contains(github.event.deployment_status.environment_url, 'vercel.app')
     runs-on: ubuntu-latest
     steps:
+      - name: Get branch name from deployment
+        id: branch
+        run: |
+          # Try to get branch from deployment ref or extract from URL
+          BRANCH="${{ github.event.deployment_status.deployment.ref }}"
+          if [ -z "$BRANCH" ] || [ "$BRANCH" = "null" ]; then
+            # Extract from environment URL (e.g., feature-branch-abc123.vercel.app)
+            BRANCH=$(echo "${{ github.event.deployment_status.environment_url }}" | sed -E 's/https:\/\/([^-]+(-[^-]+)*)-[a-z0-9]+-[^.]+\.vercel\.app/\1/' | sed 's/-$//')
+          fi
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+          echo "Detected branch: $BRANCH"
+
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.deployment_status.deployment.ref }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
@@ -34,11 +44,12 @@ jobs:
           wait-on: ${{ github.event.deployment_status.target_url }}
           wait-on-timeout: 120
           record: true
+          tag: ${{ steps.branch.outputs.branch }}
         env:
           CYPRESS_BASE_URL: ${{ github.event.deployment_status.target_url }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           CYPRESS_TEST_EMAIL: ${{ vars.TEST_EMAIL }}
           CYPRESS_TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COMMIT_INFO_BRANCH: ${{ github.event.deployment_status.deployment.ref }}
+          COMMIT_INFO_BRANCH: ${{ steps.branch.outputs.branch }}
           COMMIT_INFO_SHA: ${{ github.event.deployment_status.deployment.sha }}

@@ -58,32 +58,19 @@ Cypress.Commands.add("navigateToFilter", (filter) => {
   cy.contains("button", filterMap[filter]).click();
 });
 
-// Login command - uses session to preserve login state across tests
+// Login command - performs login with test credentials
 Cypress.Commands.add("login", () => {
   const email = Cypress.env("TEST_EMAIL");
   const password = Cypress.env("TEST_PASSWORD");
 
-  cy.session(
-    "user-session",
-    () => {
-      cy.visit("/");
-      // Use cy.prompt to handle login flow with credentials
-      cy.prompt([
-        "Look for a login or sign in button and click it",
-        `Enter the email '${email}' in the email input field`,
-        `Enter the password '${password}' in the password input field`,
-        "Click the submit or sign in button to complete login",
-        "Wait for the page to load and verify you are logged in",
-      ]);
-    },
-    {
-      validate: () => {
-        // Validate session is still valid by checking for authenticated content
-        cy.visit("/");
-        cy.get("body").should("be.visible");
-      },
-    }
-  );
+  cy.visit("/");
+  cy.prompt([
+    "Look for a login or sign in button on the page and click it",
+    `Find the email input field and type '${email}'`,
+    `Find the password input field and type '${password}'`,
+    "Click the submit or sign in button",
+    "Wait for the dashboard or main app to load after login",
+  ]);
 });
 
 export {};
