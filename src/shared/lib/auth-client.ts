@@ -6,5 +6,6 @@ export const {
   signUp,
   useSession,
 } = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8000",
+  // Use relative URL to work with any deployment domain (including Vercel previews)
+  baseURL: process.env.NEXT_PUBLIC_BASE_URL || "",
 });
