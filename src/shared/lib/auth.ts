@@ -19,19 +19,13 @@ interface BetterAuthContext {
   };
 }
 
-// Skip validation during build phase to allow Next.js static analysis to complete
-// The secret will be required at runtime when auth is actually used
-const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
-
-if (!isBuildPhase) {
-  invariant(process.env.BETTER_AUTH_SECRET, "BETTER_AUTH_SECRET environment variable is required");
-}
+invariant(process.env.BETTER_AUTH_SECRET, "BETTER_AUTH_SECRET environment variable is required");
 
 const SESSION_DURATION = 60 * 60 * 24 * 30; // 30 days
 const SESSION_REFRESH_INTERVAL = 60 * 60 * 24; // 1 day
 
 export const auth = betterAuth({
-  secret: process.env.BETTER_AUTH_SECRET || 'build-placeholder',
+  secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8000",
   database: drizzleAdapter(DB, {
     provider: "mysql",
