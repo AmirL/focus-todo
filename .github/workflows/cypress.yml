@@ -1,13 +1,11 @@
 name: Cypress E2E Tests
 
 on:
-  push:
-    branches: [main, develop, 'claude/**']
-  pull_request:
-    branches: [main, develop]
+  deployment_status:
 
 jobs:
   cypress-run:
+    if: github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,12 +25,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Cypress run
+      - name: Cypress run against preview deployment
         uses: cypress-io/github-action@v6
         with:
-          start: pnpm run dev
-          wait-on: 'http://localhost:8000'
+          wait-on: ${{ github.event.deployment_status.target_url }}
           record: true
         env:
+          CYPRESS_BASE_URL: ${{ github.event.deployment_status.target_url }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
