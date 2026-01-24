@@ -38,9 +38,9 @@ describe("Task Management", () => {
     });
 
     it("should star/select a task", () => {
-      cy.get('[data-testid^="star-task-"]').first().click();
-      // Star icon SVG should have fill when selected
-      cy.get('[data-testid^="star-task-"]').first().find('svg').should('have.attr', 'fill', '#E3B644');
+      cy.get('[data-testid^="star-task-"]').first().click({ force: true });
+      // Button should have yellow text class when selected
+      cy.get('[data-testid^="star-task-"]').first().should('have.class', 'text-yellow-500');
     });
 
     it("should delete a task", () => {

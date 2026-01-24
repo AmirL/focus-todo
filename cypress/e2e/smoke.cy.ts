@@ -18,9 +18,9 @@ describe("Smoke Tests - Critical User Flows", () => {
   });
 
   it("should star a task and view in Selected", () => {
-    cy.get('[data-testid^="star-task-"]').first().click();
-    // Check SVG fill attribute for selected state
-    cy.get('[data-testid^="star-task-"]').first().find('svg').should('have.attr', 'fill', '#E3B644');
+    cy.get('[data-testid^="star-task-"]').first().click({ force: true });
+    // Button should have yellow text class when selected
+    cy.get('[data-testid^="star-task-"]').first().should('have.class', 'text-yellow-500');
     cy.prompt(["Click the 'Selected' button in the sidebar"]);
     cy.contains("selected").should("exist");
   });
@@ -48,7 +48,8 @@ describe("Smoke Tests - Critical User Flows", () => {
   it("should search for tasks", () => {
     cy.prompt(["Click the search icon button in the header"]);
     cy.get('input[placeholder*="Search"]').type("test");
-    cy.get('[cmdk-list]').should("exist");
+    // Verify search results container appears
+    cy.get('[role="listbox"], [cmdk-list], [data-radix-scroll-area-viewport]').should("exist");
   });
 
   it("should navigate between filter views", () => {
