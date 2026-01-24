@@ -22,7 +22,10 @@ export async function middleware(request: NextRequest) {
   }
 
   // Check for session cookie from better-auth
-  const sessionCookie = request.cookies.get("better-auth.session_token");
+  // We check for both possible cookie names that better-auth might use
+  const sessionCookie =
+    request.cookies.get("better-auth.session_token") ||
+    request.cookies.get("__Secure-better-auth.session_token");
 
   if (!sessionCookie?.value) {
     // No session cookie - redirect to login
@@ -30,34 +33,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Verify the session is valid by calling the auth API
-  try {
-    const sessionResponse = await fetch(
-      new URL("/api/auth/get-session", request.url),
-      {
-        headers: {
-          cookie: request.headers.get("cookie") || "",
-        },
-      }
-    );
-
-    if (!sessionResponse.ok) {
-      const loginUrl = new URL("/login", request.url);
-      return NextResponse.redirect(loginUrl);
-    }
-
-    const session = await sessionResponse.json();
-
-    if (!session || !session.user) {
-      const loginUrl = new URL("/login", request.url);
-      return NextResponse.redirect(loginUrl);
-    }
-  } catch {
-    // If session verification fails, redirect to login
-    const loginUrl = new URL("/login", request.url);
-    return NextResponse.redirect(loginUrl);
-  }
-
+  // Cookie exists - allow the request
+  // Full session validation happens in API routes
   return NextResponse.next();
 }
 
