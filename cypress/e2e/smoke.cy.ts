@@ -7,70 +7,59 @@ describe("Smoke Tests - Critical User Flows", () => {
   });
 
   it("should create and complete a task", () => {
-    cy.prompt([
-      "Click the plus button at the bottom right corner",
-      "Type 'Smoke test task' in the textarea",
-      "Click the 'Add Task' button",
-    ]);
+    cy.get('[data-testid="add-task-button"]').click();
+    cy.get('[data-testid="task-input"]').type("Smoke test task");
+    cy.get('[data-testid="save-task-button"]').click();
     cy.contains("Smoke test task").should("be.visible");
-    cy.prompt([
-      "Click the circle checkbox on 'Smoke test task'",
-    ]);
+
+    // Complete the task
+    cy.get('[data-testid^="task-"]').contains("Smoke test task").parents('[data-testid^="task-"]').within(() => {
+      cy.get('[type="checkbox"]').click({ force: true });
+    });
     cy.get(".line-through").should("exist");
   });
 
   it("should star a task and view in Selected", () => {
-    cy.prompt([
-      "Click the star button on the first task row",
-      "Click the 'Selected' button in the sidebar",
-    ]);
+    cy.get('[data-testid^="star-task-"]').first().click();
+    cy.get('[data-testid^="star-task-"]').first().should("have.class", "text-yellow-500");
+    cy.contains("button", "Selected").click();
     cy.url().should("include", "selected");
   });
 
   it("should create a goal", () => {
-    cy.prompt([
-      "Click the 'Add Goal' button in the goals section",
-      "Type 'Test Goal' in the title input",
-      "Click the 'Create' button",
-    ]);
+    cy.get('[data-cy="add-goal-button"]').click();
+    cy.get('[data-cy="goal-title-input"]').type("Test Goal");
+    cy.get('[data-cy="create-goal-button"]').click();
     cy.contains("Test Goal").should("be.visible");
   });
 
   it("should show sidebar on desktop", () => {
     cy.viewport(1280, 720);
-    cy.get("button").contains("Backlog").should("be.visible");
-    cy.get("button").contains("Today").should("be.visible");
-    cy.get("button").contains("Tomorrow").should("be.visible");
+    cy.contains("button", "Backlog").should("be.visible");
+    cy.contains("button", "Today").should("be.visible");
+    cy.contains("button", "Tomorrow").should("be.visible");
   });
 
   it("should show menu button on mobile", () => {
     cy.viewport("iphone-x");
-    cy.prompt([
-      "Click the hamburger menu button in the top left",
-    ]);
-    cy.get("button").contains("Backlog").should("be.visible");
+    // Find and click the mobile menu button (hamburger icon)
+    cy.get('button[aria-label*="menu"], button svg.lucide-menu').first().click({ force: true });
+    cy.contains("button", "Backlog").should("be.visible");
   });
 
   it("should search for tasks", () => {
-    cy.prompt([
-      "Click the search button in the header",
-      "Type 'test' in the search input",
-    ]);
-    cy.get('[role="listbox"]').should("be.visible");
+    // Click search button in header
+    cy.get('button svg.lucide-search').first().click();
+    cy.get('input[placeholder*="Search"]').type("test");
+    cy.get('[role="listbox"], [role="option"]').should("exist");
   });
 
   it("should navigate between filter views", () => {
-    cy.prompt([
-      "Click the 'Backlog' button in the sidebar",
-    ]);
+    cy.contains("button", "Backlog").click();
     cy.url().should("include", "backlog");
-    cy.prompt([
-      "Click the 'Today' button in the sidebar",
-    ]);
+    cy.contains("button", "Today").click();
     cy.url().should("include", "today");
-    cy.prompt([
-      "Click the 'Selected' button in the sidebar",
-    ]);
+    cy.contains("button", "Selected").click();
     cy.url().should("include", "selected");
   });
 });

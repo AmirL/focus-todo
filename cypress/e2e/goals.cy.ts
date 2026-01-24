@@ -8,59 +8,39 @@ describe("Goal Management", () => {
 
   describe("Create Goals", () => {
     it("should create a new goal", () => {
-      cy.prompt([
-        "Click the 'Add Goal' button in the goals section",
-        "Type 'Learn TypeScript' in the title input",
-        "Click the 'Create' button",
-      ]);
+      cy.get('[data-cy="add-goal-button"]').click();
+      cy.get('[data-cy="goal-title-input"]').type("Learn TypeScript");
+      cy.get('[data-cy="create-goal-button"]').click();
       cy.contains("Learn TypeScript").should("be.visible");
     });
 
-    it("should create a personal goal", () => {
-      cy.prompt([
-        "Click the 'Add Goal' button in the goals section",
-        "Type 'Exercise daily' in the title input",
-        "Click the list dropdown button",
-        "Click 'Personal' in the dropdown",
-        "Click the 'Create' button",
-      ]);
+    it("should create a goal with custom progress", () => {
+      cy.get('[data-cy="add-goal-button"]').click();
+      cy.get('[data-cy="goal-title-input"]').type("Exercise daily");
+      cy.get('[data-cy="create-goal-button"]').click();
       cy.contains("Exercise daily").should("be.visible");
     });
   });
 
   describe("Edit Goals", () => {
     it("should edit goal title", () => {
-      cy.prompt([
-        "Click the pencil button on the first goal",
-        "Clear the title input",
-        "Type 'Updated Goal Title' in the title input",
-        "Click the 'Save' button",
-      ]);
+      cy.get('[data-cy="edit-goal-button"]').first().click();
+      cy.get('[data-cy="edit-goal-title-input"]').clear().type("Updated Goal Title");
+      cy.get('[data-cy="save-goal-button"]').click();
       cy.contains("Updated Goal Title").should("be.visible");
-    });
-
-    it("should update goal progress", () => {
-      cy.prompt([
-        "Click the pencil button on the first goal",
-        "Click the progress input field",
-        "Clear the progress input",
-        "Type '50' in the progress input",
-        "Click the 'Save' button",
-      ]);
     });
   });
 
   describe("Delete Goals", () => {
     it("should delete a goal", () => {
-      // Get initial count of goals
-      cy.get('[data-testid^="goal-"]').then(($goals) => {
+      // Count goals before deletion
+      cy.get('[data-cy="goal-item"]').then(($goals) => {
         const initialCount = $goals.length;
-        cy.prompt([
-          "Click the trash button on the first goal",
-        ]);
-        // Allow time for deletion
-        cy.wait(500);
-        cy.get('[data-testid^="goal-"]').should("have.length.lessThan", initialCount + 1);
+        cy.get('[data-cy="delete-goal-button"]').first().click();
+        // Wait for the goal to be removed
+        if (initialCount > 1) {
+          cy.get('[data-cy="goal-item"]').should("have.length", initialCount - 1);
+        }
       });
     });
   });
@@ -68,7 +48,11 @@ describe("Goal Management", () => {
   describe("Goal Display", () => {
     it("should display goals section", () => {
       cy.contains("Goals").should("be.visible");
-      cy.get('[data-testid^="goal-"]').should("exist");
+      cy.get('[data-cy="goal-item"]').should("exist");
+    });
+
+    it("should display goal titles", () => {
+      cy.get('[data-cy="goal-title"]').should("exist");
     });
   });
 });

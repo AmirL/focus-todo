@@ -32,7 +32,7 @@ export function EditGoalDialog({ goal, children }: { goal: GoalModel; children: 
           <div className="grid gap-4 py-2">
             <div>
               <Label htmlFor="title">Title</Label>
-              <Input id="title" name="title" defaultValue={goal.title} />
+              <Input id="title" name="title" defaultValue={goal.title} data-cy="edit-goal-title-input" />
             </div>
             <div>
               <Label htmlFor="progress">Progress: {progress}%</Label>
@@ -49,7 +49,7 @@ export function EditGoalDialog({ goal, children }: { goal: GoalModel; children: 
           </div>
           <DialogFooter>
             <DialogTrigger asChild>
-              <Button type="submit">Save changes</Button>
+              <Button type="submit" data-cy="save-goal-button">Save changes</Button>
             </DialogTrigger>
           </DialogFooter>
         </form>
