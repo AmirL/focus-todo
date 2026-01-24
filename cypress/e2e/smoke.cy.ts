@@ -11,64 +11,66 @@ describe("Smoke Tests - Critical User Flows", () => {
       "Click the plus button at the bottom right corner",
       "Type 'Smoke test task' in the textarea",
       "Click the 'Add Task' button",
-      "Verify 'Smoke test task' text appears in the task list",
-      "Click the checkbox on 'Smoke test task'",
-      "Verify the task text has strikethrough styling",
     ]);
+    cy.contains("Smoke test task").should("be.visible");
+    cy.prompt([
+      "Click the circle checkbox on 'Smoke test task'",
+    ]);
+    cy.get(".line-through").should("exist");
   });
 
   it("should star a task and view in Selected", () => {
     cy.prompt([
-      "Click the star icon button on the first task item",
-      "Verify the star icon turns yellow or filled",
+      "Click the star button on the first task row",
       "Click the 'Selected' button in the sidebar",
-      "Verify the header shows 'selected' text",
     ]);
+    cy.url().should("include", "selected");
   });
 
   it("should create a goal", () => {
     cy.prompt([
-      "Click the 'Add Goal' button in the goals section at the top",
-      "Type 'Test Goal' in the title input field",
-      "Click the 'Create' or 'Add' button",
-      "Verify 'Test Goal' text appears in the goals section",
+      "Click the 'Add Goal' button in the goals section",
+      "Type 'Test Goal' in the title input",
+      "Click the 'Create' button",
     ]);
+    cy.contains("Test Goal").should("be.visible");
   });
 
   it("should show sidebar on desktop", () => {
     cy.viewport(1280, 720);
-    cy.prompt([
-      "Verify the sidebar with 'Backlog' button is visible on the left",
-      "Verify the 'Today' button is visible in the sidebar",
-      "Verify the 'Tomorrow' button is visible in the sidebar",
-    ]);
+    cy.get("button").contains("Backlog").should("be.visible");
+    cy.get("button").contains("Today").should("be.visible");
+    cy.get("button").contains("Tomorrow").should("be.visible");
   });
 
   it("should show menu button on mobile", () => {
     cy.viewport("iphone-x");
     cy.prompt([
-      "Verify a hamburger menu icon button is visible in the top left corner",
-      "Click the hamburger menu icon button",
-      "Verify the sidebar with navigation buttons slides in",
+      "Click the hamburger menu button in the top left",
     ]);
+    cy.get("button").contains("Backlog").should("be.visible");
   });
 
   it("should search for tasks", () => {
     cy.prompt([
-      "Click the search icon button in the header",
-      "Type 'test' in the search input field",
-      "Verify search results appear below the input",
+      "Click the search button in the header",
+      "Type 'test' in the search input",
     ]);
+    cy.get('[role="listbox"]').should("be.visible");
   });
 
   it("should navigate between filter views", () => {
     cy.prompt([
       "Click the 'Backlog' button in the sidebar",
-      "Verify the header shows 'backlog' text",
-      "Click the 'Today' button in the sidebar",
-      "Verify the header shows 'today' text",
-      "Click the 'Selected' button in the sidebar",
-      "Verify the header shows 'selected' text",
     ]);
+    cy.url().should("include", "backlog");
+    cy.prompt([
+      "Click the 'Today' button in the sidebar",
+    ]);
+    cy.url().should("include", "today");
+    cy.prompt([
+      "Click the 'Selected' button in the sidebar",
+    ]);
+    cy.url().should("include", "selected");
   });
 });

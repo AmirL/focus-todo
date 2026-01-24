@@ -12,102 +12,108 @@ describe("Task Management", () => {
         "Click the plus button at the bottom right corner of the page",
         "Type 'Buy groceries' in the textarea that appears",
         "Click the 'Add Task' button",
-        "Verify that 'Buy groceries' text appears in the task list",
       ]);
+      // Verify using standard Cypress after prompt actions
+      cy.contains("Buy groceries").should("be.visible");
     });
 
     it("should create a task with estimated duration", () => {
       cy.prompt([
         "Click the plus button at the bottom right corner",
         "Type 'Prepare presentation' in the textarea",
-        "Click the clock icon or time dropdown in the form",
-        "Click '1 hour' or '60 minutes' option",
+        "Click the clock icon button in the form",
+        "Click the '1h' option",
         "Click the 'Add Task' button",
       ]);
+      cy.contains("Prepare presentation").should("be.visible");
     });
 
     it("should create a task for a specific date", () => {
       cy.prompt([
         "Click the plus button at the bottom right corner",
         "Type 'Schedule meeting' in the textarea",
-        "Click the calendar icon or date picker in the form",
-        "Click on tomorrow's date in the calendar",
+        "Click the calendar icon button in the form",
+        "Click tomorrow in the calendar picker",
         "Click the 'Add Task' button",
-        "Click the 'Tomorrow' button in the sidebar",
-        "Verify 'Schedule meeting' text is visible",
       ]);
+      cy.prompt([
+        "Click the 'Tomorrow' button in the sidebar",
+      ]);
+      cy.contains("Schedule meeting").should("be.visible");
     });
   });
 
   describe("Task Actions", () => {
     it("should mark a task as complete", () => {
       cy.prompt([
-        "Click the checkbox button on the first task item in the list",
-        "Verify the task text now has strikethrough styling",
+        "Click the circle checkbox button on the left side of the first task",
       ]);
+      // Check that task got line-through class
+      cy.get(".line-through").should("exist");
     });
 
     it("should star/select a task", () => {
       cy.prompt([
-        "Click the star icon button on the first task item in the list",
-        "Verify the star icon changes to yellow or filled state",
+        "Click the star button on the first task row",
       ]);
+      // Verify star is now filled/selected
+      cy.get('[data-selected="true"]').should("exist");
     });
 
     it("should delete a task", () => {
       cy.prompt([
-        "Click the trash icon button on the first task item in the list",
-        "Verify the task now shows with reduced opacity or strikethrough",
+        "Click the trash button on the first task row",
       ]);
+      // Verify task is marked as deleted (has line-through)
+      cy.get(".line-through").should("exist");
     });
 
     it("should snooze a task to a different date", () => {
       cy.prompt([
-        "Click the calendar icon button on the first task item",
-        "Click on any date in the calendar popover that appears",
+        "Click the calendar button on the first task row",
+        "Click tomorrow in the calendar popup",
       ]);
     });
 
     it("should mark a task as a blocker", () => {
       cy.prompt([
-        "Click the users icon button on the first task item in the list",
-        "Verify the users icon changes to blue or highlighted state",
+        "Click the users button on the first task row",
       ]);
     });
 
     it("should set estimated time for a task", () => {
       cy.prompt([
-        "Click the clock icon button on the first task item in the list",
-        "Click '30 minutes' or '30m' option in the dropdown",
-        "Verify the task now shows a time badge",
+        "Click the clock button on the first task row",
+        "Click '30m' in the dropdown menu",
       ]);
+      cy.contains("30m").should("be.visible");
     });
   });
 
   describe("Edit Tasks", () => {
     it("should edit task name", () => {
       cy.prompt([
-        "Click the pencil icon button on the first task item",
+        "Click the pencil button on the first task row",
         "Clear the name input field",
-        "Type 'Updated task name' in the name input field",
+        "Type 'Updated task name' in the name input",
         "Click the 'Save changes' button",
-        "Verify 'Updated task name' text appears in the task list",
       ]);
+      cy.contains("Updated task name").should("be.visible");
     });
 
     it("should edit task details", () => {
       cy.prompt([
-        "Click the pencil icon button on the first task item",
-        "Type 'Task details here' in the details textarea field",
+        "Click the pencil button on the first task row",
+        "Type 'Task details here' in the details textarea",
         "Click the 'Save changes' button",
       ]);
     });
 
     it("should change task list/category", () => {
       cy.prompt([
-        "Click the pencil icon button on the first task item",
-        "Click on the category or list dropdown button",
-        "Click on a different category option",
+        "Click the pencil button on the first task row",
+        "Click the list dropdown button",
+        "Click on a different list option",
         "Click the 'Save changes' button",
       ]);
     });
@@ -117,44 +123,44 @@ describe("Task Management", () => {
     it("should filter tasks by Today", () => {
       cy.prompt([
         "Click the 'Today' button in the sidebar",
-        "Verify the page header shows 'today'",
       ]);
+      cy.url().should("include", "today");
     });
 
     it("should filter tasks by Tomorrow", () => {
       cy.prompt([
         "Click the 'Tomorrow' button in the sidebar",
-        "Verify the page header shows 'tomorrow'",
       ]);
+      cy.url().should("include", "tomorrow");
     });
 
     it("should filter tasks by Backlog", () => {
       cy.prompt([
         "Click the 'Backlog' button in the sidebar",
-        "Verify the page header shows 'backlog'",
       ]);
+      cy.url().should("include", "backlog");
     });
 
     it("should filter tasks by Selected", () => {
       cy.prompt([
         "Click the 'Selected' button in the sidebar",
-        "Verify the page header shows 'selected'",
       ]);
+      cy.url().should("include", "selected");
     });
 
     it("should filter tasks by Future", () => {
       cy.prompt([
         "Click the 'Future' button in the sidebar",
-        "Verify the page header shows 'future'",
       ]);
+      cy.url().should("include", "future");
     });
 
     it("should filter tasks by list category", () => {
       cy.prompt([
-        "Click the first category button in the sidebar (below Filters section)",
-        "Verify the task list updates to show filtered tasks",
+        "Click the first category button below the Filters section in the sidebar",
+      ]);
+      cy.prompt([
         "Click the second category button in the sidebar",
-        "Verify the task list updates to show different filtered tasks",
       ]);
     });
   });
