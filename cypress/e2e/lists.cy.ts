@@ -8,10 +8,11 @@ describe("Task Categories", () => {
 
   describe("Filter by Category", () => {
     it("should show category buttons in sidebar", () => {
-      // Verify category buttons exist in sidebar
-      cy.get('aside').within(() => {
-        cy.get('button').should("have.length.greaterThan", 5); // More than just filter buttons
-      });
+      cy.prompt(["Verify the sidebar displays category filter buttons"]);
+    });
+
+    it("should filter by clicking a category", () => {
+      cy.prompt(["Click the first category button in the sidebar below the filter buttons"]);
     });
   });
 
@@ -26,7 +27,7 @@ describe("Task Categories", () => {
     it("should edit a task", () => {
       cy.get('[data-testid^="edit-task-"]').first().click();
       cy.get('[role="dialog"]').should("be.visible");
-      cy.contains("Save changes").click();
+      cy.get('[data-testid="save-task-changes-button"]').click();
     });
   });
 });

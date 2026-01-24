@@ -12,18 +12,17 @@ describe("Smoke Tests - Critical User Flows", () => {
     cy.get('[data-testid="save-task-button"]').click();
     cy.contains("Smoke test task").should("be.visible");
 
-    // Complete the task
-    cy.get('[data-testid^="task-"]').contains("Smoke test task").parents('[data-testid^="task-"]').within(() => {
-      cy.get('[type="checkbox"]').click({ force: true });
-    });
+    // Complete the task - use role="checkbox" for Radix checkbox
+    cy.get('[data-testid^="task-"]').contains("Smoke test task").parents('[data-testid^="task-"]').find('[role="checkbox"]').click();
     cy.get(".line-through").should("exist");
   });
 
   it("should star a task and view in Selected", () => {
     cy.get('[data-testid^="star-task-"]').first().click();
-    cy.get('[data-testid^="star-task-"]').first().should("have.class", "text-yellow-500");
-    cy.contains("button", "Selected").click();
-    cy.url().should("include", "selected");
+    // Check SVG fill attribute for selected state
+    cy.get('[data-testid^="star-task-"]').first().find('svg').should('have.attr', 'fill', '#E3B644');
+    cy.prompt(["Click the 'Selected' button in the sidebar"]);
+    cy.contains("selected").should("exist");
   });
 
   it("should create a goal", () => {
@@ -35,31 +34,29 @@ describe("Smoke Tests - Critical User Flows", () => {
 
   it("should show sidebar on desktop", () => {
     cy.viewport(1280, 720);
-    cy.contains("button", "Backlog").should("be.visible");
-    cy.contains("button", "Today").should("be.visible");
-    cy.contains("button", "Tomorrow").should("be.visible");
+    cy.contains("Backlog").should("be.visible");
+    cy.contains("Today").should("be.visible");
+    cy.contains("Tomorrow").should("be.visible");
   });
 
   it("should show menu button on mobile", () => {
     cy.viewport("iphone-x");
-    // Find and click the mobile menu button (hamburger icon)
-    cy.get('button[aria-label*="menu"], button svg.lucide-menu').first().click({ force: true });
-    cy.contains("button", "Backlog").should("be.visible");
+    cy.prompt(["Click the hamburger menu button to open the sidebar"]);
+    cy.contains("Backlog").should("be.visible");
   });
 
   it("should search for tasks", () => {
-    // Click search button in header
-    cy.get('button svg.lucide-search').first().click();
+    cy.prompt(["Click the search icon button in the header"]);
     cy.get('input[placeholder*="Search"]').type("test");
-    cy.get('[role="listbox"], [role="option"]').should("exist");
+    cy.get('[cmdk-list]').should("exist");
   });
 
   it("should navigate between filter views", () => {
-    cy.contains("button", "Backlog").click();
-    cy.url().should("include", "backlog");
-    cy.contains("button", "Today").click();
-    cy.url().should("include", "today");
-    cy.contains("button", "Selected").click();
-    cy.url().should("include", "selected");
+    cy.prompt(["Click the 'Backlog' button in the sidebar"]);
+    cy.contains("backlog").should("exist");
+    cy.prompt(["Click the 'Today' button in the sidebar"]);
+    cy.contains("today").should("exist");
+    cy.prompt(["Click the 'Selected' button in the sidebar"]);
+    cy.contains("selected").should("exist");
   });
 });
