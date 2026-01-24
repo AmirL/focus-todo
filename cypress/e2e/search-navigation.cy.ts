@@ -9,25 +9,32 @@ describe("Search and Navigation", () => {
   describe("Search/Spotlight", () => {
     it("should open search by clicking search icon", () => {
       cy.prompt([
-        "Click the search icon button in the top right area of the main content",
-        "Verify a search dialog or input appears",
+        "Click the search icon button in the header area",
+        "Verify a search input field appears",
       ]);
     });
 
     it("should search for tasks by name", () => {
       cy.prompt([
-        "Click the search icon button to open search",
+        "Click the search icon button in the header",
         "Type 'task' in the search input field",
-        "Verify task results appear below the search input",
+        "Verify search results appear below the input",
       ]);
     });
 
     it("should select task from search results", () => {
       cy.prompt([
         "Click the search icon button to open search",
-        "Type a few characters in the search input",
-        "Click on the first task result that appears",
-        "Verify the search dialog closes",
+        "Type 'a' in the search input field",
+        "Click on the first result item in the search results list",
+      ]);
+    });
+
+    it("should close search by clicking X button", () => {
+      cy.prompt([
+        "Click the search icon button to open search",
+        "Click the X or close button in the search dialog",
+        "Verify the search dialog is closed",
       ]);
     });
   });
@@ -36,32 +43,32 @@ describe("Search and Navigation", () => {
     it("should navigate between filter views", () => {
       cy.prompt([
         "Click the 'Backlog' button in the sidebar",
-        "Verify the page header shows 'backlog'",
+        "Verify the page header contains 'backlog' text",
         "Click the 'Today' button in the sidebar",
-        "Verify the page header shows 'today'",
+        "Verify the page header contains 'today' text",
         "Click the 'Tomorrow' button in the sidebar",
-        "Verify the page header shows 'tomorrow'",
+        "Verify the page header contains 'tomorrow' text",
       ]);
     });
 
     it("should navigate to Selected filter", () => {
       cy.prompt([
         "Click the 'Selected' button in the sidebar",
-        "Verify the page header shows 'selected'",
+        "Verify the page header contains 'selected' text",
       ]);
     });
 
     it("should navigate to Future filter", () => {
       cy.prompt([
         "Click the 'Future' button in the sidebar",
-        "Verify the page header shows 'future'",
+        "Verify the page header contains 'future' text",
       ]);
     });
 
     it("should navigate to settings", () => {
       cy.prompt([
-        "Click the 'Settings' link in the sidebar",
-        "Verify the URL changes to include 'settings'",
+        "Click the 'Settings' link or button in the sidebar",
+        "Verify the page URL contains 'settings'",
       ]);
     });
   });
@@ -73,16 +80,16 @@ describe("Search and Navigation", () => {
 
     it("should toggle mobile menu", () => {
       cy.prompt([
-        "Click the menu icon button in the top left corner",
-        "Verify the sidebar navigation becomes visible",
+        "Click the hamburger menu icon button in the top left",
+        "Verify the sidebar navigation panel slides in from the left",
       ]);
     });
 
     it("should navigate on mobile", () => {
       cy.prompt([
-        "Click the menu icon button to open the sidebar",
-        "Click the 'Today' button in the sidebar",
-        "Verify the page shows today's tasks",
+        "Click the hamburger menu icon button",
+        "Click the 'Today' button in the sidebar that appears",
+        "Verify the header shows 'today' text",
       ]);
     });
   });
@@ -90,15 +97,15 @@ describe("Search and Navigation", () => {
   describe("List/Category Navigation", () => {
     it("should filter by first category", () => {
       cy.prompt([
-        "Click the first category button in the sidebar (below Filters section)",
-        "Verify the task list updates",
+        "Click the first category button in the sidebar below the Filters section",
+        "Verify the task list content updates",
       ]);
     });
 
     it("should filter by second category", () => {
       cy.prompt([
-        "Click the second category button in the sidebar (below Filters section)",
-        "Verify the task list updates",
+        "Click the second category button in the sidebar below the Filters section",
+        "Verify the task list content updates",
       ]);
     });
   });

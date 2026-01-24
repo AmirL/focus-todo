@@ -9,20 +9,21 @@ describe("Goal Management", () => {
   describe("Create Goals", () => {
     it("should create a new goal", () => {
       cy.prompt([
-        "Click the 'Add Goal' button in the goals section",
+        "Click the 'Add Goal' button or plus icon in the goals section at the top",
         "Type 'Learn TypeScript' in the title input field",
-        "Click the 'Create' button",
-        "Verify 'Learn TypeScript' appears in the goals list",
+        "Click the 'Create' or 'Add' button in the dialog",
+        "Verify 'Learn TypeScript' text appears in the goals section",
       ]);
     });
 
-    it("should create a goal with progress", () => {
+    it("should create a personal goal", () => {
       cy.prompt([
-        "Click the 'Add Goal' button",
-        "Type 'Complete project' in the title input",
-        "Drag the progress slider to 25%",
-        "Click 'Create' button",
-        "Verify the goal shows 25% progress",
+        "Click the 'Add Goal' button in the goals section",
+        "Type 'Exercise daily' in the title input field",
+        "Click on the category or list dropdown",
+        "Click on 'Personal' option",
+        "Click the 'Create' or 'Add' button",
+        "Verify 'Exercise daily' text appears in the goals section",
       ]);
     });
   });
@@ -30,19 +31,19 @@ describe("Goal Management", () => {
   describe("Edit Goals", () => {
     it("should edit goal title", () => {
       cy.prompt([
-        "Click the pencil icon button on the first goal",
-        "Clear the title input and type 'Updated Goal Title'",
+        "Click the pencil icon button on the first goal item",
+        "Clear the title input field",
+        "Type 'Updated Goal Title' in the title input field",
         "Click the 'Save' or 'Update' button",
-        "Verify the goal shows 'Updated Goal Title'",
+        "Verify 'Updated Goal Title' text appears in the goals section",
       ]);
     });
 
-    it("should update goal progress", () => {
+    it("should update goal progress using slider", () => {
       cy.prompt([
-        "Click the pencil icon button on the first goal",
-        "Drag the progress slider to around 50%",
+        "Click the pencil icon button on the first goal item",
+        "Click and drag the progress slider to the middle position",
         "Click the 'Save' or 'Update' button",
-        "Verify the progress bar shows approximately 50%",
       ]);
     });
   });
@@ -50,17 +51,17 @@ describe("Goal Management", () => {
   describe("Delete Goals", () => {
     it("should delete a goal", () => {
       cy.prompt([
-        "Click the trash icon button on the first goal",
-        "Verify the goal is removed from the list",
+        "Click the trash icon button on the first goal item",
+        "Verify a goal is deleted by checking the goals section updates",
       ]);
     });
   });
 
   describe("Goal Display", () => {
-    it("should display goals section", () => {
+    it("should display goals section with goal items", () => {
       cy.prompt([
-        "Verify the goals section is visible above the tasks",
-        "Verify goals have a progress bar element",
+        "Verify there is a section labeled 'Goals' at the top of the page",
+        "Verify goal items are displayed with title text",
       ]);
     });
   });

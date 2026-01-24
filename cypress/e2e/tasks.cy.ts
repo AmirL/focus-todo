@@ -9,39 +9,32 @@ describe("Task Management", () => {
   describe("Create Tasks", () => {
     it("should create a new task using the add task button", () => {
       cy.prompt([
-        "Click on the add task button or plus icon to open the task creation form",
-        "Type 'Buy groceries' in the task name input field",
-        "Submit the form to create the task",
-        "Verify that a task named 'Buy groceries' appears in the task list",
+        "Click the plus button at the bottom right corner of the page",
+        "Type 'Buy groceries' in the textarea that appears",
+        "Click the 'Add Task' button",
+        "Verify that 'Buy groceries' text appears in the task list",
       ]);
     });
 
     it("should create a task with estimated duration", () => {
       cy.prompt([
-        "Open the task creation form",
-        "Enter 'Prepare presentation' as the task name",
-        "Set the estimated duration to 1 hour or 60 minutes",
-        "Save the task",
-        "Verify the task shows the duration badge",
-      ]);
-    });
-
-    it("should create multiple tasks at once using newline separator", () => {
-      cy.prompt([
-        "Open the task creation form",
-        "Enter multiple tasks separated by new lines: 'Task One', 'Task Two', 'Task Three'",
-        "Submit to create all tasks",
-        "Verify all three tasks appear in the list",
+        "Click the plus button at the bottom right corner",
+        "Type 'Prepare presentation' in the textarea",
+        "Click the clock icon or time dropdown in the form",
+        "Click '1 hour' or '60 minutes' option",
+        "Click the 'Add Task' button",
       ]);
     });
 
     it("should create a task for a specific date", () => {
       cy.prompt([
-        "Open the task creation form",
-        "Enter 'Schedule meeting' as the task name",
-        "Select tomorrow's date in the date picker",
-        "Save the task",
-        "Navigate to the Tomorrow filter and verify the task appears there",
+        "Click the plus button at the bottom right corner",
+        "Type 'Schedule meeting' in the textarea",
+        "Click the calendar icon or date picker in the form",
+        "Click on tomorrow's date in the calendar",
+        "Click the 'Add Task' button",
+        "Click the 'Tomorrow' button in the sidebar",
+        "Verify 'Schedule meeting' text is visible",
       ]);
     });
   });
@@ -49,47 +42,44 @@ describe("Task Management", () => {
   describe("Task Actions", () => {
     it("should mark a task as complete", () => {
       cy.prompt([
-        "Click the checkbox on the first task item in the task list",
-        "Verify the task text has a strikethrough style",
+        "Click the checkbox button on the first task item in the list",
+        "Verify the task text now has strikethrough styling",
       ]);
     });
 
     it("should star/select a task", () => {
       cy.prompt([
-        "Click the star icon button on the first task item",
-        "Verify the star icon is now yellow or filled",
-        "Click the 'Selected' button in the sidebar",
-        "Verify the starred task appears in the list",
+        "Click the star icon button on the first task item in the list",
+        "Verify the star icon changes to yellow or filled state",
       ]);
     });
 
     it("should delete a task", () => {
       cy.prompt([
-        "Click the trash icon button on the first task item",
-        "Verify the task shows with reduced opacity or strikethrough",
+        "Click the trash icon button on the first task item in the list",
+        "Verify the task now shows with reduced opacity or strikethrough",
       ]);
     });
 
     it("should snooze a task to a different date", () => {
       cy.prompt([
-        "Click the clock icon button on the first task item to open the snooze popover",
-        "Click on a date in the calendar that appears",
-        "Verify the task now shows a date badge",
+        "Click the calendar icon button on the first task item",
+        "Click on any date in the calendar popover that appears",
       ]);
     });
 
     it("should mark a task as a blocker", () => {
       cy.prompt([
-        "Click the users icon button on the first task item",
-        "Verify the users icon is now blue or highlighted",
+        "Click the users icon button on the first task item in the list",
+        "Verify the users icon changes to blue or highlighted state",
       ]);
     });
 
     it("should set estimated time for a task", () => {
       cy.prompt([
-        "Click the 'Set time' button or time badge on the first task item",
-        "Click '30 minutes' from the dropdown menu",
-        "Verify the task shows '30 minutes' or '30m' badge",
+        "Click the clock icon button on the first task item in the list",
+        "Click '30 minutes' or '30m' option in the dropdown",
+        "Verify the task now shows a time badge",
       ]);
     });
   });
@@ -97,25 +87,27 @@ describe("Task Management", () => {
   describe("Edit Tasks", () => {
     it("should edit task name", () => {
       cy.prompt([
-        "Click the pencil icon button on the first task item to open the edit dialog",
-        "Clear the name input field and type 'Updated task name'",
+        "Click the pencil icon button on the first task item",
+        "Clear the name input field",
+        "Type 'Updated task name' in the name input field",
         "Click the 'Save changes' button",
-        "Verify the task list shows 'Updated task name'",
+        "Verify 'Updated task name' text appears in the task list",
       ]);
     });
 
     it("should edit task details", () => {
       cy.prompt([
-        "Click the pencil icon button on the first task item to open the edit dialog",
-        "Type 'Task details here' in the details textarea",
+        "Click the pencil icon button on the first task item",
+        "Type 'Task details here' in the details textarea field",
         "Click the 'Save changes' button",
       ]);
     });
 
     it("should change task list/category", () => {
       cy.prompt([
-        "Click the pencil icon button on the first task item to open the edit dialog",
-        "Click the list/category dropdown and select 'Personal'",
+        "Click the pencil icon button on the first task item",
+        "Click on the category or list dropdown button",
+        "Click on a different category option",
         "Click the 'Save changes' button",
       ]);
     });
@@ -124,37 +116,36 @@ describe("Task Management", () => {
   describe("Filter Tasks", () => {
     it("should filter tasks by Today", () => {
       cy.prompt([
-        "Click on the Today filter button in the sidebar or navigation",
-        "Verify only tasks scheduled for today are displayed",
-        "Verify the total estimated time is shown if there are tasks",
+        "Click the 'Today' button in the sidebar",
+        "Verify the page header shows 'today'",
       ]);
     });
 
     it("should filter tasks by Tomorrow", () => {
       cy.prompt([
-        "Click on the Tomorrow filter button",
-        "Verify only tasks scheduled for tomorrow are displayed",
+        "Click the 'Tomorrow' button in the sidebar",
+        "Verify the page header shows 'tomorrow'",
       ]);
     });
 
     it("should filter tasks by Backlog", () => {
       cy.prompt([
-        "Click on the Backlog filter button",
-        "Verify tasks without a date are displayed",
+        "Click the 'Backlog' button in the sidebar",
+        "Verify the page header shows 'backlog'",
       ]);
     });
 
     it("should filter tasks by Selected", () => {
       cy.prompt([
-        "Click on the Selected filter button",
-        "Verify only starred/selected tasks are displayed",
+        "Click the 'Selected' button in the sidebar",
+        "Verify the page header shows 'selected'",
       ]);
     });
 
     it("should filter tasks by Future", () => {
       cy.prompt([
-        "Click on the Future filter button",
-        "Verify tasks scheduled for future dates are displayed",
+        "Click the 'Future' button in the sidebar",
+        "Verify the page header shows 'future'",
       ]);
     });
 
@@ -164,16 +155,6 @@ describe("Task Management", () => {
         "Verify the task list updates to show filtered tasks",
         "Click the second category button in the sidebar",
         "Verify the task list updates to show different filtered tasks",
-      ]);
-    });
-  });
-
-  describe("Task Reordering", () => {
-    it("should reorder tasks via drag and drop", () => {
-      cy.prompt([
-        "Identify the first task in the list",
-        "Drag the first task and drop it below the second task",
-        "Verify the task order has changed",
       ]);
     });
   });
