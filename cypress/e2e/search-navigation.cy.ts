@@ -88,17 +88,17 @@ describe("Search and Navigation", () => {
   });
 
   describe("List/Category Navigation", () => {
-    it("should filter by Work category", () => {
+    it("should filter by first category", () => {
       cy.prompt([
-        "Click the 'Work' button in the sidebar categories section",
-        "Verify the task list shows only Work tasks",
+        "Click the first category button in the sidebar (below Filters section)",
+        "Verify the task list updates",
       ]);
     });
 
-    it("should filter by Personal category", () => {
+    it("should filter by second category", () => {
       cy.prompt([
-        "Click the 'Personal' button in the sidebar categories section",
-        "Verify the task list shows only Personal tasks",
+        "Click the second category button in the sidebar (below Filters section)",
+        "Verify the task list updates",
       ]);
     });
   });

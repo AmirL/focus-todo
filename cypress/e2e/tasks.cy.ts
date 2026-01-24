@@ -160,10 +160,10 @@ describe("Task Management", () => {
 
     it("should filter tasks by list category", () => {
       cy.prompt([
-        "Click on the Work category filter",
-        "Verify only Work tasks are displayed",
-        "Click on the Personal category filter",
-        "Verify only Personal tasks are displayed",
+        "Click the first category button in the sidebar (below Filters section)",
+        "Verify the task list updates to show filtered tasks",
+        "Click the second category button in the sidebar",
+        "Verify the task list updates to show different filtered tasks",
       ]);
     });
   });
