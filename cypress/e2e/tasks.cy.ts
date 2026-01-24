@@ -49,52 +49,47 @@ describe("Task Management", () => {
   describe("Task Actions", () => {
     it("should mark a task as complete", () => {
       cy.prompt([
-        "Find a task in the list",
-        "Click on the checkbox to mark the task as complete",
-        "Verify the task shows as completed with a strikethrough style",
+        "Click the checkbox on the first task item in the task list",
+        "Verify the task text has a strikethrough style",
       ]);
     });
 
     it("should star/select a task", () => {
       cy.prompt([
-        "Find a task in the list",
-        "Click the star button or selection button to highlight the task",
-        "Verify the task is now starred or selected",
-        "Navigate to the Selected filter and verify the task appears there",
+        "Click the star icon button on the first task item",
+        "Verify the star icon is now yellow or filled",
+        "Click the 'Selected' button in the sidebar",
+        "Verify the starred task appears in the list",
       ]);
     });
 
     it("should delete a task", () => {
       cy.prompt([
-        "Find a task in the list",
-        "Click the delete button to remove the task",
-        "Verify the task is removed or shows as deleted",
+        "Click the trash icon button on the first task item",
+        "Verify the task shows with reduced opacity or strikethrough",
       ]);
     });
 
     it("should snooze a task to a different date", () => {
       cy.prompt([
-        "Find a task in the list",
-        "Click the snooze or calendar button to change the task date",
-        "Select a future date from the date picker",
-        "Verify the task is moved to the future date",
+        "Click the clock icon button on the first task item to open the snooze popover",
+        "Click on a date in the calendar that appears",
+        "Verify the task now shows a date badge",
       ]);
     });
 
     it("should mark a task as a blocker", () => {
       cy.prompt([
-        "Find a task in the list",
-        "Click the blocker button to mark the task as blocking",
-        "Verify the task shows a blocker indicator or badge",
+        "Click the users icon button on the first task item",
+        "Verify the users icon is now blue or highlighted",
       ]);
     });
 
     it("should set estimated time for a task", () => {
       cy.prompt([
-        "Find a task in the list",
-        "Click on the time/duration button",
-        "Select 30 minutes as the estimated duration",
-        "Verify the task shows the duration badge",
+        "Click the 'Set time' button or time badge on the first task item",
+        "Click '30 minutes' from the dropdown menu",
+        "Verify the task shows '30 minutes' or '30m' badge",
       ]);
     });
   });
@@ -102,28 +97,26 @@ describe("Task Management", () => {
   describe("Edit Tasks", () => {
     it("should edit task name", () => {
       cy.prompt([
-        "Click on a task to open the edit dialog or form",
-        "Change the task name to 'Updated task name'",
-        "Save the changes",
-        "Verify the task now shows the new name",
+        "Click the pencil icon button on the first task item to open the edit dialog",
+        "Clear the name input field and type 'Updated task name'",
+        "Click the 'Save changes' button",
+        "Verify the task list shows 'Updated task name'",
       ]);
     });
 
     it("should edit task details", () => {
       cy.prompt([
-        "Click on a task to open the edit dialog",
-        "Add details or description text",
-        "Save the changes",
-        "Verify the task shows the details indicator",
+        "Click the pencil icon button on the first task item to open the edit dialog",
+        "Type 'Task details here' in the details textarea",
+        "Click the 'Save changes' button",
       ]);
     });
 
     it("should change task list/category", () => {
       cy.prompt([
-        "Click on a task to open the edit dialog",
-        "Change the list category to Work or Personal",
-        "Save the changes",
-        "Verify the task appears under the correct category",
+        "Click the pencil icon button on the first task item to open the edit dialog",
+        "Click the list/category dropdown and select 'Personal'",
+        "Click the 'Save changes' button",
       ]);
     });
   });

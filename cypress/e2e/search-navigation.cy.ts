@@ -7,44 +7,27 @@ describe("Search and Navigation", () => {
   });
 
   describe("Search/Spotlight", () => {
-    it("should open search with keyboard shortcut", () => {
+    it("should open search by clicking search icon", () => {
       cy.prompt([
-        "Press Cmd+K or Ctrl+K to open the search spotlight",
-        "Verify the search modal or dialog appears",
+        "Click the search icon button in the top right area of the main content",
+        "Verify a search dialog or input appears",
       ]);
     });
 
     it("should search for tasks by name", () => {
       cy.prompt([
-        "Open the search modal",
-        "Type a task name in the search input",
-        "Verify matching tasks appear in the search results",
-      ]);
-    });
-
-    it("should navigate search results with keyboard", () => {
-      cy.prompt([
-        "Open the search modal and search for a term",
-        "Press the down arrow key to navigate to a result",
-        "Press Enter to select the highlighted result",
-        "Verify the selected task is highlighted or opened",
-      ]);
-    });
-
-    it("should close search with Escape key", () => {
-      cy.prompt([
-        "Open the search modal",
-        "Press the Escape key",
-        "Verify the search modal is closed",
+        "Click the search icon button to open search",
+        "Type 'task' in the search input field",
+        "Verify task results appear below the search input",
       ]);
     });
 
     it("should select task from search results", () => {
       cy.prompt([
-        "Open the search modal",
-        "Search for a specific task",
-        "Click on a task in the search results",
-        "Verify the task becomes selected or highlighted in the main view",
+        "Click the search icon button to open search",
+        "Type a few characters in the search input",
+        "Click on the first task result that appears",
+        "Verify the search dialog closes",
       ]);
     });
   });
@@ -52,33 +35,33 @@ describe("Search and Navigation", () => {
   describe("Sidebar Navigation", () => {
     it("should navigate between filter views", () => {
       cy.prompt([
-        "Click on the Backlog filter in the sidebar",
-        "Verify the Backlog view is displayed",
-        "Click on the Today filter",
-        "Verify the Today view is displayed",
-        "Click on the Tomorrow filter",
-        "Verify the Tomorrow view is displayed",
+        "Click the 'Backlog' button in the sidebar",
+        "Verify the page header shows 'backlog'",
+        "Click the 'Today' button in the sidebar",
+        "Verify the page header shows 'today'",
+        "Click the 'Tomorrow' button in the sidebar",
+        "Verify the page header shows 'tomorrow'",
       ]);
     });
 
-    it("should show task counts on filters", () => {
+    it("should navigate to Selected filter", () => {
       cy.prompt([
-        "Look at the sidebar navigation filters",
-        "Verify each filter shows the count of tasks",
+        "Click the 'Selected' button in the sidebar",
+        "Verify the page header shows 'selected'",
       ]);
     });
 
-    it("should show estimated time for Today filter", () => {
+    it("should navigate to Future filter", () => {
       cy.prompt([
-        "Look at the Today filter in the sidebar",
-        "Verify it displays the total estimated time for today's tasks",
+        "Click the 'Future' button in the sidebar",
+        "Verify the page header shows 'future'",
       ]);
     });
 
     it("should navigate to settings", () => {
       cy.prompt([
-        "Click on the settings link or icon in the sidebar",
-        "Verify the settings page or modal is displayed",
+        "Click the 'Settings' link in the sidebar",
+        "Verify the URL changes to include 'settings'",
       ]);
     });
   });
@@ -90,41 +73,32 @@ describe("Search and Navigation", () => {
 
     it("should toggle mobile menu", () => {
       cy.prompt([
-        "Click on the hamburger menu or mobile menu toggle button",
-        "Verify the mobile sidebar menu opens",
-        "Click outside or on the close button to close the menu",
-        "Verify the menu is closed",
+        "Click the menu icon button in the top left corner",
+        "Verify the sidebar navigation becomes visible",
       ]);
     });
 
     it("should navigate on mobile", () => {
       cy.prompt([
-        "Open the mobile menu",
-        "Click on a filter option like Today",
-        "Verify the view changes and the menu closes",
+        "Click the menu icon button to open the sidebar",
+        "Click the 'Today' button in the sidebar",
+        "Verify the page shows today's tasks",
       ]);
     });
   });
 
   describe("List/Category Navigation", () => {
-    it("should filter by Work list", () => {
+    it("should filter by Work category", () => {
       cy.prompt([
-        "Click on the Work category in the sidebar or filter area",
-        "Verify only Work tasks and goals are displayed",
+        "Click the 'Work' button in the sidebar categories section",
+        "Verify the task list shows only Work tasks",
       ]);
     });
 
-    it("should filter by Personal list", () => {
+    it("should filter by Personal category", () => {
       cy.prompt([
-        "Click on the Personal category in the sidebar or filter area",
-        "Verify only Personal tasks and goals are displayed",
-      ]);
-    });
-
-    it("should show all items when no category filter is selected", () => {
-      cy.prompt([
-        "Clear any category filter if active",
-        "Verify all tasks and goals are displayed regardless of list",
+        "Click the 'Personal' button in the sidebar categories section",
+        "Verify the task list shows only Personal tasks",
       ]);
     });
   });

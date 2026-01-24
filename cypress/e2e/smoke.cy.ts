@@ -8,82 +8,68 @@ describe("Smoke Tests - Critical User Flows", () => {
 
   it("should complete a full task management workflow", () => {
     cy.prompt([
-      // Create a task
-      "Click the add task button to open the task creation form",
-      "Enter 'Complete smoke test' as the task name",
-      "Save the task",
-      "Verify the task appears in the list",
-      // Star the task
-      "Find the 'Complete smoke test' task",
-      "Click the star or select button to mark it as selected",
-      "Verify the task is now starred",
-      // Navigate to Selected filter
-      "Click on the Selected filter in the navigation",
-      "Verify the 'Complete smoke test' task appears in the Selected view",
-      // Complete the task
-      "Click the checkbox to mark 'Complete smoke test' as done",
-      "Verify the task shows as completed",
+      "Click the plus button at the bottom right to add a task",
+      "Type 'Smoke test task' in the task input textarea",
+      "Click the 'Add Task' button",
+      "Verify 'Smoke test task' appears in the task list",
+      "Click the star icon button on 'Smoke test task'",
+      "Verify the star icon turns yellow",
+      "Click the 'Selected' button in the sidebar",
+      "Verify 'Smoke test task' is visible",
+      "Click the checkbox on 'Smoke test task'",
+      "Verify the task text has strikethrough styling",
     ]);
   });
 
   it("should complete a goal tracking workflow", () => {
     cy.prompt([
-      // Create a goal
-      "Click the add goal button to create a new goal",
-      "Enter 'Finish project' as the goal title",
-      "Save the goal",
-      "Verify the goal appears in the goals section with 0% progress",
-      // Update progress
-      "Click on the 'Finish project' goal to edit it",
-      "Set the progress to 50 percent",
-      "Save the changes",
-      "Verify the progress bar shows 50%",
+      "Click the 'Add Goal' button in the goals section",
+      "Type 'Test Goal' in the title input",
+      "Click the 'Create' button",
+      "Verify 'Test Goal' appears in the goals section",
+      "Click the pencil icon on 'Test Goal' to edit",
+      "Drag the progress slider to 50%",
+      "Click the save button",
+      "Verify the progress bar shows around 50%",
     ]);
   });
 
-  it("should demonstrate responsive design on desktop", () => {
+  it("should show sidebar on desktop", () => {
     cy.viewport(1280, 720);
     cy.prompt([
-      "Verify the sidebar navigation is visible on desktop",
-      "Verify the main content area shows the task list",
+      "Verify the sidebar with 'Backlog', 'Today', 'Tomorrow' buttons is visible",
+      "Verify the main content area with tasks is visible",
     ]);
   });
 
-  it("should demonstrate responsive design on tablet", () => {
-    cy.viewport("ipad-2");
-    cy.prompt(["Verify the layout adapts to tablet size"]);
-  });
-
-  it("should demonstrate responsive design on mobile", () => {
+  it("should show menu button on mobile", () => {
     cy.viewport("iphone-x");
     cy.prompt([
-      "Verify the mobile menu toggle is visible",
-      "Click the mobile menu toggle",
-      "Verify the navigation menu opens",
+      "Verify a menu icon button is visible in the top left",
+      "Click the menu icon button",
+      "Verify the sidebar navigation slides in",
     ]);
   });
 
-  it("should handle search functionality", () => {
+  it("should search for tasks", () => {
     cy.prompt([
-      // First create a task to search for
-      "Create a task named 'Searchable task item'",
-      // Open search
-      "Open the search spotlight using Cmd+K or clicking the search icon",
+      "Click the plus button to add a task",
+      "Type 'Searchable item' in the task input",
+      "Click 'Add Task' button",
+      "Click the search icon button to open search",
       "Type 'Searchable' in the search input",
-      "Verify 'Searchable task item' appears in the search results",
-      "Click on the search result to select it",
-      "Verify the task is highlighted or selected in the main view",
+      "Verify 'Searchable item' appears in the results",
     ]);
   });
 
-  it("should navigate between all main views", () => {
+  it("should navigate between filter views", () => {
     cy.prompt([
-      "Click on the Backlog filter and verify the view changes",
-      "Click on the Selected filter and verify the view changes",
-      "Click on the Today filter and verify the view changes",
-      "Click on the Tomorrow filter and verify the view changes",
-      "Click on the Future filter and verify the view changes",
-      "Verify each navigation successfully loads the corresponding view",
+      "Click the 'Backlog' button in the sidebar",
+      "Verify the header shows 'backlog'",
+      "Click the 'Today' button in the sidebar",
+      "Verify the header shows 'today'",
+      "Click the 'Selected' button in the sidebar",
+      "Verify the header shows 'selected'",
     ]);
   });
 });

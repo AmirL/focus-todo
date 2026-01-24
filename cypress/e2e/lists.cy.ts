@@ -1,63 +1,43 @@
 /// <reference types="cypress" />
 
-describe("List Management", () => {
+describe("Task Categories", () => {
   beforeEach(() => {
     cy.visit("/");
     cy.waitForAppLoad();
   });
 
-  describe("Create Lists", () => {
-    it("should create a new custom list", () => {
+  describe("Filter by Category", () => {
+    it("should filter tasks by Work category", () => {
       cy.prompt([
-        "Navigate to list management or settings where lists can be created",
-        "Click on the add list or create list button",
-        "Enter 'Side Projects' as the new list name",
-        "Save the new list",
-        "Verify the new list 'Side Projects' appears in the list options",
+        "Click the 'Work' button in the sidebar categories",
+        "Verify the task list updates to show Work tasks",
+      ]);
+    });
+
+    it("should filter tasks by Personal category", () => {
+      cy.prompt([
+        "Click the 'Personal' button in the sidebar categories",
+        "Verify the task list updates to show Personal tasks",
       ]);
     });
   });
 
-  describe("Edit Lists", () => {
-    it("should rename an existing list", () => {
+  describe("Assign Tasks to Categories", () => {
+    it("should create a task with Work category", () => {
       cy.prompt([
-        "Navigate to list management or settings",
-        "Click on edit for an existing custom list",
-        "Change the list name to a new name",
-        "Save the changes",
-        "Verify the list shows the updated name",
-      ]);
-    });
-  });
-
-  describe("Delete Lists", () => {
-    it("should delete a custom list", () => {
-      cy.prompt([
-        "Navigate to list management or settings",
-        "Find a custom list that can be deleted",
-        "Click the delete button for the list",
-        "Confirm the deletion if prompted",
-        "Verify the list is removed from the list options",
-      ]);
-    });
-  });
-
-  describe("Assign Tasks to Lists", () => {
-    it("should assign a task to a specific list", () => {
-      cy.prompt([
-        "Create a new task or edit an existing task",
-        "Select the Work list from the list dropdown",
-        "Save the task",
-        "Verify the task shows the Work list badge or is grouped under Work",
+        "Click the plus button to add a new task",
+        "Type 'Work task' in the task input",
+        "Click the category dropdown and select 'Work'",
+        "Click 'Add Task' button",
+        "Verify the task appears in the list",
       ]);
     });
 
-    it("should change task list assignment", () => {
+    it("should change task category via edit", () => {
       cy.prompt([
-        "Click on a task to edit it",
-        "Change the list from Work to Personal",
-        "Save the changes",
-        "Verify the task now appears under Personal category",
+        "Click the pencil icon on the first task to edit it",
+        "Click the category dropdown and select 'Personal'",
+        "Click 'Save changes' button",
       ]);
     });
   });

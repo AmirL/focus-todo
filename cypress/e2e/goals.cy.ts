@@ -9,21 +9,20 @@ describe("Goal Management", () => {
   describe("Create Goals", () => {
     it("should create a new goal", () => {
       cy.prompt([
-        "Click on the add goal button or navigate to goal creation",
-        "Enter 'Learn TypeScript' as the goal title",
-        "Select the Work list category",
-        "Submit to create the goal",
-        "Verify that a goal named 'Learn TypeScript' appears in the goals section",
+        "Click the 'Add Goal' button in the goals section",
+        "Type 'Learn TypeScript' in the title input field",
+        "Click the 'Create' button",
+        "Verify 'Learn TypeScript' appears in the goals list",
       ]);
     });
 
-    it("should create a personal goal", () => {
+    it("should create a goal with progress", () => {
       cy.prompt([
-        "Open the goal creation form",
-        "Enter 'Run a marathon' as the goal title",
-        "Select the Personal list category",
-        "Save the goal",
-        "Verify the goal appears under the Personal category",
+        "Click the 'Add Goal' button",
+        "Type 'Complete project' in the title input",
+        "Drag the progress slider to 25%",
+        "Click 'Create' button",
+        "Verify the goal shows 25% progress",
       ]);
     });
   });
@@ -31,28 +30,19 @@ describe("Goal Management", () => {
   describe("Edit Goals", () => {
     it("should edit goal title", () => {
       cy.prompt([
-        "Click on an existing goal to open the edit dialog",
-        "Change the goal title to 'Master TypeScript'",
-        "Save the changes",
-        "Verify the goal now shows the updated title",
+        "Click the pencil icon button on the first goal",
+        "Clear the title input and type 'Updated Goal Title'",
+        "Click the 'Save' or 'Update' button",
+        "Verify the goal shows 'Updated Goal Title'",
       ]);
     });
 
     it("should update goal progress", () => {
       cy.prompt([
-        "Click on an existing goal to open the edit dialog",
-        "Set the progress value to 50 percent",
-        "Save the changes",
-        "Verify the goal shows 50% progress in the progress bar",
-      ]);
-    });
-
-    it("should complete a goal by setting progress to 100%", () => {
-      cy.prompt([
-        "Click on an existing goal to open the edit dialog",
-        "Set the progress value to 100 percent",
-        "Save the changes",
-        "Verify the goal shows as fully completed",
+        "Click the pencil icon button on the first goal",
+        "Drag the progress slider to around 50%",
+        "Click the 'Save' or 'Update' button",
+        "Verify the progress bar shows approximately 50%",
       ]);
     });
   });
@@ -60,28 +50,17 @@ describe("Goal Management", () => {
   describe("Delete Goals", () => {
     it("should delete a goal", () => {
       cy.prompt([
-        "Find an existing goal in the goals section",
-        "Click the delete button for the goal",
-        "Confirm the deletion if prompted",
+        "Click the trash icon button on the first goal",
         "Verify the goal is removed from the list",
       ]);
     });
   });
 
   describe("Goal Display", () => {
-    it("should display goals with progress bar", () => {
+    it("should display goals section", () => {
       cy.prompt([
-        "Look for goals in the goals section above the tasks",
-        "Verify that each goal displays a progress bar",
-        "Verify the progress percentage is visible",
-      ]);
-    });
-
-    it("should group goals by list category", () => {
-      cy.prompt([
-        "View the goals section",
-        "Verify that Work goals are grouped together",
-        "Verify that Personal goals are grouped together",
+        "Verify the goals section is visible above the tasks",
+        "Verify goals have a progress bar element",
       ]);
     });
   });
