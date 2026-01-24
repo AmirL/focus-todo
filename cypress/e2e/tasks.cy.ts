@@ -38,6 +38,8 @@ describe("Task Management", () => {
     });
 
     it("should star/select a task", () => {
+      // Hover on task to reveal action buttons, then click star
+      cy.get('[data-testid^="task-"]').first().trigger('mouseover');
       cy.get('[data-testid^="star-task-"]').first().click({ force: true });
       // Button should have yellow text class when selected
       cy.get('[data-testid^="star-task-"]').first().should('have.class', 'text-yellow-500');

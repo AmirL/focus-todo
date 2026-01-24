@@ -15,8 +15,8 @@ describe("Search and Navigation", () => {
     it("should search for tasks by name", () => {
       cy.prompt(["Click the search icon button in the header"]);
       cy.get('input[placeholder*="Search"]').type("task");
-      // Verify search results container appears
-      cy.get('[role="listbox"], [cmdk-list], [data-radix-scroll-area-viewport]').should("exist");
+      // Verify search results list appears (ul with divide-y class)
+      cy.get('ul.divide-y').should("exist");
     });
 
     it("should close search dialog", () => {
