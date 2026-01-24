@@ -38,11 +38,15 @@ describe("Task Management", () => {
     });
 
     it("should star/select a task", () => {
-      // Hover on task to reveal action buttons, then click star
-      cy.get('[data-testid^="task-"]').first().trigger('mouseover');
-      cy.get('[data-testid^="star-task-"]').first().click({ force: true });
-      // Button should have yellow text class when selected
-      cy.get('[data-testid^="star-task-"]').first().should('have.class', 'text-yellow-500');
+      // Get the first task name to verify later
+      cy.get('[data-testid^="task-"]').first().invoke('text').then((taskText) => {
+        // Hover and click star
+        cy.get('[data-testid^="task-"]').first().trigger('mouseover');
+        cy.get('[data-testid^="star-task-"]').first().click({ force: true });
+        // Navigate to Selected and verify task appears there
+        cy.prompt(["Click the 'Selected' button in the sidebar"]);
+        cy.contains(taskText.slice(0, 20)).should("exist");
+      });
     });
 
     it("should delete a task", () => {
