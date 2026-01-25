@@ -56,7 +56,9 @@ describe("Task Management", () => {
 
     it("should snooze a task to a different date", () => {
       cy.get('[data-testid^="snooze-task-"]').first().click();
-      cy.get('[role="gridcell"]').not('[disabled]').first().click();
+      // Wait for calendar popover to be visible and click a date
+      cy.get('[role="grid"]').should('be.visible');
+      cy.get('[role="gridcell"] button').not('[disabled]').first().click({ force: true });
     });
 
     it("should mark a task as a blocker", () => {
