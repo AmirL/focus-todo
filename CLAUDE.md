@@ -63,13 +63,21 @@ This project follows **Feature-Sliced Design (FSD)** architecture. For complete 
 
 ### API Routes Pattern
 
-API routes follow RESTful patterns:
+**Session-based routes** (internal, require Better Auth session):
 
 - GET `/api/get-tasks` and `/api/get-goals`
 - POST `/api/create-task` and `/api/create-goal`
 - PUT `/api/update-task` and `/api/update-goal`
 
-All API routes require admin authentication via Better Auth.
+**External Task API** (API key authentication):
+
+Full RESTful API for programmatic task management. See [`docs/TASK_API.md`](./docs/TASK_API.md) for complete documentation.
+
+- `GET /api/tasks` - List tasks with filtering
+- `GET /api/tasks/:id` - Get single task
+- `POST /api/tasks` - Create task
+- `PATCH /api/tasks/:id` - Update task
+- `DELETE /api/tasks/:id` - Delete task (soft/permanent)
 
 ### Development Notes
 
