@@ -107,4 +107,26 @@ describe("Task Management", () => {
       cy.contains("future").should("exist");
     });
   });
+
+  describe("Temporary Selection (Blue Highlight)", () => {
+    it("should allow blue selection only in Selected filter", () => {
+      // First, star a task to make it appear in Selected filter
+      cy.get('[data-testid^="task-"]').first().trigger('mouseover');
+      cy.get('[data-testid^="star-task-"]').first().click({ force: true });
+
+      // Navigate to Selected filter
+      cy.navigateToFilter("selected");
+
+      // Click on a task in Selected filter - should get blue background
+      cy.get('[data-testid^="task-"]').first().click();
+      cy.get('[data-testid^="task-"]').first().should('have.class', 'bg-blue-50');
+
+      // Navigate to Backlog filter
+      cy.navigateToFilter("backlog");
+
+      // Click on a task in Backlog filter - should NOT get blue background
+      cy.get('[data-testid^="task-"]').first().click();
+      cy.get('[data-testid^="task-"]').first().should('not.have.class', 'bg-blue-50');
+    });
+  });
 });

@@ -8,6 +8,7 @@ import { TaskBadges } from './TaskBadges';
 import { TaskDetails } from './TaskDetails';
 import { TaskName } from './TaskName';
 import { useTempSelectStore } from '@/features/tasks/temp-select';
+import { useFilterStore, StatusFilterEnum } from '@/features/tasks/filter/model/filterStore';
 
 interface TaskProps {
   task: TaskModel;
@@ -22,6 +23,7 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
   const toggleTaskCompleted = useToggleTaskCompleted();
   const { toggleSelection, isSelected: isTempSelected } = useTempSelectStore();
   const isTempSelectedTask = isTempSelected(task.id);
+  const { statusFilter } = useFilterStore();
 
   const onCheckboxClick = async () => {
     if (deleted) return;
@@ -31,6 +33,9 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
   const handleTaskClick = (e: React.MouseEvent<HTMLLIElement>) => {
     // Don't select if task is deleted
     if (deleted) return;
+
+    // Only allow selection in the Selected filter
+    if (statusFilter !== StatusFilterEnum.SELECTED) return;
 
     // Check if click was on an interactive element
     const target = e.target as HTMLElement;
