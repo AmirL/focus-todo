@@ -1,0 +1,17 @@
+{
+  "workGoal": {
+    "title": "Complete Q1 objectives",
+    "list": "Work",
+    "progress": 25
+  },
+  "personalGoal": {
+    "title": "Learn a new language",
+    "list": "Personal",
+    "progress": 10
+  },
+  "completedGoal": {
+    "title": "Finish online course",
+    "list": "Work",
+    "progress": 100
+  }
+}

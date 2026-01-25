@@ -12,7 +12,13 @@
     "start": "next start",
     "lint": "next lint",
     "db:generate": "npx drizzle-kit generate",
-    "db:migrate": "npx drizzle-kit migrate"
+    "db:migrate": "npx drizzle-kit migrate",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "cy:run:record": "cypress run --record"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["cypress", "esbuild", "unrs-resolver"]
   },
   "dependencies": {
     "@babel/runtime": "^7.26.0",
@@ -65,9 +71,11 @@
     "@babel/plugin-transform-private-methods": "^7.25.9",
     "@babel/plugin-transform-private-property-in-object": "^7.25.9",
     "@babel/plugin-transform-runtime": "^7.25.9",
+    "@cypress/grep": "^5.1.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "cypress": "^15.9.0",
     "dependency-cruiser": "^16.10.0",
     "drizzle-kit": "^0.28.1",
     "eslint": "^8",

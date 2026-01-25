@@ -39,3 +39,8 @@ drizzle.config.json
 # PWA build artifacts
 public/sw.js
 public/workbox-*.js
+
+# Cypress
+cypress/videos
+cypress/screenshots
+cypress/downloads

@@ -1,0 +1,19 @@
+{
+  "sampleTask": {
+    "name": "Test Task",
+    "details": "This is a test task description",
+    "estimatedDuration": 30
+  },
+  "workTask": {
+    "name": "Work Meeting Prep",
+    "details": "Prepare slides for quarterly review",
+    "list": "Work",
+    "estimatedDuration": 60
+  },
+  "personalTask": {
+    "name": "Grocery Shopping",
+    "details": "Buy milk, eggs, and bread",
+    "list": "Personal",
+    "estimatedDuration": 45
+  }
+}
