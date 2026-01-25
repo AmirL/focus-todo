@@ -56,13 +56,13 @@ describe("Task Management", () => {
 
     it("should snooze a task to a different date", () => {
       cy.get('[data-testid^="snooze-task-"]').first().click();
-      // Wait for calendar popover to be visible
-      cy.get('[role="grid"]').should('be.visible');
-      // Navigate to next month to ensure we have valid days to select
-      // react-day-picker uses aria-label for nav buttons
-      cy.get('button[aria-label="Go to next month"]').click();
-      // Click the 15th day which should always be visible and valid
-      cy.get('[role="gridcell"] button').contains('15').click({ force: true });
+      // Wait for calendar popover content to be visible
+      cy.get('[data-radix-popper-content-wrapper]').should('be.visible');
+      // Navigate to next month using the right-positioned nav button
+      cy.get('[data-radix-popper-content-wrapper] button.absolute.right-1').click();
+      // Wait for calendar to update then click a day in the middle (index 15 = ~middle of month)
+      cy.wait(300);
+      cy.get('[role="gridcell"] button').not('.day-outside').eq(10).click({ force: true });
     });
 
     it("should mark a task as a blocker", () => {
