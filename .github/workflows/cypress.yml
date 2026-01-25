@@ -12,27 +12,29 @@ jobs:
       - name: Check if PR deployment (skip if so)
         id: check-pr
         run: |
-          REF="${{ github.event.deployment_status.deployment.ref }}"
-          echo "Deployment ref: $REF"
+          ENV_URL="${{ github.event.deployment_status.environment_url }}"
+          ENV_NAME="${{ github.event.deployment_status.environment }}"
+          echo "Environment URL: $ENV_URL"
+          echo "Environment name: $ENV_NAME"
 
-          # Always run tests for main branch deployments
-          if [ "$REF" = "main" ] || [ "$REF" = "master" ]; then
+          # Production deployments: always run tests
+          # Production URL is doable-tasks.vercel.app (no hash in subdomain)
+          if [ "$ENV_NAME" = "Production" ] || [ "$ENV_NAME" = "production" ]; then
             echo "skip=false" >> $GITHUB_OUTPUT
-            echo "Running: This is a main branch deployment"
+            echo "Running: This is a production deployment"
             exit 0
           fi
 
-          # For other branches, check if there's an open PR (skip to avoid duplicate runs)
-          PR_COUNT=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls?state=open&head=${{ github.repository_owner }}:$REF" \
-            | jq length)
-          if [ "$PR_COUNT" -gt 0 ]; then
-            echo "skip=true" >> $GITHUB_OUTPUT
-            echo "Skipping: This is a PR preview deployment"
-          else
+          # Also check URL pattern - production doesn't have the hash pattern
+          if echo "$ENV_URL" | grep -qE "^https://doable-tasks\.vercel\.app"; then
             echo "skip=false" >> $GITHUB_OUTPUT
-            echo "Running: This is a branch push deployment (no open PR)"
+            echo "Running: This is a production URL deployment"
+            exit 0
           fi
+
+          # Preview deployments - skip to avoid duplicate runs with PR checks
+          echo "skip=true" >> $GITHUB_OUTPUT
+          echo "Skipping: This is a preview deployment"
 
       - name: Get branch name from deployment
         if: steps.check-pr.outputs.skip != 'true'
