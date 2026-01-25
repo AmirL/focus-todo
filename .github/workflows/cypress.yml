@@ -18,23 +18,38 @@ jobs:
           echo "Environment name: $ENV_NAME"
 
           # Production deployments: always run tests
-          # Production URL is doable-tasks.vercel.app (no hash in subdomain)
           if [ "$ENV_NAME" = "Production" ] || [ "$ENV_NAME" = "production" ]; then
             echo "skip=false" >> $GITHUB_OUTPUT
             echo "Running: This is a production deployment"
             exit 0
           fi
 
-          # Also check URL pattern - production doesn't have the hash pattern
+          # Also check URL pattern for production
           if echo "$ENV_URL" | grep -qE "^https://doable-tasks\.vercel\.app"; then
             echo "skip=false" >> $GITHUB_OUTPUT
             echo "Running: This is a production URL deployment"
             exit 0
           fi
 
-          # Preview deployments - skip to avoid duplicate runs with PR checks
-          echo "skip=true" >> $GITHUB_OUTPUT
-          echo "Skipping: This is a preview deployment"
+          # Preview deployment - extract branch from URL and check for open PR
+          # URL format: https://doable-{branch}-{hash}-{user}.vercel.app
+          # Extract everything between "doable-" and the hash pattern
+          BRANCH=$(echo "$ENV_URL" | sed -E 's|https://doable-(.+)-[a-z0-9]+-[^.]+\.vercel\.app|\1|')
+          echo "Extracted branch: $BRANCH"
+
+          # Check if there's an open PR for this branch
+          PR_COUNT=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls?state=open&head=${{ github.repository_owner }}:$BRANCH" \
+            | jq length)
+          echo "Open PRs for branch: $PR_COUNT"
+
+          if [ "$PR_COUNT" -gt 0 ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "Skipping: PR exists for this branch (avoiding duplicate run)"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "Running: No open PR, running tests for branch deployment"
+          fi
 
       - name: Get branch name from deployment
         if: steps.check-pr.outputs.skip != 'true'
