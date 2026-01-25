@@ -60,9 +60,9 @@ describe("Task Management", () => {
       cy.get('[role="grid"]', { timeout: 15000 }).scrollIntoView().should('exist');
       // Click next month button with force to handle any overflow issues
       cy.get('button.absolute.right-1').click({ force: true });
-      // Wait for month change and select a day
+      // Wait for month change and select a day - use simple button selector within grid
       cy.wait(500);
-      cy.get('td[role="gridcell"] > button').not('.day-outside').eq(10).click({ force: true });
+      cy.get('[role="grid"] button.h-8.w-8').not('.day-outside').eq(10).click({ force: true });
     });
 
     it("should mark a task as a blocker", () => {
