@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // Routes that don't require authentication
-const publicRoutes = ["/login", "/api/auth"];
+// /api/tasks uses API key auth, handled in the route itself
+const publicRoutes = ["/login", "/api/auth", "/api/tasks"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
