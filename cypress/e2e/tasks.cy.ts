@@ -59,9 +59,10 @@ describe("Task Management", () => {
       // Wait for calendar popover to be visible
       cy.get('[role="grid"]').should('be.visible');
       // Navigate to next month to ensure we have valid days to select
-      cy.get('button[name="next-month"]').click();
-      // Click a day that's not outside the current month view
-      cy.get('[role="gridcell"] button').not('[disabled]').not('.day-outside').first().click({ force: true });
+      // react-day-picker uses aria-label for nav buttons
+      cy.get('button[aria-label="Go to next month"]').click();
+      // Click the 15th day which should always be visible and valid
+      cy.get('[role="gridcell"] button').contains('15').click({ force: true });
     });
 
     it("should mark a task as a blocker", () => {
