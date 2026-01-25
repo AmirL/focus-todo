@@ -4,6 +4,7 @@ import { and, eq, gt, gte, isNull, lt, or, isNotNull } from 'drizzle-orm';
 import dayjs from 'dayjs';
 import { tasksTable } from '@/shared/lib/drizzle/schema';
 import { getUserIdFromApiKey } from '@/app/api/api-auth';
+import { parseDateFields, TaskDateKeys } from '@/shared/lib/utils';
 
 function parseBool(v: string | null, def = false) {
   if (v == null) return def;
@@ -179,6 +180,87 @@ export async function GET(req: NextRequest) {
     const status = isAuth ? 401 : 500;
     if (!isAuth) {
       console.error('Error in GET /api/tasks:', error);
+    }
+    return NextResponse.json({ error: msg }, { status });
+  }
+}
+
+/**
+ * POST /api/tasks - Create a new task
+ *
+ * Body: Task object with required fields (name, list)
+ * Returns: Created task with assigned ID
+ */
+export async function POST(req: NextRequest) {
+  try {
+    const userId = await getUserIdFromApiKey(req);
+
+    const body = await req.json();
+
+    // Validate required fields
+    if (!body.name || typeof body.name !== 'string' || body.name.trim() === '') {
+      return NextResponse.json({ error: 'Task name is required' }, { status: 400 });
+    }
+
+    if (!body.list || typeof body.list !== 'string') {
+      return NextResponse.json({ error: 'Task list is required' }, { status: 400 });
+    }
+
+    // Remove fields that should be set server-side
+    const { id: _id, userId: _userId, createdAt: _createdAt, ...taskFields } = body;
+
+    // Parse date fields and set defaults
+    const processedTask = parseDateFields(
+      {
+        ...taskFields,
+        userId,
+        updatedAt: new Date(),
+      },
+      TaskDateKeys
+    );
+
+    const [{ id }] = await DB.insert(tasksTable).values(processedTask).$returningId();
+    const [createdTask] = await DB.select().from(tasksTable).where(eq(tasksTable.id, id));
+
+    // Serialize dates to ISO strings
+    type TaskRow = typeof tasksTable.$inferSelect;
+    type ApiTask = Omit<
+      TaskRow,
+      'date' | 'completedAt' | 'deletedAt' | 'selectedAt' | 'updatedAt' | 'createdAt'
+    > & {
+      date: string | null;
+      completedAt: string | null;
+      deletedAt: string | null;
+      selectedAt: string | null;
+      updatedAt: string | null;
+      createdAt: string | null;
+    };
+
+    const toISOString = (d: Date | string | null | undefined): string | null => {
+      if (!d) return null;
+      if (d instanceof Date) return d.toISOString();
+      const parsed = new Date(d);
+      return isNaN(parsed.getTime()) ? null : parsed.toISOString();
+    };
+
+    const apiTask: ApiTask = {
+      ...createdTask,
+      date: toISOString(createdTask.date),
+      completedAt: toISOString(createdTask.completedAt),
+      deletedAt: toISOString(createdTask.deletedAt),
+      selectedAt: toISOString(createdTask.selectedAt),
+      updatedAt: toISOString(createdTask.updatedAt),
+      createdAt: toISOString(createdTask.createdAt),
+    };
+
+    return NextResponse.json({ task: apiTask }, { status: 201 });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Unknown error occurred';
+    const lower = msg.toLowerCase();
+    const isAuth = lower.includes('api key required') || lower.includes('invalid or revoked api key');
+    const status = isAuth ? 401 : 500;
+    if (!isAuth) {
+      console.error('Error in POST /api/tasks:', error);
     }
     return NextResponse.json({ error: msg }, { status });
   }
