@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { validateUserSession } from '../user-auth';
 import { DB } from '@/shared/lib/db';
 import { and, eq } from 'drizzle-orm';
 import { goalsTable } from '@/shared/lib/drizzle/schema';
+import { withAuthAndErrorHandling } from '@/shared/lib/api/route-wrapper';
 
-export async function POST(req: NextRequest) {
-  const session = await validateUserSession();
-
+export const POST = withAuthAndErrorHandling(async (req: NextRequest, session) => {
   const { id, goal } = await req.json();
 
   // Convert deletedAt string to Date object if present
@@ -18,10 +16,10 @@ export async function POST(req: NextRequest) {
   await DB.update(goalsTable)
     .set(goalData)
     .where(and(eq(goalsTable.id, id), eq(goalsTable.userId, session.user.id)));
-    
+
   const [updatedGoal] = await DB.select()
     .from(goalsTable)
     .where(and(eq(goalsTable.id, id), eq(goalsTable.userId, session.user.id)));
 
   return NextResponse.json(updatedGoal, { status: 200 });
-}
+}, 'POST /api/update-goal');

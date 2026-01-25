@@ -1,6 +1,6 @@
 'use client';
 import { TaskModel } from '@/entities/task/model/task';
-import { useTempSelectStore } from '@/features/tasks/temp-select';
+import { useTempSelectStore } from '@/entities/task/model/tempSelectStore';
 import { TaskWithActions } from './TaskWithActions';
 
 interface LastSelectedTaskHeaderProps {

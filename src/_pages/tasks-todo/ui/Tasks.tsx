@@ -2,12 +2,12 @@ import { useApplyFilters } from '@/features/tasks/filter/model/filterTasks';
 import { useSortedTasks } from '../model/sortTasks';
 import { useTasksLoader } from '../api/useTasksLoader';
 import { useGroupedTasksByList } from '../model/groupTasks';
-import { useFilterStore } from '@/features/tasks/filter/model/filterStore';
+import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
 import { useReorderStore, useReorderMutation } from '@/features/tasks/reorder';
 import { ErrorState } from './ErrorState';
 import { TaskWithActions } from './TaskWithActions';
 import { TaskModel } from '@/entities/task/model/task';
-import { useTempSelectStore } from '@/features/tasks/temp-select';
+import { useTempSelectStore } from '@/entities/task/model/tempSelectStore';
 import {
   DndContext,
   DragEndEvent,
@@ -37,6 +37,10 @@ export function Tasks() {
   const filteredTasks = useApplyFilters(allTasks);
   const tasks = useSortedTasks(filteredTasks);
   const groups = useGroupedTasksByList(tasks);
+
+  // Compute badge visibility based on current filter
+  const hideTodayBadge = statusFilter === StatusFilterEnum.TODAY;
+  const hideDateBadge = statusFilter === StatusFilterEnum.TOMORROW;
 
   // Clear temp selections when filter changes
   useEffect(() => {
@@ -168,7 +172,7 @@ export function Tasks() {
             >
               <ul>
                 {group.tasks.map((task) => (
-                  <TaskWithActions key={task.id} task={task} />
+                  <TaskWithActions key={task.id} task={task} hideTodayBadge={hideTodayBadge} hideDateBadge={hideDateBadge} />
                 ))}
               </ul>
             </SortableContext>
@@ -179,7 +183,7 @@ export function Tasks() {
       <DragOverlay>
         {activeTask ? (
           <div className="bg-white border border-border rounded-lg shadow-lg opacity-80">
-            <TaskWithActions task={activeTask} />
+            <TaskWithActions task={activeTask} hideTodayBadge={hideTodayBadge} hideDateBadge={hideDateBadge} />
           </div>
         ) : null}
       </DragOverlay>

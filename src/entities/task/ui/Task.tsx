@@ -2,21 +2,25 @@ import { isTaskSelected, TaskModel, isTaskDeleted } from '@/entities/task/model/
 import { Checkbox } from '@/shared/ui/checkbox';
 import { cn } from '@/shared/lib/utils';
 import { useToggleTaskCompleted } from '../model/toggleCompleted';
-import { EstimatedTimeButton } from '@/features/tasks/actions/ui/EstimatedTimeButton';
+import { EstimatedTimeButton } from '@/shared/ui/task/EstimatedTimeButton';
 import { CollapsibleActions } from '@/shared/ui/collapsible-actions';
 import { TaskBadges } from './TaskBadges';
 import { TaskDetails } from './TaskDetails';
 import { TaskName } from './TaskName';
-import { useTempSelectStore } from '@/features/tasks/temp-select';
+import { useTempSelectStore } from '../model/tempSelectStore';
 
 interface TaskProps {
   task: TaskModel;
   actionButtons: JSX.Element;
   isDragging?: boolean;
   dragHandle?: JSX.Element;
+  /** Hide "Today" badge when on Today tab */
+  hideTodayBadge?: boolean;
+  /** Hide date badge when on Tomorrow tab */
+  hideDateBadge?: boolean;
 }
 
-export function Task({ task, actionButtons, isDragging = false, dragHandle }: TaskProps) {
+export function Task({ task, actionButtons, isDragging = false, dragHandle, hideTodayBadge, hideDateBadge }: TaskProps) {
   const isSelected = isTaskSelected(task);
   const deleted = isTaskDeleted(task);
   const toggleTaskCompleted = useToggleTaskCompleted();
@@ -82,7 +86,7 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
         <TaskDetails details={task.details} />
         <div className="flex justify-between items-center mt-2 gap-2">
           <div className="flex space-x-2 items-center min-w-0 flex-shrink overflow-hidden">
-            <TaskBadges task={task} />
+            <TaskBadges task={task} hideTodayBadge={hideTodayBadge} hideDateBadge={hideDateBadge} />
             <EstimatedTimeButton task={task} />
           </div>
           <div className="flex-shrink-0">

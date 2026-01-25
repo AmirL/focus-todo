@@ -1,76 +1,7 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ListModel, ListPlain } from '@/entities/list';
 import { fetchBackend } from '@/shared/lib/api';
-import toast from 'react-hot-toast';
-
-// Context type for optimistic mutations
-interface OptimisticMutationContext {
-  previousLists: ListModel[] | undefined;
-}
-
-// Generic optimistic mutation hook types
-interface OptimisticMutationOptions<TData, TVariables> {
-  mutationFn: (variables: TVariables) => Promise<TData>;
-  queryKey: readonly unknown[];
-  optimisticUpdate: (old: ListModel[] | undefined, variables: TVariables) => ListModel[];
-  onSuccess?: (data: TData, variables: TVariables, context: OptimisticMutationContext | undefined) => void;
-  onError?: (error: unknown, variables: TVariables, context: OptimisticMutationContext | undefined) => void;
-  onSettled?: (data: TData | undefined, error: unknown | null, variables: TVariables, context: OptimisticMutationContext | undefined) => void;
-  successMessage?: string;
-  errorMessage?: string;
-}
-
-// Generic optimistic mutation hook
-function useOptimisticMutation<TData, TVariables>({
-  mutationFn,
-  queryKey,
-  optimisticUpdate,
-  onSuccess,
-  onError,
-  onSettled,
-  successMessage,
-  errorMessage,
-}: OptimisticMutationOptions<TData, TVariables>) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn,
-    onMutate: async (variables): Promise<OptimisticMutationContext> => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey });
-
-      // Snapshot the previous value
-      const previousLists = queryClient.getQueryData<ListModel[]>(queryKey);
-
-      // Apply optimistic update
-      queryClient.setQueryData<ListModel[]>(queryKey, (old) => optimisticUpdate(old, variables));
-
-      // Return context object with the snapshotted value
-      return { previousLists };
-    },
-    onError: (err, variables, context) => {
-      // Roll back to previous state
-      if (context?.previousLists) {
-        queryClient.setQueryData<ListModel[]>(queryKey, context.previousLists);
-      }
-      if (errorMessage) {
-        toast.error(errorMessage);
-      }
-      onError?.(err, variables, context);
-    },
-    onSuccess: (data, variables, context) => {
-      if (successMessage) {
-        toast.success(successMessage);
-      }
-      onSuccess?.(data, variables, context);
-    },
-    onSettled: (data, error, variables, context) => {
-      // Always refetch after error or success to ensure we have the latest data
-      queryClient.invalidateQueries({ queryKey });
-      onSettled?.(data, error, variables, context);
-    },
-  });
-}
+import { useOptimisticMutation } from '@/shared/lib/optimistic-mutation';
 
 // Query Keys
 export const listKeys = {
@@ -94,8 +25,8 @@ export function useListsQuery() {
 
 // Create List Mutation
 export function useCreateListMutation() {
-  return useOptimisticMutation({
-    mutationFn: async (name: string) => {
+  return useOptimisticMutation<ListModel, string, ListModel>({
+    mutationFn: async (name) => {
       const response = (await fetchBackend('create-list', { name })) as ListPlain;
       return ListModel.toInstance(response);
     },
@@ -121,8 +52,8 @@ export function useCreateListMutation() {
 
 // Update List Mutation
 export function useUpdateListMutation() {
-  return useOptimisticMutation({
-    mutationFn: async ({ id, name }: { id: string; name: string }) => {
+  return useOptimisticMutation<ListModel, { id: string; name: string }, ListModel>({
+    mutationFn: async ({ id, name }) => {
       const response = (await fetchBackend('update-list', { id, name })) as ListPlain;
       return ListModel.toInstance(response);
     },
@@ -142,8 +73,8 @@ export function useUpdateListMutation() {
 export function useDeleteListMutation() {
   const queryClient = useQueryClient();
 
-  return useOptimisticMutation({
-    mutationFn: async ({ id, reassignToListId }: { id: string; reassignToListId?: string }) => {
+  return useOptimisticMutation<ListModel, { id: string; reassignToListId?: string }, string>({
+    mutationFn: async ({ id, reassignToListId }) => {
       await fetchBackend('delete-list', { id, reassignToListId });
       return id;
     },

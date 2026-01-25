@@ -11,7 +11,15 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 
-export function TaskWithActions({ task }: { task: TaskModel }) {
+interface TaskWithActionsProps {
+  task: TaskModel;
+  /** Hide "Today" badge when on Today tab */
+  hideTodayBadge?: boolean;
+  /** Hide date badge when on Tomorrow tab */
+  hideDateBadge?: boolean;
+}
+
+export function TaskWithActions({ task, hideTodayBadge, hideDateBadge }: TaskWithActionsProps) {
   const { isDragging } = useReorderStore();
   const {
     attributes,
@@ -33,6 +41,8 @@ export function TaskWithActions({ task }: { task: TaskModel }) {
       <Task
         task={task}
         isDragging={isCurrentTaskDragging}
+        hideTodayBadge={hideTodayBadge}
+        hideDateBadge={hideDateBadge}
         dragHandle={
           <button
             ref={setActivatorNodeRef}
