@@ -56,13 +56,14 @@ describe("Task Management", () => {
 
     it("should snooze a task to a different date", () => {
       cy.get('[data-testid^="snooze-task-"]').first().click();
-      // Wait for calendar popover content to be visible
-      cy.get('[data-radix-popper-content-wrapper]').should('be.visible');
-      // Navigate to next month using the right-positioned nav button
-      cy.get('[data-radix-popper-content-wrapper] button.absolute.right-1').click();
-      // Wait for calendar to update then click a day in the middle (index 15 = ~middle of month)
-      cy.wait(300);
-      cy.get('[role="gridcell"] button').not('.day-outside').eq(10).click({ force: true });
+      // Wait for calendar to be fully visible with table
+      cy.get('[role="grid"]', { timeout: 15000 }).should('be.visible');
+      // Click next month button (right-positioned navigation)
+      cy.get('button.absolute.right-1').click();
+      // Wait for calendar to re-render
+      cy.get('[role="grid"]').should('be.visible');
+      // Select a day button - use td[role=gridcell] > button pattern
+      cy.get('td[role="gridcell"] > button').not('.day-outside').eq(10).click({ force: true });
     });
 
     it("should mark a task as a blocker", () => {
