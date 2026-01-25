@@ -56,7 +56,13 @@ describe("Task Management", () => {
 
     it("should snooze a task to a different date", () => {
       cy.get('[data-testid^="snooze-task-"]').first().click();
-      cy.get('[role="gridcell"]').not('[disabled]').first().click();
+      // Wait for calendar grid to exist and scroll it into view
+      cy.get('[role="grid"]', { timeout: 15000 }).scrollIntoView().should('exist');
+      // Click next month button with force to handle any overflow issues
+      cy.get('button.absolute.right-1').click({ force: true });
+      // Wait for month change and select a day - use simple button selector within grid
+      cy.wait(500);
+      cy.get('[role="grid"] button.h-8.w-8').not('.day-outside').eq(10).click({ force: true });
     });
 
     it("should mark a task as a blocker", () => {

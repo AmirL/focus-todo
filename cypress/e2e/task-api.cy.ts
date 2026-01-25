@@ -19,6 +19,37 @@ describe("Task API", () => {
     expect(apiKey, "API_TEST_KEY should be configured").to.exist;
   });
 
+  describe("API Key Authentication (no session)", () => {
+    it("should work with only API key, without session cookie", () => {
+      // Clear all cookies to ensure no session exists
+      cy.clearAllCookies();
+
+      // Make request with only API key - no session cookie
+      cy.request({
+        method: "GET",
+        url: "/api/tasks?limit=1",
+        headers: authHeaders,
+      }).then((response) => {
+        expect(response.status).to.eq(200);
+        expect(response.body).to.have.property("tasks");
+      });
+    });
+
+    it("should reject requests without API key and without session", () => {
+      // Clear all cookies to ensure no session exists
+      cy.clearAllCookies();
+
+      // Make request without API key or session
+      cy.request({
+        method: "GET",
+        url: "/api/tasks",
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(401);
+      });
+    });
+  });
+
   afterEach(() => {
     // Clean up created tasks after each test
     createdTaskIds.forEach((taskId) => {
