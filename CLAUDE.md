@@ -60,6 +60,7 @@ This project follows **Feature-Sliced Design (FSD)** architecture. For complete 
 - **UI**: Radix UI components with Tailwind CSS styling
 - **PWA**: Configured with next-pwa
 - **Testing**: Vitest with globals enabled
+- **E2E Testing**: Cypress with Cypress Cloud integration. See [`docs/E2E_TESTS.md`](./docs/E2E_TESTS.md) for Cypress Cloud API access and test details.
 
 ### API Routes Pattern
 
