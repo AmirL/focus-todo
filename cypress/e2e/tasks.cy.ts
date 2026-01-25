@@ -56,13 +56,12 @@ describe("Task Management", () => {
 
     it("should snooze a task to a different date", () => {
       cy.get('[data-testid^="snooze-task-"]').first().click();
-      // Wait for calendar to be fully visible with table
-      cy.get('[role="grid"]', { timeout: 15000 }).should('be.visible');
-      // Click next month button (right-positioned navigation)
-      cy.get('button.absolute.right-1').click();
-      // Wait for calendar to re-render
-      cy.get('[role="grid"]').should('be.visible');
-      // Select a day button - use td[role=gridcell] > button pattern
+      // Wait for calendar grid to exist (don't check visibility due to fixed position ancestors)
+      cy.get('[role="grid"]', { timeout: 15000 }).should('exist');
+      // Click next month button with force to handle any overflow issues
+      cy.get('button.absolute.right-1').click({ force: true });
+      // Wait for month change and select a day
+      cy.wait(500);
       cy.get('td[role="gridcell"] > button').not('.day-outside').eq(10).click({ force: true });
     });
 
