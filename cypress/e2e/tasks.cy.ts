@@ -56,8 +56,8 @@ describe("Task Management", () => {
 
     it("should snooze a task to a different date", () => {
       cy.get('[data-testid^="snooze-task-"]').first().click();
-      // Wait for calendar grid to exist (don't check visibility due to fixed position ancestors)
-      cy.get('[role="grid"]', { timeout: 15000 }).should('exist');
+      // Wait for calendar grid to exist and scroll it into view
+      cy.get('[role="grid"]', { timeout: 15000 }).scrollIntoView().should('exist');
       // Click next month button with force to handle any overflow issues
       cy.get('button.absolute.right-1').click({ force: true });
       // Wait for month change and select a day
