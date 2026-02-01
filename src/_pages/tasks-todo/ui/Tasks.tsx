@@ -2,12 +2,13 @@ import { useApplyFilters } from '@/features/tasks/filter/model/filterTasks';
 import { useSortedTasks } from '../model/sortTasks';
 import { useTasksLoader } from '../api/useTasksLoader';
 import { useGroupedTasksByList } from '../model/groupTasks';
-import { useFilterStore } from '@/features/tasks/filter/model/filterStore';
+import { useFilterStore, StatusFilterEnum } from '@/features/tasks/filter/model/filterStore';
 import { useReorderStore, useReorderMutation } from '@/features/tasks/reorder';
 import { ErrorState } from './ErrorState';
 import { TaskWithActions } from './TaskWithActions';
 import { TaskModel } from '@/entities/task/model/task';
 import { useTempSelectStore } from '@/features/tasks/temp-select';
+import { useCurrentInitiativeQuery } from '@/shared/api/current-initiative';
 import {
   DndContext,
   DragEndEvent,
@@ -33,10 +34,22 @@ export function Tasks() {
   const { clearSelections } = useTempSelectStore();
   const reorderMutation = useReorderMutation();
   const [activeTask, setActiveTask] = useState<TaskModel | null>(null);
+  const { data: initiativeData } = useCurrentInitiativeQuery();
 
   const filteredTasks = useApplyFilters(allTasks);
   const tasks = useSortedTasks(filteredTasks);
-  const groups = useGroupedTasksByList(tasks);
+
+  // Get focus list name for Today/Selected views
+  const shouldPrioritizeFocus = statusFilter === StatusFilterEnum.TODAY || statusFilter === StatusFilterEnum.SELECTED;
+  const todayInitiative = initiativeData?.today;
+  const focusListId = todayInitiative
+    ? todayInitiative.chosenListId ?? todayInitiative.suggestedListId
+    : null;
+  const focusListName = shouldPrioritizeFocus && focusListId
+    ? initiativeData?.participatingLists.find((l) => l.id === focusListId)?.name ?? null
+    : null;
+
+  const groups = useGroupedTasksByList(tasks, { focusListName });
 
   // Clear temp selections when filter changes
   useEffect(() => {
