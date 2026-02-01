@@ -67,6 +67,20 @@ jobs:
       - name: Checkout
         if: steps.check-pr.outputs.skip != 'true'
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.deployment_status.deployment.sha }}
+
+      - name: Get actual git branch
+        if: steps.check-pr.outputs.skip != 'true'
+        id: git-branch
+        run: |
+          # Get branch from deployment or fallback to extracted branch
+          BRANCH="${{ github.event.deployment_status.deployment.ref }}"
+          if [ -z "$BRANCH" ] || [ "$BRANCH" = "null" ]; then
+            BRANCH="${{ steps.branch.outputs.branch }}"
+          fi
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+          echo "Git branch: $BRANCH"
 
       - name: Setup pnpm
         if: steps.check-pr.outputs.skip != 'true'
@@ -100,5 +114,16 @@ jobs:
           CYPRESS_TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
           CYPRESS_API_TEST_KEY: ${{ secrets.API_TEST_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COMMIT_INFO_BRANCH: ${{ steps.branch.outputs.branch }}
+          COMMIT_INFO_BRANCH: ${{ steps.git-branch.outputs.branch }}
           COMMIT_INFO_SHA: ${{ github.event.deployment_status.deployment.sha }}
+
+      - name: Upload Cypress artifacts
+        if: always() && steps.check-pr.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-results-${{ github.run_id }}
+          path: |
+            cypress/screenshots
+            cypress/videos
+          retention-days: 7
+          if-no-files-found: ignore
