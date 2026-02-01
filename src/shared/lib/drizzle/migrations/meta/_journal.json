@@ -71,6 +71,13 @@
       "when": 1758265572350,
       "tag": "0009_white_cannonball",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1769952322442,
+      "tag": "0010_moaning_killraven",
+      "breakpoints": true
     }
   ]
 }

@@ -8,6 +8,7 @@ export type ListPlain = {
   name: string;
   userId: string;
   isDefault: boolean;
+  participatesInInitiative: boolean;
   createdAt: string;
   updatedAt: string | null;
 };
@@ -17,6 +18,7 @@ export class ListModel {
   name!: string;
   userId!: string;
   isDefault!: boolean;
+  participatesInInitiative!: boolean;
 
   @Transform(transformDateToUTCString, { toPlainOnly: true })
   createdAt!: Date;

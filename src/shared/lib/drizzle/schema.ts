@@ -37,6 +37,7 @@ export const listsTable = mysqlTable('lists', {
   name: varchar('name', { length: 255 }).notNull(),
   userId: varchar('user_id', { length: 36 }).notNull().references(() => user.id, { onDelete: 'cascade' }),
   isDefault: boolean('is_default').default(false),
+  participatesInInitiative: boolean('participates_in_initiative').default(true),
   createdAt: datetime('created_at')
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
@@ -106,4 +107,16 @@ export const apiKeysTable = mysqlTable('api_keys', {
   createdAt: datetime('created_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
   lastUsedAt: datetime('last_used_at'),
   revokedAt: datetime('revoked_at'),
+});
+
+// Current Initiative - daily focus rotation between lists
+export const currentInitiativeTable = mysqlTable('current_initiatives', {
+  id: int('id').autoincrement().primaryKey().notNull(),
+  userId: varchar('user_id', { length: 36 }).notNull().references(() => user.id, { onDelete: 'cascade' }),
+  date: date('date').notNull(),
+  suggestedListId: int('suggested_list_id').references(() => listsTable.id, { onDelete: 'set null' }),
+  chosenListId: int('chosen_list_id').references(() => listsTable.id, { onDelete: 'set null' }),
+  reason: varchar('reason', { length: 500 }),
+  setAt: datetime('set_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
+  changedAt: datetime('changed_at'),
 });
