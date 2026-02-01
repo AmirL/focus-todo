@@ -11,6 +11,7 @@ import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider, useSidebar } f
 import { Separator } from '@/shared/ui/separator';
 import { useSession, signOut } from '@/shared/lib/auth-client';
 import { TaskFilters } from '@/features/tasks/filter/ui/TaskFilters';
+import { BalanceIndicator } from '@/features/current-initiative/balance';
 
 function MobileMenuButton() {
   const { toggleSidebar } = useSidebar();
@@ -135,6 +136,12 @@ export function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
             </SidebarContent>
 
             <div className="mt-auto">
+              {shouldShowSidebarContent && (
+                <>
+                  <Separator />
+                  <BalanceIndicator />
+                </>
+              )}
               <Separator />
               <UserSection />
             </div>

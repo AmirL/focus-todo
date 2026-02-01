@@ -7,6 +7,7 @@ import { isTaskToday, isTaskTomorrow, isTaskOverdue } from '@/entities/task/mode
 import { cn } from '@/shared/lib/utils';
 import { useTasksQuery } from '@/shared/api/tasks';
 import { useListsQuery } from '@/shared/api/lists';
+import { useCurrentInitiativeQuery } from '@/shared/api/current-initiative';
 import { calculateTotalEstimatedTime } from '../model/calculateTotalEstimatedTime';
 import { formatTotalDuration } from '@/shared/lib/format-duration';
 import { useSidebar } from '@/shared/ui/sidebar';
@@ -100,7 +101,15 @@ function FilterButtonWithTime({
   );
 }
 
-function CategoryButton({ category, active }: { category: string; active: boolean }) {
+function CategoryButton({
+  category,
+  active,
+  isTodaysFocus,
+}: {
+  category: string;
+  active: boolean;
+  isTodaysFocus: boolean;
+}) {
   const { setList, statusFilter } = useFilterStore();
   const { isMobile, toggleSidebar } = useSidebar();
   const router = useRouter();
@@ -110,7 +119,7 @@ function CategoryButton({ category, active }: { category: string; active: boolea
     <Button
       variant={'ghost'}
       className={cn(
-        'w-full justify-start',
+        'w-full justify-between',
         active && 'text-primary  bg-primary/10 hover:bg-primary/20 hover:text-primary'
       )}
       onClick={() => {
@@ -120,8 +129,16 @@ function CategoryButton({ category, active }: { category: string; active: boolea
         if (isMobile) toggleSidebar();
       }}
     >
-      <Tag className="mr-2 h-4 w-4" />
-      {category}
+      <div className="flex items-center">
+        <Tag className="mr-2 h-4 w-4" />
+        {category}
+      </div>
+      {isTodaysFocus && (
+        <span
+          className="h-2 w-2 rounded-full bg-primary"
+          title="Today's focus"
+        />
+      )}
     </Button>
   );
 }
@@ -129,6 +146,18 @@ function CategoryButton({ category, active }: { category: string; active: boolea
 export function TaskFilters() {
   const { statusFilter, list } = useFilterStore();
   const { data: lists = [], isLoading } = useListsQuery();
+  const { data: initiativeData } = useCurrentInitiativeQuery();
+
+  // Determine today's focus list ID (initiative uses number IDs)
+  const todaysFocusListId = initiativeData?.today
+    ? (initiativeData.today.chosenListId ?? initiativeData.today.suggestedListId)
+    : null;
+
+  // Find the name of today's focus list
+  // Note: ListModel.id is typed as string but runtime value is number from API
+  const todaysFocusListName = todaysFocusListId
+    ? lists.find((l) => Number(l.id) === todaysFocusListId)?.name ?? null
+    : null;
 
   return (
     <div className="space-y-4">
@@ -176,7 +205,12 @@ export function TaskFilters() {
             <div className="px-2 text-sm text-muted-foreground">Loading...</div>
           ) : (
             lists.map((listItem) => (
-              <CategoryButton key={listItem.id} category={listItem.name} active={list === listItem.name} />
+              <CategoryButton
+                key={listItem.id}
+                category={listItem.name}
+                active={list === listItem.name}
+                isTodaysFocus={listItem.name === todaysFocusListName}
+              />
             ))
           )}
         </div>

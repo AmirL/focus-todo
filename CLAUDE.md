@@ -4,13 +4,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
-- **Development**: `pnpm run dev` (runs on port 8000)
+- **Development**: `pnpm run dev` (runs on port 3000 by default, or next available port)
 - **Build**: `pnpm run build` (includes running tests first)
 - **Test**: `pnpm test` or `vitest run`
 - **Lint**: `pnpm run lint`
 - **TypeScript check**: `pnpm tsc --noEmit` (type checking without emitting files)
 - **Database migrations**: `pnpm run db:generate` and `pnpm run db:migrate`
 - **Architecture analysis**: `pnpm run fsd` (Feature-Sliced Design linting)
+
+### Port Configuration
+
+The dev server uses Next.js default port selection (3000, or next available). Auth is configured to work with any port - Better Auth derives the URL from request headers for local development. No environment variables needed for local dev.
 
 ## Architecture Overview
 
