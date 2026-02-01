@@ -70,13 +70,13 @@ export async function findUserListByName(userId: string, listName: string) {
 }
 
 /**
- * Gets all lists for a user
+ * Gets all lists for a user, ordered by sortOrder then createdAt
  */
 export async function getUserLists(userId: string) {
   return DB.select()
     .from(listsTable)
     .where(eq(listsTable.userId, userId))
-    .orderBy(listsTable.createdAt);
+    .orderBy(listsTable.sortOrder, listsTable.createdAt);
 }
 
 /**
@@ -102,10 +102,10 @@ export async function countListUsage(userId: string, listName: string) {
  */
 export async function createDefaultLists(userId: string) {
   const defaultLists = [
-    { name: 'Work', userId, isDefault: true },
-    { name: 'Personal', userId, isDefault: true }
+    { name: 'Work', userId, isDefault: true, sortOrder: 0 },
+    { name: 'Personal', userId, isDefault: true, sortOrder: 1 }
   ];
-  
+
   return DB.insert(listsTable).values(defaultLists);
 }
 

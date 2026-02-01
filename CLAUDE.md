@@ -16,7 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 The dev server uses Next.js default port selection (3000, or next available). Auth is configured to work with any port - Better Auth derives the URL from request headers for local development. No environment variables needed for local dev.
 
-**Important**: When starting the dev server, always read the server output to get the actual URL (e.g., `http://localhost:3000`). Next.js prints the URL when the server is ready - don't assume a port, check the output.
+**Important**: When starting the dev server, always read the server output to get the actual URL (e.g., `http://localhost:3000`). Next.js prints the URL when the server is ready - don't assume a port, check the output. Ensure the dev server is running before testing with Playwright.
 
 ## Architecture Overview
 

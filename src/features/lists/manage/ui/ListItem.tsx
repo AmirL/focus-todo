@@ -3,16 +3,20 @@
 import { Button } from '@/shared/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/shared/ui/alert-dialog';
 import { ListModel } from '@/entities/list';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, GripVertical } from 'lucide-react';
 import { useDeleteList } from '../api/useDeleteList';
 import { ListFormDialog } from './ListFormDialog';
 import { useState } from 'react';
+import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 
 interface ListItemProps {
   list: ListModel;
+  isDragging?: boolean;
+  dragHandleRef?: (element: HTMLElement | null) => void;
+  dragHandleListeners?: SyntheticListenerMap;
 }
 
-export function ListItem({ list }: ListItemProps) {
+export function ListItem({ list, isDragging, dragHandleRef, dragHandleListeners }: ListItemProps) {
   const { deleteList, isDeleting } = useDeleteList();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
@@ -20,8 +24,18 @@ export function ListItem({ list }: ListItemProps) {
     await deleteList(list.id);
   };
   return (
-    <div className="flex items-center justify-between p-3 border rounded-lg">
+    <div className={`flex items-center justify-between p-3 border rounded-lg ${isDragging ? 'opacity-50' : ''}`}>
       <div className="flex items-center space-x-2">
+        {dragHandleRef && (
+          <button
+            ref={dragHandleRef}
+            className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground"
+            {...dragHandleListeners}
+            aria-label="Drag to reorder list"
+          >
+            <GripVertical className="h-4 w-4" />
+          </button>
+        )}
         <span className="font-medium">{list.name}</span>
         {list.isDefault && (
           <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
