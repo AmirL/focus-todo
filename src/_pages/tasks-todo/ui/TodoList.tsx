@@ -3,13 +3,14 @@ import { AddTaskForm } from '@/features/tasks/add/ui/AddTaskForm';
 import { Goals } from '@/_pages/tasks-todo/ui/Goals';
 import { Tasks } from '@/_pages/tasks-todo/ui/Tasks';
 import { useSession } from '@/shared/lib/auth-client';
-import { useFilterStore } from '@/features/tasks/filter/model/filterStore';
+import { useFilterStore, StatusFilterEnum } from '@/features/tasks/filter/model/filterStore';
 import { TaskActions } from './TaskActions';
 import { EditTaskModalRoot } from '@/features/tasks/edit/ui/EditTaskModalRoot';
 import { Spotlight } from '@/features/tasks/search/ui/Spotlight';
 import { ReAddModalRoot } from '@/features/tasks/actions/ui/ReAddModalRoot';
 import { LastSelectedTaskHeader } from './LastSelectedTaskHeader';
 import { useTasksLoader } from '../api/useTasksLoader';
+import { InitiativePicker } from '@/features/current-initiative/pick';
 
 // Loading state component
 function LoadingState() {
@@ -44,8 +45,9 @@ function StatusFilterHeader({ statusFilter }: { statusFilter: string }) {
 }
 
 // Main todo list content component
-function TodoListContent({ statusFilter }: { statusFilter: string }) {
+function TodoListContent({ statusFilter }: { statusFilter: StatusFilterEnum }) {
   const { allTasks } = useTasksLoader();
+  const showInitiativePicker = statusFilter === StatusFilterEnum.TOMORROW;
 
   return (
     <>
@@ -53,6 +55,7 @@ function TodoListContent({ statusFilter }: { statusFilter: string }) {
       <div className="space-y-8">
         <Goals />
         <StatusFilterHeader statusFilter={statusFilter} />
+        {showInitiativePicker && <InitiativePicker />}
         <TaskActions />
         <Tasks />
         <AddTaskForm />
