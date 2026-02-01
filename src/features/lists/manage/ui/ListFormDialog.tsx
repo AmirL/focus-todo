@@ -3,6 +3,7 @@
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
+import { Checkbox } from '@/shared/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
 import { useCreateList } from '../api/useCreateList';
 import { useUpdateList } from '../api/useUpdateList';
@@ -27,37 +28,42 @@ export function ListFormDialog({
   const { createList, isCreating } = useCreateList();
   const { updateList, isUpdating } = useUpdateList();
   const { data: lists = [] } = useListsQuery();
-  
+
   const [value, setValue] = useState('');
-  
+  const [participatesInInitiative, setParticipatesInInitiative] = useState(true);
+
   const list = listId ? lists.find(l => l.id === listId) : null;
   const isLoading = mode === 'create' ? isCreating : isUpdating;
-  
-  // Set initial value when dialog opens
+
+  // Set initial values when dialog opens
   useEffect(() => {
     if (open) {
       const initialValue = mode === 'edit' && list ? list.name : '';
+      const initialParticipates = mode === 'edit' && list ? list.participatesInInitiative : true;
       setValue(initialValue);
+      setParticipatesInInitiative(initialParticipates);
     }
   }, [open, mode, list]);
 
   const handleSubmit = async () => {
     let success = false;
-    
+
     if (mode === 'create') {
-      success = await createList(value);
+      success = await createList(value, participatesInInitiative);
     } else if (mode === 'edit' && listId) {
-      success = await updateList(listId, value);
+      success = await updateList(listId, value, participatesInInitiative);
     }
-    
+
     if (success) {
       setValue(''); // Reset form
+      setParticipatesInInitiative(true); // Reset to default
       onCancel(); // Close dialog on success
     }
   };
 
   const handleCancel = () => {
     setValue(''); // Reset form
+    setParticipatesInInitiative(true); // Reset to default
     onCancel();
   };
 
@@ -88,6 +94,19 @@ export function ListFormDialog({
               placeholder="Enter list name"
               onKeyDown={handleKeyDown}
             />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="participates-in-initiative"
+              checked={participatesInInitiative}
+              onCheckedChange={(checked) => setParticipatesInInitiative(checked === true)}
+            />
+            <Label
+              htmlFor="participates-in-initiative"
+              className="text-sm font-normal cursor-pointer"
+            >
+              Include in Daily Focus rotation
+            </Label>
           </div>
         </div>
         <DialogFooter>

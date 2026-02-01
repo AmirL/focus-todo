@@ -27,12 +27,13 @@ export interface CreateListValidationResult {
   isValid: boolean;
   error?: string;
   name?: string;
+  participatesInInitiative?: boolean;
 }
 
 export function validateCreateListRequest(requestBody: unknown): CreateListValidationResult {
-  const body = requestBody as { name?: unknown };
+  const body = requestBody as { name?: unknown; participatesInInitiative?: unknown };
   const nameValidation = validateListName(body?.name);
-  
+
   if (!nameValidation.isValid) {
     return {
       isValid: false,
@@ -42,7 +43,8 @@ export function validateCreateListRequest(requestBody: unknown): CreateListValid
 
   return {
     isValid: true,
-    name: (body.name as string).trim()
+    name: (body.name as string).trim(),
+    participatesInInitiative: body.participatesInInitiative === undefined ? true : Boolean(body.participatesInInitiative)
   };
 }
 
@@ -51,11 +53,12 @@ export interface UpdateListValidationResult {
   error?: string;
   id?: number;
   name?: string;
+  participatesInInitiative?: boolean;
 }
 
 export function validateUpdateListRequest(requestBody: unknown): UpdateListValidationResult {
-  const body = requestBody as { id?: unknown; name?: unknown };
-  
+  const body = requestBody as { id?: unknown; name?: unknown; participatesInInitiative?: unknown };
+
   if (!body?.id) {
     return {
       isValid: false,
@@ -64,7 +67,7 @@ export function validateUpdateListRequest(requestBody: unknown): UpdateListValid
   }
 
   const nameValidation = validateListName(body.name);
-  
+
   if (!nameValidation.isValid) {
     return {
       isValid: false,
@@ -75,6 +78,7 @@ export function validateUpdateListRequest(requestBody: unknown): UpdateListValid
   return {
     isValid: true,
     id: body.id as number,
-    name: (body.name as string).trim()
+    name: (body.name as string).trim(),
+    participatesInInitiative: body.participatesInInitiative === undefined ? undefined : Boolean(body.participatesInInitiative)
   };
 }

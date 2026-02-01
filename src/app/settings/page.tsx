@@ -2,6 +2,7 @@
 
 import { ListManager } from '@/features/lists';
 import { ApiKeysManager } from '@/features/api-keys';
+import { InitiativeHistory } from '@/features/current-initiative/history';
 
 export default function SettingsPage() {
   return (
@@ -14,7 +15,7 @@ export default function SettingsPage() {
           </p>
         </div>
         <ListManager />
-
+        <InitiativeHistory />
         <ApiKeysManager />
       </div>
     </div>

@@ -95,18 +95,19 @@ export function useListsQuery() {
 // Create List Mutation
 export function useCreateListMutation() {
   return useOptimisticMutation({
-    mutationFn: async (name: string) => {
-      const response = (await fetchBackend('create-list', { name })) as ListPlain;
+    mutationFn: async ({ name, participatesInInitiative }: { name: string; participatesInInitiative: boolean }) => {
+      const response = (await fetchBackend('create-list', { name, participatesInInitiative })) as ListPlain;
       return ListModel.toInstance(response);
     },
     queryKey: listKeys.all,
-    optimisticUpdate: (old, name) => {
+    optimisticUpdate: (old, { name, participatesInInitiative }) => {
       // Optimistically add the new list to the cache
       const optimisticList = {
         id: 'temp-' + Date.now(),
         name,
         userId: 'temp',
         isDefault: false,
+        participatesInInitiative,
         createdAt: new Date(),
         updatedAt: null,
       } as unknown as ListModel;
@@ -122,15 +123,15 @@ export function useCreateListMutation() {
 // Update List Mutation
 export function useUpdateListMutation() {
   return useOptimisticMutation({
-    mutationFn: async ({ id, name }: { id: string; name: string }) => {
-      const response = (await fetchBackend('update-list', { id, name })) as ListPlain;
+    mutationFn: async ({ id, name, participatesInInitiative }: { id: string; name: string; participatesInInitiative: boolean }) => {
+      const response = (await fetchBackend('update-list', { id, name, participatesInInitiative })) as ListPlain;
       return ListModel.toInstance(response);
     },
     queryKey: listKeys.all,
-    optimisticUpdate: (old, { id, name }) => {
+    optimisticUpdate: (old, { id, name, participatesInInitiative }) => {
       if (!old) return [];
       return old.map((list) =>
-        list.id === id ? { ...list, name, updatedAt: new Date() } : list
+        list.id === id ? { ...list, name, participatesInInitiative, updatedAt: new Date() } : list
       );
     },
     successMessage: 'List updated',
