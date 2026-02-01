@@ -44,3 +44,9 @@ public/workbox-*.js
 cypress/videos
 cypress/screenshots
 cypress/downloads
+
+# Playwright
+playwright-report/
+playwright/.cache/
+test-results/
+.playwright/
