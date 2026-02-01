@@ -11,6 +11,7 @@ import { ReAddModalRoot } from '@/features/tasks/actions/ui/ReAddModalRoot';
 import { LastSelectedTaskHeader } from './LastSelectedTaskHeader';
 import { useTasksLoader } from '../api/useTasksLoader';
 import { InitiativePicker } from '@/features/current-initiative/pick';
+import { TodayFocusBanner } from '@/features/current-initiative/banner';
 
 // Loading state component
 function LoadingState() {
@@ -48,6 +49,7 @@ function StatusFilterHeader({ statusFilter }: { statusFilter: string }) {
 function TodoListContent({ statusFilter }: { statusFilter: StatusFilterEnum }) {
   const { allTasks } = useTasksLoader();
   const showInitiativePicker = statusFilter === StatusFilterEnum.TOMORROW;
+  const showTodayFocusBanner = statusFilter === StatusFilterEnum.TODAY || statusFilter === StatusFilterEnum.SELECTED;
 
   return (
     <>
@@ -55,6 +57,7 @@ function TodoListContent({ statusFilter }: { statusFilter: StatusFilterEnum }) {
       <div className="space-y-8">
         <Goals />
         <StatusFilterHeader statusFilter={statusFilter} />
+        {showTodayFocusBanner && <TodayFocusBanner />}
         {showInitiativePicker && <InitiativePicker />}
         <TaskActions />
         <Tasks />
