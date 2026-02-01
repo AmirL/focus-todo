@@ -78,6 +78,13 @@
       "when": 1769952322442,
       "tag": "0010_moaning_killraven",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1769972644333,
+      "tag": "0011_fearless_freak",
+      "breakpoints": true
     }
   ]
 }

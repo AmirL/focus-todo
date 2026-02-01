@@ -1,0 +1,1 @@
+ALTER TABLE `lists` ADD `sort_order` int DEFAULT 0;
