@@ -17,6 +17,15 @@ jobs:
           echo "Environment URL: $ENV_URL"
           echo "Environment name: $ENV_NAME"
 
+          # Skip main branch deployments - already tested in PR
+          REF="${{ github.event.deployment_status.deployment.ref }}"
+          echo "Deployment ref: $REF"
+          if [ "$REF" = "main" ] || [ "$REF" = "master" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "Skipping: Main branch deployment (already tested in PR)"
+            exit 0
+          fi
+
           # Production deployments: always run tests
           if [ "$ENV_NAME" = "Production" ] || [ "$ENV_NAME" = "production" ]; then
             echo "skip=false" >> $GITHUB_OUTPUT
