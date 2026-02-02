@@ -5,102 +5,48 @@ on:
 
 jobs:
   cypress-run:
-    # Run only when Vercel deployment succeeds and not a PR deployment
+    # Run when Vercel deployment succeeds
     if: github.event.deployment_status.state == 'success' && contains(github.event.deployment_status.environment_url, 'vercel.app')
     runs-on: ubuntu-latest
     steps:
-      - name: Check if PR deployment (skip if so)
-        id: check-pr
+      - name: Log deployment info
         run: |
-          ENV_URL="${{ github.event.deployment_status.environment_url }}"
-          ENV_NAME="${{ github.event.deployment_status.environment }}"
-          echo "Environment URL: $ENV_URL"
-          echo "Environment name: $ENV_NAME"
-
-          # Production deployments: always run tests
-          if [ "$ENV_NAME" = "Production" ] || [ "$ENV_NAME" = "production" ]; then
-            echo "skip=false" >> $GITHUB_OUTPUT
-            echo "Running: This is a production deployment"
-            exit 0
-          fi
-
-          # Also check URL pattern for production
-          if echo "$ENV_URL" | grep -qE "^https://doable-tasks\.vercel\.app"; then
-            echo "skip=false" >> $GITHUB_OUTPUT
-            echo "Running: This is a production URL deployment"
-            exit 0
-          fi
-
-          # Preview deployment - extract branch from URL and check for open PR
-          # URL format: https://doable-{branch}-{hash}-{user}.vercel.app
-          # Extract everything between "doable-" and the hash pattern
-          BRANCH=$(echo "$ENV_URL" | sed -E 's|https://doable-(.+)-[a-z0-9]+-[^.]+\.vercel\.app|\1|')
-          echo "Extracted branch: $BRANCH"
-
-          # Check if there's an open PR for this branch
-          PR_COUNT=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls?state=open&head=${{ github.repository_owner }}:$BRANCH" \
-            | jq length)
-          echo "Open PRs for branch: $PR_COUNT"
-
-          if [ "$PR_COUNT" -gt 0 ]; then
-            echo "skip=true" >> $GITHUB_OUTPUT
-            echo "Skipping: PR exists for this branch (avoiding duplicate run)"
-          else
-            echo "skip=false" >> $GITHUB_OUTPUT
-            echo "Running: No open PR, running tests for branch deployment"
-          fi
-
-      - name: Get branch name from deployment
-        if: steps.check-pr.outputs.skip != 'true'
-        id: branch
-        run: |
-          # Try to get branch from deployment ref or extract from URL
-          BRANCH="${{ github.event.deployment_status.deployment.ref }}"
-          if [ -z "$BRANCH" ] || [ "$BRANCH" = "null" ]; then
-            # Extract from environment URL (e.g., feature-branch-abc123.vercel.app)
-            BRANCH=$(echo "${{ github.event.deployment_status.environment_url }}" | sed -E 's/https:\/\/([^-]+(-[^-]+)*)-[a-z0-9]+-[^.]+\.vercel\.app/\1/' | sed 's/-$//')
-          fi
-          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
-          echo "Detected branch: $BRANCH"
+          echo "Environment URL: ${{ github.event.deployment_status.environment_url }}"
+          echo "Environment: ${{ github.event.deployment_status.environment }}"
+          echo "Deployment ref: ${{ github.event.deployment_status.deployment.ref }}"
+          echo "Deployment SHA: ${{ github.event.deployment_status.deployment.sha }}"
 
       - name: Checkout
-        if: steps.check-pr.outputs.skip != 'true'
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.deployment_status.deployment.sha }}
 
-      - name: Get actual git branch
-        if: steps.check-pr.outputs.skip != 'true'
-        id: git-branch
+      - name: Get branch name
+        id: branch
         run: |
-          # Get branch from deployment or fallback to extracted branch
+          # Get branch from deployment ref
           BRANCH="${{ github.event.deployment_status.deployment.ref }}"
           if [ -z "$BRANCH" ] || [ "$BRANCH" = "null" ]; then
-            BRANCH="${{ steps.branch.outputs.branch }}"
+            BRANCH="unknown"
           fi
           echo "branch=$BRANCH" >> $GITHUB_OUTPUT
-          echo "Git branch: $BRANCH"
+          echo "Branch: $BRANCH"
 
       - name: Setup pnpm
-        if: steps.check-pr.outputs.skip != 'true'
         uses: pnpm/action-setup@v2
         with:
           version: 8
 
       - name: Setup Node.js
-        if: steps.check-pr.outputs.skip != 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
 
       - name: Install dependencies
-        if: steps.check-pr.outputs.skip != 'true'
         run: pnpm install
 
-      - name: Cypress run against preview deployment
-        if: steps.check-pr.outputs.skip != 'true'
+      - name: Cypress run against deployment
         uses: cypress-io/github-action@v6
         with:
           wait-on: ${{ github.event.deployment_status.target_url }}
@@ -114,11 +60,11 @@ jobs:
           CYPRESS_TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
           CYPRESS_API_TEST_KEY: ${{ secrets.API_TEST_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COMMIT_INFO_BRANCH: ${{ steps.git-branch.outputs.branch }}
+          COMMIT_INFO_BRANCH: ${{ steps.branch.outputs.branch }}
           COMMIT_INFO_SHA: ${{ github.event.deployment_status.deployment.sha }}
 
       - name: Upload Cypress artifacts
-        if: always() && steps.check-pr.outputs.skip != 'true'
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: cypress-results-${{ github.run_id }}
