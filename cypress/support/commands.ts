@@ -78,7 +78,6 @@ Cypress.Commands.add("login", () => {
         },
       }).then((response) => {
         cy.log(`Sign-in response status: ${response.status}`);
-        cy.log(`Sign-in response body: ${JSON.stringify(response.body)}`);
         expect(response.status).to.eq(200);
       });
     },
@@ -90,7 +89,6 @@ Cypress.Commands.add("login", () => {
           failOnStatusCode: false,
         }).then((response) => {
           cy.log(`Session response status: ${response.status}`);
-          cy.log(`Session response body: ${JSON.stringify(response.body)}`);
           expect(response.status).to.eq(200);
           expect(response.body).to.have.property("user");
         });
