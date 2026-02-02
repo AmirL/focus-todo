@@ -20,15 +20,25 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.deployment_status.deployment.sha }}
+          fetch-depth: 0
 
       - name: Get branch name
         id: branch
         run: |
-          # Get branch from deployment ref
+          # Try deployment ref first
           BRANCH="${{ github.event.deployment_status.deployment.ref }}"
+
+          # If empty, try to find branch from git
           if [ -z "$BRANCH" ] || [ "$BRANCH" = "null" ]; then
+            # Get the branch that contains this commit
+            BRANCH=$(git branch -r --contains ${{ github.event.deployment_status.deployment.sha }} | grep -v HEAD | head -1 | sed 's|origin/||' | xargs)
+          fi
+
+          # Final fallback
+          if [ -z "$BRANCH" ]; then
             BRANCH="unknown"
           fi
+
           echo "branch=$BRANCH" >> $GITHUB_OUTPUT
           echo "Branch: $BRANCH"
 
