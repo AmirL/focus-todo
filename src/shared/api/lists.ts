@@ -102,12 +102,14 @@ export function useCreateListMutation() {
     queryKey: listKeys.all,
     optimisticUpdate: (old, { name, participatesInInitiative }) => {
       // Optimistically add the new list to the cache
+      const maxSortOrder = old ? Math.max(...old.map((l) => l.sortOrder), -1) : -1;
       const optimisticList = {
         id: 'temp-' + Date.now(),
         name,
         userId: 'temp',
         isDefault: false,
         participatesInInitiative,
+        sortOrder: maxSortOrder + 1,
         createdAt: new Date(),
         updatedAt: null,
       } as unknown as ListModel;
@@ -160,5 +162,33 @@ export function useDeleteListMutation() {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['goals'] });
     },
+  });
+}
+
+// Reorder Lists Mutation
+export function useReorderListsMutation() {
+  return useOptimisticMutation({
+    mutationFn: async (listIds: string[]) => {
+      const response = await fetch('/api/reorder-lists', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ listIds }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to reorder lists');
+      }
+      return response.json();
+    },
+    queryKey: listKeys.all,
+    optimisticUpdate: (old, listIds) => {
+      if (!old) return [];
+      // Reorder the lists based on the new order
+      const listMap = new Map(old.map((list) => [list.id, list]));
+      return listIds
+        .map((id) => listMap.get(id))
+        .filter((list): list is ListModel => list !== undefined)
+        .map((list, index) => ({ ...list, sortOrder: index }));
+    },
+    errorMessage: 'Failed to reorder lists',
   });
 }

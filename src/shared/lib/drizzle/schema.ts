@@ -38,6 +38,7 @@ export const listsTable = mysqlTable('lists', {
   userId: varchar('user_id', { length: 36 }).notNull().references(() => user.id, { onDelete: 'cascade' }),
   isDefault: boolean('is_default').default(false),
   participatesInInitiative: boolean('participates_in_initiative').default(true),
+  sortOrder: int('sort_order').default(0),
   createdAt: datetime('created_at')
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
