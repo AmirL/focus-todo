@@ -17,11 +17,13 @@ jobs:
           echo "Deployment ref: ${{ github.event.deployment_status.deployment.ref }}"
           echo "Deployment SHA: ${{ github.event.deployment_status.deployment.sha }}"
 
-          # Skip main branch deployments - already tested in PR
-          REF="${{ github.event.deployment_status.deployment.ref }}"
-          if [ "$REF" = "main" ] || [ "$REF" = "master" ]; then
+          # Skip Production deployments (main branch) - already tested in PR
+          # Vercel sets environment to "Production" for main, "Preview" for PRs
+          # Note: deployment.ref is often empty for Production deployments
+          ENV="${{ github.event.deployment_status.environment }}"
+          if [ "$ENV" = "Production" ]; then
             echo "skip=true" >> $GITHUB_OUTPUT
-            echo "Skipping: Main branch deployment (already tested in PR)"
+            echo "Skipping: Production deployment (already tested in PR)"
           else
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
@@ -53,6 +55,22 @@ jobs:
 
           echo "branch=$BRANCH" >> $GITHUB_OUTPUT
           echo "Branch: $BRANCH"
+
+      - name: Get PR number for commit
+        if: steps.deployment-info.outputs.skip != 'true'
+        id: pr-info
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Find PR associated with this commit for Cypress Cloud Branch Review
+          COMMIT_SHA="${{ github.event.deployment_status.deployment.sha }}"
+          if [ -n "$COMMIT_SHA" ]; then
+            PR_NUMBER=$(gh api repos/${{ github.repository }}/commits/${COMMIT_SHA}/pulls --jq '.[0].number' 2>/dev/null || echo "")
+            PR_URL=$(gh api repos/${{ github.repository }}/commits/${COMMIT_SHA}/pulls --jq '.[0].html_url' 2>/dev/null || echo "")
+          fi
+          echo "pr_number=${PR_NUMBER:-}" >> $GITHUB_OUTPUT
+          echo "pr_url=${PR_URL:-}" >> $GITHUB_OUTPUT
+          echo "PR Number: ${PR_NUMBER:-none}"
 
       - name: Setup pnpm
         if: steps.deployment-info.outputs.skip != 'true'
@@ -88,6 +106,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COMMIT_INFO_BRANCH: ${{ steps.branch.outputs.branch }}
           COMMIT_INFO_SHA: ${{ github.event.deployment_status.deployment.sha }}
+          # PR info for Cypress Cloud Branch Review feature
+          CYPRESS_PULL_REQUEST_ID: ${{ steps.pr-info.outputs.pr_number }}
+          CYPRESS_PULL_REQUEST_URL: ${{ steps.pr-info.outputs.pr_url }}
 
       - name: Upload Cypress artifacts
         if: always() && steps.deployment-info.outputs.skip != 'true'
