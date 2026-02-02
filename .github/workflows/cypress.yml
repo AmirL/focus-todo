@@ -10,19 +10,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Log deployment info
+        id: deployment-info
         run: |
           echo "Environment URL: ${{ github.event.deployment_status.environment_url }}"
           echo "Environment: ${{ github.event.deployment_status.environment }}"
           echo "Deployment ref: ${{ github.event.deployment_status.deployment.ref }}"
           echo "Deployment SHA: ${{ github.event.deployment_status.deployment.sha }}"
 
+          # Skip main branch deployments - already tested in PR
+          REF="${{ github.event.deployment_status.deployment.ref }}"
+          if [ "$REF" = "main" ] || [ "$REF" = "master" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "Skipping: Main branch deployment (already tested in PR)"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Checkout
+        if: steps.deployment-info.outputs.skip != 'true'
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.deployment_status.deployment.sha }}
           fetch-depth: 0
 
       - name: Get branch name
+        if: steps.deployment-info.outputs.skip != 'true'
         id: branch
         run: |
           # Try deployment ref first
@@ -43,20 +55,24 @@ jobs:
           echo "Branch: $BRANCH"
 
       - name: Setup pnpm
+        if: steps.deployment-info.outputs.skip != 'true'
         uses: pnpm/action-setup@v2
         with:
           version: 8
 
       - name: Setup Node.js
+        if: steps.deployment-info.outputs.skip != 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
 
       - name: Install dependencies
+        if: steps.deployment-info.outputs.skip != 'true'
         run: pnpm install
 
       - name: Cypress run against deployment
+        if: steps.deployment-info.outputs.skip != 'true'
         uses: cypress-io/github-action@v6
         with:
           wait-on: ${{ github.event.deployment_status.target_url }}
@@ -74,7 +90,7 @@ jobs:
           COMMIT_INFO_SHA: ${{ github.event.deployment_status.deployment.sha }}
 
       - name: Upload Cypress artifacts
-        if: always()
+        if: always() && steps.deployment-info.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: cypress-results-${{ github.run_id }}
