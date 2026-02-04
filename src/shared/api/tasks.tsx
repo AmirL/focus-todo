@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { TaskModel, TaskPlain } from '@/entities/task/model/task';
 import { fetchBackend } from '@/shared/lib/api';
 import toast from 'react-hot-toast';
+import { useEditTaskModalStore } from '@/features/tasks/edit/model/editTaskModalStore';
 
 // Query Keys
 export const taskKeys = {
@@ -55,7 +56,23 @@ export function useCreateTaskMutation() {
       queryClient.setQueryData<TaskModel[]>(taskKeys.all, context?.previousTasks);
     },
     onSuccess: (createdTask) => {
-      toast.success(`Task created: ${createdTask.name}`);
+      toast.success(
+        (t) => (
+          <span className="flex items-center gap-2">
+            Task created: {createdTask.name}
+            <button
+              onClick={() => {
+                useEditTaskModalStore.getState().openWithTask(createdTask);
+                toast.dismiss(t.id);
+              }}
+              className="ml-2 text-blue-600 underline hover:text-blue-800"
+            >
+              Edit
+            </button>
+          </span>
+        ),
+        { duration: 5000 }
+      );
     },
     onSettled: () => {
       // Always refetch after error or success to ensure we have the latest data with proper server-assigned IDs
