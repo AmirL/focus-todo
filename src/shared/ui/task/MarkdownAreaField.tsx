@@ -4,10 +4,10 @@ import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Label } from '@/shared/ui/label';
 
-export function MarkdownAreaField(props: { 
-  label: string; 
-  id: string; 
-  value: string; 
+export function MarkdownAreaField(props: {
+  label: string;
+  id: string;
+  value: string;
   onChange?: (value: string) => void;
 }) {
   const { label, id, value, onChange: onChangeParent, ...rest } = props;

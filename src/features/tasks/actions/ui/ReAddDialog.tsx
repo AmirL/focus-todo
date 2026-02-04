@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { TaskModel } from '@/entities/task/model/task';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
-import { Textarea } from '@/shared/ui/textarea';
-import { TaskMetadataFields } from '@/shared/ui/task/TaskMetadataFields';
+import { TaskFormFields } from '@/shared/ui/task/TaskFormFields';
 import { useTaskMetadata } from '@/shared/ui/task/useTaskMetadata';
 import { Button } from '@/shared/ui/button';
 import { createInstance } from '@/shared/lib/instance-tools';
@@ -20,6 +19,7 @@ export function ReAddDialog({
   initialDate: Date | null;
 }) {
   const [name, setName] = useState(task.name);
+  const [details, setDetails] = useState(task.details ?? '');
   const createTaskMutation = useCreateTaskMutation();
   const updateTaskMutation = useUpdateTaskMutation();
 
@@ -34,6 +34,7 @@ export function ReAddDialog({
   useEffect(() => {
     if (open) {
       setName(task.name);
+      setDetails(task.details ?? '');
       resetMetadata();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -57,7 +58,7 @@ export function ReAddDialog({
   const handleReAdd = () => {
     const newTask = createInstance(TaskModel, {
       name,
-      details: task.details ?? '',
+      details: details.trim(),
       list: metadata.selectedList,
       selectedAt: metadata.isStarred ? new Date() : null,
       isBlocker: metadata.isBlocker,
@@ -73,18 +74,18 @@ export function ReAddDialog({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Re-add Task</DialogTitle>
-          <DialogDescription>Adjust the title or metadata before re-adding.</DialogDescription>
+          <DialogDescription>Adjust the task before re-adding.</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-2">
-          <Textarea
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="min-h-[80px] resize-none"
-            autoFocus
+        <div className="py-4">
+          <TaskFormFields
+            name={name}
+            onNameChange={setName}
+            details={details}
+            onDetailsChange={setDetails}
+            metadata={metadata}
+            onMetadataChange={updateMetadata}
           />
-
-          <TaskMetadataFields metadata={metadata} onMetadataChange={updateMetadata} />
         </div>
 
         <DialogFooter>

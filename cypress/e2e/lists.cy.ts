@@ -21,7 +21,7 @@ describe("Task Categories", () => {
   describe("Assign Tasks to Categories", () => {
     it("should create a task", () => {
       cy.get('[data-testid="add-task-button"]').click();
-      cy.get('[data-testid="task-input"]').type("Categorized task");
+      cy.get('[data-testid="task-name-input"]').type("Categorized task");
       cy.get('[data-testid="save-task-button"]').click();
       cy.contains("Categorized task").should("be.visible");
     });
