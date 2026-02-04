@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Textarea } from '@/shared/ui/textarea';
 import { Button } from '@/shared/ui/button';
 import { Plus, PlusCircle } from 'lucide-react';
-import { useAddTasksStore } from '../model/addTaskStore';
 import {
   Dialog,
   DialogContent,
@@ -16,40 +14,40 @@ import { createInstance } from '@/shared/lib/instance-tools';
 import { TaskModel } from '@/entities/task/model/task';
 import { useCreateTaskMutation } from '@/shared/api/tasks';
 import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
-import { TaskMetadataFields } from '@/shared/ui/task/TaskMetadataFields';
+import { TaskFormFields } from '@/shared/ui/task/TaskFormFields';
 import { useTaskMetadata } from '@/shared/ui/task/useTaskMetadata';
 import dayjs from 'dayjs';
 
 export function AddTaskForm() {
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
+  const [name, setName] = useState('');
+  const [details, setDetails] = useState('');
   const createTaskMutation = useCreateTaskMutation();
+
+  const { metadata, updateMetadata, resetMetadata } = useTaskMetadata();
+  const { statusFilter, list } = useFilterStore();
+
+  const resetForm = () => {
+    setName('');
+    setDetails('');
+    resetMetadata();
+  };
 
   const handleDialogClose = (open: boolean) => {
     if (open === false) {
-      // Reset states when dialog closes
-      resetMetadata();
-      setTaskInput(''); // Optionally reset input text too
+      resetForm();
     }
     setIsAddTaskOpen(open);
   };
 
   const closeDialog = () => {
-    // Reset states when dialog is explicitly closed
-    resetMetadata();
-    setTaskInput(''); // Optionally reset input text too
+    resetForm();
     setIsAddTaskOpen(false);
   };
 
-  const taskInput = useAddTasksStore((state) => state.createTaskInput);
-  const setTaskInput = useAddTasksStore((state) => state.setCreateTaskInput);
-
-  const { metadata, updateMetadata, resetMetadata } = useTaskMetadata();
-  const { statusFilter, list } = useFilterStore();
-
   useEffect(() => {
     if (isAddTaskOpen) {
-      // Reset to defaults first
-      resetMetadata();
+      resetForm();
 
       // Apply status-based defaults
       switch (statusFilter) {
@@ -69,29 +67,23 @@ export function AddTaskForm() {
         updateMetadata({ selectedList: list });
       }
     }
-  }, [isAddTaskOpen, statusFilter, list, resetMetadata, updateMetadata]); // Rerun effect if dialog opens or filters change while open
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAddTaskOpen, statusFilter, list]);
 
   const handleAddTaskClick = async () => {
-    const todoTexts = taskInput.split('\n').filter((text) => text.trim() !== '');
+    if (!name.trim()) return;
 
-    setTaskInput('');
-
-    // Create all tasks sequentially
-    for (const text of todoTexts) {
-      const newTask = createInstance(TaskModel, {
-        name: text,
-        list: metadata.selectedList,
-        selectedAt: metadata.isStarred ? new Date() : null,
-        isBlocker: metadata.isBlocker,
-        date: metadata.selectedDate,
-        estimatedDuration: metadata.selectedDuration,
-      });
-      createTaskMutation.mutate(newTask);
-    }
-    // Don't close dialog immediately on click, wait for API response (or handle errors)
-    // closeDialog();
-    // setSelectedDate(null); // Resetting is handled by closeDialog now
-    setIsAddTaskOpen(false); // Close dialog after processing
+    const newTask = createInstance(TaskModel, {
+      name: name.trim(),
+      details: details.trim(),
+      list: metadata.selectedList,
+      selectedAt: metadata.isStarred ? new Date() : null,
+      isBlocker: metadata.isBlocker,
+      date: metadata.selectedDate,
+      estimatedDuration: metadata.selectedDuration,
+    });
+    createTaskMutation.mutate(newTask);
+    setIsAddTaskOpen(false);
   };
 
   return (
@@ -106,39 +98,23 @@ export function AddTaskForm() {
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
-        <div
-          className="w-full"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') {
-              closeDialog();
-            }
-          }}
-        >
-          <DialogHeader>
-            <DialogTitle>Add New Task</DialogTitle>
-            <DialogDescription>Create a new task for your todo list.</DialogDescription>
-          </DialogHeader>
+        <DialogHeader>
+          <DialogTitle>Add New Task</DialogTitle>
+          <DialogDescription>Create a new task for your todo list.</DialogDescription>
+        </DialogHeader>
 
-          <div className="space-y-4 py-4">
-            <Textarea
-              id="new-task"
-              placeholder="Enter your task here..."
-              className="min-h-[100px] resize-none"
-              value={taskInput}
-              onChange={(e) => setTaskInput(e.target.value)}
-              autoFocus
-              data-testid="task-input"
-            />
-
-            <TaskMetadataFields
-              metadata={metadata}
-              onMetadataChange={updateMetadata}
-            />
-          </div>
+        <div className="py-4">
+          <TaskFormFields
+            name={name}
+            onNameChange={setName}
+            details={details}
+            onDetailsChange={setDetails}
+            metadata={metadata}
+            onMetadataChange={updateMetadata}
+          />
         </div>
 
-        <DialogFooterButtons onCancel={closeDialog} onAdd={handleAddTaskClick} isAddDisabled={!taskInput.trim()} />
+        <DialogFooterButtons onCancel={closeDialog} onAdd={handleAddTaskClick} isAddDisabled={!name.trim()} />
       </DialogContent>
     </Dialog>
   );

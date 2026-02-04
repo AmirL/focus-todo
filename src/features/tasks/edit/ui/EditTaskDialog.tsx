@@ -2,12 +2,9 @@ import { useEffect, useState } from 'react';
 import { TaskModel } from '@/entities/task/model/task';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
-import { Label } from '@/shared/ui/label';
-import { Input } from '@/shared/ui/input';
-import { MarkdownAreaField } from './MarkdownAreaField';
 import { useUpdateTaskMutation } from '@/shared/api/tasks';
 import { createInstance } from '@/shared/lib/instance-tools';
-import { TaskMetadataFields } from '@/shared/ui/task/TaskMetadataFields';
+import { TaskFormFields } from '@/shared/ui/task/TaskFormFields';
 import { useTaskMetadata } from '@/shared/ui/task/useTaskMetadata';
 import { ReAddButton } from '@/features/tasks/actions/ui/ReAddButton';
 
@@ -38,6 +35,7 @@ export function EditTaskDialog({
     setName(task.name);
     setDetails(task.details ?? '');
     resetMetadata();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [task.id, open]);
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -67,24 +65,15 @@ export function EditTaskDialog({
               <DialogTitle>Edit task</DialogTitle>
             </div>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div>
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="mt-1" />
-            </div>
-
-            <TaskMetadataFields metadata={metadata} onMetadataChange={updateMetadata} />
-
-            <div>
-              <Label htmlFor="details">Details</Label>
-              <MarkdownAreaField
-                label=""
-                id="details"
-                value={details}
-                onChange={setDetails}
-                data-testid="task-details-input"
-              />
-            </div>
+          <div className="py-4">
+            <TaskFormFields
+              name={name}
+              onNameChange={setName}
+              details={details}
+              onDetailsChange={setDetails}
+              metadata={metadata}
+              onMetadataChange={updateMetadata}
+            />
           </div>
           <DialogFooter>
             <ReAddButton task={task} />
