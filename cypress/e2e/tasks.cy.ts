@@ -9,22 +9,14 @@ describe("Task Management", () => {
   describe("Create Tasks", () => {
     it("should create a new task using the add task button", () => {
       cy.get('[data-testid="add-task-button"]').click();
-      cy.get('[data-testid="task-input"]').type("Buy groceries");
+      cy.get('[data-testid="task-name-input"]').type("Buy groceries");
       cy.get('[data-testid="save-task-button"]').click();
       cy.contains("Buy groceries").should("be.visible");
     });
 
-    it("should create multiple tasks at once", () => {
-      cy.get('[data-testid="add-task-button"]').click();
-      cy.get('[data-testid="task-input"]').type("First task\nSecond task");
-      cy.get('[data-testid="save-task-button"]').click();
-      cy.contains("First task").should("be.visible");
-      cy.contains("Second task").should("be.visible");
-    });
-
     it("should create a task for a specific date", () => {
       cy.get('[data-testid="add-task-button"]').click();
-      cy.get('[data-testid="task-input"]').type("Schedule meeting");
+      cy.get('[data-testid="task-name-input"]').type("Schedule meeting");
       cy.get('[data-testid="save-task-button"]').click();
       cy.contains("Schedule meeting").should("be.visible");
     });

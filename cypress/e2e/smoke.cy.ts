@@ -8,7 +8,7 @@ describe("Smoke Tests - Critical User Flows", () => {
 
   it("should create and complete a task", () => {
     cy.get('[data-testid="add-task-button"]').click();
-    cy.get('[data-testid="task-input"]').type("Smoke test task");
+    cy.get('[data-testid="task-name-input"]').type("Smoke test task");
     cy.get('[data-testid="save-task-button"]').click();
     cy.contains("Smoke test task").should("be.visible");
 
