@@ -82,22 +82,6 @@ Cypress.Commands.add("login", () => {
         expect(response.body).to.have.property("user");
       });
     },
-    {
-      validate: () => {
-        // Validate session by checking the session endpoint
-        cy.request({
-          url: "/api/auth/get-session",
-          failOnStatusCode: false,
-        }).then((response) => {
-          cy.log(`Session validation status: ${response.status}`);
-          // response.body is null when session cookie is missing or expired
-          if (response.body === null) {
-            throw new Error("Session expired or cookie missing - will recreate");
-          }
-          expect(response.body).to.have.property("user");
-        });
-      },
-    }
   );
 });
 
