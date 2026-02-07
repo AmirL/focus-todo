@@ -1,4 +1,4 @@
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, isNull, sql } from 'drizzle-orm';
 import { DB } from '@/shared/lib/db';
 import { listsTable, tasksTable, goalsTable } from '@/shared/lib/drizzle/schema';
 
@@ -70,12 +70,19 @@ export async function findUserListByName(userId: string, listName: string) {
 }
 
 /**
- * Gets all lists for a user, ordered by sortOrder then createdAt
+ * Gets lists for a user, ordered by sortOrder then createdAt.
+ * By default excludes archived lists.
  */
-export async function getUserLists(userId: string) {
+export async function getUserLists(userId: string, includeArchived: boolean = false) {
+  const conditions = [eq(listsTable.userId, userId)];
+
+  if (!includeArchived) {
+    conditions.push(isNull(listsTable.archivedAt));
+  }
+
   return DB.select()
     .from(listsTable)
-    .where(eq(listsTable.userId, userId))
+    .where(and(...conditions))
     .orderBy(listsTable.sortOrder, listsTable.createdAt);
 }
 
@@ -131,5 +138,17 @@ export async function reassignItemsToNewList(
  */
 export async function deleteUserList(userId: string, listId: number) {
   return DB.delete(listsTable)
+    .where(userListFilter(userId, listId));
+}
+
+/**
+ * Sets the archived status of a list
+ */
+export async function setListArchivedStatus(userId: string, listId: number, archived: boolean) {
+  return DB.update(listsTable)
+    .set({
+      archivedAt: archived ? new Date() : null,
+      updatedAt: new Date(),
+    })
     .where(userListFilter(userId, listId));
 }

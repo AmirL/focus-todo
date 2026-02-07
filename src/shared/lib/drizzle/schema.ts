@@ -44,6 +44,7 @@ export const listsTable = mysqlTable('lists', {
     .notNull(),
   updatedAt: datetime('updated_at')
     .default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`),
+  archivedAt: datetime('archived_at'),
 });
 
 // BetterAuth tables

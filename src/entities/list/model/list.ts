@@ -12,6 +12,7 @@ export type ListPlain = {
   sortOrder: number;
   createdAt: string;
   updatedAt: string | null;
+  archivedAt: string | null;
 };
 
 export class ListModel {
@@ -27,6 +28,13 @@ export class ListModel {
 
   @Transform(transformDateToUTCString, { toPlainOnly: true })
   updatedAt?: Date | null;
+
+  @Transform(transformDateToUTCString, { toPlainOnly: true })
+  archivedAt?: Date | null;
+
+  get isArchived(): boolean {
+    return this.archivedAt != null;
+  }
 
   static toInstance(data: ListPlain): ListModel {
     return plainToInstance(ListModel, data);

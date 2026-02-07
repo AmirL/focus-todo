@@ -27,7 +27,7 @@ import {
 } from '@dnd-kit/sortable';
 
 export function ListManager() {
-  const { data: lists = [], isLoading } = useListsQuery();
+  const { data: lists = [], isLoading } = useListsQuery({ includeArchived: true });
   const reorderMutation = useReorderListsMutation();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [activeList, setActiveList] = useState<ListModel | null>(null);

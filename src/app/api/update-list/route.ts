@@ -3,11 +3,35 @@ import { DB } from '@/shared/lib/db';
 import { eq } from 'drizzle-orm';
 import { listsTable } from '@/shared/lib/drizzle/schema';
 import { withAuthAndErrorHandling, createErrorResponse, createSuccessResponse } from '@/shared/lib/api/route-wrapper';
-import { validateUpdateListRequest } from '@/shared/lib/validation/list-validation';
-import { findUserListById, findUserListByName, userListFilter } from '@/shared/lib/db/list-queries';
+import { validateUpdateListRequest, validateArchiveListRequest } from '@/shared/lib/validation/list-validation';
+import { findUserListById, findUserListByName, setListArchivedStatus, userListFilter } from '@/shared/lib/db/list-queries';
 
 async function updateListHandler(req: NextRequest, session: { user: { id: string } }) {
   const requestBody = await req.json();
+
+  // Handle archive toggle request
+  if ('archived' in requestBody) {
+    const archiveValidation = validateArchiveListRequest(requestBody);
+
+    if (!archiveValidation.isValid) {
+      return createErrorResponse(archiveValidation.error!, 400);
+    }
+
+    const existingList = await findUserListById(session.user.id, archiveValidation.id!);
+    if (!existingList) {
+      return createErrorResponse('List not found', 404);
+    }
+
+    await setListArchivedStatus(session.user.id, archiveValidation.id!, archiveValidation.archived!);
+
+    const [updatedList] = await DB.select()
+      .from(listsTable)
+      .where(eq(listsTable.id, archiveValidation.id!));
+
+    return createSuccessResponse(updatedList, 200);
+  }
+
+  // Handle regular update request (name, participatesInInitiative)
   const validation = validateUpdateListRequest(requestBody);
 
   if (!validation.isValid) {
@@ -16,14 +40,12 @@ async function updateListHandler(req: NextRequest, session: { user: { id: string
 
   const { id, name, participatesInInitiative } = validation;
 
-  // Check if the list exists and belongs to the user
   const existingList = await findUserListById(session.user.id, id!);
 
   if (!existingList) {
     return createErrorResponse('List not found', 404);
   }
 
-  // Check if another list with the same name already exists for this user
   const duplicateList = await findUserListByName(session.user.id, name!);
 
   if (duplicateList.length > 0 && duplicateList[0].id !== id) {

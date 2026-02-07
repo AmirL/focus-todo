@@ -55,8 +55,7 @@ export function generatePrintHTML(
   totalDuration: number,
   firstTaskDate: Date | null
 ): string {
-  const taskSections = ['Work', 'Personal']
-    .filter((listType) => groupedTasks[listType])
+  const taskSections = Object.keys(groupedTasks)
     .map((listType) => renderTaskSection(listType, groupedTasks[listType]))
     .join('');
 
