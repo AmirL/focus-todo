@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { cn } from '@/shared/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -9,10 +9,16 @@ interface TaskDetailsProps {
   onCheckboxToggle?: (checkboxIndex: number) => void;
 }
 
+function getCheckboxIndexFromEvent(e: React.ChangeEvent<HTMLInputElement>): number {
+  const container = e.target.closest('[data-testid="task-details"]');
+  if (!container) return -1;
+  const allCheckboxes = container.querySelectorAll('[data-testid="subtask-checkbox"]');
+  return Array.from(allCheckboxes).indexOf(e.target);
+}
+
 export function TaskDetails({ details, onCheckboxToggle }: TaskDetailsProps) {
   const hasBoxes = hasCheckboxes(details);
   const [folded, setFolded] = useState(!(onCheckboxToggle && hasBoxes));
-  const checkboxIndexRef = useRef(0);
 
   if (!details) return <></>;
 
@@ -24,8 +30,6 @@ export function TaskDetails({ details, onCheckboxToggle }: TaskDetailsProps) {
       handleToggle();
     }
   };
-
-  checkboxIndexRef.current = 0;
 
   return (
     <div
@@ -61,13 +65,14 @@ export function TaskDetails({ details, onCheckboxToggle }: TaskDetailsProps) {
           input: ({ type, checked, ...props }) => {
             if (type !== 'checkbox') return <input type={type} checked={checked} {...props} />;
 
-            const index = checkboxIndexRef.current++;
-
             return (
               <input
                 type="checkbox"
                 checked={checked ?? false}
-                onChange={() => onCheckboxToggle?.(index)}
+                onChange={(e) => {
+                  const index = getCheckboxIndexFromEvent(e);
+                  if (index >= 0) onCheckboxToggle?.(index);
+                }}
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}
                 className="cursor-pointer accent-primary h-4 w-4 mr-1"
