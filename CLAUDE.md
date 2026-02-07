@@ -67,6 +67,7 @@ This project follows **Feature-Sliced Design (FSD)** architecture. For complete 
 - **PWA**: Configured with next-pwa
 - **Testing**: Vitest with globals enabled
 - **E2E Testing**: Cypress with Cypress Cloud integration. See [`docs/E2E_TESTS.md`](./docs/E2E_TESTS.md) for Cypress Cloud API access and test details.
+- **E2E selectors**: Use `data-cy` attributes for Cypress selectors. Add `data-cy` attributes to components when writing E2E tests. Never rely on CSS classes, layout structure, or tag hierarchy for selectors.
 
 ### API Routes Pattern
 

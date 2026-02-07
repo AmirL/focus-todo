@@ -85,7 +85,7 @@ export function ListFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent data-cy="list-form-dialog">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{dialogDescription}</DialogDescription>
@@ -105,6 +105,7 @@ export function ListFormDialog({
             <Label htmlFor="list-description">Description</Label>
             <Textarea
               id="list-description"
+              data-cy="list-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Provide context for tasks in this list..."
@@ -126,10 +127,11 @@ export function ListFormDialog({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={handleCancel}>
+          <Button variant="outline" data-cy="list-form-cancel" onClick={handleCancel}>
             Cancel
           </Button>
           <Button
+            data-cy="list-form-submit"
             onClick={handleSubmit}
             disabled={!value.trim() || isLoading}
           >
