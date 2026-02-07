@@ -75,16 +75,22 @@ function useOptimisticMutation<TData, TVariables>({
 // Query Keys
 export const listKeys = {
   all: ['lists'] as const,
+  active: ['lists', { includeArchived: false }] as const,
+  withArchived: ['lists', { includeArchived: true }] as const,
   details: () => [...listKeys.all, 'detail'] as const,
   detail: (id: string) => [...listKeys.details(), id] as const,
 };
 
 // Fetch Lists Query
-export function useListsQuery() {
+export function useListsQuery(options?: { includeArchived?: boolean }) {
+  const includeArchived = options?.includeArchived ?? false;
+  const queryKey = includeArchived ? listKeys.withArchived : listKeys.active;
+
   return useQuery({
-    queryKey: listKeys.all,
+    queryKey,
     queryFn: async () => {
-      const data = (await fetchBackend('get-lists')) as { lists: ListPlain[] };
+      const body = includeArchived ? { includeArchived: true } : undefined;
+      const data = (await fetchBackend('get-lists', body)) as { lists: ListPlain[] };
       return ListModel.fromPlainArray(data.lists);
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -113,6 +119,7 @@ export function useCreateListMutation() {
         sortOrder: maxSortOrder + 1,
         createdAt: new Date(),
         updatedAt: null,
+        archivedAt: null,
       } as unknown as ListModel;
 
       if (!old) return [optimisticList];
@@ -134,11 +141,31 @@ export function useUpdateListMutation() {
     optimisticUpdate: (old, { id, name, description, participatesInInitiative }) => {
       if (!old) return [];
       return old.map((list) =>
-        list.id === id ? { ...list, name, ...(description !== undefined && { description }), participatesInInitiative, updatedAt: new Date() } : list
+        list.id === id ? Object.assign(Object.create(Object.getPrototypeOf(list)), list, { name, ...(description !== undefined && { description }), participatesInInitiative, updatedAt: new Date() }) : list
       );
     },
     successMessage: 'List updated',
     errorMessage: 'Failed to update list',
+  });
+}
+
+// Archive List Mutation
+export function useArchiveListMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, archived }: { id: string; archived: boolean }) => {
+      const response = (await fetchBackend('update-list', { id, archived })) as ListPlain;
+      return ListModel.toInstance(response);
+    },
+    onSuccess: (_data, { archived }) => {
+      toast.success(archived ? 'List archived' : 'List unarchived');
+      // Invalidate all list queries (both active and withArchived)
+      queryClient.invalidateQueries({ queryKey: listKeys.all });
+    },
+    onError: () => {
+      toast.error('Failed to update list archive status');
+    },
   });
 }
 
@@ -188,7 +215,7 @@ export function useReorderListsMutation() {
       return listIds
         .map((id) => listMap.get(id))
         .filter((list): list is ListModel => list !== undefined)
-        .map((list, index) => ({ ...list, sortOrder: index }));
+        .map((list, index) => Object.assign(Object.create(Object.getPrototypeOf(list)), list, { sortOrder: index }));
     },
     errorMessage: 'Failed to reorder lists',
   });

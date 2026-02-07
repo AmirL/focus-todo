@@ -39,6 +39,11 @@ describe("List Description", () => {
 
     waitForDialogClosed();
 
+    // Reload the page to ensure fresh data from server
+    cy.visit("/settings");
+    cy.waitForAppLoad();
+    cy.get('[data-cy^="list-item-"]').first().should("be.visible");
+
     // Reopen to verify persistence
     cy.get('[data-cy^="list-item-"]')
       .first()

@@ -108,6 +108,14 @@ Full RESTful API for programmatic task management. See [`docs/TASK_API.md`](./do
 - When E2E tests fail in CI, wait for the GitHub Actions run to finish, check the failure, fix it, push, and repeat until CI is green. Don't leave failing CI behind.
 - When finishing a feature, add or update E2E tests. Remove E2E tests for removed features.
 
+### CI/CD Pipeline
+
+After pushing a PR, the CI pipeline runs in this order:
+1. **Vercel Preview Deployment** (~90 seconds) - builds and deploys a preview
+2. **E2E tests** start after the preview deployment finishes
+
+When waiting for CI checks, wait ~90 seconds for the preview deployment to complete, then use `gh run watch` to monitor the E2E test run to completion.
+
 ### Recommended Practices
 
 - Use proactively qa agent and code review agent.

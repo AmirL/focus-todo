@@ -5,7 +5,7 @@ import {
   createErrorResponse,
 } from '@/shared/lib/api/route-wrapper';
 import { DB } from '@/shared/lib/db';
-import { and, eq, gte, lte, or } from 'drizzle-orm';
+import { and, eq, gte, isNull, lte, or } from 'drizzle-orm';
 import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema';
 import { getSuggestedList, calculateBalance, type ListWithLastTouched } from '@/entities/current-initiative';
 import dayjs from 'dayjs';
@@ -47,10 +47,10 @@ async function getInitiativeHandler(
   const todayDate = toDate(todayStr);
   const tomorrowDate = toDate(tomorrowStr);
 
-  // Get all participating lists for this user
+  // Get all non-archived participating lists for this user
   const lists = await DB.select()
     .from(listsTable)
-    .where(eq(listsTable.userId, userId));
+    .where(and(eq(listsTable.userId, userId), isNull(listsTable.archivedAt)));
 
   const participatingLists = lists.filter((l) => l.participatesInInitiative);
 
@@ -183,7 +183,8 @@ async function setInitiativeHandler(
     .where(
       and(
         eq(listsTable.userId, userId),
-        eq(listsTable.participatesInInitiative, true)
+        eq(listsTable.participatesInInitiative, true),
+        isNull(listsTable.archivedAt)
       )
     );
 

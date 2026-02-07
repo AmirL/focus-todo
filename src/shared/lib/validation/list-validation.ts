@@ -86,3 +86,24 @@ export function validateUpdateListRequest(requestBody: unknown): UpdateListValid
     participatesInInitiative: body.participatesInInitiative === undefined ? undefined : Boolean(body.participatesInInitiative)
   };
 }
+
+export interface ArchiveListValidationResult {
+  isValid: boolean;
+  error?: string;
+  id?: number;
+  archived?: boolean;
+}
+
+export function validateArchiveListRequest(requestBody: unknown): ArchiveListValidationResult {
+  const body = requestBody as { id?: unknown; archived?: unknown };
+
+  if (!body?.id) {
+    return { isValid: false, error: 'List ID is required' };
+  }
+
+  if (typeof body.archived !== 'boolean') {
+    return { isValid: false, error: 'archived must be a boolean' };
+  }
+
+  return { isValid: true, id: body.id as number, archived: body.archived };
+}
