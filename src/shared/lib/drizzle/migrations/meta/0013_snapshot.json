@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "73b45550-ed6d-4b56-b13c-02024ac403ef",
-  "prevId": "3db6b7a8-94a2-409b-bd87-bc7a2c17ff00",
+  "id": "224cd855-f6b5-473b-8fa9-61b5bc821d83",
+  "prevId": "73b45550-ed6d-4b56-b13c-02024ac403ef",
   "tables": {
     "account": {
       "name": "account",
@@ -499,6 +499,13 @@
           "notNull": false,
           "autoincrement": false,
           "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+        },
+        "archived_at": {
+          "name": "archived_at",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {},

@@ -35,6 +35,7 @@ export const goalsTable = mysqlTable('goals', {
 export const listsTable = mysqlTable('lists', {
   id: int('id').autoincrement().primaryKey().notNull(),
   name: varchar('name', { length: 255 }).notNull(),
+  description: text('description'),
   userId: varchar('user_id', { length: 36 }).notNull().references(() => user.id, { onDelete: 'cascade' }),
   isDefault: boolean('is_default').default(false),
   participatesInInitiative: boolean('participates_in_initiative').default(true),

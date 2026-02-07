@@ -67,6 +67,7 @@ This project follows **Feature-Sliced Design (FSD)** architecture. For complete 
 - **PWA**: Configured with next-pwa
 - **Testing**: Vitest with globals enabled
 - **E2E Testing**: Cypress with Cypress Cloud integration. See [`docs/E2E_TESTS.md`](./docs/E2E_TESTS.md) for Cypress Cloud API access and test details.
+- **E2E selectors**: Use `data-cy` attributes for Cypress selectors. Add `data-cy` attributes to components when writing E2E tests. Never rely on CSS classes, layout structure, or tag hierarchy for selectors.
 
 ### API Routes Pattern
 
@@ -92,6 +93,9 @@ Full RESTful API for programmatic task management. See [`docs/TASK_API.md`](./do
 - Component development should follow existing Radix UI + Tailwind patterns
 - New features should be structured according to FSD layers
 - Database changes require running migrations via `pnpm run db:generate` and `pnpm run db:migrate`
+- **Database migrations**: `pnpm run db:migrate` requires `DATABASE_URL` env var. It is not auto-loaded from `.env.local`. Run with: `DATABASE_URL='...' npx drizzle-kit migrate`
+- **Shared database**: Dev and prod use the same database. Be careful with migrations and data changes.
+- **Test user login**: In dev mode, the login page has a "Login as Test User" button (`test@example.com` / `password123`). Use this for Playwright testing.
 - Always run `pnpm tsc --noEmit` before committing to ensure TypeScript compliance
 - The steiger config has specific FSD rules disabled - follow existing patterns rather than strict FSD compliance
 
@@ -101,6 +105,8 @@ Full RESTful API for programmatic task management. See [`docs/TASK_API.md`](./do
 - When you consider your work is finished, use playwright mcp to test it
 - When test is finished, task you need acceptance from the reviewer agent
 - Only after that the workflow is finished.
+- When E2E tests fail in CI, wait for the GitHub Actions run to finish, check the failure, fix it, push, and repeat until CI is green. Don't leave failing CI behind.
+- When finishing a feature, add or update E2E tests. Remove E2E tests for removed features.
 
 ### CI/CD Pipeline
 

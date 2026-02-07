@@ -38,7 +38,7 @@ async function updateListHandler(req: NextRequest, session: { user: { id: string
     return createErrorResponse(validation.error!, 400);
   }
 
-  const { id, name, participatesInInitiative } = validation;
+  const { id, name, description, participatesInInitiative } = validation;
 
   const existingList = await findUserListById(session.user.id, id!);
 
@@ -55,6 +55,7 @@ async function updateListHandler(req: NextRequest, session: { user: { id: string
   await DB.update(listsTable)
     .set({
       name: name!,
+      ...(description !== undefined && { description }),
       participatesInInitiative,
       updatedAt: new Date()
     })

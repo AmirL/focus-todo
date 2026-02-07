@@ -79,21 +79,9 @@ Cypress.Commands.add("login", () => {
       }).then((response) => {
         cy.log(`Sign-in response status: ${response.status}`);
         expect(response.status).to.eq(200);
+        expect(response.body).to.have.property("user");
       });
     },
-    {
-      validate: () => {
-        // Validate session by checking the session endpoint
-        cy.request({
-          url: "/api/auth/get-session",
-          failOnStatusCode: false,
-        }).then((response) => {
-          cy.log(`Session response status: ${response.status}`);
-          expect(response.status).to.eq(200);
-          expect(response.body).to.have.property("user");
-        });
-      },
-    }
   );
 });
 

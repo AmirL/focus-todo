@@ -6,6 +6,7 @@ dayjs.extend(utc);
 export type ListPlain = {
   id: string;
   name: string;
+  description?: string | null;
   userId: string;
   isDefault: boolean;
   participatesInInitiative: boolean;
@@ -18,6 +19,7 @@ export type ListPlain = {
 export class ListModel {
   id!: string;
   name!: string;
+  description?: string | null;
   userId!: string;
   isDefault!: boolean;
   participatesInInitiative!: boolean;
