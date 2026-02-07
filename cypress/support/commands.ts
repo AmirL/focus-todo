@@ -79,6 +79,7 @@ Cypress.Commands.add("login", () => {
       }).then((response) => {
         cy.log(`Sign-in response status: ${response.status}`);
         expect(response.status).to.eq(200);
+        expect(response.body).to.have.property("user");
       });
     },
     {
@@ -88,8 +89,11 @@ Cypress.Commands.add("login", () => {
           url: "/api/auth/get-session",
           failOnStatusCode: false,
         }).then((response) => {
-          cy.log(`Session response status: ${response.status}`);
-          expect(response.status).to.eq(200);
+          cy.log(`Session validation status: ${response.status}`);
+          // response.body is null when session cookie is missing or expired
+          if (response.body === null) {
+            throw new Error("Session expired or cookie missing - will recreate");
+          }
           expect(response.body).to.have.property("user");
         });
       },
