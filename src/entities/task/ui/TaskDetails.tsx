@@ -1,14 +1,18 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { cn } from '@/shared/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { hasCheckboxes } from '@/shared/lib/toggleMarkdownCheckbox';
 
 interface TaskDetailsProps {
   details: string;
+  onCheckboxToggle?: (checkboxIndex: number) => void;
 }
 
-export function TaskDetails({ details }: TaskDetailsProps) {
-  const [folded, setFolded] = useState(true);
+export function TaskDetails({ details, onCheckboxToggle }: TaskDetailsProps) {
+  const hasBoxes = hasCheckboxes(details);
+  const [folded, setFolded] = useState(!(onCheckboxToggle && hasBoxes));
+  const checkboxIndexRef = useRef(0);
 
   if (!details) return <></>;
 
@@ -20,6 +24,8 @@ export function TaskDetails({ details }: TaskDetailsProps) {
       handleToggle();
     }
   };
+
+  checkboxIndexRef.current = 0;
 
   return (
     <div
@@ -52,6 +58,42 @@ export function TaskDetails({ details }: TaskDetailsProps) {
               {children}
             </a>
           ),
+          input: ({ type, checked, ...props }) => {
+            if (type !== 'checkbox') return <input type={type} checked={checked} {...props} />;
+
+            const index = checkboxIndexRef.current++;
+
+            return (
+              <input
+                type="checkbox"
+                checked={checked ?? false}
+                onChange={() => onCheckboxToggle?.(index)}
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+                className="cursor-pointer accent-primary h-4 w-4 mr-1"
+                data-testid="subtask-checkbox"
+              />
+            );
+          },
+          li: ({ children, className, node, ...props }) => {
+            const isTaskItem = className?.includes('task-list-item');
+            const isChecked = isTaskItem && node?.children?.some(
+              (child) => (child as { tagName?: string; properties?: { checked?: boolean } }).tagName === 'input' &&
+                (child as { properties?: { checked?: boolean } }).properties?.checked
+            );
+            return (
+              <li
+                className={cn(
+                  className,
+                  isTaskItem && 'list-none',
+                  isChecked && 'text-muted-foreground line-through'
+                )}
+                {...props}
+              >
+                {children}
+              </li>
+            );
+          },
         }}
       >
         {details}

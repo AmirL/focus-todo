@@ -8,6 +8,9 @@ import { TaskBadges } from './TaskBadges';
 import { TaskDetails } from './TaskDetails';
 import { TaskName } from './TaskName';
 import { useTempSelectStore } from '@/features/tasks/temp-select';
+import { useUpdateTaskMutation } from '@/shared/api/tasks';
+import { toggleMarkdownCheckbox } from '@/shared/lib/toggleMarkdownCheckbox';
+import { createInstance } from '@/shared/lib/instance-tools';
 
 interface TaskProps {
   task: TaskModel;
@@ -22,6 +25,13 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
   const toggleTaskCompleted = useToggleTaskCompleted();
   const { toggleSelection, isSelected: isTempSelected } = useTempSelectStore();
   const isTempSelectedTask = isTempSelected(task.id);
+  const updateTaskMutation = useUpdateTaskMutation();
+
+  const handleCheckboxToggle = (checkboxIndex: number) => {
+    const newDetails = toggleMarkdownCheckbox(task.details, checkboxIndex);
+    const updatedTask = createInstance(TaskModel, { ...task, details: newDetails, updatedAt: new Date() });
+    updateTaskMutation.mutate(updatedTask);
+  };
 
   const onCheckboxClick = async () => {
     if (deleted) return;
@@ -79,7 +89,7 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
           />
           <TaskName task={task} />
         </div>
-        <TaskDetails details={task.details} />
+        <TaskDetails details={task.details} onCheckboxToggle={handleCheckboxToggle} />
         <div className="flex justify-between items-center mt-2 gap-2">
           <div className="flex space-x-2 items-center min-w-0 flex-shrink overflow-hidden">
             <TaskBadges task={task} />
