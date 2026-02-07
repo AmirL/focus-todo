@@ -2,6 +2,7 @@
 
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
+import { Textarea } from '@/shared/ui/textarea';
 import { Label } from '@/shared/ui/label';
 import { Checkbox } from '@/shared/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
@@ -30,6 +31,7 @@ export function ListFormDialog({
   const { data: lists = [] } = useListsQuery();
 
   const [value, setValue] = useState('');
+  const [description, setDescription] = useState('');
   const [participatesInInitiative, setParticipatesInInitiative] = useState(true);
 
   const list = listId ? lists.find(l => l.id === listId) : null;
@@ -39,8 +41,10 @@ export function ListFormDialog({
   useEffect(() => {
     if (open) {
       const initialValue = mode === 'edit' && list ? list.name : '';
+      const initialDescription = mode === 'edit' && list ? list.description ?? '' : '';
       const initialParticipates = mode === 'edit' && list ? list.participatesInInitiative : true;
       setValue(initialValue);
+      setDescription(initialDescription);
       setParticipatesInInitiative(initialParticipates);
     }
   }, [open, mode, list]);
@@ -49,21 +53,23 @@ export function ListFormDialog({
     let success = false;
 
     if (mode === 'create') {
-      success = await createList(value, participatesInInitiative);
+      success = await createList(value, participatesInInitiative, description || null);
     } else if (mode === 'edit' && listId) {
-      success = await updateList(listId, value, participatesInInitiative);
+      success = await updateList(listId, value, participatesInInitiative, description || null);
     }
 
     if (success) {
-      setValue(''); // Reset form
-      setParticipatesInInitiative(true); // Reset to default
-      onCancel(); // Close dialog on success
+      setValue('');
+      setDescription('');
+      setParticipatesInInitiative(true);
+      onCancel();
     }
   };
 
   const handleCancel = () => {
-    setValue(''); // Reset form
-    setParticipatesInInitiative(true); // Reset to default
+    setValue('');
+    setDescription('');
+    setParticipatesInInitiative(true);
     onCancel();
   };
 
@@ -74,15 +80,15 @@ export function ListFormDialog({
   };
 
   const title = mode === 'create' ? 'Create New List' : 'Edit List';
-  const description = mode === 'create' ? 'Enter a name for your new list' : 'Change the name of your list';
+  const dialogDescription = mode === 'create' ? 'Enter a name for your new list' : 'Change the name of your list';
   const submitLabel = mode === 'create' ? 'Create List' : 'Update List';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent data-cy="list-form-dialog">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+          <DialogDescription>{dialogDescription}</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div>
@@ -93,6 +99,17 @@ export function ListFormDialog({
               onChange={(e) => setValue(e.target.value)}
               placeholder="Enter list name"
               onKeyDown={handleKeyDown}
+            />
+          </div>
+          <div>
+            <Label htmlFor="list-description">Description</Label>
+            <Textarea
+              id="list-description"
+              data-cy="list-description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Provide context for tasks in this list..."
+              rows={3}
             />
           </div>
           <div className="flex items-center space-x-2">
@@ -110,10 +127,11 @@ export function ListFormDialog({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={handleCancel}>
+          <Button variant="outline" data-cy="list-form-cancel" onClick={handleCancel}>
             Cancel
           </Button>
           <Button
+            data-cy="list-form-submit"
             onClick={handleSubmit}
             disabled={!value.trim() || isLoading}
           >

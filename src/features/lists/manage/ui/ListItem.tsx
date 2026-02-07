@@ -24,7 +24,7 @@ export function ListItem({ list, isDragging, dragHandleRef, dragHandleListeners 
     await deleteList(list.id);
   };
   return (
-    <div className={`flex items-center justify-between p-3 border rounded-lg ${isDragging ? 'opacity-50' : ''}`}>
+    <div data-cy={`list-item-${list.name.toLowerCase().replace(/\s+/g, '-')}`} className={`flex items-center justify-between p-3 border rounded-lg ${isDragging ? 'opacity-50' : ''}`}>
       <div className="flex items-center space-x-2">
         {dragHandleRef && (
           <button
@@ -47,6 +47,7 @@ export function ListItem({ list, isDragging, dragHandleRef, dragHandleListeners 
         <Button
           variant="ghost"
           size="sm"
+          data-cy="edit-list-btn"
           onClick={() => setEditDialogOpen(true)}
         >
           <Edit className="h-4 w-4" />

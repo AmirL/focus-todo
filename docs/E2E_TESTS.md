@@ -77,6 +77,7 @@ Tests are located in `cypress/e2e/`:
 - `tasks.cy.ts` - Task management tests
 - `goals.cy.ts` - Goal management tests
 - `lists.cy.ts` - List/category tests
+- `list-description.cy.ts` - List description field tests
 - `search-navigation.cy.ts` - Search and navigation tests
 
 ## Notes
