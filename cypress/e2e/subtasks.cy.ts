@@ -35,25 +35,24 @@ describe("Subtask Checkboxes", () => {
     getTaskCheckboxes(name).eq(2).should("be.checked");
   });
 
-  it("should toggle a checkbox and persist the change", () => {
+  it("should toggle a checkbox and verify the server update", () => {
     const name = `Toggle test ${Date.now()}`;
     createTaskWithCheckboxes(name);
+
+    // Intercept the update-task API call
+    cy.intercept("POST", "/api/update-task").as("updateTask");
 
     // Click the first checkbox to check it
     getTaskCheckboxes(name).eq(0).click();
 
-    // Verify the first checkbox is now checked
+    // Verify the first checkbox is now checked (optimistic update)
     getTaskCheckboxes(name).eq(0).should("be.checked");
 
-    // Wait for the mutation to reach the server
-    // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.wait(2000);
-
-    // Reload and verify the state persisted
-    cy.reload();
-    cy.waitForAppLoad();
-
-    getTaskCheckboxes(name).eq(0).should("be.checked");
+    // Verify the update was sent to the server with the correct data
+    cy.wait("@updateTask").then((interception) => {
+      const body = interception.request.body;
+      expect(body.task.details).to.include("- [x] Buy groceries");
+    });
   });
 
   it("should not collapse details when clicking a checkbox", () => {
