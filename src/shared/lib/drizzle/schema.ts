@@ -9,7 +9,7 @@ export const tasksTable = mysqlTable('tasks', {
   date: datetime('date'),
   estimatedDuration: int('estimated_duration'),
   completedAt: datetime('completed_at'),
-  __list_deprecated: varchar('__list_deprecated', { length: 255 }).notNull(),
+  __list_deprecated: varchar('__list_deprecated', { length: 255 }).notNull().default(''),
   listId: int('list_id').notNull().references(() => listsTable.id, { onDelete: 'restrict' }),
   isBlocker: boolean('is_blocker').default(false),
   selectedAt: date('selected_at'),
