@@ -4,6 +4,9 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
+export type { AiSuggestionField, AiSuggestions } from '@/shared/types/aiSuggestions';
+import type { AiSuggestions } from '@/shared/types/aiSuggestions';
+
 export type TaskPlain = {
   id: string;
   name: string;
@@ -18,6 +21,7 @@ export type TaskPlain = {
   isBlocker?: boolean;
   updatedAt?: string;
   sortOrder?: number;
+  aiSuggestions?: AiSuggestions | null;
 };
 
 export class TaskModel {
@@ -52,6 +56,8 @@ export class TaskModel {
   createdAt!: Date;
 
   sortOrder: number = 0;
+
+  aiSuggestions: AiSuggestions | null = null;
 
   static toInstance(data: TaskPlain): TaskModel {
     return plainToInstance(TaskModel, data);

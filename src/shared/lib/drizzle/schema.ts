@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
-import { mysqlTable, int, varchar, text, date, boolean, tinyint, timestamp, datetime } from 'drizzle-orm/mysql-core';
+import { mysqlTable, int, varchar, text, date, boolean, tinyint, timestamp, datetime, json } from 'drizzle-orm/mysql-core';
+import type { AiSuggestions } from '@/shared/types/aiSuggestions';
 
 export const tasksTable = mysqlTable('tasks', {
   id: int('id').autoincrement().primaryKey().notNull(),
@@ -20,6 +21,7 @@ export const tasksTable = mysqlTable('tasks', {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   sortOrder: int('sort_order').default(0),
+  aiSuggestions: json('ai_suggestions').$type<AiSuggestions>(),
 });
 
 export const goalsTable = mysqlTable('goals', {
