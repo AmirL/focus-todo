@@ -254,6 +254,7 @@ describe("Task API", () => {
         expect(response.body.task.id).to.eq(testTaskId);
         expect(response.body.task.name).to.eq("Task for single get test");
         expect(response.body.task.details).to.eq("Test details");
+        expect(response.body.task).to.have.property("listDescription");
       });
     });
 

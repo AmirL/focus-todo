@@ -107,6 +107,7 @@ curl -X GET "https://your-domain.com/api/tasks/123" \
     "isBlocker": true,
     "list": "Work",
     "listId": 1,
+    "listDescription": "Work-related tasks and projects",
     "deletedAt": null,
     "updatedAt": "2026-01-25T10:00:00Z",
     "createdAt": "2026-01-25T09:00:00Z",
@@ -115,6 +116,8 @@ curl -X GET "https://your-domain.com/api/tasks/123" \
   }
 }
 ```
+
+The `listDescription` field contains the description of the task's list (category), or `null` if the list has no description or the task has no `listId`.
 
 #### Error Responses
 
@@ -283,6 +286,7 @@ curl -X PATCH "https://your-domain.com/api/tasks/123" \
     "isBlocker": true,
     "list": "Work",
     "listId": 1,
+    "listDescription": "Work-related tasks and projects",
     "deletedAt": null,
     "updatedAt": "2026-01-25T15:00:00Z",
     "createdAt": "2026-01-25T09:00:00Z",
