@@ -117,8 +117,8 @@ describe("AI Suggestions", () => {
         openEditDialog(taskId);
 
         cy.get('[data-cy="ai-suggestion-banner-name"]').should("be.visible");
-        cy.get('[data-cy="ai-suggestion-banner-details"]').should("be.visible");
-        cy.get('[data-cy="ai-suggestion-banner-estimatedDuration"]').should("be.visible");
+        cy.get('[data-cy="ai-suggestion-banner-estimatedDuration"]').scrollIntoView().should("be.visible");
+        cy.get('[data-cy="ai-suggestion-banner-details"]').scrollIntoView().should("be.visible");
       });
     });
 
