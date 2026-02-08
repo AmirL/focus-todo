@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { isTaskSelected, TaskModel, isTaskDeleted } from '@/entities/task/model/task';
 import { Checkbox } from '@/shared/ui/checkbox';
 import { cn } from '@/shared/lib/utils';
@@ -5,7 +6,7 @@ import { useToggleTaskCompleted } from '../model/toggleCompleted';
 import { EstimatedTimeButton } from '@/features/tasks/actions/ui/EstimatedTimeButton';
 import { CollapsibleActions } from '@/shared/ui/collapsible-actions';
 import { TaskBadges } from './TaskBadges';
-import { TaskDetails } from './TaskDetails';
+import { TaskDetails, DescriptionIndicator } from './TaskDetails';
 import { TaskName } from './TaskName';
 import { useTempSelectStore } from '@/features/tasks/temp-select';
 import { useUpdateTaskMutation } from '@/shared/api/tasks';
@@ -26,6 +27,7 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
   const { toggleSelection, isSelected: isTempSelected } = useTempSelectStore();
   const isTempSelectedTask = isTempSelected(task.id);
   const updateTaskMutation = useUpdateTaskMutation();
+  const [detailsExpanded, setDetailsExpanded] = useState(false);
 
   const handleCheckboxToggle = (checkboxIndex: number) => {
     const newDetails = toggleMarkdownCheckbox(task.details, checkboxIndex);
@@ -89,10 +91,16 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
           />
           <TaskName task={task} />
         </div>
-        <TaskDetails details={task.details} onCheckboxToggle={handleCheckboxToggle} />
         <div className="flex justify-between items-center mt-2 gap-2">
           <div className="flex space-x-2 items-center min-w-0 flex-shrink overflow-hidden">
             <TaskBadges task={task} />
+            {task.details?.trim() && (
+              <DescriptionIndicator
+                details={task.details}
+                expanded={detailsExpanded}
+                onClick={() => setDetailsExpanded(!detailsExpanded)}
+              />
+            )}
             <EstimatedTimeButton task={task} />
           </div>
           <div className="flex-shrink-0">
@@ -101,8 +109,15 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
             </CollapsibleActions>
           </div>
         </div>
+        {task.details?.trim() && (
+          <TaskDetails
+            details={task.details}
+            expanded={detailsExpanded}
+            onCollapse={() => setDetailsExpanded(false)}
+            onCheckboxToggle={handleCheckboxToggle}
+          />
+        )}
       </div>
     </li>
   );
 }
-
