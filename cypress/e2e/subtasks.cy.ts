@@ -3,18 +3,21 @@
 const checkboxMarkdown = "- [ ] Buy groceries\n- [ ] Clean house\n- [x] Send email";
 
 function createTaskWithCheckboxes(name: string) {
+  // Intercept the task list refetch that happens after creation
+  cy.intercept("POST", "/api/get-tasks").as("getTasks");
+
   cy.get('[data-testid="add-task-button"]').click();
   cy.get('[data-testid="task-name-input"]').type(name);
   cy.contains("button", "Edit").click();
   cy.get("#details").type(checkboxMarkdown);
   cy.get('[data-testid="save-task-button"]').click();
   cy.contains(name).should("be.visible");
+
+  // Wait for the React Query refetch to complete so the component won't remount
+  cy.wait("@getTasks");
 }
 
 function expandDescription(name: string) {
-  // Wait for the task list to stabilize after creation (React Query refetch)
-  cy.wait(1000);
-
   cy.contains(name)
     .parents('[data-testid^="task-"]')
     .first()
@@ -41,6 +44,8 @@ describe("Subtask Checkboxes", () => {
   beforeEach(() => {
     cy.visit("/");
     cy.waitForAppLoad();
+    // Wait for the task list to render (ensures session is restored and main view loaded)
+    cy.get('[data-testid="add-task-button"]', { timeout: 15000 }).should("be.visible");
   });
 
   it("should create a task with checkboxes and render them", () => {
