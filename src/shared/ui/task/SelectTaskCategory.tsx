@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
 import { useListsQuery } from '@/shared/api/lists';
 
@@ -9,10 +9,17 @@ type Props = {
 
 export function SelectTaskCategory({ selectedListId, setSelectedListId }: Props) {
   const { data: lists = [], isLoading } = useListsQuery();
+  const defaultAppliedRef = useRef(false);
 
+  // Auto-select first list when no selection exists (e.g. Add Task form).
+  // Ref guard prevents re-triggering after the parent resets.
   useEffect(() => {
-    if (selectedListId == null && lists.length > 0) {
+    if (selectedListId == null && lists.length > 0 && !defaultAppliedRef.current) {
+      defaultAppliedRef.current = true;
       setSelectedListId(Number(lists[0].id));
+    }
+    if (selectedListId != null) {
+      defaultAppliedRef.current = false;
     }
   }, [selectedListId, lists, setSelectedListId]);
 

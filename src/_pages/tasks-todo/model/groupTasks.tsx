@@ -1,6 +1,6 @@
 import type { TaskModel } from '@/entities/task/model/task';
 import { useListsQuery } from '@/shared/api/lists';
-import { buildListIdToNameMap } from '@/shared/lib/listUtils';
+import { useListNameMap } from '@/shared/lib/listUtils';
 
 export type TaskGroup = {
   id: number;
@@ -21,7 +21,7 @@ export function useGroupedTasksByList(
   const { data: lists = [] } = useListsQuery();
   const { focusListName } = options;
 
-  const listNameMap = buildListIdToNameMap(lists);
+  const listNameMap = useListNameMap();
 
   // Build groups map keyed by listId
   const groupsMap = tasks.reduce<Record<number, TaskModel[]>>((acc, task) => {

@@ -10,16 +10,14 @@ import {
   calculateTotalDuration
 } from '../lib/printUtils';
 import { generatePrintHTML } from '../lib/printTemplate';
-import { useListsQuery } from '@/shared/api/lists';
-import { buildListIdToNameMap } from '@/shared/lib/listUtils';
+import { useListNameMap } from '@/shared/lib/listUtils';
 
 interface PrintButtonProps {
   tasks: TaskModel[];
 }
 
 export function PrintButton({ tasks }: PrintButtonProps) {
-  const { data: lists = [] } = useListsQuery();
-  const listNameMap = buildListIdToNameMap(lists);
+  const listNameMap = useListNameMap();
 
   const handlePrint = () => {
     const printableTasks = filterPrintableTasks(tasks);

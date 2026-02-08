@@ -4,8 +4,7 @@ import * as React from 'react';
 import { TaskModel } from '@/entities/task/model/task';
 import dayjs from 'dayjs';
 import { SpotlightDisplayItem } from '../model/spotlight';
-import { useListsQuery } from '@/shared/api/lists';
-import { buildListIdToNameMap } from '@/shared/lib/listUtils';
+import { useListNameMap } from '@/shared/lib/listUtils';
 
 type Props = {
   items: SpotlightDisplayItem[];
@@ -24,8 +23,7 @@ function formatSubline(task: TaskModel, listNameMap: Map<number, string>) {
 }
 
 export function SpotlightResults({ items, activeIndex, onHoverIndex, onSelect }: Props) {
-  const { data: lists = [] } = useListsQuery();
-  const listNameMap = buildListIdToNameMap(lists);
+  const listNameMap = useListNameMap();
   return (
     <ul className="divide-y">
       {items.map((item, idx) => {
