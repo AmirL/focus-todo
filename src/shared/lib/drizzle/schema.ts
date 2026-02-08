@@ -9,8 +9,8 @@ export const tasksTable = mysqlTable('tasks', {
   date: datetime('date'),
   estimatedDuration: int('estimated_duration'),
   completedAt: datetime('completed_at'),
-  list: varchar('list', { length: 255 }).notNull(), // Keep for backward compatibility during migration
-  listId: int('list_id').references(() => listsTable.id, { onDelete: 'restrict' }),
+  __list_deprecated: varchar('__list_deprecated', { length: 255 }).notNull().default(''),
+  listId: int('list_id').notNull().references(() => listsTable.id, { onDelete: 'restrict' }),
   isBlocker: boolean('is_blocker').default(false),
   selectedAt: date('selected_at'),
   uid: int('uid'),
@@ -28,8 +28,8 @@ export const goalsTable = mysqlTable('goals', {
   id: int('id').autoincrement().primaryKey().notNull(),
   title: varchar('title', { length: 255 }),
   progress: tinyint('progress').default(0),
-  list: varchar('list', { length: 255 }), // Keep for backward compatibility during migration
-  listId: int('list_id').references(() => listsTable.id, { onDelete: 'restrict' }),
+  __list_deprecated: varchar('__list_deprecated', { length: 255 }),
+  listId: int('list_id').notNull().references(() => listsTable.id, { onDelete: 'restrict' }),
   userId: varchar('user_id', { length: 36 }).notNull().references(() => user.id, { onDelete: 'cascade' }),
   deletedAt: datetime('deleted_at'),
 });

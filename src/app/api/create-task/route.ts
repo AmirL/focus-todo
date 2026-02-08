@@ -10,9 +10,10 @@ export async function POST(req: NextRequest) {
 
   const { task } = await req.json();
 
-  const processedTask = parseDateFields({ 
-    ...task, 
-    createdAt: undefined, 
+  const processedTask = parseDateFields({
+    ...task,
+    __list_deprecated: '',
+    createdAt: undefined,
     id: undefined,
     userId: session.user.id
   }, TaskDateKeys);

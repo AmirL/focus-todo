@@ -78,7 +78,7 @@ function UserSection() {
 export function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session, isPending } = useSession();
-  const { statusFilter, list } = useFilterStore();
+  const { statusFilter, listId } = useFilterStore();
   
   // Hide sidebar content on login page or when not authenticated
   const shouldShowSidebarContent = !pathname.includes('/login') && (session || isPending);
@@ -93,7 +93,7 @@ export function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
           <div className="flex flex-col h-full">
             <SidebarHeader>
               {(() => {
-                const homeHref = buildHomeHref(statusFilter, list);
+                const homeHref = buildHomeHref(statusFilter, listId);
                 return (
                   <Link href={homeHref} className="flex items-center gap-2 px-2 w-full">
                     <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">

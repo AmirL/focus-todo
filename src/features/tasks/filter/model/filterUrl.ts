@@ -2,17 +2,17 @@
 
 import { StatusFilterEnum } from './filterStore';
 
-// Build query string for current filter/list (empty string if none)
-export function buildFilterQuery(statusFilter: StatusFilterEnum, list: string): string {
+// Build query string for current filter/listId (empty string if none)
+export function buildFilterQuery(statusFilter: StatusFilterEnum, listId: string): string {
   const params = new URLSearchParams();
-  if (list) params.set('list', list);
+  if (listId) params.set('listId', listId);
   if (statusFilter !== StatusFilterEnum.BACKLOG) params.set('filter', statusFilter);
   return params.toString();
 }
 
 // Build href to home preserving filters
-export function buildHomeHref(statusFilter: StatusFilterEnum, list: string): string {
-  const query = buildFilterQuery(statusFilter, list);
+export function buildHomeHref(statusFilter: StatusFilterEnum, listId: string): string {
+  const query = buildFilterQuery(statusFilter, listId);
   return '/' + (query ? `?${query}` : '');
 }
 
@@ -21,9 +21,8 @@ export function navigateHome(
   router: { push: (href: string) => void },
   pathname: string | null,
   statusFilter: StatusFilterEnum,
-  list: string
+  listId: string
 ) {
-  const href = buildHomeHref(statusFilter, list);
+  const href = buildHomeHref(statusFilter, listId);
   if (pathname !== '/' || href !== '/') router.push(href);
 }
-

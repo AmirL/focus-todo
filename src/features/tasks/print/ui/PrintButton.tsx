@@ -3,24 +3,27 @@ import React from 'react';
 import { Button } from '@/shared/ui/button';
 import { TaskModel } from '@/entities/task/model/task';
 import { Printer } from 'lucide-react';
-import { 
-  filterPrintableTasks, 
-  groupTasksByList, 
-  sortTasksByDuration, 
-  calculateTotalDuration 
+import {
+  filterPrintableTasks,
+  groupTasksByList,
+  sortTasksByDuration,
+  calculateTotalDuration
 } from '../lib/printUtils';
 import { generatePrintHTML } from '../lib/printTemplate';
+import { useListNameMap } from '@/shared/lib/listUtils';
 
 interface PrintButtonProps {
   tasks: TaskModel[];
 }
 
 export function PrintButton({ tasks }: PrintButtonProps) {
+  const listNameMap = useListNameMap();
+
   const handlePrint = () => {
     const printableTasks = filterPrintableTasks(tasks);
     if (printableTasks.length === 0) return;
 
-    const groupedTasks = groupTasksByList(printableTasks);
+    const groupedTasks = groupTasksByList(printableTasks, listNameMap);
     sortTasksByDuration(groupedTasks);
     
     const totalDuration = calculateTotalDuration(printableTasks);

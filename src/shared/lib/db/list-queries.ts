@@ -28,22 +28,22 @@ export function userListByNameFilter(userId: string, listName: string) {
 }
 
 /**
- * Creates a where condition for user-owned tasks by list name
+ * Creates a where condition for user-owned tasks by list ID
  */
-export function userTasksByListFilter(userId: string, listName: string) {
+export function userTasksByListFilter(userId: string, listId: number) {
   return and(
     eq(tasksTable.userId, userId),
-    eq(tasksTable.list, listName)
+    eq(tasksTable.listId, listId)
   );
 }
 
 /**
- * Creates a where condition for user-owned goals by list name
+ * Creates a where condition for user-owned goals by list ID
  */
-export function userGoalsByListFilter(userId: string, listName: string) {
+export function userGoalsByListFilter(userId: string, listId: number) {
   return and(
     eq(goalsTable.userId, userId),
-    eq(goalsTable.list, listName)
+    eq(goalsTable.listId, listId)
   );
 }
 
@@ -89,14 +89,14 @@ export async function getUserLists(userId: string, includeArchived: boolean = fa
 /**
  * Counts tasks and goals using a specific list
  */
-export async function countListUsage(userId: string, listName: string) {
+export async function countListUsage(userId: string, listId: number) {
   const [tasksCountResult] = await DB.select({ count: sql<number>`count(*)` })
     .from(tasksTable)
-    .where(userTasksByListFilter(userId, listName));
+    .where(userTasksByListFilter(userId, listId));
 
   const [goalsCountResult] = await DB.select({ count: sql<number>`count(*)` })
     .from(goalsTable)
-    .where(userGoalsByListFilter(userId, listName));
+    .where(userGoalsByListFilter(userId, listId));
 
   return {
     tasksCount: tasksCountResult?.count || 0,
@@ -119,18 +119,18 @@ export async function createDefaultLists(userId: string) {
 /**
  * Updates tasks and goals to use a new list name
  */
-export async function reassignItemsToNewList(
-  userId: string, 
-  oldListName: string, 
-  newListName: string
+export async function reassignItemsToList(
+  userId: string,
+  fromListId: number,
+  toListId: number
 ) {
   await DB.update(tasksTable)
-    .set({ list: newListName })
-    .where(userTasksByListFilter(userId, oldListName));
+    .set({ listId: toListId })
+    .where(userTasksByListFilter(userId, fromListId));
 
   await DB.update(goalsTable)
-    .set({ list: newListName })
-    .where(userGoalsByListFilter(userId, oldListName));
+    .set({ listId: toListId })
+    .where(userGoalsByListFilter(userId, fromListId));
 }
 
 /**

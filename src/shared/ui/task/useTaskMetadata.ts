@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 
 export interface TaskMetadata {
   selectedDuration: number | null;
-  selectedList: string;
+  selectedListId: number | null;
   isStarred: boolean;
   isBlocker: boolean;
   selectedDate: Date | null;
@@ -16,7 +16,7 @@ export interface UseTaskMetadataReturn {
 
 const DEFAULT_METADATA: TaskMetadata = {
   selectedDuration: null,
-  selectedList: 'Personal',
+  selectedListId: null,
   isStarred: false,
   isBlocker: false,
   selectedDate: null,

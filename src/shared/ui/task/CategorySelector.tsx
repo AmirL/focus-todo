@@ -8,9 +8,9 @@ interface CategorySelectorProps {
 
 export function CategorySelector({ metadata, onMetadataChange }: CategorySelectorProps) {
   return (
-    <SelectTaskCategory 
-      selectedList={metadata.selectedList} 
-      setSelectedList={(list) => onMetadataChange({ selectedList: list })} 
+    <SelectTaskCategory
+      selectedListId={metadata.selectedListId}
+      setSelectedListId={(listId) => onMetadataChange({ selectedListId: listId })}
     />
   );
 }

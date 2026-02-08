@@ -9,12 +9,13 @@ export function filterPrintableTasks(tasks: TaskModel[]): TaskModel[] {
   return tasks.filter(task => !task.completedAt && !task.deletedAt);
 }
 
-export function groupTasksByList(tasks: TaskModel[]): GroupedTasks {
+export function groupTasksByList(tasks: TaskModel[], listNameMap: Map<number, string>): GroupedTasks {
   return tasks.reduce((acc: GroupedTasks, task) => {
-    if (!acc[task.list]) {
-      acc[task.list] = [];
+    const listName = listNameMap.get(task.listId) ?? 'Unknown';
+    if (!acc[listName]) {
+      acc[listName] = [];
     }
-    acc[task.list].push(task);
+    acc[listName].push(task);
     return acc;
   }, {});
 }

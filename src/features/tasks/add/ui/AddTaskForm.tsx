@@ -25,7 +25,7 @@ export function AddTaskForm() {
   const createTaskMutation = useCreateTaskMutation();
 
   const { metadata, updateMetadata, resetMetadata } = useTaskMetadata();
-  const { statusFilter, list } = useFilterStore();
+  const { statusFilter, listId } = useFilterStore();
 
   const resetForm = () => {
     setName('');
@@ -63,12 +63,12 @@ export function AddTaskForm() {
       }
 
       // Apply list filter default, if any
-      if (list) {
-        updateMetadata({ selectedList: list });
+      if (listId) {
+        updateMetadata({ selectedListId: Number(listId) });
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAddTaskOpen, statusFilter, list]);
+  }, [isAddTaskOpen, statusFilter, listId]);
 
   const handleAddTaskClick = async () => {
     if (!name.trim()) return;
@@ -76,7 +76,7 @@ export function AddTaskForm() {
     const newTask = createInstance(TaskModel, {
       name: name.trim(),
       details: details.trim(),
-      list: metadata.selectedList,
+      listId: metadata.selectedListId!,
       selectedAt: metadata.isStarred ? new Date() : null,
       isBlocker: metadata.isBlocker,
       date: metadata.selectedDate,

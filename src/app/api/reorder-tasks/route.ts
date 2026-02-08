@@ -8,7 +8,7 @@ type ReorderRequestBody = {
   taskIds: string[];
   context: {
     statusFilter: string;
-    list: string;
+    listId: number;
   };
 };
 
@@ -25,9 +25,9 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    if (!context || !context.statusFilter || !context.list) {
+    if (!context || !context.statusFilter || !context.listId) {
       return NextResponse.json(
-        { error: 'context with statusFilter and list is required' },
+        { error: 'context with statusFilter and listId is required' },
         { status: 400 }
       );
     }

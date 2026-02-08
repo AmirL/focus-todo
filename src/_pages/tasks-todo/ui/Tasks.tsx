@@ -29,7 +29,7 @@ import { useState, useEffect } from 'react';
 
 export function Tasks() {
   const { allTasks, isLoading, error } = useTasksLoader();
-  const { statusFilter, list: selectedList } = useFilterStore();
+  const { statusFilter, listId: selectedListId } = useFilterStore();
   const { setOptimisticTasks, setIsDragging } = useReorderStore();
   const { clearSelections } = useTempSelectStore();
   const reorderMutation = useReorderMutation();
@@ -54,7 +54,7 @@ export function Tasks() {
   // Clear temp selections when filter changes
   useEffect(() => {
     clearSelections();
-  }, [statusFilter, selectedList, clearSelections]);
+  }, [statusFilter, selectedListId, clearSelections]);
 
   // Configure sensors for touch and mouse
   const sensors = useSensors(
@@ -109,7 +109,7 @@ export function Tasks() {
     );
 
     // Only allow reordering within the same group
-    if (!activeGroup || !overGroup || activeGroup.name !== overGroup.name) {
+    if (!activeGroup || !overGroup || activeGroup.id !== overGroup.id) {
       return;
     }
 
@@ -127,11 +127,11 @@ export function Tasks() {
     const processedGroups = new Set();
 
     for (const task of tasks) {
-      if (task.list === activeGroup.name && !processedGroups.has(task.list)) {
+      if (task.listId === activeGroup.id && !processedGroups.has(task.listId)) {
         // Add all reordered tasks for this group
         optimisticTasks.push(...reorderedGroupTasks);
-        processedGroups.add(task.list);
-      } else if (task.list !== activeGroup.name) {
+        processedGroups.add(task.listId);
+      } else if (task.listId !== activeGroup.id) {
         // Add tasks from other groups as-is
         optimisticTasks.push(task);
       }
@@ -144,7 +144,7 @@ export function Tasks() {
     const reorderedTaskIds = reorderedGroupTasks.map((task) => task.id);
     const context = {
       statusFilter: statusFilter,
-      list: activeGroup.name,
+      listId: activeGroup.id,
     };
 
     // Execute mutation
@@ -173,7 +173,7 @@ export function Tasks() {
     >
       <section className="pb-20">
         {groups.map((group) => (
-          <div key={group.name} className="mt-16 first:mt-0">
+          <div key={group.id} className="mt-16 first:mt-0">
             <h3 className="px-4 text-base font-semibold text-primary">{group.name}</h3>
             <SortableContext
               items={group.tasks.map((task) => task.id)}

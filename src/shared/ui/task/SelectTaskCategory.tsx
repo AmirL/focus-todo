@@ -1,22 +1,36 @@
+import { useRef, useEffect } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
 import { useListsQuery } from '@/shared/api/lists';
 
 type Props = {
-  selectedList: string;
-  setSelectedList: (list: string) => void;
+  selectedListId: number | null;
+  setSelectedListId: (listId: number) => void;
 };
 
-export function SelectTaskCategory({ selectedList, setSelectedList }: Props) {
+export function SelectTaskCategory({ selectedListId, setSelectedListId }: Props) {
   const { data: lists = [], isLoading } = useListsQuery();
+  const defaultAppliedRef = useRef(false);
+
+  // Auto-select first list when no selection exists (e.g. Add Task form).
+  // Ref guard prevents re-triggering after the parent resets.
+  useEffect(() => {
+    if (selectedListId == null && lists.length > 0 && !defaultAppliedRef.current) {
+      defaultAppliedRef.current = true;
+      setSelectedListId(Number(lists[0].id));
+    }
+    if (selectedListId != null) {
+      defaultAppliedRef.current = false;
+    }
+  }, [selectedListId, lists, setSelectedListId]);
 
   return (
-    <Select value={selectedList} onValueChange={setSelectedList} disabled={isLoading}>
+    <Select value={selectedListId != null ? String(selectedListId) : ''} onValueChange={(v) => setSelectedListId(Number(v))} disabled={isLoading}>
       <SelectTrigger id="task-list" className="w-[140px] h-8">
         <SelectValue placeholder={isLoading ? "Loading..." : "Select a list"} />
       </SelectTrigger>
       <SelectContent>
         {lists.map((list) => (
-          <SelectItem key={list.id} value={list.name}>
+          <SelectItem key={list.id} value={String(list.id)}>
             {list.name}
           </SelectItem>
         ))}

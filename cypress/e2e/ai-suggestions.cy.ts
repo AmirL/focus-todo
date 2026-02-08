@@ -3,6 +3,8 @@
 const apiKey = Cypress.env("API_TEST_KEY");
 const authHeaders = { "X-API-Key": apiKey };
 
+let workListId: number;
+
 const pendingSuggestions = {
   name: { suggestion: "Improved task title", userReaction: null },
   details: { suggestion: "Better description with more context", userReaction: null },
@@ -23,7 +25,7 @@ function createTaskWithSuggestions(
       method: "POST",
       url: "/api/tasks",
       headers: authHeaders,
-      body: { name, list: "Work" },
+      body: { name, listId: workListId },
     })
     .then((response) => {
       const taskId = response.body.task.id;
@@ -49,6 +51,17 @@ function openEditDialog(taskId: number) {
 
 describe("AI Suggestions", () => {
   let createdTaskIds: number[] = [];
+
+  before(() => {
+    cy.request({
+      method: "GET",
+      url: "/api/tasks?limit=1",
+      headers: authHeaders,
+    }).then((response) => {
+      expect(response.body.tasks.length).to.be.greaterThan(0);
+      workListId = response.body.tasks[0].listId;
+    });
+  });
 
   beforeEach(() => {
     expect(apiKey, "API_TEST_KEY should be configured").to.exist;

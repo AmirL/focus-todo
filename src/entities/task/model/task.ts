@@ -14,7 +14,7 @@ export type TaskPlain = {
   selectedAt: string | null;
   date: string | null;
   completedAt: string | null;
-  list: string;
+  listId: number;
   deletedAt: string | null;
   createdAt: string;
   estimatedDuration?: number | null;
@@ -44,7 +44,7 @@ export class TaskModel {
 
   isBlocker: boolean = false;
 
-  list!: string;
+  listId!: number;
 
   @Transform(transformDateToUTCString, { toPlainOnly: true })
   deletedAt?: Date | null;
