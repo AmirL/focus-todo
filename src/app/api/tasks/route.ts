@@ -216,6 +216,7 @@ export async function POST(req: NextRequest) {
     const processedTask = parseDateFields(
       {
         ...taskFields,
+        __list_deprecated: '',
         userId,
         updatedAt: new Date(),
       },
