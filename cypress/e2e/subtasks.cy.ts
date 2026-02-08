@@ -11,6 +11,14 @@ function createTaskWithCheckboxes(name: string) {
   cy.contains(name).should("be.visible");
 }
 
+function expandDescription(name: string) {
+  cy.contains(name)
+    .parents('[data-testid^="task-"]')
+    .first()
+    .find('[data-cy="description-indicator"]')
+    .click();
+}
+
 function getTaskCheckboxes(name: string) {
   return cy
     .contains(name)
@@ -28,6 +36,7 @@ describe("Subtask Checkboxes", () => {
   it("should create a task with checkboxes and render them", () => {
     const name = `Render test ${Date.now()}`;
     createTaskWithCheckboxes(name);
+    expandDescription(name);
 
     getTaskCheckboxes(name).should("have.length", 3);
     getTaskCheckboxes(name).eq(0).should("not.be.checked");
@@ -38,6 +47,7 @@ describe("Subtask Checkboxes", () => {
   it("should toggle a checkbox and verify the server update", () => {
     const name = `Toggle test ${Date.now()}`;
     createTaskWithCheckboxes(name);
+    expandDescription(name);
 
     // Intercept the update-task API call
     cy.intercept("POST", "/api/update-task").as("updateTask");
@@ -58,6 +68,7 @@ describe("Subtask Checkboxes", () => {
   it("should not collapse details when clicking a checkbox", () => {
     const name = `Collapse test ${Date.now()}`;
     createTaskWithCheckboxes(name);
+    expandDescription(name);
 
     // Verify all 3 checkboxes are visible (details expanded)
     getTaskCheckboxes(name).should("have.length", 3);
@@ -72,6 +83,7 @@ describe("Subtask Checkboxes", () => {
   it("should uncheck a previously checked checkbox", () => {
     const name = `Uncheck test ${Date.now()}`;
     createTaskWithCheckboxes(name);
+    expandDescription(name);
 
     // The third checkbox ("Send email") is already checked
     getTaskCheckboxes(name).eq(2).should("be.checked");
