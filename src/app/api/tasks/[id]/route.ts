@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { and, eq, isNull } from 'drizzle-orm';
-import { tasksTable } from '@/shared/lib/drizzle/schema';
+import { tasksTable, listsTable } from '@/shared/lib/drizzle/schema';
 import { getUserIdFromApiKey } from '@/app/api/api-auth';
 import { parseDateFields, TaskDateKeys } from '@/shared/lib/utils';
 import dayjs from 'dayjs';
@@ -19,6 +19,7 @@ type ApiTask = Omit<
   selectedAt: string | null;
   updatedAt: string | null;
   createdAt: string | null;
+  listDescription: string | null;
 };
 
 function toISOString(d: Date | string | null | undefined): string | null {
@@ -28,7 +29,7 @@ function toISOString(d: Date | string | null | undefined): string | null {
   return isNaN(parsed.getTime()) ? null : parsed.toISOString();
 }
 
-function serializeTask(t: TaskRow): ApiTask {
+function serializeTask(t: TaskRow, listDescription?: string | null): ApiTask {
   return {
     ...t,
     date: toISOString(t.date),
@@ -37,6 +38,7 @@ function serializeTask(t: TaskRow): ApiTask {
     selectedAt: toISOString(t.selectedAt),
     updatedAt: toISOString(t.updatedAt),
     createdAt: toISOString(t.createdAt),
+    listDescription: listDescription ?? null,
   };
 }
 
@@ -64,8 +66,12 @@ export async function GET(req: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: 'Invalid task ID' }, { status: 400 });
     }
 
-    const [task] = await DB.select()
+    const [row] = await DB.select({
+      task: tasksTable,
+      listDescription: listsTable.description,
+    })
       .from(tasksTable)
+      .leftJoin(listsTable, eq(tasksTable.listId, listsTable.id))
       .where(
         and(
           eq(tasksTable.id, taskId),
@@ -74,11 +80,11 @@ export async function GET(req: NextRequest, context: RouteContext) {
         )
       );
 
-    if (!task) {
+    if (!row) {
       return NextResponse.json({ error: 'Task not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ task: serializeTask(task) }, { status: 200 });
+    return NextResponse.json({ task: serializeTask(row.task, row.listDescription) }, { status: 200 });
   } catch (error) {
     return handleError(error, 'GET /api/tasks/:id');
   }
@@ -130,11 +136,15 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       .set(processedFields)
       .where(and(eq(tasksTable.id, taskId), eq(tasksTable.userId, userId)));
 
-    const [updatedTask] = await DB.select()
+    const [updatedRow] = await DB.select({
+      task: tasksTable,
+      listDescription: listsTable.description,
+    })
       .from(tasksTable)
+      .leftJoin(listsTable, eq(tasksTable.listId, listsTable.id))
       .where(and(eq(tasksTable.id, taskId), eq(tasksTable.userId, userId)));
 
-    return NextResponse.json({ task: serializeTask(updatedTask) }, { status: 200 });
+    return NextResponse.json({ task: serializeTask(updatedRow.task, updatedRow.listDescription) }, { status: 200 });
   } catch (error) {
     return handleError(error, 'PATCH /api/tasks/:id');
   }
