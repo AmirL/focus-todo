@@ -116,6 +116,10 @@ After pushing a PR, the CI pipeline runs in this order:
 
 When waiting for CI checks, wait ~90 seconds for the preview deployment to complete, then use `gh run watch` to monitor the E2E test run to completion.
 
+### Development Best Practices
+
+- When finish a task - review your changes in the browser (playwright mcp) and take a screenshot as evidence. Save screenshots to `screenshots/<short-feature-name>.png` (e.g. `screenshots/blocked-tasks-in-charts.png`). These are committed to git so they're visible in PR reviews.
+
 ### Recommended Practices
 
 - Use proactively qa agent and code review agent.
