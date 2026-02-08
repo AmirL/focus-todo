@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { TaskModel } from '@/entities/task/model/task';
+import type { AiSuggestions } from '@/shared/types/aiSuggestions';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
 import { useUpdateTaskMutation } from '@/shared/api/tasks';
@@ -22,6 +23,7 @@ export function EditTaskDialog({
   // Initialize state with task values
   const [name, setName] = useState(task.name);
   const [details, setDetails] = useState(task.details ?? '');
+  const [aiSuggestions, setAiSuggestions] = useState<AiSuggestions | null>(task.aiSuggestions ?? null);
   const { metadata, updateMetadata, resetMetadata } = useTaskMetadata({
     selectedDuration: task.estimatedDuration ?? null,
     selectedList: task.list,
@@ -34,9 +36,36 @@ export function EditTaskDialog({
   useEffect(() => {
     setName(task.name);
     setDetails(task.details ?? '');
+    setAiSuggestions(task.aiSuggestions ?? null);
     resetMetadata();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [task.id, open]);
+
+  const handleAcceptSuggestion = (fieldName: string) => {
+    if (!aiSuggestions?.[fieldName]) return;
+    const suggestion = aiSuggestions[fieldName].suggestion;
+
+    if (fieldName === 'name') {
+      setName(suggestion);
+    } else if (fieldName === 'details') {
+      setDetails(suggestion);
+    } else if (fieldName === 'estimatedDuration') {
+      const parsed = parseInt(suggestion, 10);
+      if (!isNaN(parsed)) {
+        updateMetadata({ selectedDuration: parsed });
+      }
+    }
+
+    setAiSuggestions((prev) =>
+      prev ? { ...prev, [fieldName]: { ...prev[fieldName], userReaction: 'accepted' as const } } : null
+    );
+  };
+
+  const handleRejectSuggestion = (fieldName: string) => {
+    setAiSuggestions((prev) =>
+      prev ? { ...prev, [fieldName]: { ...prev[fieldName], userReaction: 'rejected' as const } } : null
+    );
+  };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +79,7 @@ export function EditTaskDialog({
       selectedAt: metadata.isStarred ? task.selectedAt || new Date() : null,
       isBlocker: metadata.isBlocker,
       date: metadata.selectedDate,
+      aiSuggestions,
       updatedAt: new Date(),
     });
     updateTaskMutation.mutate(updatedTask);
@@ -73,6 +103,9 @@ export function EditTaskDialog({
               onDetailsChange={setDetails}
               metadata={metadata}
               onMetadataChange={updateMetadata}
+              aiSuggestions={aiSuggestions}
+              onAcceptSuggestion={handleAcceptSuggestion}
+              onRejectSuggestion={handleRejectSuggestion}
             />
           </div>
           <DialogFooter>
