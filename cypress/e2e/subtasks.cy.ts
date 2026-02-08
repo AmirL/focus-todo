@@ -12,18 +12,21 @@ function createTaskWithCheckboxes(name: string) {
 }
 
 function expandDescription(name: string) {
+  // Wait for the task list to stabilize after creation (React Query refetch)
+  cy.wait(1000);
+
   cy.contains(name)
     .parents('[data-testid^="task-"]')
     .first()
     .find('[data-cy="description-indicator"]')
     .click();
 
-  // Wait for the description to expand and checkboxes to render
+  // Wait for the checkboxes to render after expanding
   cy.contains(name)
     .parents('[data-testid^="task-"]')
     .first()
-    .find('[data-testid="task-details"]')
-    .should("be.visible");
+    .find('[data-testid="subtask-checkbox"]')
+    .should("have.length.at.least", 1);
 }
 
 function getTaskCheckboxes(name: string) {
