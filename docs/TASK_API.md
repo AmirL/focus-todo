@@ -24,22 +24,22 @@ Retrieve a list of tasks with optional filtering.
 
 #### Query Parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `on` | `today` \| `tomorrow` \| `YYYY-MM-DD` | - | Filter by specific day |
-| `since` | ISO date string | - | Tasks with date >= since |
-| `until` | ISO date string | - | Tasks with date < until |
-| `listId` | number | - | Filter by list ID |
-| `completed` | `true` \| `false` | - | Filter by completion status |
-| `includeDeleted` | `true` \| `false` | `false` | Include all deleted tasks |
-| `includeRecentlyDeleted` | `true` \| `false` | `false` | Include tasks deleted in last 24h |
-| `tzOffset` | number | `0` | Timezone offset from UTC in minutes (e.g., -120 for UTC+2) |
-| `limit` | 1-500 | 100 | Maximum number of tasks to return |
+| Parameter                | Type                                  | Default | Description                                                |
+| ------------------------ | ------------------------------------- | ------- | ---------------------------------------------------------- |
+| `on`                     | `today` \| `tomorrow` \| `YYYY-MM-DD` | -       | Filter by specific day                                     |
+| `since`                  | ISO date string                       | -       | Tasks with date >= since                                   |
+| `until`                  | ISO date string                       | -       | Tasks with date < until                                    |
+| `listId`                 | number                                | -       | Filter by list ID                                          |
+| `completed`              | `true` \| `false`                     | -       | Filter by completion status                                |
+| `includeDeleted`         | `true` \| `false`                     | `false` | Include all deleted tasks                                  |
+| `includeRecentlyDeleted` | `true` \| `false`                     | `false` | Include tasks deleted in last 24h                          |
+| `tzOffset`               | number                                | `0`     | Timezone offset from UTC in minutes (e.g., -120 for UTC+2) |
+| `limit`                  | 1-500                                 | 100     | Maximum number of tasks to return                          |
 
 #### Example Request
 
 ```bash
-curl -X GET "https://your-domain.com/api/tasks?on=today&completed=false" \
+curl -X GET "https://doable-tasks.vercel.app/api/tasks?on=today&completed=false" \
   -H "Authorization: Bearer your_api_key"
 ```
 
@@ -80,14 +80,14 @@ Retrieve a single task by ID.
 
 #### Path Parameters
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `id` | number | Task ID |
+| Parameter | Type   | Description |
+| --------- | ------ | ----------- |
+| `id`      | number | Task ID     |
 
 #### Example Request
 
 ```bash
-curl -X GET "https://your-domain.com/api/tasks/123" \
+curl -X GET "https://doable-tasks.vercel.app/api/tasks/123" \
   -H "Authorization: Bearer your_api_key"
 ```
 
@@ -147,7 +147,7 @@ Create a new task.
 #### Example Request
 
 ```bash
-curl -X POST "https://your-domain.com/api/tasks" \
+curl -X POST "https://doable-tasks.vercel.app/api/tasks" \
   -H "Authorization: Bearer your_api_key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -201,9 +201,9 @@ Partially update an existing task. Only include fields you want to change.
 
 #### Path Parameters
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `id` | number | Task ID |
+| Parameter | Type   | Description |
+| --------- | ------ | ----------- |
+| `id`      | number | Task ID     |
 
 #### Request Body
 
@@ -225,7 +225,7 @@ All fields are optional. Only provided fields will be updated.
 #### Example Request - Mark as Completed
 
 ```bash
-curl -X PATCH "https://your-domain.com/api/tasks/123" \
+curl -X PATCH "https://doable-tasks.vercel.app/api/tasks/123" \
   -H "Authorization: Bearer your_api_key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -236,7 +236,7 @@ curl -X PATCH "https://your-domain.com/api/tasks/123" \
 #### Example Request - Update Multiple Fields
 
 ```bash
-curl -X PATCH "https://your-domain.com/api/tasks/123" \
+curl -X PATCH "https://doable-tasks.vercel.app/api/tasks/123" \
   -H "Authorization: Bearer your_api_key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -249,7 +249,7 @@ curl -X PATCH "https://your-domain.com/api/tasks/123" \
 #### Example Request - Set AI Suggestions
 
 ```bash
-curl -X PATCH "https://your-domain.com/api/tasks/123" \
+curl -X PATCH "https://doable-tasks.vercel.app/api/tasks/123" \
   -H "Authorization: Bearer your_api_key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -307,27 +307,27 @@ Delete a task. By default, performs a soft delete (sets `deletedAt` timestamp).
 
 #### Path Parameters
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `id` | number | Task ID |
+| Parameter | Type   | Description |
+| --------- | ------ | ----------- |
+| `id`      | number | Task ID     |
 
 #### Query Parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
+| Parameter   | Type              | Default | Description                           |
+| ----------- | ----------------- | ------- | ------------------------------------- |
 | `permanent` | `true` \| `false` | `false` | Permanently delete (cannot be undone) |
 
 #### Example Request - Soft Delete
 
 ```bash
-curl -X DELETE "https://your-domain.com/api/tasks/123" \
+curl -X DELETE "https://doable-tasks.vercel.app/api/tasks/123" \
   -H "Authorization: Bearer your_api_key"
 ```
 
 #### Example Request - Permanent Delete
 
 ```bash
-curl -X DELETE "https://your-domain.com/api/tasks/123?permanent=true" \
+curl -X DELETE "https://doable-tasks.vercel.app/api/tasks/123?permanent=true" \
   -H "Authorization: Bearer your_api_key"
 ```
 
@@ -366,14 +366,14 @@ All endpoints return errors in a consistent format:
 
 ### Common HTTP Status Codes
 
-| Code | Description |
-|------|-------------|
-| `200` | Success |
-| `201` | Created (POST requests) |
-| `400` | Bad Request - Invalid input |
+| Code  | Description                               |
+| ----- | ----------------------------------------- |
+| `200` | Success                                   |
+| `201` | Created (POST requests)                   |
+| `400` | Bad Request - Invalid input               |
 | `401` | Unauthorized - Invalid or missing API key |
-| `404` | Not Found - Resource doesn't exist |
-| `500` | Internal Server Error |
+| `404` | Not Found - Resource doesn't exist        |
+| `500` | Internal Server Error                     |
 
 ---
 
@@ -421,7 +421,7 @@ Currently, there are no rate limits enforced. This may change in future versions
 
 ```bash
 # 1. Create a task
-TASK=$(curl -s -X POST "https://your-domain.com/api/tasks" \
+TASK=$(curl -s -X POST "https://doable-tasks.vercel.app/api/tasks" \
   -H "Authorization: Bearer $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"name": "New task", "listId": 1}')
@@ -429,32 +429,32 @@ TASK=$(curl -s -X POST "https://your-domain.com/api/tasks" \
 TASK_ID=$(echo $TASK | jq -r '.task.id')
 
 # 2. Update the task
-curl -X PATCH "https://your-domain.com/api/tasks/$TASK_ID" \
+curl -X PATCH "https://doable-tasks.vercel.app/api/tasks/$TASK_ID" \
   -H "Authorization: Bearer $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"isBlocker": true, "estimatedDuration": 30}'
 
 # 3. Mark as completed
-curl -X PATCH "https://your-domain.com/api/tasks/$TASK_ID" \
+curl -X PATCH "https://doable-tasks.vercel.app/api/tasks/$TASK_ID" \
   -H "Authorization: Bearer $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"completedAt": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}'
 
 # 4. Delete the task
-curl -X DELETE "https://your-domain.com/api/tasks/$TASK_ID" \
+curl -X DELETE "https://doable-tasks.vercel.app/api/tasks/$TASK_ID" \
   -H "Authorization: Bearer $API_KEY"
 ```
 
 ### Fetch Today's Incomplete Tasks
 
 ```bash
-curl -X GET "https://your-domain.com/api/tasks?on=today&completed=false" \
+curl -X GET "https://doable-tasks.vercel.app/api/tasks?on=today&completed=false" \
   -H "Authorization: Bearer $API_KEY"
 ```
 
 ### Fetch All Blockers
 
 ```bash
-curl -X GET "https://your-domain.com/api/tasks?completed=false" \
+curl -X GET "https://doable-tasks.vercel.app/api/tasks?completed=false" \
   -H "Authorization: Bearer $API_KEY" | jq '.tasks | map(select(.isBlocker == true))'
 ```
