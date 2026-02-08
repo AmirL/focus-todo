@@ -1,11 +1,14 @@
 import { Sparkles, Check, X } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface AiSuggestionBannerProps {
   fieldName: string;
   suggestion: string;
   displayValue?: string;
+  renderAsMarkdown?: boolean;
   onAccept: () => void;
   onReject: () => void;
 }
@@ -14,6 +17,7 @@ export function AiSuggestionBanner({
   fieldName,
   suggestion,
   displayValue,
+  renderAsMarkdown,
   onAccept,
   onReject,
 }: AiSuggestionBannerProps) {
@@ -30,17 +34,30 @@ export function AiSuggestionBanner({
       <Sparkles className="mt-0.5 h-4 w-4 flex-shrink-0 text-purple-500" />
       <div className="min-w-0 flex-1">
         <span className="font-medium text-purple-700">AI suggestion: </span>
-        <span className="text-purple-900">
-          {displayText}
-        </span>
-        {isLong && (
-          <button
-            type="button"
-            className="ml-1 text-purple-600 underline"
-            onClick={() => setExpanded(!expanded)}
-          >
-            {expanded ? 'less' : 'more'}
-          </button>
+        {renderAsMarkdown ? (
+          <div className="mt-1 max-h-[200px] overflow-y-auto">
+            <ReactMarkdown
+              className="prose prose-sm text-purple-900 prose-headings:text-purple-900 prose-strong:text-purple-900 prose-a:text-purple-700"
+              remarkPlugins={[remarkGfm]}
+            >
+              {text}
+            </ReactMarkdown>
+          </div>
+        ) : (
+          <>
+            <span className="text-purple-900">
+              {displayText}
+            </span>
+            {isLong && (
+              <button
+                type="button"
+                className="ml-1 text-purple-600 underline"
+                onClick={() => setExpanded(!expanded)}
+              >
+                {expanded ? 'less' : 'more'}
+              </button>
+            )}
+          </>
         )}
       </div>
       <div className="flex flex-shrink-0 gap-1">

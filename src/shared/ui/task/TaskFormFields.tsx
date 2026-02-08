@@ -76,6 +76,7 @@ export function TaskFormFields({
           <AiSuggestionBanner
             fieldName="details"
             suggestion={detailsSuggestion}
+            renderAsMarkdown
             onAccept={() => onAcceptSuggestion('details')}
             onReject={() => onRejectSuggestion('details')}
           />
