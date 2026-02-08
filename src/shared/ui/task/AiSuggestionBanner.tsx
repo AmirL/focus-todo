@@ -28,14 +28,40 @@ export function AiSuggestionBanner({
 
   return (
     <div
-      className="mt-1 flex items-start gap-2 rounded-md border-l-4 border-purple-400 bg-purple-50 px-3 py-2 text-sm"
+      className="mt-1 rounded-md border-l-4 border-purple-400 bg-purple-50 text-sm"
       data-cy={`ai-suggestion-banner-${fieldName}`}
     >
-      <Sparkles className="mt-0.5 h-4 w-4 flex-shrink-0 text-purple-500" />
-      <div className="min-w-0 flex-1">
-        <span className="font-medium text-purple-700">AI suggestion: </span>
+      <div className="flex items-center justify-between px-3 py-2">
+        <div className="flex items-center gap-2">
+          <Sparkles className="h-4 w-4 flex-shrink-0 text-purple-500" />
+          <span className="font-medium text-purple-700">AI suggestion</span>
+        </div>
+        <div className="flex flex-shrink-0 gap-1">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-7 w-7 p-0 text-green-600 hover:bg-green-100 hover:text-green-700"
+            onClick={onAccept}
+            data-cy={`accept-suggestion-${fieldName}`}
+          >
+            <Check className="h-4 w-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-7 w-7 p-0 text-red-500 hover:bg-red-100 hover:text-red-600"
+            onClick={onReject}
+            data-cy={`reject-suggestion-${fieldName}`}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+      <div className="border-t border-purple-200 bg-white/60 px-3 py-2">
         {renderAsMarkdown ? (
-          <div className="mt-1 max-h-[200px] overflow-y-auto">
+          <div className="max-h-[300px] overflow-y-auto">
             <ReactMarkdown
               className="prose prose-sm text-purple-900 prose-headings:text-purple-900 prose-strong:text-purple-900 prose-a:text-purple-700"
               remarkPlugins={[remarkGfm]}
@@ -59,28 +85,6 @@ export function AiSuggestionBanner({
             )}
           </>
         )}
-      </div>
-      <div className="flex flex-shrink-0 gap-1">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-7 w-7 p-0 text-green-600 hover:bg-green-100 hover:text-green-700"
-          onClick={onAccept}
-          data-cy={`accept-suggestion-${fieldName}`}
-        >
-          <Check className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-7 w-7 p-0 text-red-500 hover:bg-red-100 hover:text-red-600"
-          onClick={onReject}
-          data-cy={`reject-suggestion-${fieldName}`}
-        >
-          <X className="h-4 w-4" />
-        </Button>
       </div>
     </div>
   );
