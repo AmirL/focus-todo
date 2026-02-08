@@ -62,7 +62,8 @@ curl -X GET "https://your-domain.com/api/tasks?on=today&completed=false" \
       "deletedAt": null,
       "updatedAt": "2026-01-25T08:00:00+00:00",
       "createdAt": "2026-01-24T10:00:00+00:00",
-      "sortOrder": 0
+      "sortOrder": 0,
+      "aiSuggestions": null
     }
   ]
 }
@@ -109,7 +110,8 @@ curl -X GET "https://your-domain.com/api/tasks/123" \
     "deletedAt": null,
     "updatedAt": "2026-01-25T10:00:00Z",
     "createdAt": "2026-01-25T09:00:00Z",
-    "sortOrder": 0
+    "sortOrder": 0,
+    "aiSuggestions": null
   }
 }
 ```
@@ -176,7 +178,8 @@ curl -X POST "https://your-domain.com/api/tasks" \
     "deletedAt": null,
     "updatedAt": "2026-01-25T12:00:00Z",
     "createdAt": "2026-01-25T12:00:00Z",
-    "sortOrder": 0
+    "sortOrder": 0,
+    "aiSuggestions": null
   }
 }
 ```
@@ -219,6 +222,7 @@ All fields are optional. Only provided fields will be updated.
 | `list` | string | List name |
 | `listId` | number | List ID |
 | `sortOrder` | number | Sort order |
+| `aiSuggestions` | object \| null | AI-generated suggestions for task fields (see [AI Suggestions](#ai-suggestions)) |
 
 #### Example Request - Mark as Completed
 
@@ -244,6 +248,26 @@ curl -X PATCH "https://your-domain.com/api/tasks/123" \
   }'
 ```
 
+#### Example Request - Set AI Suggestions
+
+```bash
+curl -X PATCH "https://your-domain.com/api/tasks/123" \
+  -H "Authorization: Bearer your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "aiSuggestions": {
+      "name": {
+        "suggestion": "A clearer task title",
+        "userReaction": null
+      },
+      "details": {
+        "suggestion": "Detailed breakdown:\n- [ ] Step 1\n- [ ] Step 2",
+        "userReaction": null
+      }
+    }
+  }'
+```
+
 #### Example Response
 
 ```json
@@ -262,7 +286,8 @@ curl -X PATCH "https://your-domain.com/api/tasks/123" \
     "deletedAt": null,
     "updatedAt": "2026-01-25T15:00:00Z",
     "createdAt": "2026-01-25T09:00:00Z",
-    "sortOrder": 0
+    "sortOrder": 0,
+    "aiSuggestions": null
   }
 }
 ```
@@ -359,6 +384,30 @@ All endpoints return errors in a consistent format:
 - All dates are handled in UTC by default
 - Use the `tzOffset` parameter in GET requests to receive dates adjusted for your timezone
 - When creating/updating tasks, send dates in ISO 8601 format (e.g., `2026-01-25T10:00:00Z`)
+
+---
+
+## AI Suggestions
+
+Tasks may include an `aiSuggestions` field containing AI-generated improvement suggestions for task fields.
+
+### Structure
+
+```json
+{
+  "aiSuggestions": {
+    "<fieldName>": {
+      "suggestion": "string - the proposed value",
+      "userReaction": null | "accepted" | "rejected"
+    }
+  }
+}
+```
+
+- Keys correspond to task field names (e.g., `name`, `details`)
+- `suggestion`: The proposed new value for the field
+- `userReaction`: `null` when pending review, `"accepted"` or `"rejected"` after user action
+- Set `aiSuggestions` to `null` to clear all suggestions
 
 ---
 
