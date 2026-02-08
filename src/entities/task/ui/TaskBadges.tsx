@@ -1,9 +1,10 @@
 import { Badge } from '@/shared/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Sparkles } from 'lucide-react';
 import { TaskModel, isTaskDeleted, isTaskOverdue } from '@/entities/task/model/task';
 import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
 import { isFutureDate, isToday } from '@/shared/lib/utils';
+import { hasPendingSuggestions } from '@/shared/lib/aiSuggestions';
 import dayjs from 'dayjs';
 
 interface TaskBadgesProps {
@@ -33,6 +34,19 @@ export function TaskBadges({ task }: TaskBadgesProps) {
           </TooltipTrigger>
           <TooltipContent>
             <p>Overdue: {dayjs(task.date).format('DD.MM.YY')}</p>
+          </TooltipContent>
+        </Tooltip>
+      )}
+      {/* Show AI suggestions indicator */}
+      {hasPendingSuggestions(task.aiSuggestions) && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Badge variant="secondary" className="bg-purple-100 text-purple-700 px-1.5 py-0.5" data-cy="ai-suggestion-badge">
+              <Sparkles className="h-3 w-3" />
+            </Badge>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>AI suggestions available</p>
           </TooltipContent>
         </Tooltip>
       )}
