@@ -17,6 +17,13 @@ function expandDescription(name: string) {
     .first()
     .find('[data-cy="description-indicator"]')
     .click();
+
+  // Wait for the description to expand and checkboxes to render
+  cy.contains(name)
+    .parents('[data-testid^="task-"]')
+    .first()
+    .find('[data-testid="task-details"]')
+    .should("be.visible");
 }
 
 function getTaskCheckboxes(name: string) {
