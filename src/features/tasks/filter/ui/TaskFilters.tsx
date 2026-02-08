@@ -25,7 +25,7 @@ function FilterButton({
   children: React.ReactNode;
   icon: React.ElementType;
 }) {
-  const { setStatusFilter, list } = useFilterStore();
+  const { setStatusFilter, listId } = useFilterStore();
   const { isMobile, toggleSidebar } = useSidebar();
   const router = useRouter();
   const pathname = usePathname();
@@ -39,7 +39,7 @@ function FilterButton({
       )}
       onClick={() => {
         setStatusFilter(filter);
-        navigateHome(router, pathname, filter, list);
+        navigateHome(router, pathname, filter, listId);
         if (isMobile) toggleSidebar();
       }}
     >
@@ -60,7 +60,7 @@ function FilterButtonWithTime({
   children: React.ReactNode;
   icon: React.ElementType;
 }) {
-  const { setStatusFilter, list } = useFilterStore();
+  const { setStatusFilter, listId } = useFilterStore();
   const { data: allTasks = [] } = useTasksQuery();
   const { isMobile, toggleSidebar } = useSidebar();
   const router = useRouter();
@@ -88,7 +88,7 @@ function FilterButtonWithTime({
       )}
       onClick={() => {
         setStatusFilter(filter);
-        navigateHome(router, pathname, filter, list);
+        navigateHome(router, pathname, filter, listId);
         if (isMobile) toggleSidebar();
       }}
     >
@@ -102,15 +102,17 @@ function FilterButtonWithTime({
 }
 
 function CategoryButton({
+  listItemId,
   category,
   active,
   isTodaysFocus,
 }: {
+  listItemId: string;
   category: string;
   active: boolean;
   isTodaysFocus: boolean;
 }) {
-  const { setList, statusFilter } = useFilterStore();
+  const { setListId, statusFilter } = useFilterStore();
   const { isMobile, toggleSidebar } = useSidebar();
   const router = useRouter();
   const pathname = usePathname();
@@ -123,9 +125,9 @@ function CategoryButton({
         active && 'text-primary  bg-primary/10 hover:bg-primary/20 hover:text-primary'
       )}
       onClick={() => {
-        const nextList = active ? '' : category;
-        setList(category);
-        navigateHome(router, pathname, statusFilter, nextList);
+        const nextListId = active ? '' : listItemId;
+        setListId(listItemId);
+        navigateHome(router, pathname, statusFilter, nextListId);
         if (isMobile) toggleSidebar();
       }}
     >
@@ -144,19 +146,13 @@ function CategoryButton({
 }
 
 export function TaskFilters() {
-  const { statusFilter, list } = useFilterStore();
+  const { statusFilter, listId } = useFilterStore();
   const { data: lists = [], isLoading } = useListsQuery();
   const { data: initiativeData } = useCurrentInitiativeQuery();
 
   // Determine today's focus list ID (initiative uses number IDs)
   const todaysFocusListId = initiativeData?.today
     ? (initiativeData.today.chosenListId ?? initiativeData.today.suggestedListId)
-    : null;
-
-  // Find the name of today's focus list
-  // Note: ListModel.id is typed as string but runtime value is number from API
-  const todaysFocusListName = todaysFocusListId
-    ? lists.find((l) => Number(l.id) === todaysFocusListId)?.name ?? null
     : null;
 
   return (
@@ -207,9 +203,10 @@ export function TaskFilters() {
             lists.map((listItem) => (
               <CategoryButton
                 key={listItem.id}
+                listItemId={String(listItem.id)}
                 category={listItem.name}
-                active={list === listItem.name}
-                isTodaysFocus={listItem.name === todaysFocusListName}
+                active={listId === String(listItem.id)}
+                isTodaysFocus={todaysFocusListId != null && Number(listItem.id) === todaysFocusListId}
               />
             ))
           )}

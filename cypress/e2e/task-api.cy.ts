@@ -14,6 +14,21 @@ describe("Task API", () => {
   // Store created task IDs for cleanup
   let createdTaskIds: number[] = [];
 
+  // Will be populated in before() by fetching an existing task
+  let workListId: number;
+
+  before(() => {
+    // Fetch an existing task to determine a valid listId
+    cy.request({
+      method: "GET",
+      url: "/api/tasks?limit=1",
+      headers: authHeaders,
+    }).then((response) => {
+      expect(response.body.tasks.length).to.be.greaterThan(0);
+      workListId = response.body.tasks[0].listId;
+    });
+  });
+
   beforeEach(() => {
     // Verify API key is configured
     expect(apiKey, "API_TEST_KEY should be configured").to.exist;
@@ -71,14 +86,14 @@ describe("Task API", () => {
         headers: authHeaders,
         body: {
           name: "Test task from API",
-          list: "Work",
+          listId: workListId,
         },
       }).then((response) => {
         expect(response.status).to.eq(201);
         expect(response.body).to.have.property("task");
         expect(response.body.task).to.have.property("id");
         expect(response.body.task.name).to.eq("Test task from API");
-        expect(response.body.task.list).to.eq("Work");
+        expect(response.body.task.listId).to.eq(workListId);
         createdTaskIds.push(response.body.task.id);
       });
     });
@@ -93,7 +108,7 @@ describe("Task API", () => {
         headers: authHeaders,
         body: {
           name: "Complete task from API",
-          list: "Personal",
+          listId: workListId,
           details: "This is a detailed task description",
           date: taskDate.toISOString(),
           estimatedDuration: 60,
@@ -103,7 +118,7 @@ describe("Task API", () => {
         expect(response.status).to.eq(201);
         const task = response.body.task;
         expect(task.name).to.eq("Complete task from API");
-        expect(task.list).to.eq("Personal");
+        expect(task.listId).to.eq(workListId);
         expect(task.details).to.eq("This is a detailed task description");
         expect(task.date).to.not.be.null;
         expect(task.estimatedDuration).to.eq(60);
@@ -119,7 +134,7 @@ describe("Task API", () => {
         url: "/api/tasks",
         headers: authHeaders,
         body: {
-          list: "Work",
+          listId: workListId,
         },
         failOnStatusCode: false,
       }).then((response) => {
@@ -128,7 +143,7 @@ describe("Task API", () => {
       });
     });
 
-    it("should fail without task list", () => {
+    it("should fail without task listId", () => {
       cy.request({
         method: "POST",
         url: "/api/tasks",
@@ -139,7 +154,7 @@ describe("Task API", () => {
         failOnStatusCode: false,
       }).then((response) => {
         expect(response.status).to.eq(400);
-        expect(response.body.error).to.eq("Task list is required");
+        expect(response.body.error).to.eq("Task listId is required (number)");
       });
     });
 
@@ -149,7 +164,7 @@ describe("Task API", () => {
         url: "/api/tasks",
         body: {
           name: "Unauthorized task",
-          list: "Work",
+          listId: workListId,
         },
         failOnStatusCode: false,
       }).then((response) => {
@@ -169,7 +184,7 @@ describe("Task API", () => {
         headers: authHeaders,
         body: {
           name: "Task for list test",
-          list: "Work",
+          listId: workListId,
         },
       }).then((response) => {
         testTaskId = response.body.task.id;
@@ -234,7 +249,7 @@ describe("Task API", () => {
         headers: authHeaders,
         body: {
           name: "Task for single get test",
-          list: "Work",
+          listId: workListId,
           details: "Test details",
         },
       }).then((response) => {
@@ -303,7 +318,7 @@ describe("Task API", () => {
         headers: authHeaders,
         body: {
           name: "Task to update",
-          list: "Work",
+          listId: workListId,
           isBlocker: false,
         },
       }).then((response) => {
@@ -323,7 +338,7 @@ describe("Task API", () => {
       }).then((response) => {
         expect(response.status).to.eq(200);
         expect(response.body.task.name).to.eq("Updated task name");
-        expect(response.body.task.list).to.eq("Work"); // Unchanged
+        expect(response.body.task.listId).to.eq(workListId); // Unchanged
       });
     });
 
@@ -417,7 +432,7 @@ describe("Task API", () => {
         headers: authHeaders,
         body: {
           name: "Task to soft delete",
-          list: "Work",
+          listId: workListId,
         },
       }).then((createResponse) => {
         const taskId = createResponse.body.task.id;
@@ -459,7 +474,7 @@ describe("Task API", () => {
         headers: authHeaders,
         body: {
           name: "Task to permanently delete",
-          list: "Work",
+          listId: workListId,
         },
       }).then((createResponse) => {
         const taskId = createResponse.body.task.id;
@@ -518,7 +533,7 @@ describe("Task API", () => {
         headers: authHeaders,
         body: {
           name: "Lifecycle test task",
-          list: "Work",
+          listId: workListId,
           details: "Initial details",
         },
       }).then((response) => {

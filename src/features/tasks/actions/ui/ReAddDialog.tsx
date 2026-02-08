@@ -25,7 +25,7 @@ export function ReAddDialog({
 
   const { metadata, updateMetadata, resetMetadata } = useTaskMetadata({
     selectedDuration: task.estimatedDuration ?? null,
-    selectedList: task.list,
+    selectedListId: task.listId,
     isStarred: !!task.selectedAt,
     isBlocker: !!task.isBlocker,
     selectedDate: initialDate ?? task.date ?? null,
@@ -59,7 +59,7 @@ export function ReAddDialog({
     const newTask = createInstance(TaskModel, {
       name,
       details: details.trim(),
-      list: metadata.selectedList,
+      listId: metadata.selectedListId!,
       selectedAt: metadata.isStarred ? new Date() : null,
       isBlocker: metadata.isBlocker,
       date: metadata.selectedDate,

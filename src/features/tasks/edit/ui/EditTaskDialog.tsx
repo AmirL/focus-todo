@@ -26,7 +26,7 @@ export function EditTaskDialog({
   const [aiSuggestions, setAiSuggestions] = useState<AiSuggestions | null>(task.aiSuggestions ?? null);
   const { metadata, updateMetadata, resetMetadata } = useTaskMetadata({
     selectedDuration: task.estimatedDuration ?? null,
-    selectedList: task.list,
+    selectedListId: task.listId,
     isStarred: !!task.selectedAt,
     isBlocker: task.isBlocker,
     selectedDate: task.date ?? null,
@@ -75,7 +75,7 @@ export function EditTaskDialog({
       name,
       details,
       estimatedDuration: metadata.selectedDuration,
-      list: metadata.selectedList,
+      listId: metadata.selectedListId!,
       selectedAt: metadata.isStarred ? task.selectedAt || new Date() : null,
       isBlocker: metadata.isBlocker,
       date: metadata.selectedDate,

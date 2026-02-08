@@ -57,7 +57,6 @@ curl -X GET "https://your-domain.com/api/tasks?on=today&completed=false" \
       "selectedAt": null,
       "estimatedDuration": 60,
       "isBlocker": false,
-      "list": "Work",
       "listId": 1,
       "deletedAt": null,
       "updatedAt": "2026-01-25T08:00:00+00:00",
@@ -105,7 +104,6 @@ curl -X GET "https://your-domain.com/api/tasks/123" \
     "selectedAt": null,
     "estimatedDuration": 30,
     "isBlocker": true,
-    "list": "Work",
     "listId": 1,
     "listDescription": "Work-related tasks and projects",
     "deletedAt": null,
@@ -117,7 +115,7 @@ curl -X GET "https://your-domain.com/api/tasks/123" \
 }
 ```
 
-The `listDescription` field contains the description of the task's list (category), or `null` if the list has no description or the task has no `listId`.
+The `listDescription` field contains the description of the task's list (category), or `null` if the list has no description.
 
 #### Error Responses
 
@@ -139,12 +137,11 @@ Create a new task.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `name` | string | Yes | Task name (max 300 chars) |
-| `list` | string | Yes | List name (e.g., "Work", "Personal") |
+| `listId` | number | Yes | List ID (e.g., 1 for "Work", 2 for "Personal") |
 | `details` | string | No | Task details/description |
 | `date` | ISO date string | No | Scheduled date |
 | `estimatedDuration` | number | No | Estimated duration in minutes |
 | `isBlocker` | boolean | No | Whether task is a blocker |
-| `listId` | number | No | List ID (alternative to `list`) |
 | `selectedAt` | ISO date string | No | When task was selected |
 
 #### Example Request
@@ -155,7 +152,7 @@ curl -X POST "https://your-domain.com/api/tasks" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Write documentation",
-    "list": "Work",
+    "listId": 1,
     "details": "API documentation for task endpoints",
     "date": "2026-01-26T10:00:00Z",
     "estimatedDuration": 45,
@@ -176,8 +173,7 @@ curl -X POST "https://your-domain.com/api/tasks" \
     "selectedAt": null,
     "estimatedDuration": 45,
     "isBlocker": false,
-    "list": "Work",
-    "listId": null,
+    "listId": 1,
     "deletedAt": null,
     "updatedAt": "2026-01-25T12:00:00Z",
     "createdAt": "2026-01-25T12:00:00Z",
@@ -191,7 +187,7 @@ curl -X POST "https://your-domain.com/api/tasks" \
 
 #### Error Responses
 
-- `400 Bad Request` - Missing required fields (name or list)
+- `400 Bad Request` - Missing required fields (name or listId)
 
 ---
 
@@ -222,7 +218,6 @@ All fields are optional. Only provided fields will be updated.
 | `selectedAt` | ISO date string \| null | Selection timestamp |
 | `estimatedDuration` | number \| null | Duration in minutes |
 | `isBlocker` | boolean | Blocker status |
-| `list` | string | List name |
 | `listId` | number | List ID |
 | `sortOrder` | number | Sort order |
 | `aiSuggestions` | object \| null | AI-generated suggestions for task fields (see [AI Suggestions](#ai-suggestions)) |
@@ -284,7 +279,6 @@ curl -X PATCH "https://your-domain.com/api/tasks/123" \
     "selectedAt": null,
     "estimatedDuration": 90,
     "isBlocker": true,
-    "list": "Work",
     "listId": 1,
     "listDescription": "Work-related tasks and projects",
     "deletedAt": null,
@@ -430,7 +424,7 @@ Currently, there are no rate limits enforced. This may change in future versions
 TASK=$(curl -s -X POST "https://your-domain.com/api/tasks" \
   -H "Authorization: Bearer $API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"name": "New task", "list": "Work"}')
+  -d '{"name": "New task", "listId": 1}')
 
 TASK_ID=$(echo $TASK | jq -r '.task.id')
 

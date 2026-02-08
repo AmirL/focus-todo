@@ -128,7 +128,7 @@ export async function GET(req: NextRequest) {
     type TaskRow = typeof tasksTable.$inferSelect;
     type ApiTask = Omit<
       TaskRow,
-      'date' | 'completedAt' | 'deletedAt' | 'selectedAt' | 'updatedAt' | 'createdAt'
+      'date' | 'completedAt' | 'deletedAt' | 'selectedAt' | 'updatedAt' | 'createdAt' | '__list_deprecated'
     > & {
       date: string | null;
       completedAt: string | null;
@@ -162,15 +162,18 @@ export async function GET(req: NextRequest) {
       return null;
     };
 
-    const apiTasks: ApiTask[] = tasks.map((t) => ({
-      ...t,
-      date: toLocal(ensureDate((t as TaskRow).date)),
-      completedAt: toLocal(ensureDate((t as TaskRow).completedAt)),
-      deletedAt: toLocal(ensureDate((t as TaskRow).deletedAt)),
-      selectedAt: toLocal(ensureDate((t as TaskRow).selectedAt)),
-      updatedAt: toLocal(ensureDate((t as TaskRow).updatedAt)),
-      createdAt: toLocal(ensureDate((t as TaskRow).createdAt)),
-    }));
+    const apiTasks: ApiTask[] = tasks.map((t) => {
+      const { __list_deprecated: _, ...rest } = t;
+      return {
+        ...rest,
+        date: toLocal(ensureDate((t as TaskRow).date)),
+        completedAt: toLocal(ensureDate((t as TaskRow).completedAt)),
+        deletedAt: toLocal(ensureDate((t as TaskRow).deletedAt)),
+        selectedAt: toLocal(ensureDate((t as TaskRow).selectedAt)),
+        updatedAt: toLocal(ensureDate((t as TaskRow).updatedAt)),
+        createdAt: toLocal(ensureDate((t as TaskRow).createdAt)),
+      };
+    });
 
     return NextResponse.json({ tasks: apiTasks }, { status: 200 });
   } catch (error) {
@@ -188,7 +191,7 @@ export async function GET(req: NextRequest) {
 /**
  * POST /api/tasks - Create a new task
  *
- * Body: Task object with required fields (name, list)
+ * Body: Task object with required fields (name, listId)
  * Returns: Created task with assigned ID
  */
 export async function POST(req: NextRequest) {
@@ -202,8 +205,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Task name is required' }, { status: 400 });
     }
 
-    if (!body.list || typeof body.list !== 'string') {
-      return NextResponse.json({ error: 'Task list is required' }, { status: 400 });
+    if (!body.listId || typeof body.listId !== 'number') {
+      return NextResponse.json({ error: 'Task listId is required (number)' }, { status: 400 });
     }
 
     // Remove fields that should be set server-side
@@ -226,7 +229,7 @@ export async function POST(req: NextRequest) {
     type TaskRow = typeof tasksTable.$inferSelect;
     type ApiTask = Omit<
       TaskRow,
-      'date' | 'completedAt' | 'deletedAt' | 'selectedAt' | 'updatedAt' | 'createdAt'
+      'date' | 'completedAt' | 'deletedAt' | 'selectedAt' | 'updatedAt' | 'createdAt' | '__list_deprecated'
     > & {
       date: string | null;
       completedAt: string | null;
@@ -243,8 +246,9 @@ export async function POST(req: NextRequest) {
       return isNaN(parsed.getTime()) ? null : parsed.toISOString();
     };
 
+    const { __list_deprecated: _, ...createdTaskRest } = createdTask;
     const apiTask: ApiTask = {
-      ...createdTask,
+      ...createdTaskRest,
       date: toISOString(createdTask.date),
       completedAt: toISOString(createdTask.completedAt),
       deletedAt: toISOString(createdTask.deletedAt),

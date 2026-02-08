@@ -1,10 +1,10 @@
 import { NextRequest } from 'next/server';
 import { withAuthAndErrorHandling, createErrorResponse, createSuccessResponse } from '@/shared/lib/api/route-wrapper';
-import { 
-  findUserListById, 
-  countListUsage, 
-  reassignItemsToNewList, 
-  deleteUserList 
+import {
+  findUserListById,
+  countListUsage,
+  reassignItemsToList,
+  deleteUserList
 } from '@/shared/lib/db/list-queries';
 
 async function deleteListHandler(req: NextRequest, session: { user: { id: string } }) {
@@ -22,7 +22,7 @@ async function deleteListHandler(req: NextRequest, session: { user: { id: string
   }
 
   // Check if there are tasks or goals using this list
-  const { tasksCount, goalsCount } = await countListUsage(session.user.id, existingList.name);
+  const { tasksCount, goalsCount } = await countListUsage(session.user.id, existingList.id);
 
   if ((tasksCount > 0 || goalsCount > 0) && !reassignToListId) {
     return createErrorResponse(
@@ -40,7 +40,7 @@ async function deleteListHandler(req: NextRequest, session: { user: { id: string
     }
 
     // Reassign tasks and goals to the new list
-    await reassignItemsToNewList(session.user.id, existingList.name, targetList.name);
+    await reassignItemsToList(session.user.id, existingList.id, targetList.id);
   }
 
   // Delete the list

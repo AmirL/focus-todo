@@ -6,7 +6,7 @@ interface ReorderTasksParams {
   taskIds: string[];
   context: {
     statusFilter: string;
-    list: string;
+    listId: number;
   };
 }
 

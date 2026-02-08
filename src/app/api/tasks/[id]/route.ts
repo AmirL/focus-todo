@@ -11,7 +11,7 @@ type RouteContext = { params: Promise<{ id: string }> };
 type TaskRow = typeof tasksTable.$inferSelect;
 type ApiTask = Omit<
   TaskRow,
-  'date' | 'completedAt' | 'deletedAt' | 'selectedAt' | 'updatedAt' | 'createdAt'
+  'date' | 'completedAt' | 'deletedAt' | 'selectedAt' | 'updatedAt' | 'createdAt' | '__list_deprecated'
 > & {
   date: string | null;
   completedAt: string | null;
@@ -30,8 +30,9 @@ function toISOString(d: Date | string | null | undefined): string | null {
 }
 
 function serializeTask(t: TaskRow, listDescription?: string | null): ApiTask {
+  const { __list_deprecated: _, ...rest } = t;
   return {
-    ...t,
+    ...rest,
     date: toISOString(t.date),
     completedAt: toISOString(t.completedAt),
     deletedAt: toISOString(t.deletedAt),

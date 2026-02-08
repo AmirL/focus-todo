@@ -14,12 +14,12 @@ import {
 import { useFilterStore, StatusFilterEnum } from './filterStore';
 
 export function useApplyFilters(tasks: TaskModel[]) {
-  const { statusFilter, list } = useFilterStore();
+  const { statusFilter, listId } = useFilterStore();
 
   return tasks
     .filter((task) => !isTaskDeletedAgo(task) && !isTaskCompletedAgo(task))
     .filter((task) => applyStatusFilter(task, statusFilter))
-    .filter((task) => list === '' || task.list === list);
+    .filter((task) => listId === '' || String(task.listId) === listId);
 }
 function applyStatusFilter(task: TaskModel, filter: StatusFilterEnum) {
   switch (filter) {

@@ -4,7 +4,7 @@ export type GoalPlain = {
   id: string;
   title: string;
   progress: number;
-  list: string;
+  listId: number;
   deletedAt: string | null;
   createdAt?: string;
   updatedAt?: string;
@@ -14,7 +14,7 @@ export class GoalModel {
   id!: string;
   title!: string;
   progress!: number;
-  list!: string;
+  listId!: number;
   deletedAt!: string;
 
   static toInstance(data: GoalPlain): GoalModel {

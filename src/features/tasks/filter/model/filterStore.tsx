@@ -13,43 +13,43 @@ export enum StatusFilterEnum {
 
 type FilterState = {
   statusFilter: StatusFilterEnum;
-  list: string;
+  listId: string;
   setStatusFilter: (filter: StatusFilterEnum) => void;
-  setList: (list: string) => void;
+  setListId: (listId: string) => void;
   initializeFromURL: () => void;
 };
 
 // Helper function to get initial state from URL
-function getInitialStateFromURL(): { statusFilter: StatusFilterEnum; list: string } {
+function getInitialStateFromURL(): { statusFilter: StatusFilterEnum; listId: string } {
   const filterParam = getSearchParam('filter');
-  const listParam = getSearchParam('list') || '';
+  const listIdParam = getSearchParam('listId') || '';
 
   const statusFilter = validateEnumValue(filterParam, StatusFilterEnum, StatusFilterEnum.BACKLOG);
 
-  return { statusFilter, list: listParam };
+  return { statusFilter, listId: listIdParam };
 }
 
 // Helper function to update URL
-function updateURL(statusFilter: StatusFilterEnum, list: string) {
+function updateURL(statusFilter: StatusFilterEnum, listId: string) {
   updateSearchParams({
     filter: statusFilter !== StatusFilterEnum.BACKLOG ? statusFilter : null,
-    list: list || null,
+    listId: listId || null,
   });
 }
 
 export const useFilterStore = create<FilterState>((set, get) => ({
   statusFilter: StatusFilterEnum.BACKLOG,
-  list: '',
+  listId: '',
 
   setStatusFilter: (filter) => {
     set({ statusFilter: filter });
-    updateURL(filter, get().list);
+    updateURL(filter, get().listId);
   },
-  setList: (list) => {
-    const currentList = get().list;
-    const newList = list === currentList ? '' : list;
-    set({ list: newList });
-    updateURL(get().statusFilter, newList);
+  setListId: (listId) => {
+    const currentListId = get().listId;
+    const newListId = listId === currentListId ? '' : listId;
+    set({ listId: newListId });
+    updateURL(get().statusFilter, newListId);
   },
   initializeFromURL: () => {
     const initialState = getInitialStateFromURL();

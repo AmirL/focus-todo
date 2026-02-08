@@ -1,7 +1,9 @@
 import type { TaskModel } from '@/entities/task/model/task';
 import { useListsQuery } from '@/shared/api/lists';
+import { buildListIdToNameMap } from '@/shared/lib/listUtils';
 
 export type TaskGroup = {
+  id: number;
   name: string;
   tasks: TaskModel[];
 };
@@ -10,7 +12,7 @@ type UseGroupedTasksOptions = {
   focusListName?: string | null;
 };
 
-// Groups tasks by their `list` and sorts groups according to the lists order from the sidebar.
+// Groups tasks by their `listId` and sorts groups according to the lists order from the sidebar.
 // If focusListName is provided, that list's group will appear first.
 export function useGroupedTasksByList(
   tasks: TaskModel[],
@@ -19,21 +21,25 @@ export function useGroupedTasksByList(
   const { data: lists = [] } = useListsQuery();
   const { focusListName } = options;
 
-  // Build groups map
-  const groupsMap = tasks.reduce<Record<string, TaskModel[]>>((acc, task) => {
-    if (!acc[task.list]) acc[task.list] = [];
-    acc[task.list].push(task);
+  const listNameMap = buildListIdToNameMap(lists);
+
+  // Build groups map keyed by listId
+  const groupsMap = tasks.reduce<Record<number, TaskModel[]>>((acc, task) => {
+    if (!acc[task.listId]) acc[task.listId] = [];
+    acc[task.listId].push(task);
     return acc;
   }, {});
 
-  // Sort group names using sidebar order; fallback to alphabetical
-  // If focusListName is provided, prioritize it first
-  const orderIndex = new Map(lists.map((l, i) => [l.name, i] as const));
-  const names = Object.keys(groupsMap).sort((a, b) => {
+  // Sort group IDs using sidebar order; fallback to alphabetical by name
+  const orderIndex = new Map(lists.map((l, i) => [Number(l.id), i] as const));
+  const listIds = Object.keys(groupsMap).map(Number).sort((a, b) => {
+    const nameA = listNameMap.get(a) ?? '';
+    const nameB = listNameMap.get(b) ?? '';
+
     // Focus list always comes first
     if (focusListName) {
-      if (a === focusListName) return -1;
-      if (b === focusListName) return 1;
+      if (nameA === focusListName) return -1;
+      if (nameB === focusListName) return 1;
     }
 
     const ia = orderIndex.get(a);
@@ -41,9 +47,12 @@ export function useGroupedTasksByList(
     if (ia != null && ib != null) return ia - ib;
     if (ia != null) return -1;
     if (ib != null) return 1;
-    return a.localeCompare(b);
+    return nameA.localeCompare(nameB);
   });
 
-  return names.map((name) => ({ name, tasks: groupsMap[name] }));
+  return listIds.map((id) => ({
+    id,
+    name: listNameMap.get(id) ?? 'Unknown',
+    tasks: groupsMap[id],
+  }));
 }
-
