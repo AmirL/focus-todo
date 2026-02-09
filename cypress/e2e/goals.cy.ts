@@ -1,9 +1,17 @@
 /// <reference types="cypress" />
 
 describe("Goal Management", () => {
+  let createdGoalIds: number[] = [];
+
   beforeEach(() => {
+    cy.intercept("POST", "/api/create-goal").as("createGoal");
     cy.visit("/");
     cy.waitForAppLoad();
+  });
+
+  afterEach(() => {
+    cy.apiCleanupGoals(createdGoalIds);
+    createdGoalIds = [];
   });
 
   describe("Create Goals", () => {
@@ -12,6 +20,10 @@ describe("Goal Management", () => {
       cy.get('[data-cy="goal-title-input"]').type("Learn TypeScript");
       cy.get('[data-cy="create-goal-button"]').click();
       cy.contains("Learn TypeScript").should("be.visible");
+
+      cy.wait("@createGoal").then((interception) => {
+        createdGoalIds.push(interception.response!.body.id);
+      });
     });
 
     it("should create a goal with custom progress", () => {
@@ -19,6 +31,10 @@ describe("Goal Management", () => {
       cy.get('[data-cy="goal-title-input"]').type("Exercise daily");
       cy.get('[data-cy="create-goal-button"]').click();
       cy.contains("Exercise daily").should("be.visible");
+
+      cy.wait("@createGoal").then((interception) => {
+        createdGoalIds.push(interception.response!.body.id);
+      });
     });
   });
 

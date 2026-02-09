@@ -1,9 +1,17 @@
 /// <reference types="cypress" />
 
 describe("Task Management", () => {
+  let createdTaskIds: number[] = [];
+
   beforeEach(() => {
+    cy.intercept("POST", "/api/create-task").as("createTask");
     cy.visit("/");
     cy.waitForAppLoad();
+  });
+
+  afterEach(() => {
+    cy.apiCleanupTasks(createdTaskIds);
+    createdTaskIds = [];
   });
 
   describe("Create Tasks", () => {
@@ -12,6 +20,10 @@ describe("Task Management", () => {
       cy.get('[data-testid="task-name-input"]').type("Buy groceries");
       cy.get('[data-testid="save-task-button"]').click();
       cy.contains("Buy groceries").should("be.visible");
+
+      cy.wait("@createTask").then((interception) => {
+        createdTaskIds.push(interception.response!.body.id);
+      });
     });
 
     it("should create a task for a specific date", () => {
@@ -19,6 +31,10 @@ describe("Task Management", () => {
       cy.get('[data-testid="task-name-input"]').type("Schedule meeting");
       cy.get('[data-testid="save-task-button"]').click();
       cy.contains("Schedule meeting").should("be.visible");
+
+      cy.wait("@createTask").then((interception) => {
+        createdTaskIds.push(interception.response!.body.id);
+      });
     });
   });
 

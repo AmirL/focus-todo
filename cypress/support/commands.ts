@@ -28,6 +28,26 @@ declare global {
        * Login to the application
        */
       login(): Chainable<void>;
+
+      /**
+       * Permanently delete a task via API (for test cleanup)
+       */
+      apiCleanupTask(taskId: number): Chainable<void>;
+
+      /**
+       * Permanently delete a goal via API (for test cleanup)
+       */
+      apiCleanupGoal(goalId: number): Chainable<void>;
+
+      /**
+       * Permanently delete multiple tasks via API (for test cleanup)
+       */
+      apiCleanupTasks(taskIds: number[]): Chainable<void>;
+
+      /**
+       * Permanently delete multiple goals via API (for test cleanup)
+       */
+      apiCleanupGoals(goalIds: number[]): Chainable<void>;
     }
   }
 }
@@ -83,6 +103,41 @@ Cypress.Commands.add("login", () => {
       });
     },
   );
+});
+
+// Cleanup commands for E2E test data management
+const getAuthHeaders = () => ({
+  "X-API-Key": Cypress.env("API_TEST_KEY"),
+});
+
+Cypress.Commands.add("apiCleanupTask", (taskId: number) => {
+  cy.request({
+    method: "DELETE",
+    url: `/api/tasks/${taskId}?permanent=true`,
+    headers: getAuthHeaders(),
+    failOnStatusCode: false,
+  });
+});
+
+Cypress.Commands.add("apiCleanupGoal", (goalId: number) => {
+  cy.request({
+    method: "DELETE",
+    url: `/api/goals/${goalId}?permanent=true`,
+    headers: getAuthHeaders(),
+    failOnStatusCode: false,
+  });
+});
+
+Cypress.Commands.add("apiCleanupTasks", (taskIds: number[]) => {
+  taskIds.forEach((taskId) => {
+    cy.apiCleanupTask(taskId);
+  });
+});
+
+Cypress.Commands.add("apiCleanupGoals", (goalIds: number[]) => {
+  goalIds.forEach((goalId) => {
+    cy.apiCleanupGoal(goalId);
+  });
 });
 
 export {};
