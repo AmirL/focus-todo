@@ -18,13 +18,35 @@ function createTaskWithCheckboxes(name: string) {
 }
 
 function expandDescription(name: string) {
+  // Click the description indicator, then verify checkboxes appear.
+  // A background React Query refetch can remount the component and reset the
+  // expanded state after the click. If that happens, we click again.
   cy.contains(name)
     .parents('[data-testid^="task-"]')
     .first()
     .find('[data-cy="description-indicator"]')
     .click();
 
-  // Wait for the checkboxes to render after expanding
+  cy.contains(name)
+    .parents('[data-testid^="task-"]')
+    .first()
+    .find('[data-cy="description-indicator"]')
+    .should("have.attr", "aria-expanded", "true");
+
+  // Re-check after a moment — if a refetch collapsed it, click again
+  // eslint-disable-next-line cypress/no-unnecessary-waiting
+  cy.wait(1000);
+
+  cy.contains(name)
+    .parents('[data-testid^="task-"]')
+    .first()
+    .find('[data-cy="description-indicator"]')
+    .then(($btn) => {
+      if ($btn.attr("aria-expanded") !== "true") {
+        cy.wrap($btn).click();
+      }
+    });
+
   cy.contains(name)
     .parents('[data-testid^="task-"]')
     .first()
