@@ -101,7 +101,7 @@ async function getInitiativeHandler(
 
   // Get suggested list for tomorrow (if not already set)
   let suggestedList: ListWithLastTouched | null = null;
-  if (!tomorrowInitiative) {
+  if (!tomorrowInitiative || !todayInitiative) {
     // Build list with last touched info from initiatives
     const listsWithLastTouched: ListWithLastTouched[] = participatingLists.map((list) => {
       const listBalance = balance.find((b) => b.listId === list.id);
@@ -128,6 +128,7 @@ async function getInitiativeHandler(
 
 interface SetInitiativeBody {
   listId: number;
+  date?: string; // YYYY-MM-DD, defaults to tomorrow
   reason?: string;
 }
 
@@ -140,14 +141,29 @@ async function setInitiativeHandler(
   session: { user: { id: string } }
 ) {
   const userId = session.user.id;
-  const tomorrowStr = dayjs().add(1, 'day').format('YYYY-MM-DD');
-  const tomorrowDate = toDate(tomorrowStr);
 
   const body: SetInitiativeBody = await req.json();
 
   if (!body.listId) {
     return createErrorResponse('listId is required', 400);
   }
+
+  // Determine target date: use provided date or default to tomorrow
+  const todayStr = dayjs().format('YYYY-MM-DD');
+  const tomorrowStr = dayjs().add(1, 'day').format('YYYY-MM-DD');
+
+  if (body.date) {
+    const isValid = /^\d{4}-\d{2}-\d{2}$/.test(body.date) && dayjs(body.date, 'YYYY-MM-DD', true).isValid();
+    if (!isValid) {
+      return createErrorResponse('Invalid date format. Use YYYY-MM-DD', 400);
+    }
+    if (body.date !== todayStr && body.date !== tomorrowStr) {
+      return createErrorResponse('Can only set initiative for today or tomorrow', 400);
+    }
+  }
+
+  const targetDateStr = body.date ?? tomorrowStr;
+  const targetDate = toDate(targetDateStr);
 
   // Verify the list exists and belongs to the user
   const [list] = await DB.select()
@@ -163,18 +179,18 @@ async function setInitiativeHandler(
     return createErrorResponse('List not found', 404);
   }
 
-  // Check if tomorrow's initiative already exists
+  // Check if initiative already exists for target date
   const [existing] = await DB.select()
     .from(currentInitiativeTable)
     .where(
       and(
         eq(currentInitiativeTable.userId, userId),
-        eq(currentInitiativeTable.date, tomorrowDate)
+        eq(currentInitiativeTable.date, targetDate)
       )
     );
 
   if (existing) {
-    return createErrorResponse('Initiative for tomorrow already exists. Use PATCH to change it.', 409);
+    return createErrorResponse('Initiative for this date already exists. Use PATCH to change it.', 409);
   }
 
   // Calculate the suggested list to store what the system would have suggested
@@ -190,7 +206,7 @@ async function setInitiativeHandler(
 
   // Get recent initiatives to calculate suggestion
   const thirtyDaysAgoDate = toDate(dayjs().subtract(30, 'day').format('YYYY-MM-DD'));
-  const todayDate = toDate(dayjs().format('YYYY-MM-DD'));
+  const todayDate = toDate(todayStr);
   const recentInitiatives = await DB.select()
     .from(currentInitiativeTable)
     .where(
@@ -237,7 +253,7 @@ async function setInitiativeHandler(
   const [inserted] = await DB.insert(currentInitiativeTable)
     .values({
       userId,
-      date: tomorrowDate,
+      date: targetDate,
       suggestedListId,
       chosenListId,
       reason: body.reason ?? null,

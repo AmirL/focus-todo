@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchBackend } from '@/shared/lib/api';
 import type { InitiativeBalance, ListWithLastTouched } from '@/entities/current-initiative';
 import toast from 'react-hot-toast';
+import dayjs from 'dayjs';
 
 // Types for API responses
 interface InitiativeRow {
@@ -113,15 +114,18 @@ export function useSetInitiativeMutation() {
   return useMutation({
     mutationFn: async ({
       listId,
+      date,
       reason,
     }: {
       listId: number;
+      date?: string;
       reason?: string;
     }): Promise<SetInitiativeResponse> => {
-      return fetchBackend('current-initiative', { listId, reason });
+      return fetchBackend('current-initiative', { listId, date, reason });
     },
-    onSuccess: () => {
-      toast.success('Tomorrow\'s focus has been set');
+    onSuccess: (_, variables) => {
+      const label = variables.date === dayjs().format('YYYY-MM-DD') ? "Today's" : "Tomorrow's";
+      toast.success(`${label} focus has been set`);
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: initiativeKeys.all });
     },
