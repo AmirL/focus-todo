@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { Sparkles } from 'lucide-react';
 import { TaskModel } from '@/entities/task/model/task';
 import type { AiSuggestions } from '@/shared/types/aiSuggestions';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
 import { useUpdateTaskMutation } from '@/shared/api/tasks';
 import { createInstance } from '@/shared/lib/instance-tools';
+import { hasAnySuggestions } from '@/shared/lib/aiSuggestions';
 import { TaskFormFields } from '@/shared/ui/task/TaskFormFields';
 import { useTaskMetadata } from '@/shared/ui/task/useTaskMetadata';
 import { ReAddButton } from '@/features/tasks/actions/ui/ReAddButton';
@@ -67,6 +69,23 @@ export function EditTaskDialog({
     );
   };
 
+  const handleClearSuggestions = () => {
+    setAiSuggestions(null);
+    const updatedTask = createInstance(TaskModel, {
+      ...task,
+      name,
+      details,
+      estimatedDuration: metadata.selectedDuration,
+      listId: metadata.selectedListId!,
+      selectedAt: metadata.isStarred ? task.selectedAt || new Date() : null,
+      isBlocker: metadata.isBlocker,
+      date: metadata.selectedDate,
+      aiSuggestions: null,
+      updatedAt: new Date(),
+    });
+    updateTaskMutation.mutate(updatedTask);
+  };
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -110,6 +129,19 @@ export function EditTaskDialog({
           </div>
           <DialogFooter>
             <ReAddButton task={task} />
+            {hasAnySuggestions(aiSuggestions) && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-purple-600 hover:bg-purple-100 hover:text-purple-700"
+                onClick={handleClearSuggestions}
+                data-cy="clear-suggestions-button"
+              >
+                <Sparkles className="h-4 w-4 mr-1" />
+                Clear suggestions
+              </Button>
+            )}
             <Button type="submit" data-testid="save-task-changes-button">
               Save changes
             </Button>

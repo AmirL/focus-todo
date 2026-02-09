@@ -105,6 +105,20 @@ describe("AI Suggestions", () => {
           .should("not.exist");
       });
     });
+
+    it("should not show badge when suggestion matches current task value", () => {
+      const taskName = `AI match test ${Date.now()}`;
+      createTaskWithSuggestions(taskName, {
+        name: { suggestion: taskName, userReaction: null },
+      }).then((taskId) => {
+        createdTaskIds.push(taskId);
+        cy.visit("/");
+        cy.waitForAppLoad();
+        findTaskElement(taskId)
+          .find('[data-cy="ai-suggestion-badge"]')
+          .should("not.exist");
+      });
+    });
   });
 
   describe("Suggestion banners in edit dialog", () => {
@@ -119,6 +133,26 @@ describe("AI Suggestions", () => {
         cy.get('[data-cy="ai-suggestion-banner-name"]').should("be.visible");
         cy.get('[data-cy="ai-suggestion-banner-estimatedDuration"]').scrollIntoView().should("be.visible");
         cy.get('[data-cy="ai-suggestion-banner-details"]').scrollIntoView().should("be.visible");
+      });
+    });
+
+    it("should not show banner when suggestion matches current field value", () => {
+      const taskName = `AI banner match ${Date.now()}`;
+      createTaskWithSuggestions(taskName, {
+        name: { suggestion: taskName, userReaction: null },
+        details: { suggestion: "Different details", userReaction: null },
+      }).then((taskId) => {
+        createdTaskIds.push(taskId);
+        cy.visit("/");
+        cy.waitForAppLoad();
+        openEditDialog(taskId);
+
+        // Name suggestion matches current value - should not show
+        cy.get('[data-cy="ai-suggestion-banner-name"]').should("not.exist");
+        // Details suggestion does NOT match - should show
+        cy.get('[data-cy="ai-suggestion-banner-details"]')
+          .scrollIntoView()
+          .should("be.visible");
       });
     });
 
@@ -246,6 +280,66 @@ describe("AI Suggestions", () => {
         findTaskElement(taskId)
           .find('[data-cy="ai-suggestion-badge"]')
           .should("not.exist");
+      });
+    });
+  });
+
+  describe("Clear suggestions button", () => {
+    it("should show clear button when task has suggestions", () => {
+      const name = `AI clear visible ${Date.now()}`;
+      createTaskWithSuggestions(name, pendingSuggestions).then((taskId) => {
+        createdTaskIds.push(taskId);
+        cy.visit("/");
+        cy.waitForAppLoad();
+        openEditDialog(taskId);
+
+        cy.get('[data-cy="clear-suggestions-button"]')
+          .scrollIntoView()
+          .should("be.visible");
+      });
+    });
+
+    it("should not show clear button when task has no suggestions", () => {
+      cy.request({
+        method: "POST",
+        url: "/api/tasks",
+        headers: authHeaders,
+        body: { name: `No suggestions ${Date.now()}`, listId: workListId },
+      }).then((response) => {
+        const taskId = response.body.task.id;
+        createdTaskIds.push(taskId);
+        cy.visit("/");
+        cy.waitForAppLoad();
+        openEditDialog(taskId);
+
+        cy.get('[data-cy="clear-suggestions-button"]').should("not.exist");
+      });
+    });
+
+    it("should clear all suggestions and persist via API", () => {
+      const name = `AI clear persist ${Date.now()}`;
+      createTaskWithSuggestions(name, pendingSuggestions).then((taskId) => {
+        createdTaskIds.push(taskId);
+        cy.visit("/");
+        cy.waitForAppLoad();
+
+        cy.intercept("POST", "/api/update-task").as("updateTask");
+
+        openEditDialog(taskId);
+        cy.get('[data-cy="clear-suggestions-button"]').click();
+
+        cy.wait("@updateTask").then((interception) => {
+          const task = interception.request.body.task;
+          expect(task.aiSuggestions).to.be.null;
+        });
+
+        // Banners and clear button should disappear
+        cy.get('[data-cy="ai-suggestion-banner-name"]').should("not.exist");
+        cy.get('[data-cy="ai-suggestion-banner-details"]').should("not.exist");
+        cy.get('[data-cy="ai-suggestion-banner-estimatedDuration"]').should(
+          "not.exist"
+        );
+        cy.get('[data-cy="clear-suggestions-button"]').should("not.exist");
       });
     });
   });
