@@ -9,6 +9,7 @@ import { TaskBadges } from './TaskBadges';
 import { TaskDetails, DescriptionIndicator } from './TaskDetails';
 import { TaskName } from './TaskName';
 import { useTempSelectStore } from '@/features/tasks/temp-select';
+import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
 import { useUpdateTaskMutation } from '@/shared/api/tasks';
 import { toggleMarkdownCheckbox } from '@/shared/lib/toggleMarkdownCheckbox';
 import { createInstance } from '@/shared/lib/instance-tools';
@@ -25,6 +26,7 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
   const deleted = isTaskDeleted(task);
   const toggleTaskCompleted = useToggleTaskCompleted();
   const { toggleSelection, isSelected: isTempSelected } = useTempSelectStore();
+  const statusFilter = useFilterStore((s) => s.statusFilter);
   const isTempSelectedTask = isTempSelected(task.id);
   const updateTaskMutation = useUpdateTaskMutation();
   const [detailsExpanded, setDetailsExpanded] = useState(false);
@@ -41,6 +43,9 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
   };
 
   const handleTaskClick = (e: React.MouseEvent<HTMLLIElement>) => {
+    // Only allow temporary selection in the Selected filter
+    if (statusFilter !== StatusFilterEnum.SELECTED) return;
+
     // Don't select if task is deleted
     if (deleted) return;
 
