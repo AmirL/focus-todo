@@ -1,24 +1,42 @@
 /// <reference types="cypress" />
 
 describe("Task Management", () => {
+  let createdTaskIds: number[] = [];
+
   beforeEach(() => {
+    cy.intercept("POST", "/api/create-task").as("createTask");
     cy.visit("/");
     cy.waitForAppLoad();
   });
 
+  afterEach(() => {
+    cy.apiCleanupTasks(createdTaskIds);
+    createdTaskIds = [];
+  });
+
   describe("Create Tasks", () => {
     it("should create a new task using the add task button", () => {
+      const taskName = `Buy groceries ${Date.now()}`;
       cy.get('[data-testid="add-task-button"]').click();
-      cy.get('[data-testid="task-name-input"]').type("Buy groceries");
+      cy.get('[data-testid="task-name-input"]').type(taskName);
       cy.get('[data-testid="save-task-button"]').click();
-      cy.contains("Buy groceries").should("be.visible");
+      cy.contains(taskName).should("be.visible");
+
+      cy.wait("@createTask").then((interception) => {
+        createdTaskIds.push(interception.response!.body.id);
+      });
     });
 
     it("should create a task for a specific date", () => {
+      const taskName = `Schedule meeting ${Date.now()}`;
       cy.get('[data-testid="add-task-button"]').click();
-      cy.get('[data-testid="task-name-input"]').type("Schedule meeting");
+      cy.get('[data-testid="task-name-input"]').type(taskName);
       cy.get('[data-testid="save-task-button"]').click();
-      cy.contains("Schedule meeting").should("be.visible");
+      cy.contains(taskName).should("be.visible");
+
+      cy.wait("@createTask").then((interception) => {
+        createdTaskIds.push(interception.response!.body.id);
+      });
     });
   });
 
@@ -66,10 +84,11 @@ describe("Task Management", () => {
 
   describe("Edit Tasks", () => {
     it("should edit task name", () => {
+      const updatedName = `Updated task ${Date.now()}`;
       cy.get('[data-testid^="edit-task-"]').first().click();
-      cy.get('#name').clear().type("Updated task name");
+      cy.get('#name').clear().type(updatedName);
       cy.get('[data-testid="save-task-changes-button"]').click();
-      cy.contains("Updated task name").should("be.visible");
+      cy.contains(updatedName).should("be.visible");
     });
 
     it("should open edit dialog", () => {

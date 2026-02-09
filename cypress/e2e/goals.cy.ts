@@ -1,33 +1,52 @@
 /// <reference types="cypress" />
 
 describe("Goal Management", () => {
+  let createdGoalIds: number[] = [];
+
   beforeEach(() => {
+    cy.intercept("POST", "/api/create-goal").as("createGoal");
     cy.visit("/");
     cy.waitForAppLoad();
   });
 
+  afterEach(() => {
+    cy.apiCleanupGoals(createdGoalIds);
+    createdGoalIds = [];
+  });
+
   describe("Create Goals", () => {
     it("should create a new goal", () => {
+      const goalTitle = `Learn TypeScript ${Date.now()}`;
       cy.get('[data-cy="add-goal-button"]').click();
-      cy.get('[data-cy="goal-title-input"]').type("Learn TypeScript");
+      cy.get('[data-cy="goal-title-input"]').type(goalTitle);
       cy.get('[data-cy="create-goal-button"]').click();
-      cy.contains("Learn TypeScript").should("be.visible");
+      cy.contains(goalTitle).should("be.visible");
+
+      cy.wait("@createGoal").then((interception) => {
+        createdGoalIds.push(interception.response!.body.id);
+      });
     });
 
     it("should create a goal with custom progress", () => {
+      const goalTitle = `Exercise daily ${Date.now()}`;
       cy.get('[data-cy="add-goal-button"]').click();
-      cy.get('[data-cy="goal-title-input"]').type("Exercise daily");
+      cy.get('[data-cy="goal-title-input"]').type(goalTitle);
       cy.get('[data-cy="create-goal-button"]').click();
-      cy.contains("Exercise daily").should("be.visible");
+      cy.contains(goalTitle).should("be.visible");
+
+      cy.wait("@createGoal").then((interception) => {
+        createdGoalIds.push(interception.response!.body.id);
+      });
     });
   });
 
   describe("Edit Goals", () => {
     it("should edit goal title", () => {
+      const updatedTitle = `Updated Goal ${Date.now()}`;
       cy.get('[data-cy="edit-goal-button"]').first().click();
-      cy.get('[data-cy="edit-goal-title-input"]').clear().type("Updated Goal Title");
+      cy.get('[data-cy="edit-goal-title-input"]').clear().type(updatedTitle);
       cy.get('[data-cy="save-goal-button"]').click();
-      cy.contains("Updated Goal Title").should("be.visible");
+      cy.contains(updatedTitle).should("be.visible");
     });
   });
 

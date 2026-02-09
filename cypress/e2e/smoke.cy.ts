@@ -1,19 +1,36 @@
 /// <reference types="cypress" />
 
 describe("Smoke Tests - Critical User Flows", () => {
+  let createdTaskIds: number[] = [];
+  let createdGoalIds: number[] = [];
+
   beforeEach(() => {
+    cy.intercept("POST", "/api/create-task").as("createTask");
+    cy.intercept("POST", "/api/create-goal").as("createGoal");
     cy.visit("/");
     cy.waitForAppLoad();
   });
 
+  afterEach(() => {
+    cy.apiCleanupTasks(createdTaskIds);
+    cy.apiCleanupGoals(createdGoalIds);
+    createdTaskIds = [];
+    createdGoalIds = [];
+  });
+
   it("should create and complete a task", () => {
+    const taskName = `Smoke test task ${Date.now()}`;
     cy.get('[data-testid="add-task-button"]').click();
-    cy.get('[data-testid="task-name-input"]').type("Smoke test task");
+    cy.get('[data-testid="task-name-input"]').type(taskName);
     cy.get('[data-testid="save-task-button"]').click();
-    cy.contains("Smoke test task").should("be.visible");
+    cy.contains(taskName).should("be.visible");
+
+    cy.wait("@createTask").then((interception) => {
+      createdTaskIds.push(interception.response!.body.id);
+    });
 
     // Complete the task - use role="checkbox" for Radix checkbox
-    cy.get('[data-testid^="task-"]').contains("Smoke test task").parents('[data-testid^="task-"]').find('[role="checkbox"]').click();
+    cy.get('[data-testid^="task-"]').contains(taskName).parents('[data-testid^="task-"]').find('[role="checkbox"]').click();
     cy.get(".line-through").should("exist");
   });
 
@@ -30,10 +47,15 @@ describe("Smoke Tests - Critical User Flows", () => {
   });
 
   it("should create a goal", () => {
+    const goalTitle = `Test Goal ${Date.now()}`;
     cy.get('[data-cy="add-goal-button"]').click();
-    cy.get('[data-cy="goal-title-input"]').type("Test Goal");
+    cy.get('[data-cy="goal-title-input"]').type(goalTitle);
     cy.get('[data-cy="create-goal-button"]').click();
-    cy.contains("Test Goal").should("be.visible");
+    cy.contains(goalTitle).should("be.visible");
+
+    cy.wait("@createGoal").then((interception) => {
+      createdGoalIds.push(interception.response!.body.id);
+    });
   });
 
   it("should show sidebar on desktop", () => {

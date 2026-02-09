@@ -1,9 +1,17 @@
 /// <reference types="cypress" />
 
 describe("Task Categories", () => {
+  let createdTaskIds: number[] = [];
+
   beforeEach(() => {
+    cy.intercept("POST", "/api/create-task").as("createTask");
     cy.visit("/");
     cy.waitForAppLoad();
+  });
+
+  afterEach(() => {
+    cy.apiCleanupTasks(createdTaskIds);
+    createdTaskIds = [];
   });
 
   describe("Filter by Category", () => {
@@ -20,10 +28,15 @@ describe("Task Categories", () => {
 
   describe("Assign Tasks to Categories", () => {
     it("should create a task", () => {
+      const taskName = `Categorized task ${Date.now()}`;
       cy.get('[data-testid="add-task-button"]').click();
-      cy.get('[data-testid="task-name-input"]').type("Categorized task");
+      cy.get('[data-testid="task-name-input"]').type(taskName);
       cy.get('[data-testid="save-task-button"]').click();
-      cy.contains("Categorized task").should("be.visible");
+      cy.contains(taskName).should("be.visible");
+
+      cy.wait("@createTask").then((interception) => {
+        createdTaskIds.push(interception.response!.body.id);
+      });
     });
 
     it("should edit a task", () => {
