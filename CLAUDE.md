@@ -104,7 +104,7 @@ Full RESTful API for programmatic task management. See [`docs/TASK_API.md`](./do
 - First work on the task,
 - When you consider your work is finished, use playwright mcp to test it
 - When test is finished, task you need acceptance from the reviewer agent
-- Only after that the workflow is finished.
+- When the branch has commits (changes were made in the worktree), create a PR. After creating the PR, wait for all CI checks to pass before considering the work done.
 - When E2E tests fail in CI, wait for the GitHub Actions run to finish, check the failure, fix it, push, and repeat until CI is green. Don't leave failing CI behind.
 - When finishing a feature, add or update E2E tests. Remove E2E tests for removed features.
 

@@ -6,11 +6,13 @@ import dayjs from 'dayjs';
 import { cn } from '@/shared/lib/utils';
 import {
   useCurrentInitiativeQuery,
+  useSetInitiativeMutation,
   useChangeInitiativeMutation,
 } from '@/shared/api/current-initiative';
 
 export function TodayFocusBanner() {
   const { data, isLoading, error } = useCurrentInitiativeQuery();
+  const setInitiativeMutation = useSetInitiativeMutation();
   const changeInitiativeMutation = useChangeInitiativeMutation();
 
   const [isExpanded, setIsExpanded] = useState(false);
@@ -40,18 +42,21 @@ export function TodayFocusBanner() {
   const { participatingLists } = data;
   const eligibleLists = participatingLists.filter((list) => list.participatesInInitiative);
 
-  // Don't show banner if no eligible lists or no initiative set for today
-  if (eligibleLists.length === 0 || !todayInitiative) {
+  if (eligibleLists.length === 0) {
     return null;
   }
 
-  // Current effective selection (existing or pending)
-  const currentListId = pendingListId ?? existingListId;
+  const isNotSet = !todayInitiative;
+
+  // Current effective selection: pending > existing > suggested
+  const currentListId = pendingListId ?? existingListId ?? data.suggestedList?.id ?? null;
   const currentList = eligibleLists.find((l) => l.id === currentListId);
-  const hasUnsavedChanges = pendingListId !== null && pendingListId !== existingListId;
+  const hasUnsavedChanges = isNotSet
+    ? pendingListId !== null
+    : pendingListId !== null && pendingListId !== existingListId;
 
   const handleSelect = (listId: number) => {
-    if (listId === existingListId) {
+    if (!isNotSet && listId === existingListId) {
       // Selecting the already-saved option - clear pending
       setPendingListId(null);
     } else {
@@ -61,35 +66,52 @@ export function TodayFocusBanner() {
   };
 
   const handleSave = () => {
-    if (pendingListId === null) return;
+    const listIdToSave = pendingListId ?? currentListId;
+    if (listIdToSave === null) return;
 
-    changeInitiativeMutation.mutate({
-      date: todayDate,
-      listId: pendingListId,
-    });
+    if (todayInitiative) {
+      changeInitiativeMutation.mutate({
+        date: todayDate,
+        listId: listIdToSave,
+      });
+    } else {
+      setInitiativeMutation.mutate({
+        date: todayDate,
+        listId: listIdToSave,
+      });
+    }
   };
 
-  const isSaving = changeInitiativeMutation.isPending;
+  const isSaving = changeInitiativeMutation.isPending || setInitiativeMutation.isPending;
 
   return (
     <div className="px-2 sm:px-4 mb-4">
-      <div className="bg-primary/5 border border-primary/20 rounded-lg px-4 py-3">
+      <div className={cn(
+        "bg-primary/5 border rounded-lg px-4 py-3",
+        isNotSet ? "border-amber-300/50" : "border-primary/20"
+      )}>
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-primary">Today&apos;s Focus:</span>
-              <span className="text-sm font-semibold">{currentList?.name ?? 'Not set'}</span>
-              {todayInitiative.chosenListId !== null && (
-                <span className="text-xs text-muted-foreground">(you chose this)</span>
+              {isNotSet ? (
+                <span className="text-sm text-muted-foreground">Not set yet</span>
+              ) : (
+                <>
+                  <span className="text-sm font-semibold">{currentList?.name ?? 'Not set'}</span>
+                  {todayInitiative.chosenListId !== null && (
+                    <span className="text-xs text-muted-foreground">(you chose this)</span>
+                  )}
+                </>
               )}
             </div>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Pick one task to start your day
+              {isNotSet ? 'Choose a category to focus on today' : 'Pick one task to start your day'}
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Change dropdown */}
+            {/* Dropdown */}
             <div className="relative">
               <button
                 type="button"
@@ -100,7 +122,7 @@ export function TodayFocusBanner() {
                   hasUnsavedChanges && 'border-primary'
                 )}
               >
-                <span>Change</span>
+                <span>{isNotSet ? (currentList?.name ?? 'Select') : 'Change'}</span>
                 <ChevronDown
                   className={cn('h-3.5 w-3.5 text-muted-foreground transition-transform', isExpanded && 'rotate-180')}
                 />
@@ -137,7 +159,7 @@ export function TodayFocusBanner() {
               )}
             </div>
 
-            {/* Save button - only show when there are unsaved changes */}
+            {/* Save button */}
             {hasUnsavedChanges && (
               <button
                 type="button"
