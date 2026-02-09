@@ -293,7 +293,9 @@ describe("AI Suggestions", () => {
         cy.waitForAppLoad();
         openEditDialog(taskId);
 
-        cy.get('[data-cy="clear-suggestions-button"]').should("be.visible");
+        cy.get('[data-cy="clear-suggestions-button"]')
+          .scrollIntoView()
+          .should("be.visible");
       });
     });
 
