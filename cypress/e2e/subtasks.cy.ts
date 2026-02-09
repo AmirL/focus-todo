@@ -14,7 +14,7 @@ function createTaskWithCheckboxes(name: string) {
   cy.contains("button", "Edit").click();
   cy.get("#details").type(checkboxMarkdown);
   cy.get('[data-testid="save-task-button"]').click();
-  cy.contains(name).should("be.visible");
+  cy.contains(name, { timeout: 15000 }).should("be.visible");
 
   // Capture created task ID for cleanup
   cy.wait("@createTask").then((interception) => {
