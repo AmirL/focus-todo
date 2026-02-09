@@ -77,13 +77,17 @@ export function InitiativePicker() {
 
   const balanceMap = new Map(balance.map((b) => [b.listId, b.lastUsedDate]));
 
+  const isNotSet = !existingInitiative;
+
   // Current effective selection (existing or pending)
   const currentListId = pendingListId ?? existingListId ?? suggestedList?.id ?? null;
   const currentList = eligibleLists.find((l) => l.id === currentListId);
-  const hasUnsavedChanges = pendingListId !== null && pendingListId !== existingListId;
+  const hasUnsavedChanges = isNotSet
+    ? pendingListId !== null
+    : pendingListId !== null && pendingListId !== existingListId;
 
   const handleSelect = (listId: number) => {
-    if (listId === existingListId) {
+    if (!isNotSet && listId === existingListId) {
       // Selecting the already-saved option - clear pending
       setPendingListId(null);
     } else {
@@ -93,18 +97,19 @@ export function InitiativePicker() {
   };
 
   const handleSave = () => {
-    if (pendingListId === null) return;
+    const listIdToSave = pendingListId ?? currentListId;
+    if (listIdToSave === null) return;
 
     if (existingInitiative) {
       // Change existing
       changeInitiativeMutation.mutate({
         date: tomorrowDate,
-        listId: pendingListId,
+        listId: listIdToSave,
       });
     } else {
       // Set new
       setInitiativeMutation.mutate({
-        listId: pendingListId,
+        listId: listIdToSave,
       });
     }
   };
@@ -128,6 +133,9 @@ export function InitiativePicker() {
             )}
           >
             <span>{currentList?.name ?? 'Select category'}</span>
+            {isNotSet && !hasUnsavedChanges && (
+              <span className="text-xs text-muted-foreground">(suggested)</span>
+            )}
             <ChevronDown
               className={cn('h-4 w-4 text-muted-foreground transition-transform', isExpanded && 'rotate-180')}
             />
@@ -179,8 +187,8 @@ export function InitiativePicker() {
           )}
         </div>
 
-        {/* Save button - only show when there are unsaved changes */}
-        {hasUnsavedChanges && (
+        {/* Save button - show when there are unsaved changes or when not set yet */}
+        {(hasUnsavedChanges || isNotSet) && (
           <button
             type="button"
             onClick={handleSave}
