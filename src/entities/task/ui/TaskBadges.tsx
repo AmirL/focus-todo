@@ -38,7 +38,11 @@ export function TaskBadges({ task }: TaskBadgesProps) {
         </Tooltip>
       )}
       {/* Show AI suggestions indicator */}
-      {hasPendingSuggestions(task.aiSuggestions) && (
+      {hasPendingSuggestions(task.aiSuggestions, {
+        name: task.name,
+        details: task.details,
+        estimatedDuration: task.estimatedDuration,
+      }) && (
         <Tooltip>
           <TooltipTrigger asChild>
             <Badge variant="secondary" className="bg-purple-100 text-purple-700 px-1.5 py-0.5" data-cy="ai-suggestion-badge">

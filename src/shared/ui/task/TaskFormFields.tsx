@@ -31,9 +31,9 @@ export function TaskFormFields({
   onAcceptSuggestion,
   onRejectSuggestion,
 }: TaskFormFieldsProps) {
-  const nameSuggestion = getPendingSuggestion(aiSuggestions ?? null, 'name');
-  const detailsSuggestion = getPendingSuggestion(aiSuggestions ?? null, 'details');
-  const durationSuggestion = getPendingSuggestion(aiSuggestions ?? null, 'estimatedDuration');
+  const nameSuggestion = getPendingSuggestion(aiSuggestions ?? null, 'name', name);
+  const detailsSuggestion = getPendingSuggestion(aiSuggestions ?? null, 'details', details);
+  const durationSuggestion = getPendingSuggestion(aiSuggestions ?? null, 'estimatedDuration', metadata.selectedDuration);
 
   return (
     <div className="grid gap-4">
