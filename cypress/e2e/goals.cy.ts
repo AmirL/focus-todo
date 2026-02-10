@@ -56,6 +56,7 @@ describe("Goal Management", () => {
     it("should edit goal title", () => {
       const updatedTitle = `Updated Goal ${Date.now()}`;
       cy.get('[data-cy="edit-goal-button"]').first().click();
+      cy.get('[role="dialog"]').should("be.visible");
       cy.get('[data-cy="edit-goal-title-input"]').clear().type(updatedTitle);
       cy.get('[data-cy="save-goal-button"]').click();
       cy.contains(updatedTitle).should("be.visible");
