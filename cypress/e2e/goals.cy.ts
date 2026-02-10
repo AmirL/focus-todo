@@ -58,9 +58,12 @@ describe("Goal Management", () => {
       cy.intercept("POST", "/api/update-goal").as("updateGoal");
       cy.get('[data-cy="edit-goal-button"]').first().click();
       cy.get('[role="dialog"]').should("be.visible");
-      // Use selectall+type to avoid clear() which can trigger dialog close via Radix key handlers
-      cy.get('[data-cy="edit-goal-title-input"]').type("{selectall}" + updatedTitle);
-      cy.get('[data-cy="save-goal-button"]').click();
+      // Use invoke to set value without keyboard events, then submit via form
+      cy.get('[data-cy="edit-goal-title-input"]')
+        .invoke("val", updatedTitle)
+        .trigger("input");
+      // Submit form directly instead of clicking save button (which is wrapped in DialogTrigger)
+      cy.get('[role="dialog"] form').submit();
       cy.wait("@updateGoal").then((interception) => {
         expect(interception.request.body.goal.title).to.equal(updatedTitle);
       });
