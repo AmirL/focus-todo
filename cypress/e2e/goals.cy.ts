@@ -58,7 +58,8 @@ describe("Goal Management", () => {
       cy.intercept("POST", "/api/update-goal").as("updateGoal");
       cy.get('[data-cy="edit-goal-button"]').first().click();
       cy.get('[role="dialog"]').should("be.visible");
-      cy.get('[data-cy="edit-goal-title-input"]').type('{selectall}' + updatedTitle);
+      cy.get('[data-cy="edit-goal-title-input"]').clear();
+      cy.get('[data-cy="edit-goal-title-input"]').type(updatedTitle);
       cy.get('[data-cy="save-goal-button"]').click();
       cy.wait("@updateGoal");
       cy.contains(updatedTitle).should("be.visible");
