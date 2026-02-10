@@ -59,8 +59,8 @@ describe("Goal Management", () => {
       cy.get('[data-cy="edit-goal-button"]').first().click();
       cy.get('[role="dialog"]').should("be.visible");
       cy.get('[role="dialog"]').within(() => {
-        // Use select-all + type to replace text (avoids detach after clear)
-        cy.get('[data-cy="edit-goal-title-input"]').focus().type('{selectall}').type(updatedTitle);
+        // Select all and replace in one type call to avoid DOM detach
+        cy.get('[data-cy="edit-goal-title-input"]').type('{selectall}' + updatedTitle);
         cy.contains('button', 'Save changes').click();
       });
       cy.wait("@updateGoal");
