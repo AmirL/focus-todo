@@ -45,9 +45,11 @@ describe("Smoke Tests - Critical User Flows", () => {
       createdTaskIds.push(interception.response!.body.id);
     });
 
-    // Hover and click star
+    // Hover and click star, wait for update to complete
+    cy.intercept("PUT", "/api/update-task").as("updateTask");
     cy.get('[data-testid^="task-"]').first().trigger('mouseover');
     cy.get('[data-testid^="star-task-"]').first().click({ force: true });
+    cy.wait("@updateTask");
     // Navigate to Selected and verify task appears there
     cy.prompt(["Click the 'Selected' button in the sidebar"]);
     cy.get('[data-testid^="task-"]').should("exist");

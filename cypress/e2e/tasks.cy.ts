@@ -106,11 +106,13 @@ describe("Task Management", () => {
 
     it("should edit task name", () => {
       const updatedName = `Updated task ${Date.now()}`;
+      cy.intercept("PUT", "/api/update-task").as("updateTask");
       cy.get('[data-testid^="edit-task-"]').first().click();
       cy.get('[role="dialog"]').should("be.visible");
       cy.get('#name').clear().type(updatedName);
       cy.get('[data-testid="save-task-changes-button"]').click();
-      // Wait for dialog to close, then verify updated name
+      // Wait for the update API call to complete, then verify
+      cy.wait("@updateTask");
       cy.get('[role="dialog"]').should("not.exist");
       cy.contains(updatedName).should("be.visible");
     });
