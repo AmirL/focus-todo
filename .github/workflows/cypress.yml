@@ -8,6 +8,10 @@ jobs:
     # Run when Vercel deployment succeeds
     if: github.event.deployment_status.state == 'success' && contains(github.event.deployment_status.environment_url, 'vercel.app')
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        containers: [1, 2, 3]
     steps:
       - name: Log deployment info
         id: deployment-info
@@ -96,6 +100,8 @@ jobs:
           wait-on: ${{ github.event.deployment_status.target_url }}
           wait-on-timeout: 120
           record: true
+          parallel: true
+          ci-build-id: ${{ github.run_id }}-${{ github.run_attempt }}
           tag: ${{ steps.branch.outputs.branch }}
         env:
           CYPRESS_BASE_URL: ${{ github.event.deployment_status.target_url }}
@@ -114,7 +120,7 @@ jobs:
         if: always() && steps.deployment-info.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-results-${{ github.run_id }}
+          name: cypress-results-${{ github.run_id }}-${{ matrix.containers }}
           path: |
             cypress/screenshots
             cypress/videos
