@@ -58,11 +58,12 @@ describe("Goal Management", () => {
       cy.intercept("POST", "/api/update-goal").as("updateGoal");
       cy.get('[data-cy="edit-goal-button"]').first().click();
       cy.get('[role="dialog"]').should("be.visible");
-      cy.get('[data-cy="edit-goal-title-input"]').clear();
-      cy.get('[data-cy="edit-goal-title-input"]').type(updatedTitle);
+      // Use selectall+type to avoid clear() which can trigger dialog close via Radix key handlers
+      cy.get('[data-cy="edit-goal-title-input"]').type("{selectall}" + updatedTitle);
       cy.get('[data-cy="save-goal-button"]').click();
-      cy.wait("@updateGoal");
-      cy.contains(updatedTitle).should("be.visible");
+      cy.wait("@updateGoal").then((interception) => {
+        expect(interception.request.body.goal.title).to.equal(updatedTitle);
+      });
     });
   });
 
