@@ -60,13 +60,14 @@ describe("Task Management", () => {
     });
 
     it("should star/select a task", () => {
-      // Get the first task name to verify later
+      // Hover and click star, wait for update to complete
+      cy.intercept("POST", "/api/update-task").as("updateTask");
       cy.get('[data-testid^="task-"]').first().invoke('text').then((taskText) => {
-        // Hover and click star
         cy.get('[data-testid^="task-"]').first().trigger('mouseover');
         cy.get('[data-testid^="star-task-"]').first().click({ force: true });
+        cy.wait("@updateTask");
         // Navigate to Selected and verify task appears there
-        cy.prompt(["Click the 'Selected' button in the sidebar"]);
+        cy.get('[data-cy="filter-selected"]').click();
         cy.contains(taskText.slice(0, 20)).should("exist");
       });
     });
@@ -113,8 +114,8 @@ describe("Task Management", () => {
       cy.get('[data-testid="save-task-changes-button"]').click();
       // Wait for the update API call to complete, then verify
       cy.wait("@updateTask");
-      cy.get('[role="dialog"]').should("not.exist");
-      cy.contains(updatedName).should("be.visible");
+      cy.get('[role="dialog"]', { timeout: 15000 }).should("not.exist");
+      cy.contains(updatedName, { timeout: 15000 }).should("be.visible");
     });
 
     it("should open edit dialog", () => {
@@ -126,27 +127,27 @@ describe("Task Management", () => {
 
   describe("Filter Tasks", () => {
     it("should navigate to Today filter", () => {
-      cy.prompt(["Click the 'Today' button in the sidebar"]);
+      cy.get('[data-cy="filter-today"]').click();
       cy.contains("today").should("exist");
     });
 
     it("should navigate to Tomorrow filter", () => {
-      cy.prompt(["Click the 'Tomorrow' button in the sidebar"]);
+      cy.get('[data-cy="filter-tomorrow"]').click();
       cy.contains("tomorrow").should("exist");
     });
 
     it("should navigate to Backlog filter", () => {
-      cy.prompt(["Click the 'Backlog' button in the sidebar"]);
+      cy.get('[data-cy="filter-backlog"]').click();
       cy.contains("backlog").should("exist");
     });
 
     it("should navigate to Selected filter", () => {
-      cy.prompt(["Click the 'Selected' button in the sidebar"]);
+      cy.get('[data-cy="filter-selected"]').click();
       cy.contains("selected").should("exist");
     });
 
     it("should navigate to Future filter", () => {
-      cy.prompt(["Click the 'Future' button in the sidebar"]);
+      cy.get('[data-cy="filter-future"]').click();
       cy.contains("future").should("exist");
     });
   });

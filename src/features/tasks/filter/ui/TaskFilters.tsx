@@ -33,6 +33,7 @@ function FilterButton({
   return (
     <Button
       variant={'ghost'}
+      data-cy={`filter-${filter}`}
       className={cn(
         'w-full justify-start',
         active && 'text-primary  bg-primary/10 hover:bg-primary/20 hover:text-primary'
@@ -82,6 +83,7 @@ function FilterButtonWithTime({
   return (
     <Button
       variant={'ghost'}
+      data-cy={`filter-${filter}`}
       className={cn(
         'w-full justify-between',
         active && 'text-primary  bg-primary/10 hover:bg-primary/20 hover:text-primary'
@@ -120,6 +122,7 @@ function CategoryButton({
   return (
     <Button
       variant={'ghost'}
+      data-cy={`category-${category.toLowerCase().replace(/\s+/g, '-')}`}
       className={cn(
         'w-full justify-between',
         active && 'text-primary  bg-primary/10 hover:bg-primary/20 hover:text-primary'

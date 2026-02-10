@@ -37,7 +37,7 @@ export function Spotlight({ buttonClassName }: SpotlightProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" className={buttonClassName} aria-label="Search tasks">
+        <Button variant="ghost" size="icon" className={buttonClassName} aria-label="Search tasks" data-cy="search-button">
           <Search className="h-4 w-4" />
         </Button>
       </DialogTrigger>

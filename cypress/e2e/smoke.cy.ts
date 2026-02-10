@@ -51,8 +51,8 @@ describe("Smoke Tests - Critical User Flows", () => {
     cy.get('[data-testid^="star-task-"]').first().click({ force: true });
     cy.wait("@updateTask");
     // Navigate to Selected and verify task appears there
-    cy.prompt(["Click the 'Selected' button in the sidebar"]);
-    cy.get('[data-testid^="task-"]').should("exist");
+    cy.get('[data-cy="filter-selected"]').click();
+    cy.contains(taskName).should("be.visible");
   });
 
   it("should create a goal", () => {
@@ -76,7 +76,7 @@ describe("Smoke Tests - Critical User Flows", () => {
 
   it("should show menu button on mobile", () => {
     cy.viewport("iphone-x");
-    cy.prompt(["Click the hamburger menu button to open the sidebar"]);
+    cy.get('[data-cy="mobile-menu-button"]').click();
     cy.contains("Backlog").should("be.visible");
   });
 
@@ -91,18 +91,18 @@ describe("Smoke Tests - Critical User Flows", () => {
       createdTaskIds.push(interception.response!.body.id);
     });
 
-    cy.prompt(["Click the search icon button in the header"]);
+    cy.get('[data-cy="search-button"]').click();
     cy.get('input[placeholder*="Search"]').type("Searchable smoke");
     // Verify search results list appears (ul with divide-y class)
     cy.get('ul.divide-y').should("exist");
   });
 
   it("should navigate between filter views", () => {
-    cy.prompt(["Click the 'Backlog' button in the sidebar"]);
+    cy.get('[data-cy="filter-backlog"]').click();
     cy.contains("backlog").should("exist");
-    cy.prompt(["Click the 'Today' button in the sidebar"]);
+    cy.get('[data-cy="filter-today"]').click();
     cy.contains("today").should("exist");
-    cy.prompt(["Click the 'Selected' button in the sidebar"]);
+    cy.get('[data-cy="filter-selected"]').click();
     cy.contains("selected").should("exist");
   });
 });

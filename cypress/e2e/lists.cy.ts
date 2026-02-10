@@ -22,7 +22,7 @@ describe("Task Categories", () => {
     });
 
     it("should filter by clicking a category", () => {
-      cy.prompt(["Click the first category button in the sidebar below the filter buttons"]);
+      cy.get('[data-cy^="category-"]').first().click();
     });
   });
 
