@@ -58,8 +58,19 @@ describe("AI Suggestions", () => {
       url: "/api/tasks?limit=1",
       headers: authHeaders,
     }).then((response) => {
-      expect(response.body.tasks.length).to.be.greaterThan(0);
-      workListId = response.body.tasks[0].listId;
+      if (response.body.tasks.length > 0) {
+        workListId = response.body.tasks[0].listId;
+      } else {
+        // No tasks exist - login and fetch lists to get a valid listId
+        cy.login();
+        cy.request({
+          method: "POST",
+          url: "/api/get-lists",
+        }).then((listsResponse) => {
+          expect(listsResponse.body.lists.length).to.be.greaterThan(0);
+          workListId = listsResponse.body.lists[0].id;
+        });
+      }
     });
   });
 

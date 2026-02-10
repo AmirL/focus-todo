@@ -41,6 +41,18 @@ describe("Task Management", () => {
   });
 
   describe("Task Actions", () => {
+    beforeEach(() => {
+      // Create a task so there's always one to act on
+      const taskName = `Action test task ${Date.now()}`;
+      cy.get('[data-testid="add-task-button"]').click();
+      cy.get('[data-testid="task-name-input"]').type(taskName);
+      cy.get('[data-testid="save-task-button"]').click();
+      cy.contains(taskName).should("be.visible");
+      cy.wait("@createTask").then((interception) => {
+        createdTaskIds.push(interception.response!.body.id);
+      });
+    });
+
     it("should mark a task as complete", () => {
       // Radix checkbox uses role="checkbox"
       cy.get('[data-testid^="task-"]').first().find('[role="checkbox"]').click();
@@ -83,6 +95,18 @@ describe("Task Management", () => {
   });
 
   describe("Edit Tasks", () => {
+    beforeEach(() => {
+      // Create a task so there's always one to edit
+      const taskName = `Edit test task ${Date.now()}`;
+      cy.get('[data-testid="add-task-button"]').click();
+      cy.get('[data-testid="task-name-input"]').type(taskName);
+      cy.get('[data-testid="save-task-button"]').click();
+      cy.contains(taskName).should("be.visible");
+      cy.wait("@createTask").then((interception) => {
+        createdTaskIds.push(interception.response!.body.id);
+      });
+    });
+
     it("should edit task name", () => {
       const updatedName = `Updated task ${Date.now()}`;
       cy.get('[data-testid^="edit-task-"]').first().click();
