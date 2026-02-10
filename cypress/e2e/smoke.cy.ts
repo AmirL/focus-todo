@@ -46,7 +46,7 @@ describe("Smoke Tests - Critical User Flows", () => {
     });
 
     // Hover and click star, wait for update to complete
-    cy.intercept("PUT", "/api/update-task").as("updateTask");
+    cy.intercept("POST", "/api/update-task").as("updateTask");
     cy.get('[data-testid^="task-"]').first().trigger('mouseover');
     cy.get('[data-testid^="star-task-"]').first().click({ force: true });
     cy.wait("@updateTask");

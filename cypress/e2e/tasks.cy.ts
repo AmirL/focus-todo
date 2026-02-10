@@ -106,7 +106,7 @@ describe("Task Management", () => {
 
     it("should edit task name", () => {
       const updatedName = `Updated task ${Date.now()}`;
-      cy.intercept("PUT", "/api/update-task").as("updateTask");
+      cy.intercept("POST", "/api/update-task").as("updateTask");
       cy.get('[data-testid^="edit-task-"]').first().click();
       cy.get('[role="dialog"]').should("be.visible");
       cy.get('#name').clear().type(updatedName);
