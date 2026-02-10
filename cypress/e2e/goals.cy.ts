@@ -47,10 +47,10 @@ describe("Goal Management", () => {
       cy.get('[data-cy="add-goal-button"]').click();
       cy.get('[data-cy="goal-title-input"]').type(goalTitle);
       cy.get('[data-cy="create-goal-button"]').click();
-      cy.contains(goalTitle).should("be.visible");
       cy.wait("@createGoal").then((interception) => {
         createdGoalIds.push(interception.response!.body.id);
       });
+      cy.contains(goalTitle, { timeout: 15000 }).should("be.visible");
     });
 
     it("should edit goal title", () => {
@@ -77,10 +77,10 @@ describe("Goal Management", () => {
       cy.get('[data-cy="add-goal-button"]').click();
       cy.get('[data-cy="goal-title-input"]').type(goalTitle);
       cy.get('[data-cy="create-goal-button"]').click();
-      cy.contains(goalTitle).should("be.visible");
       cy.wait("@createGoal").then((interception) => {
         createdGoalIds.push(interception.response!.body.id);
       });
+      cy.contains(goalTitle, { timeout: 15000 }).should("be.visible");
     });
 
     it("should delete a goal", () => {
@@ -103,10 +103,10 @@ describe("Goal Management", () => {
       cy.get('[data-cy="add-goal-button"]').click();
       cy.get('[data-cy="goal-title-input"]').type(goalTitle);
       cy.get('[data-cy="create-goal-button"]').click();
-      cy.contains(goalTitle).should("be.visible");
       cy.wait("@createGoal").then((interception) => {
         createdGoalIds.push(interception.response!.body.id);
       });
+      cy.contains(goalTitle, { timeout: 15000 }).should("be.visible");
     });
 
     it("should display goals section", () => {

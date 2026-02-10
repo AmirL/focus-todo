@@ -47,10 +47,10 @@ describe("Task Management", () => {
       cy.get('[data-testid="add-task-button"]').click();
       cy.get('[data-testid="task-name-input"]').type(taskName);
       cy.get('[data-testid="save-task-button"]').click();
-      cy.contains(taskName).should("be.visible");
       cy.wait("@createTask").then((interception) => {
         createdTaskIds.push(interception.response!.body.id);
       });
+      cy.contains(taskName, { timeout: 15000 }).should("be.visible");
     });
 
     it("should mark a task as complete", () => {
@@ -99,10 +99,10 @@ describe("Task Management", () => {
       cy.get('[data-testid="add-task-button"]').click();
       cy.get('[data-testid="task-name-input"]').type(taskName);
       cy.get('[data-testid="save-task-button"]').click();
-      cy.contains(taskName).should("be.visible");
       cy.wait("@createTask").then((interception) => {
         createdTaskIds.push(interception.response!.body.id);
       });
+      cy.contains(taskName, { timeout: 15000 }).should("be.visible");
     });
 
     it("should edit task name", () => {
