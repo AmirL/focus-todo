@@ -1,9 +1,17 @@
 /// <reference types="cypress" />
 
 describe("Search and Navigation", () => {
+  let createdTaskIds: number[] = [];
+
   beforeEach(() => {
+    cy.intercept("POST", "/api/create-task").as("createTask");
     cy.visit("/");
     cy.waitForAppLoad();
+  });
+
+  afterEach(() => {
+    cy.apiCleanupTasks(createdTaskIds);
+    createdTaskIds = [];
   });
 
   describe("Search/Spotlight", () => {
@@ -13,8 +21,18 @@ describe("Search and Navigation", () => {
     });
 
     it("should search for tasks by name", () => {
+      // Create a task so search has results
+      const taskName = `Searchable task ${Date.now()}`;
+      cy.get('[data-testid="add-task-button"]').click();
+      cy.get('[data-testid="task-name-input"]').type(taskName);
+      cy.get('[data-testid="save-task-button"]').click();
+      cy.contains(taskName).should("be.visible");
+      cy.wait("@createTask").then((interception) => {
+        createdTaskIds.push(interception.response!.body.id);
+      });
+
       cy.get('[data-cy="search-button"]').click();
-      cy.get('input[placeholder*="Search"]').type("task");
+      cy.get('input[placeholder*="Search"]').type("Searchable");
       cy.get('[data-cy="search-results"]').should("exist");
     });
 
