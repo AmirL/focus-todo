@@ -78,13 +78,10 @@ describe("Task Management", () => {
 
     it("should snooze a task to a different date", () => {
       cy.get('[data-testid^="snooze-task-"]').first().click();
-      // Wait for calendar grid to exist and scroll it into view
-      cy.get('[role="grid"]', { timeout: 15000 }).scrollIntoView().should('exist');
-      // Click next month button with force to handle any overflow issues
-      cy.get('button.absolute.right-1').click({ force: true });
-      // Wait for month change and select a day - use simple button selector within grid
-      cy.wait(500);
-      cy.get('[role="grid"] button.h-8.w-8').not('.day-outside').eq(10).click({ force: true });
+      // Wait for calendar to appear
+      cy.get('[role="grid"]', { timeout: 15000 }).should('be.visible');
+      // Select the last non-outside day in the current month
+      cy.get('[role="grid"] button').not('.day-outside').not('[disabled]').last().click({ force: true });
     });
 
     it("should mark a task as a blocker", () => {
@@ -110,8 +107,11 @@ describe("Task Management", () => {
     it("should edit task name", () => {
       const updatedName = `Updated task ${Date.now()}`;
       cy.get('[data-testid^="edit-task-"]').first().click();
+      cy.get('[role="dialog"]').should("be.visible");
       cy.get('#name').clear().type(updatedName);
       cy.get('[data-testid="save-task-changes-button"]').click();
+      // Wait for dialog to close, then verify updated name
+      cy.get('[role="dialog"]').should("not.exist");
       cy.contains(updatedName).should("be.visible");
     });
 
