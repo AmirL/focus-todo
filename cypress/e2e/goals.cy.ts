@@ -55,10 +55,14 @@ describe("Goal Management", () => {
 
     it("should edit goal title", () => {
       const updatedTitle = `Updated Goal ${Date.now()}`;
+      cy.intercept("POST", "/api/update-goal").as("updateGoal");
       cy.get('[data-cy="edit-goal-button"]').first().click();
       cy.get('[role="dialog"]').should("be.visible");
-      cy.get('[data-cy="edit-goal-title-input"]').clear().type(updatedTitle);
-      cy.get('[data-cy="save-goal-button"]').click();
+      cy.get('[role="dialog"]').within(() => {
+        cy.get('[data-cy="edit-goal-title-input"]').clear().type(updatedTitle);
+        cy.contains('button', 'Save changes').click();
+      });
+      cy.wait("@updateGoal");
       cy.contains(updatedTitle).should("be.visible");
     });
   });
