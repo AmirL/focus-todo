@@ -3,6 +3,12 @@ name: Cypress E2E Tests
 on:
   deployment_status:
 
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+  deployments: read
+
 jobs:
   cypress-run:
     # Run when Vercel deployment succeeds
