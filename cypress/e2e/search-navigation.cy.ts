@@ -15,8 +15,7 @@ describe("Search and Navigation", () => {
     it("should search for tasks by name", () => {
       cy.get('[data-cy="search-button"]').click();
       cy.get('input[placeholder*="Search"]').type("task");
-      // Verify search results list appears (ul with divide-y class)
-      cy.get('ul.divide-y').should("exist");
+      cy.get('[data-cy="search-results"]').should("exist");
     });
 
     it("should close search dialog", () => {
