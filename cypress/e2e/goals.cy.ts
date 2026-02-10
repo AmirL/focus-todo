@@ -41,6 +41,18 @@ describe("Goal Management", () => {
   });
 
   describe("Edit Goals", () => {
+    beforeEach(() => {
+      // Create a goal so there's always one to edit
+      const goalTitle = `Edit test goal ${Date.now()}`;
+      cy.get('[data-cy="add-goal-button"]').click();
+      cy.get('[data-cy="goal-title-input"]').type(goalTitle);
+      cy.get('[data-cy="create-goal-button"]').click();
+      cy.contains(goalTitle).should("be.visible");
+      cy.wait("@createGoal").then((interception) => {
+        createdGoalIds.push(interception.response!.body.id);
+      });
+    });
+
     it("should edit goal title", () => {
       const updatedTitle = `Updated Goal ${Date.now()}`;
       cy.get('[data-cy="edit-goal-button"]').first().click();
@@ -51,6 +63,18 @@ describe("Goal Management", () => {
   });
 
   describe("Delete Goals", () => {
+    beforeEach(() => {
+      // Create a goal so there's always one to delete
+      const goalTitle = `Delete test goal ${Date.now()}`;
+      cy.get('[data-cy="add-goal-button"]').click();
+      cy.get('[data-cy="goal-title-input"]').type(goalTitle);
+      cy.get('[data-cy="create-goal-button"]').click();
+      cy.contains(goalTitle).should("be.visible");
+      cy.wait("@createGoal").then((interception) => {
+        createdGoalIds.push(interception.response!.body.id);
+      });
+    });
+
     it("should delete a goal", () => {
       // Count goals before deletion
       cy.get('[data-cy="goal-item"]').then(($goals) => {
@@ -65,6 +89,18 @@ describe("Goal Management", () => {
   });
 
   describe("Goal Display", () => {
+    beforeEach(() => {
+      // Create a goal so there's always one to display
+      const goalTitle = `Display test goal ${Date.now()}`;
+      cy.get('[data-cy="add-goal-button"]').click();
+      cy.get('[data-cy="goal-title-input"]').type(goalTitle);
+      cy.get('[data-cy="create-goal-button"]').click();
+      cy.contains(goalTitle).should("be.visible");
+      cy.wait("@createGoal").then((interception) => {
+        createdGoalIds.push(interception.response!.body.id);
+      });
+    });
+
     it("should display goals section", () => {
       cy.contains("Goals").should("be.visible");
       cy.get('[data-cy="goal-item"]').should("exist");

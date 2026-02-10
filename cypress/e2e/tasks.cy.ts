@@ -112,9 +112,10 @@ describe("Task Management", () => {
       cy.get('[role="dialog"]').should("be.visible");
       cy.get('#name').clear().type(updatedName);
       cy.get('[data-testid="save-task-changes-button"]').click();
-      // Wait for the update API call to complete, then verify
+      // Wait for the update API call to complete, then reload to verify server state
       cy.wait("@updateTask");
-      cy.get('[role="dialog"]', { timeout: 15000 }).should("not.exist");
+      cy.reload();
+      cy.waitForAppLoad();
       cy.contains(updatedName, { timeout: 15000 }).should("be.visible");
     });
 
