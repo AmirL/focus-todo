@@ -25,7 +25,7 @@ function formatSubline(task: TaskModel, listNameMap: Map<number, string>) {
 export function SpotlightResults({ items, activeIndex, onHoverIndex, onSelect }: Props) {
   const listNameMap = useListNameMap();
   return (
-    <ul className="divide-y">
+    <ul className="divide-y" data-cy="search-results">
       {items.map((item, idx) => {
         if (item.type === 'active') {
           const task = item.task;

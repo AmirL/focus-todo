@@ -22,11 +22,23 @@ describe("Task Categories", () => {
     });
 
     it("should filter by clicking a category", () => {
-      cy.prompt(["Click the first category button in the sidebar below the filter buttons"]);
+      cy.get('[data-cy^="category-"]').first().click();
     });
   });
 
   describe("Assign Tasks to Categories", () => {
+    beforeEach(() => {
+      // Create a task so there's always one to act on
+      const taskName = `Category test task ${Date.now()}`;
+      cy.get('[data-testid="add-task-button"]').click();
+      cy.get('[data-testid="task-name-input"]').type(taskName);
+      cy.get('[data-testid="save-task-button"]').click();
+      cy.wait("@createTask").then((interception) => {
+        createdTaskIds.push(interception.response!.body.id);
+      });
+      cy.contains(taskName, { timeout: 15000 }).should("be.visible");
+    });
+
     it("should create a task", () => {
       const taskName = `Categorized task ${Date.now()}`;
       cy.get('[data-testid="add-task-button"]').click();

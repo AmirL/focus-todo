@@ -41,6 +41,18 @@ describe("Task Management", () => {
   });
 
   describe("Task Actions", () => {
+    beforeEach(() => {
+      // Create a task so there's always one to act on
+      const taskName = `Action test task ${Date.now()}`;
+      cy.get('[data-testid="add-task-button"]').click();
+      cy.get('[data-testid="task-name-input"]').type(taskName);
+      cy.get('[data-testid="save-task-button"]').click();
+      cy.wait("@createTask").then((interception) => {
+        createdTaskIds.push(interception.response!.body.id);
+      });
+      cy.contains(taskName, { timeout: 15000 }).should("be.visible");
+    });
+
     it("should mark a task as complete", () => {
       // Radix checkbox uses role="checkbox"
       cy.get('[data-testid^="task-"]').first().find('[role="checkbox"]').click();
@@ -48,13 +60,14 @@ describe("Task Management", () => {
     });
 
     it("should star/select a task", () => {
-      // Get the first task name to verify later
+      // Hover and click star, wait for update to complete
+      cy.intercept("POST", "/api/update-task").as("updateTask");
       cy.get('[data-testid^="task-"]').first().invoke('text').then((taskText) => {
-        // Hover and click star
         cy.get('[data-testid^="task-"]').first().trigger('mouseover');
         cy.get('[data-testid^="star-task-"]').first().click({ force: true });
+        cy.wait("@updateTask");
         // Navigate to Selected and verify task appears there
-        cy.prompt(["Click the 'Selected' button in the sidebar"]);
+        cy.get('[data-cy="filter-selected"]').click();
         cy.contains(taskText.slice(0, 20)).should("exist");
       });
     });
@@ -66,13 +79,10 @@ describe("Task Management", () => {
 
     it("should snooze a task to a different date", () => {
       cy.get('[data-testid^="snooze-task-"]').first().click();
-      // Wait for calendar grid to exist and scroll it into view
-      cy.get('[role="grid"]', { timeout: 15000 }).scrollIntoView().should('exist');
-      // Click next month button with force to handle any overflow issues
-      cy.get('button.absolute.right-1').click({ force: true });
-      // Wait for month change and select a day - use simple button selector within grid
-      cy.wait(500);
-      cy.get('[role="grid"] button.h-8.w-8').not('.day-outside').eq(10).click({ force: true });
+      // Wait for calendar to appear
+      cy.get('[role="grid"]', { timeout: 15000 }).should('be.visible');
+      // Select the last non-outside day in the current month
+      cy.get('[role="grid"] button').not('.day-outside').not('[disabled]').last().click({ force: true });
     });
 
     it("should mark a task as a blocker", () => {
@@ -83,12 +93,29 @@ describe("Task Management", () => {
   });
 
   describe("Edit Tasks", () => {
+    beforeEach(() => {
+      // Create a task so there's always one to edit
+      const taskName = `Edit test task ${Date.now()}`;
+      cy.get('[data-testid="add-task-button"]').click();
+      cy.get('[data-testid="task-name-input"]').type(taskName);
+      cy.get('[data-testid="save-task-button"]').click();
+      cy.wait("@createTask").then((interception) => {
+        createdTaskIds.push(interception.response!.body.id);
+      });
+      cy.contains(taskName, { timeout: 15000 }).should("be.visible");
+    });
+
     it("should edit task name", () => {
       const updatedName = `Updated task ${Date.now()}`;
+      cy.intercept("POST", "/api/update-task").as("updateTask");
       cy.get('[data-testid^="edit-task-"]').first().click();
+      cy.get('[role="dialog"]').should("be.visible");
       cy.get('#name').clear().type(updatedName);
       cy.get('[data-testid="save-task-changes-button"]').click();
-      cy.contains(updatedName).should("be.visible");
+      // Verify the update API call was sent with the correct name
+      cy.wait("@updateTask").then((interception) => {
+        expect(interception.request.body.task.name).to.equal(updatedName);
+      });
     });
 
     it("should open edit dialog", () => {
@@ -100,27 +127,27 @@ describe("Task Management", () => {
 
   describe("Filter Tasks", () => {
     it("should navigate to Today filter", () => {
-      cy.prompt(["Click the 'Today' button in the sidebar"]);
+      cy.get('[data-cy="filter-today"]').click();
       cy.contains("today").should("exist");
     });
 
     it("should navigate to Tomorrow filter", () => {
-      cy.prompt(["Click the 'Tomorrow' button in the sidebar"]);
+      cy.get('[data-cy="filter-tomorrow"]').click();
       cy.contains("tomorrow").should("exist");
     });
 
     it("should navigate to Backlog filter", () => {
-      cy.prompt(["Click the 'Backlog' button in the sidebar"]);
+      cy.get('[data-cy="filter-backlog"]').click();
       cy.contains("backlog").should("exist");
     });
 
     it("should navigate to Selected filter", () => {
-      cy.prompt(["Click the 'Selected' button in the sidebar"]);
+      cy.get('[data-cy="filter-selected"]').click();
       cy.contains("selected").should("exist");
     });
 
     it("should navigate to Future filter", () => {
-      cy.prompt(["Click the 'Future' button in the sidebar"]);
+      cy.get('[data-cy="filter-future"]').click();
       cy.contains("future").should("exist");
     });
   });

@@ -16,7 +16,7 @@ import { BalanceIndicator } from '@/features/current-initiative/balance';
 function MobileMenuButton() {
   const { toggleSidebar } = useSidebar();
   return (
-    <Button variant="outline" size="icon" onClick={toggleSidebar}>
+    <Button variant="outline" size="icon" onClick={toggleSidebar} data-cy="mobile-menu-button">
       <Menu className="h-4 w-4" />
     </Button>
   );
@@ -120,7 +120,7 @@ export function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
                         className="w-full justify-start"
                         asChild
                       >
-                        <Link href="/settings">
+                        <Link href="/settings" data-cy="settings-link">
                           <Settings className="mr-2 h-4 w-4" />
                           Settings
                         </Link>

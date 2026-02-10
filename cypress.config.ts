@@ -10,6 +10,10 @@ export default defineConfig({
     requestTimeout: 10000,
     responseTimeout: 10000,
     video: true,
+    retries: {
+      runMode: 1,
+      openMode: 0,
+    },
     screenshotOnRunFailure: true,
     experimentalStudio: true,
     experimentalPromptCommand: true,

@@ -1,26 +1,43 @@
 /// <reference types="cypress" />
 
 describe("Search and Navigation", () => {
+  let createdTaskIds: number[] = [];
+
   beforeEach(() => {
+    cy.intercept("POST", "/api/create-task").as("createTask");
     cy.visit("/");
     cy.waitForAppLoad();
   });
 
+  afterEach(() => {
+    cy.apiCleanupTasks(createdTaskIds);
+    createdTaskIds = [];
+  });
+
   describe("Search/Spotlight", () => {
     it("should open search by clicking search icon", () => {
-      cy.prompt(["Click the search icon button in the header"]);
+      cy.get('[data-cy="search-button"]').click();
       cy.get('input[placeholder*="Search"]').should("be.visible");
     });
 
     it("should search for tasks by name", () => {
-      cy.prompt(["Click the search icon button in the header"]);
-      cy.get('input[placeholder*="Search"]').type("task");
-      // Verify search results list appears (ul with divide-y class)
-      cy.get('ul.divide-y').should("exist");
+      // Create a task so search has results
+      const taskName = `Searchable task ${Date.now()}`;
+      cy.get('[data-testid="add-task-button"]').click();
+      cy.get('[data-testid="task-name-input"]').type(taskName);
+      cy.get('[data-testid="save-task-button"]').click();
+      cy.contains(taskName).should("be.visible");
+      cy.wait("@createTask").then((interception) => {
+        createdTaskIds.push(interception.response!.body.id);
+      });
+
+      cy.get('[data-cy="search-button"]').click();
+      cy.get('input[placeholder*="Search"]').type("Searchable");
+      cy.get('[data-cy="search-results"]').should("exist");
     });
 
     it("should close search dialog", () => {
-      cy.prompt(["Click the search icon button in the header"]);
+      cy.get('[data-cy="search-button"]').click();
       cy.get('input[placeholder*="Search"]').should("be.visible");
       cy.get('body').type('{esc}');
       cy.get('input[placeholder*="Search"]').should("not.exist");
@@ -29,26 +46,26 @@ describe("Search and Navigation", () => {
 
   describe("Sidebar Navigation", () => {
     it("should navigate between filter views", () => {
-      cy.prompt(["Click the 'Backlog' button in the sidebar"]);
+      cy.get('[data-cy="filter-backlog"]').click();
       cy.contains("backlog").should("exist");
-      cy.prompt(["Click the 'Today' button in the sidebar"]);
+      cy.get('[data-cy="filter-today"]').click();
       cy.contains("today").should("exist");
-      cy.prompt(["Click the 'Tomorrow' button in the sidebar"]);
+      cy.get('[data-cy="filter-tomorrow"]').click();
       cy.contains("tomorrow").should("exist");
     });
 
     it("should navigate to Selected filter", () => {
-      cy.prompt(["Click the 'Selected' button in the sidebar"]);
+      cy.get('[data-cy="filter-selected"]').click();
       cy.contains("selected").should("exist");
     });
 
     it("should navigate to Future filter", () => {
-      cy.prompt(["Click the 'Future' button in the sidebar"]);
+      cy.get('[data-cy="filter-future"]').click();
       cy.contains("future").should("exist");
     });
 
     it("should navigate to settings", () => {
-      cy.prompt(["Click the 'Settings' link in the sidebar"]);
+      cy.get('[data-cy="settings-link"]').click();
       cy.url().should("include", "settings");
     });
   });
@@ -59,22 +76,20 @@ describe("Search and Navigation", () => {
     });
 
     it("should toggle mobile menu", () => {
-      cy.prompt(["Click the hamburger menu button to open the sidebar"]);
+      cy.get('[data-cy="mobile-menu-button"]').click();
       cy.contains("Backlog").should("be.visible");
     });
 
     it("should navigate on mobile", () => {
-      cy.prompt([
-        "Click the hamburger menu button to open the sidebar",
-        "Click the 'Today' button",
-      ]);
+      cy.get('[data-cy="mobile-menu-button"]').click();
+      cy.get('[data-cy="filter-today"]').click();
       cy.contains("today").should("exist");
     });
   });
 
   describe("List/Category Navigation", () => {
     it("should show category buttons in sidebar", () => {
-      cy.prompt(["Verify the sidebar shows category filter buttons"]);
+      cy.contains("Categories").should("be.visible");
     });
   });
 });

@@ -35,15 +35,24 @@ describe("Smoke Tests - Critical User Flows", () => {
   });
 
   it("should star a task and view in Selected", () => {
-    // Get the first task name to verify later
-    cy.get('[data-testid^="task-"]').first().invoke('text').then((taskText) => {
-      // Hover and click star
-      cy.get('[data-testid^="task-"]').first().trigger('mouseover');
-      cy.get('[data-testid^="star-task-"]').first().click({ force: true });
-      // Navigate to Selected and verify task appears there
-      cy.prompt(["Click the 'Selected' button in the sidebar"]);
-      cy.get('[data-testid^="task-"]').should("exist");
+    // Create a task first so there's one to star
+    const taskName = `Star test task ${Date.now()}`;
+    cy.get('[data-testid="add-task-button"]').click();
+    cy.get('[data-testid="task-name-input"]').type(taskName);
+    cy.get('[data-testid="save-task-button"]').click();
+    cy.contains(taskName).should("be.visible");
+    cy.wait("@createTask").then((interception) => {
+      createdTaskIds.push(interception.response!.body.id);
     });
+
+    // Hover and click star, wait for update to complete
+    cy.intercept("POST", "/api/update-task").as("updateTask");
+    cy.get('[data-testid^="task-"]').first().trigger('mouseover');
+    cy.get('[data-testid^="star-task-"]').first().click({ force: true });
+    cy.wait("@updateTask");
+    // Navigate to Selected and verify task appears there
+    cy.get('[data-cy="filter-selected"]').click();
+    cy.contains(taskName).should("be.visible");
   });
 
   it("should create a goal", () => {
@@ -67,23 +76,33 @@ describe("Smoke Tests - Critical User Flows", () => {
 
   it("should show menu button on mobile", () => {
     cy.viewport("iphone-x");
-    cy.prompt(["Click the hamburger menu button to open the sidebar"]);
+    cy.get('[data-cy="mobile-menu-button"]').click();
     cy.contains("Backlog").should("be.visible");
   });
 
   it("should search for tasks", () => {
-    cy.prompt(["Click the search icon button in the header"]);
-    cy.get('input[placeholder*="Search"]').type("test");
+    // Create a task first so there's something to find
+    const taskName = `Searchable smoke task ${Date.now()}`;
+    cy.get('[data-testid="add-task-button"]').click();
+    cy.get('[data-testid="task-name-input"]').type(taskName);
+    cy.get('[data-testid="save-task-button"]').click();
+    cy.contains(taskName).should("be.visible");
+    cy.wait("@createTask").then((interception) => {
+      createdTaskIds.push(interception.response!.body.id);
+    });
+
+    cy.get('[data-cy="search-button"]').click();
+    cy.get('input[placeholder*="Search"]').type("Searchable smoke");
     // Verify search results list appears (ul with divide-y class)
     cy.get('ul.divide-y').should("exist");
   });
 
   it("should navigate between filter views", () => {
-    cy.prompt(["Click the 'Backlog' button in the sidebar"]);
+    cy.get('[data-cy="filter-backlog"]').click();
     cy.contains("backlog").should("exist");
-    cy.prompt(["Click the 'Today' button in the sidebar"]);
+    cy.get('[data-cy="filter-today"]').click();
     cy.contains("today").should("exist");
-    cy.prompt(["Click the 'Selected' button in the sidebar"]);
+    cy.get('[data-cy="filter-selected"]').click();
     cy.contains("selected").should("exist");
   });
 });
