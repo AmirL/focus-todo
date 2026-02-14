@@ -1,5 +1,18 @@
 /// <reference types="cypress" />
 
+// Helper: click a Radix Dialog trigger and wait for it to open.
+// Radix sometimes misses the first click in headless CI, so retry once if needed.
+function openRadixDialog(triggerSelector: string) {
+  cy.get(triggerSelector).first().as("dialogTrigger").click();
+  cy.wait(500);
+  cy.get("body").then(($body) => {
+    if ($body.find('[role="dialog"]').length === 0) {
+      cy.get("@dialogTrigger").click();
+    }
+  });
+  cy.get('[role="dialog"]').should("be.visible");
+}
+
 describe("Goal Management", () => {
   let createdGoalIds: number[] = [];
 
@@ -42,7 +55,6 @@ describe("Goal Management", () => {
 
   describe("Edit Goals", () => {
     beforeEach(() => {
-      // Create a goal so there's always one to edit
       const goalTitle = `Edit test goal ${Date.now()}`;
       cy.get('[data-cy="add-goal-button"]').click();
       cy.get('[data-cy="goal-title-input"]').type(goalTitle);
@@ -56,30 +68,10 @@ describe("Goal Management", () => {
     it("should edit goal title", () => {
       const updatedTitle = `Updated Goal ${Date.now()}`;
       cy.intercept("POST", "/api/update-goal").as("updateGoal");
-      // Click edit button and ensure dialog opens (retry click if needed for Radix Dialog)
-      cy.get('[data-cy="edit-goal-button"]').first().as("editBtn");
-      cy.get("@editBtn").click();
-      cy.wait(500);
-      cy.get("body").then(($body) => {
-        if ($body.find('[role="dialog"]').length === 0) {
-          cy.get("@editBtn").click();
-        }
-      });
-      cy.get('[role="dialog"]', { timeout: 10000 }).should("be.visible");
-      // Wait for milestones section to load so dialog is fully stable
-      cy.get('[data-cy="milestones-section"]', { timeout: 15000 }).should("be.visible");
-      // Use native setter to avoid detached element issues during re-render
-      cy.get('[data-cy="edit-goal-title-input"]')
-        .should("be.visible")
-        .then(($el) => {
-          const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-            window.HTMLInputElement.prototype,
-            "value"
-          )!.set!;
-          nativeInputValueSetter.call($el[0], updatedTitle);
-          $el[0].dispatchEvent(new Event("input", { bubbles: true }));
-        });
-      // Submit the edit form (first form in dialog, not the milestone form)
+      openRadixDialog('[data-cy="edit-goal-button"]');
+      // Wait for milestones to load so dialog is stable
+      cy.get('[data-cy="milestones-section"]').should("be.visible");
+      cy.get('[data-cy="edit-goal-title-input"]').clear().type(updatedTitle);
       cy.get('[role="dialog"] form').first().submit();
       cy.wait("@updateGoal").then((interception) => {
         expect(interception.request.body.goal.title).to.equal(updatedTitle);
@@ -89,7 +81,6 @@ describe("Goal Management", () => {
 
   describe("Delete Goals", () => {
     beforeEach(() => {
-      // Create a goal so there's always one to delete
       const goalTitle = `Delete test goal ${Date.now()}`;
       cy.get('[data-cy="add-goal-button"]').click();
       cy.get('[data-cy="goal-title-input"]').type(goalTitle);
@@ -101,11 +92,9 @@ describe("Goal Management", () => {
     });
 
     it("should delete a goal", () => {
-      // Count goals before deletion
       cy.get('[data-cy="goal-item"]').then(($goals) => {
         const initialCount = $goals.length;
         cy.get('[data-cy="delete-goal-button"]').first().click();
-        // Wait for the goal to be removed
         if (initialCount > 1) {
           cy.get('[data-cy="goal-item"]').should("have.length", initialCount - 1);
         }
@@ -128,45 +117,22 @@ describe("Goal Management", () => {
       });
       cy.contains(goalTitle, { timeout: 15000 }).should("be.visible");
 
-      // Open the edit dialog (retry click if needed for Radix Dialog)
-      cy.get('[data-cy="edit-goal-button"]').first().as("editBtnMilestone");
-      cy.get("@editBtnMilestone").click();
-      cy.wait(500);
-      cy.get("body").then(($body) => {
-        if ($body.find('[role="dialog"]').length === 0) {
-          cy.get("@editBtnMilestone").click();
-        }
-      });
-      cy.get('[role="dialog"]', { timeout: 10000 }).should("be.visible");
+      // Open edit dialog and wait for milestones to load
+      openRadixDialog('[data-cy="edit-goal-button"]');
       cy.wait("@getMilestones");
 
-      // Verify milestones section renders with empty state
-      cy.get('[data-cy="milestones-section"]', { timeout: 15000 })
-        .scrollIntoView()
-        .should("be.visible");
+      // Verify empty state
+      cy.get('[data-cy="milestones-section"]').scrollIntoView().should("be.visible");
       cy.contains("No milestones yet").should("be.visible");
 
-      // Create a milestone by setting textarea value and submitting form
-      cy.get('[data-cy="milestone-description-input"]', { timeout: 15000 })
-        .should("exist")
-        .then(($el) => {
-          const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-            window.HTMLTextAreaElement.prototype,
-            "value"
-          )!.set!;
-          nativeInputValueSetter.call($el[0], "Starting weight 93 kg");
-          $el[0].dispatchEvent(new Event("input", { bubbles: true }));
-          $el[0].dispatchEvent(new Event("change", { bubbles: true }));
-        });
+      // Create a milestone
+      cy.get('[data-cy="milestone-description-input"]').type("Starting weight 93 kg");
       cy.get('[role="dialog"] form').eq(1).submit();
 
-      // Verify milestone was created - check request was sent correctly
+      // Verify milestone was created
       cy.wait("@createMilestone").then((interception) => {
         expect(interception.request.body.description).to.equal("Starting weight 93 kg");
       });
-
-      // Verify the milestone appears in timeline
-      cy.get('[data-cy="milestone-entry"]', { timeout: 15000 }).should("exist");
       cy.get('[data-cy="milestone-entry"]').should("contain.text", "Starting weight 93 kg");
       cy.contains("No milestones yet").should("not.exist");
     });
@@ -174,7 +140,6 @@ describe("Goal Management", () => {
 
   describe("Goal Display", () => {
     beforeEach(() => {
-      // Create a goal so there's always one to display
       const goalTitle = `Display test goal ${Date.now()}`;
       cy.get('[data-cy="add-goal-button"]').click();
       cy.get('[data-cy="goal-title-input"]').type(goalTitle);
