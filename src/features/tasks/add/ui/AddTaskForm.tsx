@@ -81,6 +81,7 @@ export function AddTaskForm() {
       isBlocker: metadata.isBlocker,
       date: metadata.selectedDate,
       estimatedDuration: metadata.selectedDuration,
+      goalId: metadata.selectedGoalId,
     });
     createTaskMutation.mutate(newTask);
     setIsAddTaskOpen(false);

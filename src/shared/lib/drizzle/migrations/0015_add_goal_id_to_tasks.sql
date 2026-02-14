@@ -1,0 +1,2 @@
+ALTER TABLE `tasks` ADD `goal_id` int;--> statement-breakpoint
+ALTER TABLE `tasks` ADD CONSTRAINT `tasks_goal_id_goals_id_fk` FOREIGN KEY (`goal_id`) REFERENCES `goals`(`id`) ON DELETE set null ON UPDATE no action;
