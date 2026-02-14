@@ -99,12 +99,13 @@ describe("Goal Management", () => {
       openRadixDialog('[data-cy="edit-goal-button"]');
       cy.get('[data-cy="milestones-section"]').should("be.visible");
       cy.get('[data-cy="edit-goal-description-input"]').type(description);
-      cy.get('[role="dialog"] form').first().submit();
+      // Click save button (wrapped in DialogTrigger) to submit and close dialog
+      cy.get('[data-cy="save-goal-button"]').click();
       cy.wait("@updateGoal").then((interception) => {
         expect(interception.request.body.goal.description).to.equal(description);
       });
 
-      // Wait for dialog close animation to complete
+      // Wait for dialog to fully close before re-opening
       cy.get('[role="dialog"]').should("have.attr", "data-state", "closed");
       cy.wait(500);
       // Re-open dialog and verify description persisted
