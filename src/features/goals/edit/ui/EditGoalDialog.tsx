@@ -4,13 +4,18 @@ import { Button } from '@/shared/ui/button';
 import { Label } from '@/shared/ui/label';
 import { Input } from '@/shared/ui/input';
 import { Slider } from '@/shared/ui/slider';
+import { Separator } from '@/shared/ui/separator';
 import { createInstance } from '@/shared/lib/instance-tools';
 import { useUpdateGoalMutation } from '@/shared/api/goals';
+import { useGoalMilestonesQuery } from '@/shared/api/goal-milestones';
 import { useState } from 'react';
+import { MilestoneTimeline } from './MilestoneTimeline';
+import { AddMilestoneForm } from './AddMilestoneForm';
 
 export function EditGoalDialog({ goal, children }: { goal: GoalModel; children: React.ReactNode }) {
   const updateGoalMutation = useUpdateGoalMutation();
   const [progress, setProgress] = useState(goal.progress || 0);
+  const { data: milestones = [], isLoading: milestonesLoading } = useGoalMilestonesQuery(goal.id);
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +29,7 @@ export function EditGoalDialog({ goal, children }: { goal: GoalModel; children: 
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-h-[80vh] overflow-y-auto">
         <form onSubmit={onSubmit} className="space-y-4">
           <DialogHeader>
             <DialogTitle>Edit goal</DialogTitle>
@@ -53,6 +58,18 @@ export function EditGoalDialog({ goal, children }: { goal: GoalModel; children: 
             </DialogTrigger>
           </DialogFooter>
         </form>
+
+        <Separator />
+
+        <div className="space-y-4" data-cy="milestones-section">
+          <h3 className="text-sm font-semibold">Milestones</h3>
+          <MilestoneTimeline milestones={milestones} isLoading={milestonesLoading} />
+          <AddMilestoneForm
+            goalId={goal.id}
+            currentProgress={progress}
+            onMilestoneAdded={(newProgress) => setProgress(newProgress)}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );

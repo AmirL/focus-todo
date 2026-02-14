@@ -113,6 +113,13 @@
       "when": 1771027200000,
       "tag": "0015_add_goal_id_to_tasks",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "5",
+      "when": 1771088069322,
+      "tag": "0016_goal_milestones",
+      "breakpoints": true
     }
   ]
 }
