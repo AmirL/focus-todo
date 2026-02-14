@@ -122,9 +122,9 @@ describe("Goal Management", () => {
     it("should add a milestone and display it in timeline", () => {
       cy.get('[data-cy="edit-goal-button"]').first().click();
       cy.get('[role="dialog"]').should("be.visible");
-      // Wait for dialog animation to settle before interacting with milestone form
-      cy.wait(500);
-      cy.get('[data-cy="milestone-description-input"]')
+      // Ensure milestones section is fully rendered before interacting
+      cy.contains("Milestones", { timeout: 15000 }).should("be.visible");
+      cy.get('[data-cy="milestone-description-input"]', { timeout: 10000 })
         .scrollIntoView()
         .should("be.visible")
         .should("not.be.disabled")
