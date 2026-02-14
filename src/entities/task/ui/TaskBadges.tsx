@@ -1,10 +1,11 @@
 import { Badge } from '@/shared/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
-import { AlertTriangle, Sparkles } from 'lucide-react';
+import { AlertTriangle, Sparkles, Target } from 'lucide-react';
 import { TaskModel, isTaskDeleted, isTaskOverdue } from '@/entities/task/model/task';
 import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
 import { isFutureDate, isToday } from '@/shared/lib/utils';
 import { hasPendingSuggestions } from '@/shared/lib/aiSuggestions';
+import { useGoalsQuery } from '@/shared/api/goals';
 import dayjs from 'dayjs';
 
 interface TaskBadgesProps {
@@ -13,6 +14,8 @@ interface TaskBadgesProps {
 
 export function TaskBadges({ task }: TaskBadgesProps) {
   const { statusFilter } = useFilterStore();
+  const { data: goals = [] } = useGoalsQuery();
+  const goal = task.goalId ? goals.find((g) => String(g.id) === String(task.goalId)) : null;
 
   // Hide redundant date badges when on Today/Tomorrow tabs
   const isOnTodayTab = statusFilter === StatusFilterEnum.TODAY;
@@ -36,6 +39,13 @@ export function TaskBadges({ task }: TaskBadgesProps) {
             <p>Overdue: {dayjs(task.date).format('DD.MM.YY')}</p>
           </TooltipContent>
         </Tooltip>
+      )}
+      {/* Show goal indicator */}
+      {goal && (
+        <Badge variant="outline" className="text-emerald-700 border-emerald-300 bg-emerald-50" data-cy="goal-badge">
+          <Target className="h-3 w-3 mr-1" />
+          {goal.title}
+        </Badge>
       )}
       {/* Show AI suggestions indicator */}
       {hasPendingSuggestions(task.aiSuggestions, {

@@ -6,6 +6,7 @@ export interface TaskMetadata {
   isStarred: boolean;
   isBlocker: boolean;
   selectedDate: Date | null;
+  selectedGoalId: number | null;
 }
 
 export interface UseTaskMetadataReturn {
@@ -20,6 +21,7 @@ const DEFAULT_METADATA: TaskMetadata = {
   isStarred: false,
   isBlocker: false,
   selectedDate: null,
+  selectedGoalId: null,
 };
 
 export function useTaskMetadata(initialMetadata?: Partial<TaskMetadata>): UseTaskMetadataReturn {

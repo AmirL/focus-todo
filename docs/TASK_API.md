@@ -30,6 +30,7 @@ Retrieve a list of tasks with optional filtering.
 | `since`                  | ISO date string                       | -       | Tasks with date >= since                                   |
 | `until`                  | ISO date string                       | -       | Tasks with date < until                                    |
 | `listId`                 | number                                | -       | Filter by list ID                                          |
+| `goalId`                 | number                                | -       | Filter by goal ID                                          |
 | `completed`              | `true` \| `false`                     | -       | Filter by completion status                                |
 | `includeDeleted`         | `true` \| `false`                     | `false` | Include all deleted tasks                                  |
 | `includeRecentlyDeleted` | `true` \| `false`                     | `false` | Include tasks deleted in last 24h                          |
@@ -62,7 +63,8 @@ curl -X GET "https://doable-tasks.vercel.app/api/tasks?on=today&completed=false"
       "updatedAt": "2026-01-25T08:00:00+00:00",
       "createdAt": "2026-01-24T10:00:00+00:00",
       "sortOrder": 0,
-      "aiSuggestions": null
+      "aiSuggestions": null,
+      "goalId": null
     }
   ]
 }
@@ -110,7 +112,8 @@ curl -X GET "https://doable-tasks.vercel.app/api/tasks/123" \
     "updatedAt": "2026-01-25T10:00:00Z",
     "createdAt": "2026-01-25T09:00:00Z",
     "sortOrder": 0,
-    "aiSuggestions": null
+    "aiSuggestions": null,
+    "goalId": null
   }
 }
 ```
@@ -143,6 +146,7 @@ Create a new task.
 | `estimatedDuration` | number | No | Estimated duration in minutes |
 | `isBlocker` | boolean | No | Whether task is a blocker |
 | `selectedAt` | ISO date string | No | When task was selected |
+| `goalId` | number \| null | No | Associated goal ID |
 
 #### Example Request
 
@@ -178,7 +182,8 @@ curl -X POST "https://doable-tasks.vercel.app/api/tasks" \
     "updatedAt": "2026-01-25T12:00:00Z",
     "createdAt": "2026-01-25T12:00:00Z",
     "sortOrder": 0,
-    "aiSuggestions": null
+    "aiSuggestions": null,
+    "goalId": null
   }
 }
 ```
@@ -221,6 +226,7 @@ All fields are optional. Only provided fields will be updated.
 | `listId` | number | List ID |
 | `sortOrder` | number | Sort order |
 | `aiSuggestions` | object \| null | AI-generated suggestions for task fields (see [AI Suggestions](#ai-suggestions)) |
+| `goalId` | number \| null | Associated goal ID |
 
 #### Example Request - Mark as Completed
 
@@ -285,7 +291,8 @@ curl -X PATCH "https://doable-tasks.vercel.app/api/tasks/123" \
     "updatedAt": "2026-01-25T15:00:00Z",
     "createdAt": "2026-01-25T09:00:00Z",
     "sortOrder": 0,
-    "aiSuggestions": null
+    "aiSuggestions": null,
+    "goalId": null
   }
 }
 ```
