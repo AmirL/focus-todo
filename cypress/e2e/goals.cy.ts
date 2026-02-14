@@ -96,6 +96,41 @@ describe("Goal Management", () => {
     });
   });
 
+  describe("Goal Milestones", () => {
+    beforeEach(() => {
+      cy.intercept("POST", "/api/create-goal-milestone").as("createMilestone");
+      cy.intercept("POST", "/api/get-goal-milestones").as("getMilestones");
+
+      const goalTitle = `Milestone test goal ${Date.now()}`;
+      cy.get('[data-cy="add-goal-button"]').click();
+      cy.get('[data-cy="goal-title-input"]').type(goalTitle);
+      cy.get('[data-cy="create-goal-button"]').click();
+      cy.wait("@createGoal").then((interception) => {
+        createdGoalIds.push(interception.response!.body.id);
+      });
+      cy.contains(goalTitle, { timeout: 15000 }).should("be.visible");
+    });
+
+    it("should show milestones section in edit dialog", () => {
+      cy.get('[data-cy="edit-goal-button"]').first().click();
+      cy.get('[role="dialog"]').should("be.visible");
+      cy.contains("Milestones").should("be.visible");
+      cy.get('[data-cy="milestone-description-input"]').should("be.visible");
+      cy.get('[data-cy="add-milestone-button"]').should("be.disabled");
+    });
+
+    it("should add a milestone and display it in timeline", () => {
+      cy.get('[data-cy="edit-goal-button"]').first().click();
+      cy.get('[role="dialog"]').should("be.visible");
+      cy.get('[data-cy="milestone-description-input"]').type("Start weight 93 kg");
+      cy.get('[data-cy="add-milestone-button"]').should("not.be.disabled").click();
+      cy.wait("@createMilestone");
+      cy.get('[data-cy="milestone-timeline"]').should("be.visible");
+      cy.get('[data-cy="milestone-entry"]').should("have.length", 1);
+      cy.contains("Start weight 93 kg").should("be.visible");
+    });
+  });
+
   describe("Goal Display", () => {
     beforeEach(() => {
       // Create a goal so there's always one to display
