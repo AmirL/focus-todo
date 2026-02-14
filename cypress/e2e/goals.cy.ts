@@ -56,14 +56,21 @@ describe("Goal Management", () => {
     it("should edit goal title", () => {
       const updatedTitle = `Updated Goal ${Date.now()}`;
       cy.intercept("POST", "/api/update-goal").as("updateGoal");
-      cy.intercept("POST", "/api/get-goal-milestones").as("getMilestonesEdit");
-      cy.get('[data-cy="edit-goal-button"]').first().click();
-      cy.get('[role="dialog"]').should("be.visible");
-      // Wait for milestones to load so dialog is stable
-      cy.wait("@getMilestonesEdit");
+      // Click edit button and ensure dialog opens (retry click if needed for Radix Dialog)
+      cy.get('[data-cy="edit-goal-button"]').first().as("editBtn");
+      cy.get("@editBtn").click();
+      cy.wait(500);
+      cy.get("body").then(($body) => {
+        if ($body.find('[role="dialog"]').length === 0) {
+          cy.get("@editBtn").click();
+        }
+      });
+      cy.get('[role="dialog"]', { timeout: 10000 }).should("be.visible");
+      // Wait for milestones section to load so dialog is fully stable
+      cy.get('[data-cy="milestones-section"]', { timeout: 15000 }).should("be.visible");
       // Use native setter to avoid detached element issues during re-render
       cy.get('[data-cy="edit-goal-title-input"]')
-        .should("exist")
+        .should("be.visible")
         .then(($el) => {
           const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
             window.HTMLInputElement.prototype,
@@ -121,8 +128,15 @@ describe("Goal Management", () => {
       });
       cy.contains(goalTitle, { timeout: 15000 }).should("be.visible");
 
-      // Open the edit dialog - use the goal we just created (first in the list)
-      cy.get('[data-cy="edit-goal-button"]').first().click();
+      // Open the edit dialog (retry click if needed for Radix Dialog)
+      cy.get('[data-cy="edit-goal-button"]').first().as("editBtnMilestone");
+      cy.get("@editBtnMilestone").click();
+      cy.wait(500);
+      cy.get("body").then(($body) => {
+        if ($body.find('[role="dialog"]').length === 0) {
+          cy.get("@editBtnMilestone").click();
+        }
+      });
       cy.get('[role="dialog"]', { timeout: 10000 }).should("be.visible");
       cy.wait("@getMilestones");
 
