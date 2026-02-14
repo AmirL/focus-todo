@@ -40,6 +40,21 @@ describe("Goal Management", () => {
       });
     });
 
+    it("should create a goal with description", () => {
+      const goalTitle = `Goal with desc ${Date.now()}`;
+      const goalDescription = "This goal tracks our test coverage improvements";
+      cy.get('[data-cy="add-goal-button"]').click();
+      cy.get('[data-cy="goal-title-input"]').type(goalTitle);
+      cy.get('[data-cy="goal-description-input"]').type(goalDescription);
+      cy.get('[data-cy="create-goal-button"]').click();
+
+      cy.wait("@createGoal").then((interception) => {
+        createdGoalIds.push(interception.response!.body.id);
+        expect(interception.request.body.goal.description).to.equal(goalDescription);
+      });
+      cy.contains(goalTitle).should("be.visible");
+    });
+
     it("should create a goal with custom progress", () => {
       const goalTitle = `Exercise daily ${Date.now()}`;
       cy.get('[data-cy="add-goal-button"]').click();
@@ -76,6 +91,26 @@ describe("Goal Management", () => {
       cy.wait("@updateGoal").then((interception) => {
         expect(interception.request.body.goal.title).to.equal(updatedTitle);
       });
+    });
+
+    it("should edit goal description", () => {
+      const description = "Updated description for testing";
+      cy.intercept("POST", "/api/update-goal").as("updateGoal");
+      openRadixDialog('[data-cy="edit-goal-button"]');
+      cy.get('[data-cy="milestones-section"]').should("be.visible");
+      cy.get('[data-cy="edit-goal-description-input"]').type(description);
+      // Click save button (wrapped in DialogTrigger) to submit and close dialog
+      cy.get('[data-cy="save-goal-button"]').click();
+      cy.wait("@updateGoal").then((interception) => {
+        expect(interception.request.body.goal.description).to.equal(description);
+      });
+
+      // Wait for dialog to close completely
+      cy.get('[role="dialog"]').should("not.exist");
+      // Re-open dialog and verify description persisted
+      openRadixDialog('[data-cy="edit-goal-button"]');
+      cy.get('[data-cy="milestones-section"]').should("be.visible");
+      cy.get('[data-cy="edit-goal-description-input"]').should("have.value", description);
     });
   });
 
