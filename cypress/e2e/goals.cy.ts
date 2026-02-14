@@ -105,9 +105,8 @@ describe("Goal Management", () => {
         expect(interception.request.body.goal.description).to.equal(description);
       });
 
-      // Wait for dialog to fully close before re-opening
-      cy.get('[role="dialog"]').should("have.attr", "data-state", "closed");
-      cy.wait(500);
+      // Wait for dialog to close completely
+      cy.get('[role="dialog"]').should("not.exist");
       // Re-open dialog and verify description persisted
       openRadixDialog('[data-cy="edit-goal-button"]');
       cy.get('[data-cy="milestones-section"]').should("be.visible");
