@@ -16,7 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 The dev server uses Next.js default port selection (3000, or next available). Auth is configured to work with any port - Better Auth derives the URL from request headers for local development. No environment variables needed for local dev.
 
-**Important**: When starting the dev server, always read the server output to get the actual URL (e.g., `http://localhost:3000`). Next.js prints the URL when the server is ready - don't assume a port, check the output. Ensure the dev server is running before testing with Playwright.
+**Important**: When starting the dev server, always read the server output to get the actual URL (e.g., `http://localhost:3000`). Next.js prints the URL when the server is ready - don't assume a port, check the output. Ensure the dev server is running before testing with `playwright-cli`.
 
 ## Architecture Overview
 
@@ -95,14 +95,14 @@ Full RESTful API for programmatic task management. See [`docs/TASK_API.md`](./do
 - Database changes require running migrations via `pnpm run db:generate` and `pnpm run db:migrate`
 - **Database migrations**: `pnpm run db:migrate` requires `DATABASE_URL` env var. It is not auto-loaded from `.env.local`. Run with: `DATABASE_URL='...' npx drizzle-kit migrate`
 - **Shared database**: Dev and prod use the same database. Be careful with migrations and data changes.
-- **Test user login**: In dev mode, the login page has a "Login as Test User" button (`test@example.com` / `password123`). Use this for Playwright testing. Note: the button may need to be clicked twice and the redirect can take a few seconds. If the page doesn't redirect after clicking, wait 3-5 seconds and try again or navigate to `/` manually.
+- **Test user login**: In dev mode, the login page has a "Login as Test User" button (`test@example.com` / `password123`). Use this for `playwright-cli` testing. Note: the button may need to be clicked twice and the redirect can take a few seconds. If the page doesn't redirect after clicking, wait 3-5 seconds and try again or navigate to `/` manually.
 - Always run `pnpm tsc --noEmit` before committing to ensure TypeScript compliance
 - The steiger config has specific FSD rules disabled - follow existing patterns rather than strict FSD compliance
 
 ### Workflow
 
 - First work on the task,
-- When you consider your work is finished, use playwright mcp to test it
+- When you consider your work is finished, use `playwright-cli` to test it
 - When test is finished, task you need acceptance from the reviewer agent
 - When the branch has commits (changes were made in the worktree), create a PR. After creating the PR, wait for all CI checks to pass before considering the work done.
 - When E2E tests fail in CI, wait for the GitHub Actions run to finish, check the failure, fix it, push, and repeat until CI is green. Don't leave failing CI behind.
@@ -118,7 +118,7 @@ When waiting for CI checks, wait ~90 seconds for the preview deployment to compl
 
 ### Development Best Practices
 
-- When finish a task - review your changes in the browser (playwright mcp) and take a screenshot as evidence. Save screenshots to `screenshots/<short-feature-name>.png` (e.g. `screenshots/blocked-tasks-in-charts.png`). These are committed to git so they're visible in PR reviews.
+- When finish a task - review your changes in the browser (`playwright-cli`) and take a screenshot as evidence. Save screenshots to `screenshots/<short-feature-name>.png` (e.g. `screenshots/blocked-tasks-in-charts.png`). These are committed to git so they're visible in PR reviews.
 
 ### Recommended Practices
 
