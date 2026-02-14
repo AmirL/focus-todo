@@ -113,25 +113,26 @@ describe("Goal Management", () => {
     });
 
     it("should show milestones section and add a milestone", () => {
-      // Open the edit dialog
+      // Open the edit dialog and wait for it to fully load
       cy.get('[data-cy="edit-goal-button"]').first().click();
-      cy.get('[role="dialog"]').should("be.visible");
+      cy.get('[role="dialog"]', { timeout: 10000 }).should("be.visible");
 
-      // Wait for milestones API to complete before interacting
+      // Wait for dialog animation to settle and milestones API to load
       cy.wait("@getMilestones");
+      cy.wait(500); // Allow Radix Dialog animation to complete
+
+      // Scroll down within the dialog to ensure milestones section is in view
+      cy.get('[role="dialog"]').scrollTo("bottom");
 
       // Verify milestones section is visible
       cy.get('[data-cy="milestones-section"]', { timeout: 15000 })
-        .scrollIntoView()
         .should("be.visible");
       cy.contains("No milestones yet").should("be.visible");
 
-      // Fill in the milestone form using the second form in the dialog
-      // (first form is the edit goal form)
+      // Fill in the milestone form using native DOM setter for reliability
       cy.get('[data-cy="milestone-description-input"]', { timeout: 15000 })
         .should("exist")
         .then(($el) => {
-          // Use native DOM to set value and trigger React's onChange
           const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
             window.HTMLTextAreaElement.prototype,
             "value"
