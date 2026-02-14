@@ -97,11 +97,11 @@ describe("Goal Management", () => {
   });
 
   describe("Goal Milestones", () => {
-    beforeEach(() => {
+    it("should show milestones section in edit dialog and create a milestone", () => {
       cy.intercept("POST", "/api/get-goal-milestones").as("getMilestones");
       cy.intercept("POST", "/api/create-goal-milestone").as("createMilestone");
-      cy.intercept("POST", "/api/update-goal").as("updateGoal");
 
+      // Create a goal
       const goalTitle = `Milestone test goal ${Date.now()}`;
       cy.get('[data-cy="add-goal-button"]').click();
       cy.get('[data-cy="goal-title-input"]').type(goalTitle);
@@ -110,26 +110,19 @@ describe("Goal Management", () => {
         createdGoalIds.push(interception.response!.body.id);
       });
       cy.contains(goalTitle, { timeout: 15000 }).should("be.visible");
-    });
 
-    it("should show milestones section and add a milestone", () => {
-      // Open the edit dialog and wait for it to fully load
+      // Open the edit dialog - use the goal we just created (first in the list)
       cy.get('[data-cy="edit-goal-button"]').first().click();
       cy.get('[role="dialog"]', { timeout: 10000 }).should("be.visible");
-
-      // Wait for dialog animation to settle and milestones API to load
       cy.wait("@getMilestones");
-      cy.wait(500); // Allow Radix Dialog animation to complete
 
-      // Scroll down within the dialog to ensure milestones section is in view
-      cy.get('[role="dialog"]').scrollTo("bottom");
-
-      // Verify milestones section is visible
+      // Verify milestones section renders with empty state
       cy.get('[data-cy="milestones-section"]', { timeout: 15000 })
+        .scrollIntoView()
         .should("be.visible");
       cy.contains("No milestones yet").should("be.visible");
 
-      // Fill in the milestone form using native DOM setter for reliability
+      // Create a milestone by setting textarea value and submitting form
       cy.get('[data-cy="milestone-description-input"]', { timeout: 15000 })
         .should("exist")
         .then(($el) => {
@@ -141,21 +134,17 @@ describe("Goal Management", () => {
           $el[0].dispatchEvent(new Event("input", { bubbles: true }));
           $el[0].dispatchEvent(new Event("change", { bubbles: true }));
         });
-
-      // Submit the milestone form (second form in the dialog)
       cy.get('[role="dialog"] form').eq(1).submit();
 
-      // Wait for the milestone to be created
+      // Verify milestone was created
       cy.wait("@createMilestone").then((interception) => {
         expect(interception.response!.statusCode).to.eq(200);
         expect(interception.request.body.description).to.equal("Starting weight 93 kg");
       });
 
-      // Verify the milestone appears in the timeline
+      // Verify the milestone appears in timeline
       cy.get('[data-cy="milestone-entry"]', { timeout: 10000 }).should("exist");
       cy.get('[data-cy="milestone-entry"]').should("contain.text", "Starting weight 93 kg");
-
-      // Verify "No milestones yet" is gone
       cy.contains("No milestones yet").should("not.exist");
     });
   });
