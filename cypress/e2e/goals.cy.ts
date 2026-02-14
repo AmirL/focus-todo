@@ -122,7 +122,13 @@ describe("Goal Management", () => {
     it("should add a milestone and display it in timeline", () => {
       cy.get('[data-cy="edit-goal-button"]').first().click();
       cy.get('[role="dialog"]').should("be.visible");
-      cy.get('[data-cy="milestone-description-input"]').scrollIntoView().type("Start weight 93 kg");
+      // Wait for dialog animation to settle before interacting with milestone form
+      cy.wait(500);
+      cy.get('[data-cy="milestone-description-input"]')
+        .scrollIntoView()
+        .should("be.visible")
+        .should("not.be.disabled")
+        .type("Start weight 93 kg");
       cy.get('[data-cy="add-milestone-button"]').scrollIntoView().should("not.be.disabled").click();
       cy.wait("@createMilestone");
       cy.get('[data-cy="milestone-timeline"]').should("be.visible");
