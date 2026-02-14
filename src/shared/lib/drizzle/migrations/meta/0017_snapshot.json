@@ -1,7 +1,11 @@
 {
   "version": "5",
   "dialect": "mysql",
+<<<<<<< HEAD
+  "id": "1f6fdca4-df6a-4deb-b706-f6aa1775607e",
+=======
   "id": "4d54d4b1-52a8-407b-a7a9-d53f7b47de9b",
+>>>>>>> origin/main
   "prevId": "8f2f9588-8990-4132-a4a7-2a922b1fc634",
   "tables": {
     "account": {
@@ -352,6 +356,16 @@
           "notNull": false,
           "autoincrement": false
         },
+<<<<<<< HEAD
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+=======
+>>>>>>> origin/main
         "progress": {
           "name": "progress",
           "type": "tinyint",
@@ -360,8 +374,13 @@
           "autoincrement": false,
           "default": 0
         },
+<<<<<<< HEAD
+        "__list_deprecated": {
+          "name": "__list_deprecated",
+=======
         "list": {
           "name": "list",
+>>>>>>> origin/main
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false,
@@ -371,7 +390,11 @@
           "name": "list_id",
           "type": "int",
           "primaryKey": false,
+<<<<<<< HEAD
+          "notNull": true,
+=======
           "notNull": false,
+>>>>>>> origin/main
           "autoincrement": false
         },
         "user_id": {
@@ -674,18 +697,32 @@
           "notNull": false,
           "autoincrement": false
         },
+<<<<<<< HEAD
+        "__list_deprecated": {
+          "name": "__list_deprecated",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "''"
+=======
         "list": {
           "name": "list",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+>>>>>>> origin/main
         },
         "list_id": {
           "name": "list_id",
           "type": "int",
           "primaryKey": false,
+<<<<<<< HEAD
+          "notNull": true,
+=======
           "notNull": false,
+>>>>>>> origin/main
           "autoincrement": false
         },
         "is_blocker": {
@@ -934,6 +971,8 @@
       },
       "uniqueConstraints": {},
       "checkConstraint": {}
+<<<<<<< HEAD
+=======
     },
     "goal_milestones": {
       "name": "goal_milestones",
@@ -1001,6 +1040,7 @@
       },
       "uniqueConstraints": {},
       "checkConstraint": {}
+>>>>>>> origin/main
     }
   },
   "views": {},

@@ -116,6 +116,17 @@ export const apiKeysTable = mysqlTable('api_keys', {
   revokedAt: datetime('revoked_at'),
 });
 
+// Goal Milestones - progress log entries for goals
+export const goalMilestonesTable = mysqlTable('goal_milestones', {
+  id: int('id').autoincrement().primaryKey().notNull(),
+  goalId: int('goal_id').notNull().references(() => goalsTable.id, { onDelete: 'cascade' }),
+  progress: tinyint('progress').notNull(),
+  description: varchar('description', { length: 500 }).notNull(),
+  createdAt: datetime('created_at')
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
 // Current Initiative - daily focus rotation between lists
 export const currentInitiativeTable = mysqlTable('current_initiatives', {
   id: int('id').autoincrement().primaryKey().notNull(),
