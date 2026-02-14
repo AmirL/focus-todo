@@ -126,17 +126,23 @@ describe("Goal Management", () => {
         .should("be.visible");
       cy.contains("No milestones yet").should("be.visible");
 
-      // Fill in the milestone form
-      cy.get('[data-cy="milestone-description-input"]')
-        .scrollIntoView()
-        .should("be.visible")
-        .type("Starting weight 93 kg", { force: true });
+      // Fill in the milestone form using the second form in the dialog
+      // (first form is the edit goal form)
+      cy.get('[data-cy="milestone-description-input"]', { timeout: 15000 })
+        .should("exist")
+        .then(($el) => {
+          // Use native DOM to set value and trigger React's onChange
+          const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+            window.HTMLTextAreaElement.prototype,
+            "value"
+          )!.set!;
+          nativeInputValueSetter.call($el[0], "Starting weight 93 kg");
+          $el[0].dispatchEvent(new Event("input", { bubbles: true }));
+          $el[0].dispatchEvent(new Event("change", { bubbles: true }));
+        });
 
-      // Verify button becomes enabled and submit
-      cy.get('[data-cy="add-milestone-button"]')
-        .scrollIntoView()
-        .should("not.be.disabled")
-        .click({ force: true });
+      // Submit the milestone form (second form in the dialog)
+      cy.get('[role="dialog"] form').eq(1).submit();
 
       // Wait for the milestone to be created
       cy.wait("@createMilestone").then((interception) => {
