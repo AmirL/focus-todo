@@ -62,8 +62,8 @@ describe("Goal Management", () => {
       cy.get('[data-cy="edit-goal-title-input"]')
         .invoke("val", updatedTitle)
         .trigger("input");
-      // Submit form directly instead of clicking save button (which is wrapped in DialogTrigger)
-      cy.get('[role="dialog"] form').submit();
+      // Submit the edit form (first form in dialog, not the milestone form)
+      cy.get('[role="dialog"] form').first().submit();
       cy.wait("@updateGoal").then((interception) => {
         expect(interception.request.body.goal.title).to.equal(updatedTitle);
       });
@@ -114,16 +114,16 @@ describe("Goal Management", () => {
     it("should show milestones section in edit dialog", () => {
       cy.get('[data-cy="edit-goal-button"]').first().click();
       cy.get('[role="dialog"]').should("be.visible");
-      cy.contains("Milestones").should("be.visible");
-      cy.get('[data-cy="milestone-description-input"]').should("be.visible");
-      cy.get('[data-cy="add-milestone-button"]').should("be.disabled");
+      cy.contains("Milestones").scrollIntoView().should("be.visible");
+      cy.get('[data-cy="milestone-description-input"]').scrollIntoView().should("be.visible");
+      cy.get('[data-cy="add-milestone-button"]').scrollIntoView().should("be.disabled");
     });
 
     it("should add a milestone and display it in timeline", () => {
       cy.get('[data-cy="edit-goal-button"]').first().click();
       cy.get('[role="dialog"]').should("be.visible");
-      cy.get('[data-cy="milestone-description-input"]').type("Start weight 93 kg");
-      cy.get('[data-cy="add-milestone-button"]').should("not.be.disabled").click();
+      cy.get('[data-cy="milestone-description-input"]').scrollIntoView().type("Start weight 93 kg");
+      cy.get('[data-cy="add-milestone-button"]').scrollIntoView().should("not.be.disabled").click();
       cy.wait("@createMilestone");
       cy.get('[data-cy="milestone-timeline"]').should("be.visible");
       cy.get('[data-cy="milestone-entry"]').should("have.length", 1);
