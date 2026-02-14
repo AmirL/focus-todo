@@ -32,6 +32,7 @@ export function EditTaskDialog({
     isStarred: !!task.selectedAt,
     isBlocker: task.isBlocker,
     selectedDate: task.date ?? null,
+    selectedGoalId: task.goalId ?? null,
   });
 
   // Reset form values when task changes or dialog opens in controlled mode
@@ -80,6 +81,7 @@ export function EditTaskDialog({
       selectedAt: metadata.isStarred ? task.selectedAt || new Date() : null,
       isBlocker: metadata.isBlocker,
       date: metadata.selectedDate,
+      goalId: metadata.selectedGoalId,
       aiSuggestions: null,
       updatedAt: new Date(),
     });
@@ -98,6 +100,7 @@ export function EditTaskDialog({
       selectedAt: metadata.isStarred ? task.selectedAt || new Date() : null,
       isBlocker: metadata.isBlocker,
       date: metadata.selectedDate,
+      goalId: metadata.selectedGoalId,
       aiSuggestions,
       updatedAt: new Date(),
     });

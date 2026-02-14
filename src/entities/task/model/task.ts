@@ -22,6 +22,7 @@ export type TaskPlain = {
   updatedAt?: string;
   sortOrder?: number;
   aiSuggestions?: AiSuggestions | null;
+  goalId?: number | null;
 };
 
 export class TaskModel {
@@ -58,6 +59,8 @@ export class TaskModel {
   sortOrder: number = 0;
 
   aiSuggestions: AiSuggestions | null = null;
+
+  goalId: number | null = null;
 
   static toInstance(data: TaskPlain): TaskModel {
     return plainToInstance(TaskModel, data);

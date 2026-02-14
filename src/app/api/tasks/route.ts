@@ -110,6 +110,15 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    // Goal filter
+    const goalIdParam = searchParams.get('goalId');
+    if (goalIdParam) {
+      const goalId = Number(goalIdParam);
+      if (!Number.isNaN(goalId)) {
+        conditions.push(eq(tasksTable.goalId, goalId));
+      }
+    }
+
     // Completed filter
     if (completed === 'true') {
       conditions.push(isNotNull(tasksTable.completedAt));

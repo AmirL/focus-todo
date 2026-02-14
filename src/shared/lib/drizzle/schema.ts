@@ -22,6 +22,7 @@ export const tasksTable = mysqlTable('tasks', {
     .notNull(),
   sortOrder: int('sort_order').default(0),
   aiSuggestions: json('ai_suggestions').$type<AiSuggestions>(),
+  goalId: int('goal_id').references(() => goalsTable.id, { onDelete: 'set null' }),
 });
 
 export const goalsTable = mysqlTable('goals', {
