@@ -114,7 +114,9 @@ describe("Goal Management", () => {
     it("should show milestones section in edit dialog", () => {
       cy.get('[data-cy="edit-goal-button"]').first().click();
       cy.get('[role="dialog"]').should("be.visible");
-      cy.get('[data-cy="milestones-section"]', { timeout: 15000 }).scrollIntoView().should("be.visible");
+      // Wait for milestones API to respond before interacting
+      cy.wait("@getMilestones");
+      cy.get('[data-cy="milestones-section"]').scrollIntoView().should("be.visible");
       cy.get('[data-cy="milestone-description-input"]').should("be.visible");
       cy.get('[data-cy="add-milestone-button"]').should("be.disabled");
     });
@@ -122,11 +124,11 @@ describe("Goal Management", () => {
     it("should add a milestone and display it in timeline", () => {
       cy.get('[data-cy="edit-goal-button"]').first().click();
       cy.get('[role="dialog"]').should("be.visible");
-      // Scroll to milestones section and wait for it to be fully rendered
-      cy.get('[data-cy="milestones-section"]', { timeout: 15000 }).scrollIntoView();
-      // Use force:true because Radix Dialog animation can briefly make elements non-interactive
-      cy.get('[data-cy="milestone-description-input"]').should("be.visible").type("Start weight 93 kg", { force: true });
-      cy.get('[data-cy="add-milestone-button"]').should("exist").click({ force: true });
+      // Wait for milestones API to respond so dialog is fully rendered
+      cy.wait("@getMilestones");
+      cy.get('[data-cy="milestones-section"]').scrollIntoView();
+      cy.get('[data-cy="milestone-description-input"]').type("Start weight 93 kg", { force: true });
+      cy.get('[data-cy="add-milestone-button"]').click({ force: true });
       cy.wait("@createMilestone");
       cy.get('[data-cy="milestone-timeline"]', { timeout: 15000 }).should("be.visible");
       cy.get('[data-cy="milestone-entry"]').should("have.length", 1);
