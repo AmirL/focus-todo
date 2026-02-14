@@ -27,6 +27,7 @@ export const tasksTable = mysqlTable('tasks', {
 export const goalsTable = mysqlTable('goals', {
   id: int('id').autoincrement().primaryKey().notNull(),
   title: varchar('title', { length: 255 }),
+  description: text('description'),
   progress: tinyint('progress').default(0),
   __list_deprecated: varchar('__list_deprecated', { length: 255 }),
   listId: int('list_id').notNull().references(() => listsTable.id, { onDelete: 'restrict' }),

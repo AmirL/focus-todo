@@ -3,6 +3,7 @@ import { instanceToPlain, plainToInstance } from 'class-transformer';
 export type GoalPlain = {
   id: string;
   title: string;
+  description: string | null;
   progress: number;
   listId: number;
   deletedAt: string | null;
@@ -13,6 +14,7 @@ export type GoalPlain = {
 export class GoalModel {
   id!: string;
   title!: string;
+  description!: string;
   progress!: number;
   listId!: number;
   deletedAt!: string;

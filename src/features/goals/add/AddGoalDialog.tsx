@@ -4,6 +4,7 @@ import { Button } from '@/shared/ui/button';
 import { Label } from '@/shared/ui/label';
 import { Input } from '@/shared/ui/input';
 import { Slider } from '@/shared/ui/slider';
+import { Textarea } from '@/shared/ui/textarea';
 import { useCreateGoalMutation } from '@/shared/api/goals';
 import { GoalModel } from '@/entities/goal/model/goal';
 import { createInstance } from '@/shared/lib/instance-tools';
@@ -12,6 +13,7 @@ import { useListsQuery } from '@/shared/api/lists';
 export function AddGoalDialog() {
   const [open, setOpen] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [description, setDescription] = useState('');
   const createGoalMutation = useCreateGoalMutation();
   const { data: lists = [] } = useListsQuery();
 
@@ -20,10 +22,11 @@ export function AddGoalDialog() {
     const values = new FormData(e.target as HTMLFormElement);
     const title = values.get('title') as string;
     const firstListId = lists.length > 0 ? Number(lists[0].id) : 1;
-    const newGoal = createInstance(GoalModel, { title, progress, listId: firstListId });
+    const newGoal = createInstance(GoalModel, { title, description, progress, listId: firstListId });
     createGoalMutation.mutate(newGoal);
     setOpen(false);
-    setProgress(0); // Reset progress when dialog closes
+    setProgress(0);
+    setDescription('');
   };
 
   return (
@@ -40,6 +43,17 @@ export function AddGoalDialog() {
             <div>
               <Label htmlFor="title">Title</Label>
               <Input id="title" name="title" required data-cy="goal-title-input" />
+            </div>
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Describe this goal..."
+                className="min-h-[80px]"
+                data-cy="goal-description-input"
+              />
             </div>
             <div>
               <Label htmlFor="progress">Progress: {progress}%</Label>
