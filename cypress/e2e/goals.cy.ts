@@ -114,20 +114,20 @@ describe("Goal Management", () => {
     it("should show milestones section in edit dialog", () => {
       cy.get('[data-cy="edit-goal-button"]').first().click();
       cy.get('[role="dialog"]').should("be.visible");
-      cy.contains("Milestones").scrollIntoView().should("be.visible");
-      cy.get('[data-cy="milestone-description-input"]').scrollIntoView().should("be.visible");
-      cy.get('[data-cy="add-milestone-button"]').scrollIntoView().should("be.disabled");
+      cy.get('[data-cy="milestones-section"]', { timeout: 15000 }).scrollIntoView().should("be.visible");
+      cy.get('[data-cy="milestone-description-input"]').should("be.visible");
+      cy.get('[data-cy="add-milestone-button"]').should("be.disabled");
     });
 
     it("should add a milestone and display it in timeline", () => {
       cy.get('[data-cy="edit-goal-button"]').first().click();
       cy.get('[role="dialog"]').should("be.visible");
-      // Ensure milestones section is fully rendered before interacting
-      cy.get('[data-cy="add-milestone-button"]', { timeout: 15000 }).should("exist");
-      cy.get('[data-cy="milestone-description-input"]').type("Start weight 93 kg", { force: true });
-      cy.get('[data-cy="add-milestone-button"]').click({ force: true });
+      // Scroll to milestones section and wait for it to be fully rendered
+      cy.get('[data-cy="milestones-section"]', { timeout: 15000 }).scrollIntoView();
+      cy.get('[data-cy="milestone-description-input"]').should("be.visible").type("Start weight 93 kg");
+      cy.get('[data-cy="add-milestone-button"]').should("not.be.disabled").click();
       cy.wait("@createMilestone");
-      cy.get('[data-cy="milestone-timeline"]').should("be.visible");
+      cy.get('[data-cy="milestone-timeline"]', { timeout: 15000 }).should("be.visible");
       cy.get('[data-cy="milestone-entry"]').should("have.length", 1);
       cy.contains("Start weight 93 kg").should("be.visible");
     });

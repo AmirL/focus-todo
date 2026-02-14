@@ -61,7 +61,7 @@ export function EditGoalDialog({ goal, children }: { goal: GoalModel; children: 
 
         <Separator />
 
-        <div className="space-y-4">
+        <div className="space-y-4" data-cy="milestones-section">
           <h3 className="text-sm font-semibold">Milestones</h3>
           <MilestoneTimeline milestones={milestones} isLoading={milestonesLoading} />
           <AddMilestoneForm
