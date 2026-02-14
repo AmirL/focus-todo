@@ -16,7 +16,7 @@ export function GoalSelector({ metadata, onMetadataChange }: GoalSelectorProps) 
       onValueChange={(v) => onMetadataChange({ selectedGoalId: v === 'none' ? null : Number(v) })}
       disabled={isLoading}
     >
-      <SelectTrigger className="w-[160px] h-8" data-cy="goal-selector">
+      <SelectTrigger className="w-[140px] h-8" data-cy="goal-selector">
         <SelectValue placeholder={isLoading ? 'Loading...' : 'Goal (optional)'} />
       </SelectTrigger>
       <SelectContent>

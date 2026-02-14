@@ -119,6 +119,7 @@ When waiting for CI checks, wait ~90 seconds for the preview deployment to compl
 ### Development Best Practices
 
 - When finish a task - review your changes in the browser (`playwright-cli`) and take a screenshot as evidence. Save screenshots to `screenshots/<short-feature-name>.png` (e.g. `screenshots/blocked-tasks-in-charts.png`). These are committed to git so they're visible in PR reviews.
+- When a change affects any UI form or dialog (add/edit forms, settings dialogs, etc.), take a screenshot of each modified form specifically — not just the list/page view. Forms are common sources of layout regressions.
 
 ### Recommended Practices
 
