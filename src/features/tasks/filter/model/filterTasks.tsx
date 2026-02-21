@@ -21,7 +21,7 @@ export function useApplyFilters(tasks: TaskModel[]) {
     .filter((task) => applyStatusFilter(task, statusFilter))
     .filter((task) => listId === '' || String(task.listId) === listId);
 }
-function applyStatusFilter(task: TaskModel, filter: StatusFilterEnum) {
+export function applyStatusFilter(task: TaskModel, filter: StatusFilterEnum) {
   switch (filter) {
     case StatusFilterEnum.BACKLOG:
       return isTaskInBacklog(task);
