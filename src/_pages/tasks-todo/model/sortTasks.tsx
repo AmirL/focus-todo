@@ -21,7 +21,7 @@ export function useSortedTasks(tasks: TaskModel[]) {
 }
 
 // Primary sort by date, secondary sort by manual order (sortOrder)
-function sortTasksByDateWithManualOrder(tasks: TaskModel[]) {
+export function sortTasksByDateWithManualOrder(tasks: TaskModel[]) {
   return [...tasks].sort((a, b) => {
     const dateDiff = unixTime(a.date) - unixTime(b.date);
     if (dateDiff !== 0) return dateDiff;
@@ -31,7 +31,7 @@ function sortTasksByDateWithManualOrder(tasks: TaskModel[]) {
 }
 
 // Primary sort by blocker status, secondary sort by manual order
-function sortBlockerTasksBottomWithManualOrder(tasks: TaskModel[]) {
+export function sortBlockerTasksBottomWithManualOrder(tasks: TaskModel[]) {
   return [...tasks].sort((a, b) => {
     const blockerDiff = Number(a.isBlocker) - Number(b.isBlocker);
     if (blockerDiff !== 0) return blockerDiff;
@@ -41,7 +41,7 @@ function sortBlockerTasksBottomWithManualOrder(tasks: TaskModel[]) {
 }
 
 // Sort purely by manual order (for backlog and other contexts)
-function sortByManualOrder(tasks: TaskModel[]) {
+export function sortByManualOrder(tasks: TaskModel[]) {
   return [...tasks].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 }
 
