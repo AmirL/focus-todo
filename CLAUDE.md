@@ -77,15 +77,14 @@ This project follows **Feature-Sliced Design (FSD)** architecture. For complete 
 - POST `/api/create-task` and `/api/create-goal`
 - PUT `/api/update-task` and `/api/update-goal`
 
-**External Task API** (API key authentication):
+**External API** (API key authentication):
 
-Full RESTful API for programmatic task management. See [`docs/TASK_API.md`](./docs/TASK_API.md) for complete documentation.
+Full RESTful API for programmatic access to tasks, goals, lists, and initiative. See [`docs/TASK_API.md`](./docs/TASK_API.md) for complete documentation and [`docs/TASK_API_SKILL.md`](./docs/TASK_API_SKILL.md) for the LLM-optimized version.
 
-- `GET /api/tasks` - List tasks with filtering
-- `GET /api/tasks/:id` - Get single task
-- `POST /api/tasks` - Create task
-- `PATCH /api/tasks/:id` - Update task
-- `DELETE /api/tasks/:id` - Delete task (soft/permanent)
+- `GET/POST /api/tasks`, `GET/PATCH/DELETE /api/tasks/:id` - Task CRUD with filtering
+- `GET/POST /api/goals`, `GET/PATCH/DELETE /api/goals/:id` - Goal CRUD
+- `GET/POST /api/lists`, `GET/PATCH/DELETE /api/lists/:id` - List (category) management
+- `GET/POST /api/initiative`, `GET/PATCH /api/initiative/:date`, `GET /api/initiative/history` - Daily focus management
 
 ### Development Notes
 

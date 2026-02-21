@@ -1,6 +1,6 @@
-# Task API Documentation
+# External API Documentation
 
-This document describes the external Task API for programmatic access to tasks. All endpoints require API key authentication.
+This document describes the external API for programmatic access to tasks, goals, lists, and initiative (daily focus). All endpoints require API key authentication.
 
 ## Authentication
 
@@ -12,7 +12,7 @@ All API endpoints require authentication via API key. Pass the key using one of 
 
 API keys can be created and managed in the application settings.
 
-## Endpoints
+## Task Endpoints
 
 ### List Tasks
 
@@ -361,6 +361,593 @@ Or for permanent deletion:
 
 ---
 
+## Goal Endpoints
+
+### List Goals
+
+```
+GET /api/goals
+```
+
+Retrieve all goals for the authenticated user.
+
+#### Query Parameters
+
+| Parameter        | Type              | Default | Description                        |
+| ---------------- | ----------------- | ------- | ---------------------------------- |
+| `listId`         | number            | -       | Filter by list ID                  |
+| `includeDeleted` | `true` \| `false` | `false` | Include soft-deleted goals         |
+
+#### Example Request
+
+```bash
+curl -X GET "https://doable-tasks.vercel.app/api/goals" \
+  -H "Authorization: Bearer your_api_key"
+```
+
+#### Example Response
+
+```json
+{
+  "goals": [
+    {
+      "id": 1,
+      "title": "Launch MVP",
+      "description": "Ship the first version",
+      "progress": 75,
+      "listId": 1,
+      "listName": "Work",
+      "userId": "abc123",
+      "deletedAt": null
+    }
+  ]
+}
+```
+
+---
+
+### Get Single Goal
+
+```
+GET /api/goals/:id
+```
+
+Retrieve a single goal by ID.
+
+#### Path Parameters
+
+| Parameter | Type   | Description |
+| --------- | ------ | ----------- |
+| `id`      | number | Goal ID     |
+
+#### Example Request
+
+```bash
+curl -X GET "https://doable-tasks.vercel.app/api/goals/1" \
+  -H "Authorization: Bearer your_api_key"
+```
+
+#### Example Response
+
+```json
+{
+  "goal": {
+    "id": 1,
+    "title": "Launch MVP",
+    "description": "Ship the first version",
+    "progress": 75,
+    "listId": 1,
+    "listName": "Work",
+    "userId": "abc123",
+    "deletedAt": null
+  }
+}
+```
+
+#### Error Responses
+
+- `400 Bad Request` - Invalid goal ID format
+- `404 Not Found` - Goal not found or deleted
+
+---
+
+### Create Goal
+
+```
+POST /api/goals
+```
+
+Create a new goal.
+
+#### Request Body
+
+| Field         | Type   | Required | Description                    |
+| ------------- | ------ | -------- | ------------------------------ |
+| `title`       | string | Yes      | Goal title                     |
+| `listId`      | number | Yes      | List ID the goal belongs to    |
+| `description` | string | No       | Goal description               |
+| `progress`    | number | No       | Progress percentage (default 0)|
+
+#### Example Request
+
+```bash
+curl -X POST "https://doable-tasks.vercel.app/api/goals" \
+  -H "Authorization: Bearer your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Launch MVP",
+    "listId": 1,
+    "description": "Ship the first version"
+  }'
+```
+
+**Status Code**: `201 Created`
+
+#### Error Responses
+
+- `400 Bad Request` - Missing required fields (title or listId)
+- `404 Not Found` - List not found
+
+---
+
+### Update Goal
+
+```
+PATCH /api/goals/:id
+```
+
+Partially update an existing goal. Only include fields you want to change.
+
+#### Path Parameters
+
+| Parameter | Type   | Description |
+| --------- | ------ | ----------- |
+| `id`      | number | Goal ID     |
+
+#### Request Body
+
+| Field         | Type                       | Description            |
+| ------------- | -------------------------- | ---------------------- |
+| `title`       | string                     | Goal title             |
+| `description` | string                     | Goal description       |
+| `progress`    | number                     | Progress (0-100)       |
+| `listId`      | number                     | Move to different list |
+| `deletedAt`   | ISO date string \| null    | Set null to restore    |
+
+#### Example Request
+
+```bash
+curl -X PATCH "https://doable-tasks.vercel.app/api/goals/1" \
+  -H "Authorization: Bearer your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{"progress": 100}'
+```
+
+#### Error Responses
+
+- `400 Bad Request` - Invalid goal ID
+- `404 Not Found` - Goal not found or deleted
+
+---
+
+### Delete Goal
+
+```
+DELETE /api/goals/:id
+```
+
+Delete a goal. By default, performs a soft delete (sets `deletedAt` timestamp).
+
+#### Path Parameters
+
+| Parameter | Type   | Description |
+| --------- | ------ | ----------- |
+| `id`      | number | Goal ID     |
+
+#### Query Parameters
+
+| Parameter   | Type              | Default | Description                           |
+| ----------- | ----------------- | ------- | ------------------------------------- |
+| `permanent` | `true` \| `false` | `false` | Permanently delete (cannot be undone) |
+
+#### Example Request
+
+```bash
+curl -X DELETE "https://doable-tasks.vercel.app/api/goals/1" \
+  -H "Authorization: Bearer your_api_key"
+```
+
+#### Example Response
+
+```json
+{
+  "message": "Goal deleted"
+}
+```
+
+#### Error Responses
+
+- `400 Bad Request` - Invalid goal ID
+- `404 Not Found` - Goal not found
+
+---
+
+## List Endpoints
+
+### List All Lists
+
+```
+GET /api/lists
+```
+
+Retrieve all lists (categories) for the authenticated user.
+
+#### Query Parameters
+
+| Parameter         | Type              | Default | Description                  |
+| ----------------- | ----------------- | ------- | ---------------------------- |
+| `includeArchived` | `true` \| `false` | `false` | Include archived lists       |
+
+#### Example Request
+
+```bash
+curl -X GET "https://doable-tasks.vercel.app/api/lists" \
+  -H "Authorization: Bearer your_api_key"
+```
+
+#### Example Response
+
+```json
+{
+  "lists": [
+    {
+      "id": 1,
+      "name": "Work",
+      "description": "Work-related tasks and projects",
+      "userId": "abc123",
+      "isDefault": true,
+      "participatesInInitiative": true,
+      "sortOrder": 0,
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-15T10:00:00.000Z",
+      "archivedAt": null
+    }
+  ]
+}
+```
+
+---
+
+### Get Single List
+
+```
+GET /api/lists/:id
+```
+
+Retrieve a single list by ID.
+
+#### Path Parameters
+
+| Parameter | Type   | Description |
+| --------- | ------ | ----------- |
+| `id`      | number | List ID     |
+
+#### Error Responses
+
+- `400 Bad Request` - Invalid list ID format
+- `404 Not Found` - List not found
+
+---
+
+### Create List
+
+```
+POST /api/lists
+```
+
+Create a new list.
+
+#### Request Body
+
+| Field                      | Type    | Required | Description                                        |
+| -------------------------- | ------- | -------- | -------------------------------------------------- |
+| `name`                     | string  | Yes      | List name (max 255 chars)                          |
+| `description`              | string  | No       | List description                                   |
+| `participatesInInitiative` | boolean | No       | Whether list participates in initiative (default: true) |
+
+#### Example Request
+
+```bash
+curl -X POST "https://doable-tasks.vercel.app/api/lists" \
+  -H "Authorization: Bearer your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Side Projects",
+    "description": "Personal side project tasks"
+  }'
+```
+
+**Status Code**: `201 Created`
+
+#### Error Responses
+
+- `400 Bad Request` - Missing name or name too long
+- `409 Conflict` - A list with this name already exists
+
+---
+
+### Update List
+
+```
+PATCH /api/lists/:id
+```
+
+Update an existing list. Only include fields you want to change.
+
+#### Path Parameters
+
+| Parameter | Type   | Description |
+| --------- | ------ | ----------- |
+| `id`      | number | List ID     |
+
+#### Request Body
+
+| Field                      | Type    | Description                                  |
+| -------------------------- | ------- | -------------------------------------------- |
+| `name`                     | string  | List name (max 255 chars)                    |
+| `description`              | string  | List description                             |
+| `participatesInInitiative` | boolean | Initiative participation                     |
+| `archived`                 | boolean | Archive/unarchive the list                   |
+
+#### Example Request - Archive a List
+
+```bash
+curl -X PATCH "https://doable-tasks.vercel.app/api/lists/3" \
+  -H "Authorization: Bearer your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{"archived": true}'
+```
+
+#### Error Responses
+
+- `400 Bad Request` - Invalid list ID or no valid fields
+- `404 Not Found` - List not found
+- `409 Conflict` - Duplicate list name
+
+---
+
+### Delete List
+
+```
+DELETE /api/lists/:id
+```
+
+Permanently delete a list. If the list has associated tasks or goals, you must specify a target list to reassign them to.
+
+#### Path Parameters
+
+| Parameter | Type   | Description |
+| --------- | ------ | ----------- |
+| `id`      | number | List ID     |
+
+#### Query Parameters
+
+| Parameter    | Type   | Description                                        |
+| ------------ | ------ | -------------------------------------------------- |
+| `reassignTo` | number | List ID to move tasks/goals to before deletion     |
+
+#### Example Request
+
+```bash
+curl -X DELETE "https://doable-tasks.vercel.app/api/lists/3?reassignTo=1" \
+  -H "Authorization: Bearer your_api_key"
+```
+
+#### Example Response
+
+```json
+{
+  "message": "List deleted successfully"
+}
+```
+
+#### Error Responses
+
+- `400 Bad Request` - Invalid list ID, or list has items and no `reassignTo` specified
+- `404 Not Found` - List or target list not found
+
+---
+
+## Initiative Endpoints
+
+The initiative system manages daily focus — which list (category) to focus on each day. It tracks suggestions, user choices, and balance across lists.
+
+### Get Current Initiative
+
+```
+GET /api/initiative
+```
+
+Get today's and tomorrow's initiative along with balance data and a suggested list for upcoming days.
+
+#### Example Request
+
+```bash
+curl -X GET "https://doable-tasks.vercel.app/api/initiative" \
+  -H "Authorization: Bearer your_api_key"
+```
+
+#### Example Response
+
+```json
+{
+  "today": {
+    "id": 42,
+    "userId": "abc123",
+    "date": "2026-02-21",
+    "suggestedListId": 1,
+    "chosenListId": null,
+    "reason": null,
+    "setAt": "2026-02-20T18:00:00.000Z",
+    "changedAt": null
+  },
+  "tomorrow": null,
+  "suggestedList": {
+    "id": 2,
+    "name": "Personal",
+    "participatesInInitiative": true,
+    "lastTouchedAt": "2026-02-19T00:00:00.000Z"
+  },
+  "balance": [
+    { "listId": 1, "listName": "Work", "count": 18, "percentage": 60, "lastUsedDate": "2026-02-21" },
+    { "listId": 2, "listName": "Personal", "count": 12, "percentage": 40, "lastUsedDate": "2026-02-19" }
+  ],
+  "participatingLists": [
+    { "id": 1, "name": "Work", "participatesInInitiative": true },
+    { "id": 2, "name": "Personal", "participatesInInitiative": true }
+  ]
+}
+```
+
+---
+
+### Get Initiative by Date
+
+```
+GET /api/initiative/:date
+```
+
+Get the initiative for a specific date.
+
+#### Path Parameters
+
+| Parameter | Type       | Description                |
+| --------- | ---------- | -------------------------- |
+| `date`    | YYYY-MM-DD | The date to look up        |
+
+#### Error Responses
+
+- `400 Bad Request` - Invalid date format
+- `404 Not Found` - No initiative for this date
+
+---
+
+### Set Initiative (Create)
+
+```
+POST /api/initiative
+```
+
+Set the focus list for a date. Can only set initiative for today or tomorrow.
+
+#### Request Body
+
+| Field    | Type       | Required | Description                                   |
+| -------- | ---------- | -------- | --------------------------------------------- |
+| `listId` | number     | Yes      | List ID to focus on                           |
+| `date`   | YYYY-MM-DD | No       | Target date (default: tomorrow)               |
+| `reason` | string     | No       | Reason for choosing this list                 |
+
+#### Example Request
+
+```bash
+curl -X POST "https://doable-tasks.vercel.app/api/initiative" \
+  -H "Authorization: Bearer your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{"listId": 2, "date": "2026-02-22", "reason": "Catching up on personal tasks"}'
+```
+
+**Status Code**: `201 Created`
+
+#### Error Responses
+
+- `400 Bad Request` - Missing listId or invalid date
+- `404 Not Found` - List not found
+- `409 Conflict` - Initiative for this date already exists (use PATCH to change)
+
+---
+
+### Change Initiative
+
+```
+PATCH /api/initiative/:date
+```
+
+Change the focus list for a specific date that already has an initiative set.
+
+#### Path Parameters
+
+| Parameter | Type       | Description         |
+| --------- | ---------- | ------------------- |
+| `date`    | YYYY-MM-DD | The date to update  |
+
+#### Request Body
+
+| Field    | Type   | Required | Description                    |
+| -------- | ------ | -------- | ------------------------------ |
+| `listId` | number | Yes      | New list ID to focus on        |
+| `reason` | string | No       | Reason for the change          |
+
+#### Error Responses
+
+- `400 Bad Request` - Missing listId or invalid date
+- `404 Not Found` - No initiative for this date or list not found
+
+---
+
+### Get Initiative History
+
+```
+GET /api/initiative/history
+```
+
+Get initiative history with balance data for a configurable period.
+
+#### Query Parameters
+
+| Parameter | Type   | Default | Description                        |
+| --------- | ------ | ------- | ---------------------------------- |
+| `days`    | 1-365  | 30      | Number of days to look back        |
+
+#### Example Request
+
+```bash
+curl -X GET "https://doable-tasks.vercel.app/api/initiative/history?days=60" \
+  -H "Authorization: Bearer your_api_key"
+```
+
+#### Example Response
+
+```json
+{
+  "initiatives": [
+    {
+      "id": 42,
+      "userId": "abc123",
+      "date": "2026-02-21",
+      "suggestedListId": 1,
+      "chosenListId": null,
+      "reason": null,
+      "setAt": "2026-02-20T18:00:00.000Z",
+      "changedAt": null,
+      "suggestedListName": "Work",
+      "chosenListName": null,
+      "effectiveListName": "Work"
+    }
+  ],
+  "balance": [
+    { "listId": 1, "listName": "Work", "count": 18, "percentage": 60, "lastUsedDate": "2026-02-21" }
+  ],
+  "period": {
+    "startDate": "2026-01-22",
+    "endDate": "2026-02-21",
+    "days": 30
+  }
+}
+```
+
+---
+
 ## Error Responses
 
 All endpoints return errors in a consistent format:
@@ -380,6 +967,7 @@ All endpoints return errors in a consistent format:
 | `400` | Bad Request - Invalid input               |
 | `401` | Unauthorized - Invalid or missing API key |
 | `404` | Not Found - Resource doesn't exist        |
+| `409` | Conflict - Duplicate resource             |
 | `500` | Internal Server Error                     |
 
 ---
