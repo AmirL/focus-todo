@@ -5,14 +5,19 @@ import { ReAddButton } from '@/features/tasks/actions/ui/ReAddButton';
 import { SnoozeButton } from '@/features/tasks/actions/ui/SnoozeButton';
 import { StarButton } from '@/features/tasks/actions/ui/StarButton';
 import { BlockerButton } from '@/features/tasks/actions/ui/BlockerButton';
+import { EstimatedTimeButton } from '@/features/tasks/actions/ui/EstimatedTimeButton';
 import { useReorderStore } from '@/features/tasks/reorder';
-import type { TaskModel } from '@/entities/task/model/task';
+import { useTempSelectStore } from '@/features/tasks/temp-select';
+import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
+import { isTaskDeleted, type TaskModel } from '@/entities/task/model/task';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 
 export function TaskWithActions({ task }: { task: TaskModel }) {
   const { isDragging } = useReorderStore();
+  const { toggleSelection, isSelected: isTempSelected } = useTempSelectStore();
+  const statusFilter = useFilterStore((s) => s.statusFilter);
   const {
     attributes,
     listeners,
@@ -33,6 +38,15 @@ export function TaskWithActions({ task }: { task: TaskModel }) {
       <Task
         task={task}
         isDragging={isCurrentTaskDragging}
+        estimatedTimeSlot={<EstimatedTimeButton task={task} />}
+        isTempSelected={isTempSelected(task.id)}
+        onToggleSelection={
+          statusFilter === StatusFilterEnum.SELECTED && !isTaskDeleted(task)
+            ? () => toggleSelection(task.id)
+            : undefined
+        }
+        hideTodayBadge={statusFilter === StatusFilterEnum.TODAY}
+        hideDateBadge={statusFilter === StatusFilterEnum.TOMORROW}
         dragHandle={
           <button
             ref={setActivatorNodeRef}

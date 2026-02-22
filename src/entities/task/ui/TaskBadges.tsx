@@ -2,7 +2,6 @@ import { Badge } from '@/shared/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
 import { AlertTriangle, Sparkles, Target } from 'lucide-react';
 import { TaskModel, isTaskDeleted, isTaskOverdue } from '@/entities/task/model/task';
-import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
 import { isFutureDate, isToday } from '@/shared/lib/utils';
 import { hasPendingSuggestions } from '@/shared/lib/aiSuggestions';
 import { useGoalsQuery } from '@/shared/api/goals';
@@ -10,16 +9,16 @@ import dayjs from 'dayjs';
 
 interface TaskBadgesProps {
   task: TaskModel;
+  hideTodayBadge?: boolean;
+  hideDateBadge?: boolean;
 }
 
-export function TaskBadges({ task }: TaskBadgesProps) {
-  const { statusFilter } = useFilterStore();
+export function TaskBadges({ task, hideTodayBadge, hideDateBadge }: TaskBadgesProps) {
   const { data: goals = [] } = useGoalsQuery();
   const goal = task.goalId ? goals.find((g) => String(g.id) === String(task.goalId)) : null;
 
-  // Hide redundant date badges when on Today/Tomorrow tabs
-  const isOnTodayTab = statusFilter === StatusFilterEnum.TODAY;
-  const isOnTomorrowTab = statusFilter === StatusFilterEnum.TOMORROW;
+  const isOnTodayTab = !!hideTodayBadge;
+  const isOnTomorrowTab = !!hideDateBadge;
 
   return (
     <>
