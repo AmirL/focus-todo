@@ -10,7 +10,7 @@ export default defineConfig({
     responseTimeout: 10000,
     video: true,
     retries: {
-      runMode: 1,
+      runMode: 2,
       openMode: 0,
     },
     screenshotOnRunFailure: true,

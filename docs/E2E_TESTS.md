@@ -23,6 +23,15 @@ Tests are located in `cypress/e2e/`:
 - `list-description.cy.ts` - List description field tests
 - `search-navigation.cy.ts` - Search and navigation tests
 
+## Flaky Test Detection
+
+Cypress is configured with automatic retries for flaky test detection:
+
+- **CI (runMode)**: Failed tests retry up to 2 times. If a test fails then passes on retry, Cypress marks it as "flaky" in the output.
+- **Interactive (openMode)**: No retries, so failures are immediate for faster local debugging.
+
+This configuration is set in `cypress.config.ts` under the `retries` option.
+
 ## Notes
 
 - Tests use `cy.prompt()` for AI-powered element finding (experimental feature)

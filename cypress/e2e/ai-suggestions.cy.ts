@@ -61,11 +61,11 @@ describe("AI Suggestions", () => {
       if (response.body.tasks.length > 0) {
         workListId = response.body.tasks[0].listId;
       } else {
-        // No tasks exist - login and fetch lists to get a valid listId
-        cy.login();
+        // No tasks exist - fetch lists via external API to get a valid listId
         cy.request({
-          method: "POST",
-          url: "/api/get-lists",
+          method: "GET",
+          url: "/api/lists",
+          headers: authHeaders,
         }).then((listsResponse) => {
           expect(listsResponse.body.lists.length).to.be.greaterThan(0);
           workListId = listsResponse.body.lists[0].id;
