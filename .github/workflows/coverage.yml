@@ -29,22 +29,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build with coverage instrumentation
-        run: pnpm next build
-        env:
-          CYPRESS_COVERAGE: 'true'
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
-          API_KEY_SECRET: ${{ secrets.API_KEY_SECRET }}
-
       - name: Run Cypress with coverage
         uses: cypress-io/github-action@v6
         with:
-          start: pnpm start
-          wait-on: 'http://localhost:3000'
+          start: pnpm dev
+          wait-on: 'http-get://localhost:3000'
           wait-on-timeout: 120
           install: false
         env:
+          CYPRESS_COVERAGE: 'true'
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
           API_KEY_SECRET: ${{ secrets.API_KEY_SECRET }}
