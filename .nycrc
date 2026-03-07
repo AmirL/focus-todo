@@ -2,5 +2,6 @@
   "extends": "@istanbuljs/nyc-config-typescript",
   "all": true,
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["**/*.spec.ts", "**/*.test.ts", "cypress/**"]
+  "exclude": ["**/*.spec.ts", "**/*.test.ts", "cypress/**"],
+  "reporter": ["text", "text-summary", "json-summary", "lcov"]
 }
