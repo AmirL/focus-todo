@@ -35,7 +35,6 @@ jobs:
           start: pnpm dev
           wait-on: 'http-get://localhost:3000'
           wait-on-timeout: 120
-          install: false
         env:
           CYPRESS_COVERAGE: 'true'
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
