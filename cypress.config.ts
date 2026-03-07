@@ -26,6 +26,8 @@ export default defineConfig({
     },
     setupNodeEvents(on, config) {
       cypressSplit(on, config);
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      require("@cypress/code-coverage/task")(on, config);
       return config;
     },
   },

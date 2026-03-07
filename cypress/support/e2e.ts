@@ -5,6 +5,7 @@
 // ***********************************************************
 
 import "./commands";
+import "@cypress/code-coverage/support";
 
 // Hide fetch/XHR requests from command log for cleaner output
 const app = window.top;
