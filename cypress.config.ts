@@ -16,6 +16,13 @@ export default defineConfig({
     screenshotOnRunFailure: true,
     experimentalStudio: true,
     experimentalPromptCommand: true,
+    reporter: "mochawesome",
+    reporterOptions: {
+      reportDir: "cypress/results",
+      overwrite: false,
+      html: false,
+      json: true,
+    },
     setupNodeEvents(on, config) {
       // implement node event listeners here
     },
