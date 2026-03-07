@@ -160,8 +160,8 @@ importers:
         specifier: ^7.28.5
         version: 7.28.5(@babel/core@7.27.4)
       '@cypress/code-coverage':
-        specifier: ^4.0.1
-        version: 4.0.1(@babel/core@7.27.4)(@babel/preset-env@7.29.0(@babel/core@7.27.4))(babel-loader@10.1.0(@babel/core@7.27.4)(webpack@5.99.9(esbuild@0.19.12)))(cypress@15.9.0)(webpack@5.99.9(esbuild@0.19.12))
+        specifier: ^3.14.7
+        version: 3.14.7(@babel/core@7.27.4)(@babel/preset-env@7.29.0(@babel/core@7.27.4))(babel-loader@10.1.0(@babel/core@7.27.4)(webpack@5.99.9(esbuild@0.19.12)))(cypress@15.9.0)(webpack@5.99.9(esbuild@0.19.12))
       '@cypress/grep':
         specifier: ^5.1.0
         version: 5.1.0(@babel/core@7.27.4)(cypress@15.9.0)
@@ -918,14 +918,13 @@ packages:
   '@clack/prompts@0.9.1':
     resolution: {integrity: sha512-JIpyaboYZeWYlyP0H+OoPPxd6nqueG/CmN6ixBiNFsIDHREevjIf0n0Ohh5gr5C8pEDknzgvz+pIJ8dMhzWIeg==}
 
-  '@cypress/code-coverage@4.0.1':
-    resolution: {integrity: sha512-t0XT8bfAZycb5mQtgqD1VyeriBH6vIbRBX/UvoxZVww/0mUX3O7b+8Xv4WEJ3hpCSzQayv11V0qGarole67C8Q==}
-    engines: {node: '>=20'}
+  '@cypress/code-coverage@3.14.7':
+    resolution: {integrity: sha512-0qk2aNKmrB0AwJtYSyK2+MWl/3NqDgZQ1OBSEh6oFnJwl/H2u3NTatV+FTCap22HTm+uxUS6SarU8gP9gFZ6Tw==}
     peerDependencies:
       '@babel/core': ^7.0.1
       '@babel/preset-env': ^7.0.0
       babel-loader: ^8.3 || ^9 || ^10
-      cypress: '>=15.10.0'
+      cypress: '*'
       webpack: ^4 || ^5
 
   '@cypress/grep@5.1.0':
@@ -3329,9 +3328,6 @@ packages:
   dayjs@1.11.13:
     resolution: {integrity: sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==}
 
-  dayjs@1.11.19:
-    resolution: {integrity: sha512-t5EcLVS6QPBNqM2z8fakk/NKel+Xzshgt8FFKAn+qwlD1pzZWxh0nVCrvFK7ZDb6XucZeF9z8C7CBWTRIVApAw==}
-
   debug@3.2.7:
     resolution: {integrity: sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==}
     peerDependencies:
@@ -4574,6 +4570,10 @@ packages:
     resolution: {integrity: sha512-Pt/uge1Q9s+5VAZ+pCo16TYMWPBIl+oaNIjgLQxcX0itS6ueeaA+pEfThZpH8WxhFgCiEb8sAJY6MdUKgiIWaQ==}
     engines: {node: '>=8'}
 
+  istanbul-lib-instrument@4.0.3:
+    resolution: {integrity: sha512-BXgQl9kf4WTCPCCpmFGoJkz/+uhvm7h7PFKUYxh7qarQd3ER33vHG//qaE8eN25l07YqZPpHXU9I09l/RD5aGQ==}
+    engines: {node: '>=8'}
+
   istanbul-lib-instrument@6.0.3:
     resolution: {integrity: sha512-Vtgk7L/R2JHyyGW07spoFlB8/lpjiOLTjMdms6AFMraYt3BaJauod/NGrfnVG/y4Ix1JEuMRPDPEj2ua+zz1/Q==}
     engines: {node: '>=10'}
@@ -4634,10 +4634,6 @@ packages:
 
   js-yaml@4.1.0:
     resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==}
-    hasBin: true
-
-  js-yaml@4.1.1:
-    resolution: {integrity: sha512-qQKT4zQxXl8lLwBtHMWwaTcGfFOZviOJet3Oy/xmGk2gZH677CJM9EvtfdSkgWcATZhj/55JZ0rmy3myCT5lsA==}
     hasBin: true
 
   jsbn@0.1.1:
@@ -5164,6 +5160,11 @@ packages:
   npm-run-path@4.0.1:
     resolution: {integrity: sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==}
     engines: {node: '>=8'}
+
+  nyc@15.1.0:
+    resolution: {integrity: sha512-jMW04n9SxKdKi1ZMGhvUTHBN0EICCRkHemEoE5jm6mTYcqcdas0ATzgUgejlQUHMvpnOZqGB5Xxsv9KxJW1j8A==}
+    engines: {node: '>=8.9'}
+    hasBin: true
 
   nyc@17.1.0:
     resolution: {integrity: sha512-U42vQ4czpKa0QdI1hu950XuNhYqgoM+ZF1HT+VuUHL9hPfDPVvNQyltmMqdE9bUHMVa+8yNbc3QKTj8zQhlVxQ==}
@@ -7629,7 +7630,7 @@ snapshots:
       picocolors: 1.1.1
       sisteransi: 1.0.5
 
-  '@cypress/code-coverage@4.0.1(@babel/core@7.27.4)(@babel/preset-env@7.29.0(@babel/core@7.27.4))(babel-loader@10.1.0(@babel/core@7.27.4)(webpack@5.99.9(esbuild@0.19.12)))(cypress@15.9.0)(webpack@5.99.9(esbuild@0.19.12))':
+  '@cypress/code-coverage@3.14.7(@babel/core@7.27.4)(@babel/preset-env@7.29.0(@babel/core@7.27.4))(babel-loader@10.1.0(@babel/core@7.27.4)(webpack@5.99.9(esbuild@0.19.12)))(cypress@15.9.0)(webpack@5.99.9(esbuild@0.19.12))':
     dependencies:
       '@babel/core': 7.27.4
       '@babel/preset-env': 7.29.0(@babel/core@7.27.4)
@@ -7637,12 +7638,12 @@ snapshots:
       babel-loader: 10.1.0(@babel/core@7.27.4)(webpack@5.99.9(esbuild@0.19.12))
       chalk: 4.1.2
       cypress: 15.9.0
-      dayjs: 1.11.19
+      dayjs: 1.11.13
       debug: 4.4.0
       execa: 4.1.0
       istanbul-lib-coverage: 3.2.2
-      js-yaml: 4.1.1
-      nyc: 17.1.0
+      js-yaml: 4.1.0
+      nyc: 15.1.0
       tinyglobby: 0.2.14
       webpack: 5.99.9(esbuild@0.19.12)
     transitivePeerDependencies:
@@ -7685,7 +7686,7 @@ snapshots:
       '@babel/preset-env': 7.29.0(@babel/core@7.27.4)
       babel-loader: 10.1.0(@babel/core@7.27.4)(webpack@5.99.9(esbuild@0.19.12))
       bluebird: 3.7.1
-      debug: 4.4.1(supports-color@8.1.1)
+      debug: 4.4.3
       lodash: 4.17.21
       semver: 7.7.2
       webpack: 5.99.9(esbuild@0.19.12)
@@ -9915,8 +9916,6 @@ snapshots:
 
   dayjs@1.11.13: {}
 
-  dayjs@1.11.19: {}
-
   debug@3.2.7(supports-color@8.1.1):
     dependencies:
       ms: 2.1.3
@@ -11379,6 +11378,15 @@ snapshots:
     dependencies:
       append-transform: 2.0.0
 
+  istanbul-lib-instrument@4.0.3:
+    dependencies:
+      '@babel/core': 7.27.4
+      '@istanbuljs/schema': 0.1.3
+      istanbul-lib-coverage: 3.2.2
+      semver: 6.3.1
+    transitivePeerDependencies:
+      - supports-color
+
   istanbul-lib-instrument@6.0.3:
     dependencies:
       '@babel/core': 7.27.4
@@ -11406,7 +11414,7 @@ snapshots:
 
   istanbul-lib-source-maps@4.0.1:
     dependencies:
-      debug: 4.4.1(supports-color@8.1.1)
+      debug: 4.4.3
       istanbul-lib-coverage: 3.2.2
       source-map: 0.6.1
     transitivePeerDependencies:
@@ -11469,10 +11477,6 @@ snapshots:
       esprima: 4.0.1
 
   js-yaml@4.1.0:
-    dependencies:
-      argparse: 2.0.1
-
-  js-yaml@4.1.1:
     dependencies:
       argparse: 2.0.1
 
@@ -12220,6 +12224,38 @@ snapshots:
   npm-run-path@4.0.1:
     dependencies:
       path-key: 3.1.1
+
+  nyc@15.1.0:
+    dependencies:
+      '@istanbuljs/load-nyc-config': 1.1.0
+      '@istanbuljs/schema': 0.1.3
+      caching-transform: 4.0.0
+      convert-source-map: 1.9.0
+      decamelize: 1.2.0
+      find-cache-dir: 3.3.2
+      find-up: 4.1.0
+      foreground-child: 2.0.0
+      get-package-type: 0.1.0
+      glob: 7.2.3
+      istanbul-lib-coverage: 3.2.2
+      istanbul-lib-hook: 3.0.0
+      istanbul-lib-instrument: 4.0.3
+      istanbul-lib-processinfo: 2.0.3
+      istanbul-lib-report: 3.0.1
+      istanbul-lib-source-maps: 4.0.1
+      istanbul-reports: 3.2.0
+      make-dir: 3.1.0
+      node-preload: 0.2.1
+      p-map: 3.0.0
+      process-on-spawn: 1.1.0
+      resolve-from: 5.0.0
+      rimraf: 3.0.2
+      signal-exit: 3.0.7
+      spawn-wrap: 2.0.0
+      test-exclude: 6.0.0
+      yargs: 15.4.1
+    transitivePeerDependencies:
+      - supports-color
 
   nyc@17.1.0:
     dependencies:
