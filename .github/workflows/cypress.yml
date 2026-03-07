@@ -14,6 +14,10 @@ jobs:
     # Run when Vercel deployment succeeds
     if: github.event.deployment_status.state == 'success' && contains(github.event.deployment_status.environment_url, 'vercel.app')
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        containers: [1, 2, 3]
     steps:
       - name: Log deployment info
         id: deployment-info
@@ -69,51 +73,83 @@ jobs:
           CYPRESS_TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
           CYPRESS_API_TEST_KEY: ${{ secrets.API_TEST_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SPLIT: ${{ strategy.job-total }}
+          SPLIT_INDEX: ${{ strategy.job-index }}
 
       - name: Merge mochawesome reports
         if: always() && steps.deployment-info.outputs.skip != 'true'
         run: |
           npx mochawesome-merge cypress/results/*.json -o cypress/results/merged-report.json 2>/dev/null || echo "No mochawesome reports to merge"
 
-      - name: Detect flaky tests and label PR
+      - name: Upload Cypress artifacts
         if: always() && steps.deployment-info.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-results-${{ github.run_id }}-${{ matrix.containers }}
+          path: |
+            cypress/screenshots
+            cypress/videos
+            cypress/results
+          retention-days: 7
+          if-no-files-found: ignore
+
+  detect-flaky:
+    needs: cypress-run
+    if: always() && needs.cypress-run.result != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.deployment_status.deployment.sha }}
+          sparse-checkout: .
+
+      - name: Download all mochawesome artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: cypress-results-${{ github.run_id }}-*
+          path: all-results
+          merge-multiple: false
+
+      - name: Detect flaky tests and label PR
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          MERGED_REPORT="cypress/results/merged-report.json"
-          if [ ! -f "$MERGED_REPORT" ]; then
-            echo "No merged report found, skipping flaky test detection"
+          # Collect all merged reports from each container
+          REPORT_FILES=$(find all-results -name "merged-report.json" 2>/dev/null)
+          if [ -z "$REPORT_FILES" ]; then
+            echo "No merged reports found, skipping flaky test detection"
             exit 0
           fi
 
-          # A test is flaky if it has retries > 0 and still passed.
-          # In mochawesome JSON, each test has a "pass" boolean and an "attempts" array (Cypress 10+).
-          # When Cypress retries are enabled, failed-then-passed tests show up with pass=true
-          # but have multiple entries in the "tests" array where earlier attempts have err != null.
-          # We detect flaky tests by looking for tests where pass=true but currentRetry > 0.
+          echo "Found reports: $REPORT_FILES"
+
+          # Parse all reports for flaky tests
           FLAKY_TESTS=$(node -e "
-            const report = require('./$MERGED_REPORT');
+            const fs = require('fs');
+            const files = process.argv.slice(1);
             const flaky = [];
-            function walk(suites) {
-              for (const suite of (suites || [])) {
-                for (const test of (suite.tests || [])) {
-                  // Cypress with mochawesome: a retried test that eventually passed
-                  // has pass=true and currentRetry > 0 in context
-                  const attempts = test.attempts || [];
-                  const passed = test.pass === true;
-                  const hadFailedAttempts = attempts.some(a => a.pass === false || a.error);
-                  if (passed && hadFailedAttempts) {
-                    flaky.push(test.fullTitle || test.title);
+            for (const file of files) {
+              const report = JSON.parse(fs.readFileSync(file, 'utf8'));
+              function walk(suites) {
+                for (const suite of (suites || [])) {
+                  for (const test of (suite.tests || [])) {
+                    const attempts = test.attempts || [];
+                    const passed = test.pass === true;
+                    const hadFailedAttempts = attempts.some(a => a.pass === false || a.error);
+                    if (passed && hadFailedAttempts) {
+                      flaky.push(test.fullTitle || test.title);
+                    }
                   }
+                  walk(suite.suites);
                 }
-                walk(suite.suites);
               }
+              walk(report.results ? report.results.map(r => r.suites).flat() : []);
             }
-            walk(report.results ? report.results.map(r => r.suites).flat() : []);
             if (flaky.length > 0) {
               console.log(JSON.stringify(flaky));
             }
-          " 2>/dev/null || echo "")
+          " $REPORT_FILES 2>/dev/null || echo "")
 
           if [ -n "$FLAKY_TESTS" ] && [ "$FLAKY_TESTS" != "" ]; then
             echo "Flaky tests detected: $FLAKY_TESTS"
@@ -132,15 +168,3 @@ jobs:
           else
             echo "No flaky tests detected"
           fi
-
-      - name: Upload Cypress artifacts
-        if: always() && steps.deployment-info.outputs.skip != 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: cypress-results-${{ github.run_id }}
-          path: |
-            cypress/screenshots
-            cypress/videos
-            cypress/results
-          retention-days: 7
-          if-no-files-found: ignore

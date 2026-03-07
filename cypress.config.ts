@@ -1,4 +1,5 @@
 import { defineConfig } from "cypress";
+import cypressSplit from "cypress-split";
 
 export default defineConfig({
   e2e: {
@@ -24,7 +25,8 @@ export default defineConfig({
       json: true,
     },
     setupNodeEvents(on, config) {
-      // implement node event listeners here
+      cypressSplit(on, config);
+      return config;
     },
   },
 });
