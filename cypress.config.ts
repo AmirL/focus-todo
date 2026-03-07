@@ -1,7 +1,7 @@
 import { defineConfig } from "cypress";
+import cypressSplit from "cypress-split";
 
 export default defineConfig({
-  projectId: "oufatd",
   e2e: {
     baseUrl: "http://localhost:3000",
     viewportWidth: 1280,
@@ -11,14 +11,22 @@ export default defineConfig({
     responseTimeout: 10000,
     video: true,
     retries: {
-      runMode: 1,
+      runMode: 2,
       openMode: 0,
     },
     screenshotOnRunFailure: true,
     experimentalStudio: true,
     experimentalPromptCommand: true,
+    reporter: "mochawesome",
+    reporterOptions: {
+      reportDir: "cypress/results",
+      overwrite: false,
+      html: false,
+      json: true,
+    },
     setupNodeEvents(on, config) {
-      // implement node event listeners here
+      cypressSplit(on, config);
+      return config;
     },
   },
 });

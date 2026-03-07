@@ -6,7 +6,7 @@ on:
 permissions:
   contents: read
   actions: read
-  pull-requests: read
+  pull-requests: write
   deployments: read
 
 jobs:
@@ -43,44 +43,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.deployment_status.deployment.sha }}
-          fetch-depth: 0
-
-      - name: Get branch name
-        if: steps.deployment-info.outputs.skip != 'true'
-        id: branch
-        run: |
-          # Try deployment ref first
-          BRANCH="${{ github.event.deployment_status.deployment.ref }}"
-
-          # If empty, try to find branch from git
-          if [ -z "$BRANCH" ] || [ "$BRANCH" = "null" ]; then
-            # Get the branch that contains this commit
-            BRANCH=$(git branch -r --contains ${{ github.event.deployment_status.deployment.sha }} | grep -v HEAD | head -1 | sed 's|origin/||' | xargs)
-          fi
-
-          # Final fallback
-          if [ -z "$BRANCH" ]; then
-            BRANCH="unknown"
-          fi
-
-          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
-          echo "Branch: $BRANCH"
-
-      - name: Get PR number for commit
-        if: steps.deployment-info.outputs.skip != 'true'
-        id: pr-info
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Find PR associated with this commit for Cypress Cloud Branch Review
-          COMMIT_SHA="${{ github.event.deployment_status.deployment.sha }}"
-          if [ -n "$COMMIT_SHA" ]; then
-            PR_NUMBER=$(gh api repos/${{ github.repository }}/commits/${COMMIT_SHA}/pulls --jq '.[0].number' 2>/dev/null || echo "")
-            PR_URL=$(gh api repos/${{ github.repository }}/commits/${COMMIT_SHA}/pulls --jq '.[0].html_url' 2>/dev/null || echo "")
-          fi
-          echo "pr_number=${PR_NUMBER:-}" >> $GITHUB_OUTPUT
-          echo "pr_url=${PR_URL:-}" >> $GITHUB_OUTPUT
-          echo "PR Number: ${PR_NUMBER:-none}"
 
       - name: Setup pnpm
         if: steps.deployment-info.outputs.skip != 'true'
@@ -105,22 +67,19 @@ jobs:
         with:
           wait-on: ${{ github.event.deployment_status.target_url }}
           wait-on-timeout: 120
-          record: true
-          parallel: true
-          ci-build-id: ${{ github.run_id }}-${{ github.run_attempt }}
-          tag: ${{ steps.branch.outputs.branch }}
         env:
           CYPRESS_BASE_URL: ${{ github.event.deployment_status.target_url }}
-          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           CYPRESS_TEST_EMAIL: ${{ vars.TEST_EMAIL }}
           CYPRESS_TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
           CYPRESS_API_TEST_KEY: ${{ secrets.API_TEST_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COMMIT_INFO_BRANCH: ${{ steps.branch.outputs.branch }}
-          COMMIT_INFO_SHA: ${{ github.event.deployment_status.deployment.sha }}
-          # PR info for Cypress Cloud Branch Review feature
-          CYPRESS_PULL_REQUEST_ID: ${{ steps.pr-info.outputs.pr_number }}
-          CYPRESS_PULL_REQUEST_URL: ${{ steps.pr-info.outputs.pr_url }}
+          SPLIT: ${{ strategy.job-total }}
+          SPLIT_INDEX: ${{ strategy.job-index }}
+
+      - name: Merge mochawesome reports
+        if: always() && steps.deployment-info.outputs.skip != 'true'
+        run: |
+          npx mochawesome-merge cypress/results/*.json -o cypress/results/merged-report.json 2>/dev/null || echo "No mochawesome reports to merge"
 
       - name: Upload Cypress artifacts
         if: always() && steps.deployment-info.outputs.skip != 'true'
@@ -130,5 +89,82 @@ jobs:
           path: |
             cypress/screenshots
             cypress/videos
+            cypress/results
           retention-days: 7
           if-no-files-found: ignore
+
+  detect-flaky:
+    needs: cypress-run
+    if: always() && needs.cypress-run.result != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.deployment_status.deployment.sha }}
+          sparse-checkout: .
+
+      - name: Download all mochawesome artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: cypress-results-${{ github.run_id }}-*
+          path: all-results
+          merge-multiple: false
+
+      - name: Detect flaky tests and label PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Collect all merged reports from each container
+          REPORT_FILES=$(find all-results -name "merged-report.json" 2>/dev/null)
+          if [ -z "$REPORT_FILES" ]; then
+            echo "No merged reports found, skipping flaky test detection"
+            exit 0
+          fi
+
+          echo "Found reports: $REPORT_FILES"
+
+          # Parse all reports for flaky tests
+          FLAKY_TESTS=$(node -e "
+            const fs = require('fs');
+            const files = process.argv.slice(1);
+            const flaky = [];
+            for (const file of files) {
+              const report = JSON.parse(fs.readFileSync(file, 'utf8'));
+              function walk(suites) {
+                for (const suite of (suites || [])) {
+                  for (const test of (suite.tests || [])) {
+                    const attempts = test.attempts || [];
+                    const passed = test.pass === true;
+                    const hadFailedAttempts = attempts.some(a => a.pass === false || a.error);
+                    if (passed && hadFailedAttempts) {
+                      flaky.push(test.fullTitle || test.title);
+                    }
+                  }
+                  walk(suite.suites);
+                }
+              }
+              walk(report.results ? report.results.map(r => r.suites).flat() : []);
+            }
+            if (flaky.length > 0) {
+              console.log(JSON.stringify(flaky));
+            }
+          " $REPORT_FILES 2>/dev/null || echo "")
+
+          if [ -n "$FLAKY_TESTS" ] && [ "$FLAKY_TESTS" != "" ]; then
+            echo "Flaky tests detected: $FLAKY_TESTS"
+
+            # Find the PR number for this deployment
+            PR_NUMBER=$(gh pr list --search "${{ github.event.deployment_status.deployment.sha }}" --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
+
+            if [ -n "$PR_NUMBER" ]; then
+              gh pr edit "$PR_NUMBER" --add-label "flaky-tests" 2>/dev/null || \
+                (gh label create "flaky-tests" --color "FBCA04" --description "PR has flaky E2E tests" 2>/dev/null; \
+                 gh pr edit "$PR_NUMBER" --add-label "flaky-tests")
+              echo "Added 'flaky-tests' label to PR #$PR_NUMBER"
+            else
+              echo "Could not find PR for this deployment, skipping label"
+            fi
+          else
+            echo "No flaky tests detected"
+          fi
