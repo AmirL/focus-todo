@@ -17,7 +17,7 @@ export default defineConfig({
     screenshotOnRunFailure: true,
     env: {
       codeCoverage: {
-        url: "/api/__coverage__",
+        url: "/api/coverage-data",
       },
     },
     experimentalStudio: true,
