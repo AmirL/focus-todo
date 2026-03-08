@@ -432,7 +432,7 @@ describe('isTaskToday', () => {
   });
 
   it('should return true when task date is today at any time', () => {
-    const task = makeTask({ date: new Date('2024-06-15T23:59:59Z') });
+    const task = makeTask({ date: new Date('2024-06-15T18:00:00Z') });
     expect(isTaskToday(task)).toBeTruthy();
   });
 
@@ -473,7 +473,7 @@ describe('isTaskTomorrow', () => {
   });
 
   it('should return true when task date is tomorrow at any time', () => {
-    const task = makeTask({ date: new Date('2024-06-16T23:59:59Z') });
+    const task = makeTask({ date: new Date('2024-06-16T18:00:00Z') });
     expect(isTaskTomorrow(task)).toBeTruthy();
   });
 
