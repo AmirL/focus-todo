@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 // Endpoint for @cypress/code-coverage to collect server-side coverage data.
 // Only active when code is instrumented via babel-plugin-istanbul (CYPRESS_COVERAGE=true).
 export async function GET() {
