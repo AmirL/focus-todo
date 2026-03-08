@@ -82,6 +82,7 @@ jobs:
             --temp-dir coverage/merged \
             --reporter=text-summary \
             --reporter=json-summary \
+            --reporter=lcov \
             --report-dir coverage/merged
 
       - name: Print coverage summary
