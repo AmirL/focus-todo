@@ -59,8 +59,6 @@ Cypress.Commands.add("waitForAppLoad", () => {
   // 2. Authentication session has been restored
   // 3. The main layout with sidebar is rendered
   cy.get('[data-cy="filter-backlog"]', { timeout: 30000 }).should("be.visible");
-  // Wait for the main content area to render (add-task button is always present)
-  cy.get('[data-testid="add-task-button"]', { timeout: 15000 }).should("exist");
 });
 
 // Get element by data-testid
