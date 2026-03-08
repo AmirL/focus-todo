@@ -7,8 +7,8 @@ const isDev = process.env.NODE_ENV === 'development';
 const isCypressCoverage = process.env.CYPRESS_COVERAGE === 'true';
 
 const nextConfig = {
-  webpack(config, { isServer }) {
-    if (isCypressCoverage && !isServer) {
+  webpack(config) {
+    if (isCypressCoverage) {
       config.module.rules.push({
         test: /\.(js|ts|tsx)$/,
         enforce: 'post',
