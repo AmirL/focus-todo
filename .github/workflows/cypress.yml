@@ -95,16 +95,29 @@ jobs:
 
   detect-flaky:
     needs: cypress-run
-    if: always() && needs.cypress-run.result != 'skipped'
+    if: always() && needs.cypress-run.result == 'success'
     runs-on: ubuntu-latest
     steps:
+      - name: Skip if Production deployment
+        id: check-env
+        run: |
+          ENV="${{ github.event.deployment_status.environment }}"
+          if [ "$ENV" = "Production" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "Skipping: Production deployment"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Checkout
+        if: steps.check-env.outputs.skip != 'true'
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.deployment_status.deployment.sha }}
           sparse-checkout: .
 
       - name: Download all mochawesome artifacts
+        if: steps.check-env.outputs.skip != 'true'
         uses: actions/download-artifact@v4
         with:
           pattern: cypress-results-${{ github.run_id }}-*
@@ -112,6 +125,7 @@ jobs:
           merge-multiple: false
 
       - name: Detect flaky tests and label PR
+        if: steps.check-env.outputs.skip != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
