@@ -78,7 +78,8 @@ describe("Task Management", () => {
     });
 
     it("should snooze a task to a different date", () => {
-      cy.get('[data-testid^="snooze-task-"]').first().click();
+      cy.get('[data-testid^="task-"]').first().trigger('mouseover');
+      cy.get('[data-testid^="snooze-task-"]').first().click({ force: true });
       // Wait for calendar to appear
       cy.get('[role="grid"]', { timeout: 15000 }).should('be.visible');
       // Select the last non-outside day in the current month

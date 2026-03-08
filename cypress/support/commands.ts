@@ -52,12 +52,15 @@ declare global {
   }
 }
 
-// Wait for the application to fully load
+// Wait for the application to fully load (authenticated and sidebar rendered)
 Cypress.Commands.add("waitForAppLoad", () => {
-  // Wait for the main layout to be visible
-  cy.get("body", { timeout: 15000 }).should("be.visible");
-  // Wait for any loading states to complete
-  cy.get('[data-loading="true"]', { timeout: 10000 }).should("not.exist");
+  // Wait for the sidebar filter buttons to appear, which confirms:
+  // 1. The page has loaded
+  // 2. Authentication session has been restored
+  // 3. The main layout with sidebar is rendered
+  cy.get('[data-cy="filter-backlog"]', { timeout: 30000 }).should("be.visible");
+  // Wait for the main content area to render (add-task button is always present)
+  cy.get('[data-testid="add-task-button"]', { timeout: 15000 }).should("exist");
 });
 
 // Get element by data-testid
