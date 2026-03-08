@@ -40,18 +40,30 @@ function createTaskWithSuggestions(
     });
 }
 
+/**
+ * Visit the home page, intercept the get-tasks API call, and wait for
+ * task data to load so that task elements are rendered in the DOM.
+ */
+function visitAndWaitForTasks() {
+  cy.intercept("POST", "/api/get-tasks").as("getTasks");
+  cy.visit("/");
+  cy.wait("@getTasks");
+  cy.waitForAppLoad();
+}
+
 function findTaskElement(taskId: number) {
   return cy.get(`[data-testid="task-${taskId}"]`);
 }
 
 function openEditDialog(taskId: number) {
-  cy.get(`[data-testid="edit-task-${taskId}"]`).click();
+  // The edit button is inside CollapsibleActions and only visible on hover (desktop).
+  // Trigger hover on the task element first, then click the edit button.
+  findTaskElement(taskId).trigger("mouseover");
+  cy.get(`[data-testid="edit-task-${taskId}"]`).click({ force: true });
   cy.get('[role="dialog"]').should("be.visible");
 }
 
-// TODO: Fix test - tasks created via API are not found in the UI (data-testid selectors fail).
-// This is a pre-existing issue unrelated to Cypress Cloud removal.
-describe.skip("AI Suggestions", () => {
+describe("AI Suggestions", () => {
   let createdTaskIds: number[] = [];
 
   before(() => {
@@ -78,8 +90,6 @@ describe.skip("AI Suggestions", () => {
 
   beforeEach(() => {
     expect(apiKey, "API_TEST_KEY should be configured").to.exist;
-    cy.visit("/");
-    cy.waitForAppLoad();
   });
 
   afterEach(() => {
@@ -99,8 +109,8 @@ describe.skip("AI Suggestions", () => {
       const name = `AI badge test ${Date.now()}`;
       createTaskWithSuggestions(name, pendingSuggestions).then((taskId) => {
         createdTaskIds.push(taskId);
-        cy.visit("/");
-        cy.waitForAppLoad();
+        visitAndWaitForTasks();
+        cy.contains(name).should("be.visible");
         findTaskElement(taskId)
           .find('[data-cy="ai-suggestion-badge"]')
           .should("be.visible");
@@ -111,8 +121,8 @@ describe.skip("AI Suggestions", () => {
       const name = `AI no-badge test ${Date.now()}`;
       createTaskWithSuggestions(name, reviewedSuggestions).then((taskId) => {
         createdTaskIds.push(taskId);
-        cy.visit("/");
-        cy.waitForAppLoad();
+        visitAndWaitForTasks();
+        cy.contains(name).should("be.visible");
         findTaskElement(taskId)
           .find('[data-cy="ai-suggestion-badge"]')
           .should("not.exist");
@@ -125,8 +135,8 @@ describe.skip("AI Suggestions", () => {
         name: { suggestion: taskName, userReaction: null },
       }).then((taskId) => {
         createdTaskIds.push(taskId);
-        cy.visit("/");
-        cy.waitForAppLoad();
+        visitAndWaitForTasks();
+        cy.contains(taskName).should("be.visible");
         findTaskElement(taskId)
           .find('[data-cy="ai-suggestion-badge"]')
           .should("not.exist");
@@ -139,8 +149,8 @@ describe.skip("AI Suggestions", () => {
       const name = `AI banners test ${Date.now()}`;
       createTaskWithSuggestions(name, pendingSuggestions).then((taskId) => {
         createdTaskIds.push(taskId);
-        cy.visit("/");
-        cy.waitForAppLoad();
+        visitAndWaitForTasks();
+        cy.contains(name).should("be.visible");
         openEditDialog(taskId);
 
         cy.get('[data-cy="ai-suggestion-banner-name"]').should("be.visible");
@@ -156,8 +166,8 @@ describe.skip("AI Suggestions", () => {
         details: { suggestion: "Different details", userReaction: null },
       }).then((taskId) => {
         createdTaskIds.push(taskId);
-        cy.visit("/");
-        cy.waitForAppLoad();
+        visitAndWaitForTasks();
+        cy.contains(taskName).should("be.visible");
         openEditDialog(taskId);
 
         // Name suggestion matches current value - should not show
@@ -173,8 +183,8 @@ describe.skip("AI Suggestions", () => {
       const name = `AI accept name ${Date.now()}`;
       createTaskWithSuggestions(name, pendingSuggestions).then((taskId) => {
         createdTaskIds.push(taskId);
-        cy.visit("/");
-        cy.waitForAppLoad();
+        visitAndWaitForTasks();
+        cy.contains(name).should("be.visible");
         openEditDialog(taskId);
 
         cy.get('[data-cy="accept-suggestion-name"]').click();
@@ -196,8 +206,8 @@ describe.skip("AI Suggestions", () => {
         details: { suggestion: "Should not appear", userReaction: null },
       }).then((taskId) => {
         createdTaskIds.push(taskId);
-        cy.visit("/");
-        cy.waitForAppLoad();
+        visitAndWaitForTasks();
+        cy.contains(name).should("be.visible");
         openEditDialog(taskId);
 
         cy.get('[data-cy="reject-suggestion-details"]').click();
@@ -213,8 +223,8 @@ describe.skip("AI Suggestions", () => {
         estimatedDuration: { suggestion: "60", userReaction: null },
       }).then((taskId) => {
         createdTaskIds.push(taskId);
-        cy.visit("/");
-        cy.waitForAppLoad();
+        visitAndWaitForTasks();
+        cy.contains(name).should("be.visible");
         openEditDialog(taskId);
 
         cy.get('[data-cy="ai-suggestion-banner-estimatedDuration"]')
@@ -234,8 +244,8 @@ describe.skip("AI Suggestions", () => {
       const name = `AI persist accept ${Date.now()}`;
       createTaskWithSuggestions(name, pendingSuggestions).then((taskId) => {
         createdTaskIds.push(taskId);
-        cy.visit("/");
-        cy.waitForAppLoad();
+        visitAndWaitForTasks();
+        cy.contains(name).should("be.visible");
 
         cy.intercept("POST", "/api/update-task").as("updateTask");
 
@@ -256,8 +266,8 @@ describe.skip("AI Suggestions", () => {
         details: { suggestion: "New details", userReaction: null },
       }).then((taskId) => {
         createdTaskIds.push(taskId);
-        cy.visit("/");
-        cy.waitForAppLoad();
+        visitAndWaitForTasks();
+        cy.contains(name).should("be.visible");
 
         cy.intercept("POST", "/api/update-task").as("updateTask");
 
@@ -278,8 +288,8 @@ describe.skip("AI Suggestions", () => {
         name: { suggestion: "New title", userReaction: null },
       }).then((taskId) => {
         createdTaskIds.push(taskId);
-        cy.visit("/");
-        cy.waitForAppLoad();
+        visitAndWaitForTasks();
+        cy.contains(name).should("be.visible");
 
         findTaskElement(taskId)
           .find('[data-cy="ai-suggestion-badge"]')
@@ -302,8 +312,8 @@ describe.skip("AI Suggestions", () => {
       const name = `AI clear visible ${Date.now()}`;
       createTaskWithSuggestions(name, pendingSuggestions).then((taskId) => {
         createdTaskIds.push(taskId);
-        cy.visit("/");
-        cy.waitForAppLoad();
+        visitAndWaitForTasks();
+        cy.contains(name).should("be.visible");
         openEditDialog(taskId);
 
         cy.get('[data-cy="clear-suggestions-button"]')
@@ -321,8 +331,7 @@ describe.skip("AI Suggestions", () => {
       }).then((response) => {
         const taskId = response.body.task.id;
         createdTaskIds.push(taskId);
-        cy.visit("/");
-        cy.waitForAppLoad();
+        visitAndWaitForTasks();
         openEditDialog(taskId);
 
         cy.get('[data-cy="clear-suggestions-button"]').should("not.exist");
@@ -333,8 +342,8 @@ describe.skip("AI Suggestions", () => {
       const name = `AI clear persist ${Date.now()}`;
       createTaskWithSuggestions(name, pendingSuggestions).then((taskId) => {
         createdTaskIds.push(taskId);
-        cy.visit("/");
-        cy.waitForAppLoad();
+        visitAndWaitForTasks();
+        cy.contains(name).should("be.visible");
 
         cy.intercept("POST", "/api/update-task").as("updateTask");
 
