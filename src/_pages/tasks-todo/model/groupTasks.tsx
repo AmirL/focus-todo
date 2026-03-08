@@ -1,4 +1,5 @@
 import type { TaskModel } from '@/entities/task/model/task';
+import type { ListModel } from '@/entities/list';
 import { useListsQuery } from '@/shared/api/lists';
 import { useListNameMap } from '@/shared/lib/listUtils';
 
@@ -8,20 +9,19 @@ export type TaskGroup = {
   tasks: TaskModel[];
 };
 
-type UseGroupedTasksOptions = {
+type GroupTasksOptions = {
   focusListName?: string | null;
 };
 
-// Groups tasks by their `listId` and sorts groups according to the lists order from the sidebar.
+// Pure function: groups tasks by listId and sorts groups by sidebar order.
 // If focusListName is provided, that list's group will appear first.
-export function useGroupedTasksByList(
+export function groupTasksByList(
   tasks: TaskModel[],
-  options: UseGroupedTasksOptions = {}
+  lists: ListModel[],
+  listNameMap: Map<number, string>,
+  options: GroupTasksOptions = {}
 ): TaskGroup[] {
-  const { data: lists = [] } = useListsQuery();
   const { focusListName } = options;
-
-  const listNameMap = useListNameMap();
 
   // Build groups map keyed by listId
   const groupsMap = tasks.reduce<Record<number, TaskModel[]>>((acc, task) => {
@@ -55,4 +55,15 @@ export function useGroupedTasksByList(
     name: listNameMap.get(id) ?? 'Unknown',
     tasks: groupsMap[id],
   }));
+}
+
+// Hook wrapper: groups tasks by their `listId` and sorts groups according to the lists order from the sidebar.
+// If focusListName is provided, that list's group will appear first.
+export function useGroupedTasksByList(
+  tasks: TaskModel[],
+  options: GroupTasksOptions = {}
+): TaskGroup[] {
+  const { data: lists = [] } = useListsQuery();
+  const listNameMap = useListNameMap();
+  return groupTasksByList(tasks, lists, listNameMap, options);
 }

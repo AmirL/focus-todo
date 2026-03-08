@@ -10,8 +10,9 @@ function createTaskWithCheckboxes(name: string) {
   cy.intercept("POST", "/api/create-task").as("createTask");
 
   cy.get('[data-testid="add-task-button"]').click();
+  cy.get('[role="dialog"]').should("be.visible");
   cy.get('[data-testid="task-name-input"]').type(name);
-  cy.contains("button", "Edit").click();
+  cy.get('[role="dialog"]').contains("button", "Edit").click();
   cy.get("#details").type(checkboxMarkdown);
   cy.get('[data-testid="save-task-button"]').click();
   cy.contains(name, { timeout: 15000 }).should("be.visible");
