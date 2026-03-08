@@ -77,8 +77,8 @@ jobs:
           done
 
           # Merge and generate reports
-          npx nyc merge coverage/to-merge coverage/merged/coverage-final.json
-          npx nyc report \
+          pnpm exec nyc merge coverage/to-merge coverage/merged/coverage-final.json
+          pnpm exec nyc report \
             --temp-dir coverage/merged \
             --reporter=text-summary \
             --reporter=json-summary \
@@ -87,20 +87,18 @@ jobs:
       - name: Print coverage summary
         if: always()
         run: |
-          SUMMARY_FILE=""
           if [ -f coverage/merged/coverage-summary.json ]; then
+            LABEL="unit + e2e"
             SUMMARY_FILE="coverage/merged/coverage-summary.json"
           elif [ -f coverage/unit/coverage-final.json ]; then
-            SUMMARY_FILE="unit-only"
+            LABEL="unit tests only"
+            # Generate summary from unit coverage
+            pnpm exec nyc report --temp-dir coverage/unit --reporter=json-summary --report-dir coverage/unit 2>/dev/null
+            SUMMARY_FILE="coverage/unit/coverage-summary.json"
           fi
 
-          if [ "$SUMMARY_FILE" = "unit-only" ]; then
-            echo "## Coverage Summary (unit tests only)" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            npx nyc report --temp-dir coverage/unit --reporter=text-summary 2>/dev/null
-            echo '```' >> $GITHUB_STEP_SUMMARY
-          elif [ -n "$SUMMARY_FILE" ]; then
-            echo "## Coverage Summary (unit + e2e)" >> $GITHUB_STEP_SUMMARY
+          if [ -n "$SUMMARY_FILE" ] && [ -f "$SUMMARY_FILE" ]; then
+            echo "## Coverage Summary ($LABEL)" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
             python3 -c "
           import json
@@ -111,7 +109,7 @@ jobs:
               metric = total.get(key, {})
               pct = metric.get('pct', 'N/A')
               print(f'{key}: {pct}%')
-          "
+          " >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
           else
             echo "No coverage data available" >> $GITHUB_STEP_SUMMARY

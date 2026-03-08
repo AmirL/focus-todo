@@ -95,6 +95,7 @@
     "mochawesome": "^7.1.4",
     "mochawesome-merge": "^5.1.1",
     "mochawesome-report-generator": "^6.3.2",
+    "nyc": "^18.0.0",
     "postcss": "^8",
     "steiger": "^0.5.5",
     "tailwindcss": "^3.4.1",
