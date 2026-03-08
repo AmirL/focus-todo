@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   coverage:
@@ -28,6 +28,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Run unit tests with coverage
+        run: pnpm vitest run --coverage
+
       - name: Run Cypress with coverage
         continue-on-error: true
         uses: cypress-io/github-action@v6
@@ -44,27 +47,73 @@ jobs:
           CYPRESS_TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
           CYPRESS_API_TEST_KEY: ${{ secrets.API_TEST_KEY }}
 
+      - name: Merge coverage reports
+        if: always()
+        run: |
+          mkdir -p coverage/merged
+
+          # Collect available coverage JSON files
+          COVERAGE_FILES=""
+          if [ -f coverage/unit/coverage-final.json ]; then
+            COVERAGE_FILES="$COVERAGE_FILES coverage/unit/coverage-final.json"
+            echo "Found unit test coverage"
+          fi
+          if [ -f coverage/coverage-final.json ]; then
+            COVERAGE_FILES="$COVERAGE_FILES coverage/coverage-final.json"
+            echo "Found e2e test coverage"
+          fi
+
+          if [ -z "$COVERAGE_FILES" ]; then
+            echo "No coverage files found"
+            exit 0
+          fi
+
+          # Copy coverage files into a temp dir for nyc merge
+          mkdir -p coverage/to-merge
+          INDEX=0
+          for f in $COVERAGE_FILES; do
+            cp "$f" "coverage/to-merge/coverage-${INDEX}.json"
+            INDEX=$((INDEX + 1))
+          done
+
+          # Merge and generate reports
+          pnpm exec nyc merge coverage/to-merge coverage/merged/coverage-final.json
+          pnpm exec nyc report \
+            --temp-dir coverage/merged \
+            --reporter=text-summary \
+            --reporter=json-summary \
+            --reporter=lcov \
+            --report-dir coverage/merged
+
       - name: Print coverage summary
         if: always()
         run: |
-          if [ -f coverage/coverage-summary.json ]; then
-            echo "## Coverage Summary" >> $GITHUB_STEP_SUMMARY
+          if [ -f coverage/merged/coverage-summary.json ]; then
+            LABEL="unit + e2e"
+            SUMMARY_FILE="coverage/merged/coverage-summary.json"
+          elif [ -f coverage/unit/coverage-final.json ]; then
+            LABEL="unit tests only"
+            # Generate summary from unit coverage
+            pnpm exec nyc report --temp-dir coverage/unit --reporter=json-summary --report-dir coverage/unit 2>/dev/null
+            SUMMARY_FILE="coverage/unit/coverage-summary.json"
+          fi
+
+          if [ -n "$SUMMARY_FILE" ] && [ -f "$SUMMARY_FILE" ]; then
+            echo "## Coverage Summary ($LABEL)" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
-            npx nyc report --reporter=text-summary 2>/dev/null || python3 -c "
+            python3 -c "
           import json
-          with open('coverage/coverage-summary.json') as f:
+          with open('$SUMMARY_FILE') as f:
               data = json.load(f)
           total = data.get('total', {})
           for key in ['lines', 'statements', 'functions', 'branches']:
               metric = total.get(key, {})
               pct = metric.get('pct', 'N/A')
               print(f'{key}: {pct}%')
-          "
+          " >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
           else
-            echo "No coverage summary found" >> $GITHUB_STEP_SUMMARY
-            echo "Coverage files found:"
-            find coverage -type f 2>/dev/null || echo "No coverage directory"
+            echo "No coverage data available" >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Upload coverage artifacts
@@ -75,59 +124,3 @@ jobs:
           path: coverage/
           retention-days: 14
           if-no-files-found: warn
-
-      - name: Generate and commit coverage badge
-        if: always()
-        run: |
-          if [ ! -f coverage/coverage-summary.json ]; then
-            echo "No coverage summary found, skipping badge generation"
-            exit 0
-          fi
-
-          mkdir -p badges
-          python3 -c "
-          import json, pathlib
-
-          with open('coverage/coverage-summary.json') as f:
-              data = json.load(f)
-          pct = data.get('total', {}).get('lines', {}).get('pct', 0)
-          label = f'{pct:.1f}%'
-
-          if pct >= 80: color = '#4c1'
-          elif pct >= 60: color = '#dfb317'
-          elif pct >= 40: color = '#fe7d37'
-          else: color = '#e05d44'
-
-          svg = f'''<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"140\" height=\"20\" role=\"img\" aria-label=\"coverage: {label}\">
-            <title>coverage: {label}</title>
-            <linearGradient id=\"s\" x2=\"0\" y2=\"100%\">
-              <stop offset=\"0\" stop-color=\"#bbb\" stop-opacity=\".1\"/>
-              <stop offset=\"1\" stop-opacity=\".1\"/>
-            </linearGradient>
-            <clipPath id=\"r\">
-              <rect width=\"140\" height=\"20\" rx=\"3\" fill=\"#fff\"/>
-            </clipPath>
-            <g clip-path=\"url(#r)\">
-              <rect width=\"68\" height=\"20\" fill=\"#555\"/>
-              <rect x=\"68\" width=\"72\" height=\"20\" fill=\"{color}\"/>
-              <rect width=\"140\" height=\"20\" fill=\"url(#s)\"/>
-            </g>
-            <g fill=\"#fff\" text-anchor=\"middle\" font-family=\"Verdana,Geneva,DejaVu Sans,sans-serif\" text-rendering=\"geometricPrecision\" font-size=\"110\">
-              <text aria-hidden=\"true\" x=\"350\" y=\"150\" fill=\"#010101\" fill-opacity=\".3\" transform=\"scale(.1)\" textLength=\"580\">coverage</text>
-              <text x=\"350\" y=\"140\" transform=\"scale(.1)\" fill=\"#fff\" textLength=\"580\">coverage</text>
-              <text aria-hidden=\"true\" x=\"1030\" y=\"150\" fill=\"#010101\" fill-opacity=\".3\" transform=\"scale(.1)\" textLength=\"520\">{label}</text>
-              <text x=\"1030\" y=\"140\" transform=\"scale(.1)\" fill=\"#fff\" textLength=\"520\">{label}</text>
-            </g>
-          </svg>'''
-
-          pathlib.Path('badges/coverage.svg').write_text(svg)
-          print(f'Badge generated: coverage {label}')
-          "
-
-          # Commit and push the badge
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add badges/coverage.svg
-          git diff --cached --quiet && echo "Badge unchanged, skipping commit" && exit 0
-          git commit -m "Update coverage badge [skip ci]"
-          git push
