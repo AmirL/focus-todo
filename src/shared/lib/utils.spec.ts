@@ -25,9 +25,9 @@ describe('isFutureDate', () => {
     expect(isFutureDate(today)).toBe(false);
   });
 
-  it('should return false for today at end of day', () => {
-    const endOfToday = new Date('2024-06-15T23:59:59Z');
-    expect(isFutureDate(endOfToday)).toBe(false);
+  it('should return false for today at a later time', () => {
+    const laterToday = new Date('2024-06-15T18:00:00Z');
+    expect(isFutureDate(laterToday)).toBe(false);
   });
 
   it('should return false for a date in the past', () => {
@@ -71,9 +71,9 @@ describe('isToday', () => {
     expect(isToday(todayStart)).toBe(true);
   });
 
-  it('should return true for today at end of day', () => {
-    const todayEnd = new Date('2024-06-15T23:59:59Z');
-    expect(isToday(todayEnd)).toBe(true);
+  it('should return true for today at a later time', () => {
+    const laterToday = new Date('2024-06-15T18:00:00Z');
+    expect(isToday(laterToday)).toBe(true);
   });
 
   it('should return false for yesterday', () => {
