@@ -15,6 +15,11 @@ export default defineConfig({
       openMode: 0,
     },
     screenshotOnRunFailure: true,
+    env: {
+      codeCoverage: {
+        url: "/api/__coverage__",
+      },
+    },
     experimentalStudio: true,
     experimentalPromptCommand: true,
     reporter: "mochawesome",
