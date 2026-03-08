@@ -2,7 +2,7 @@ name: Code Coverage
 
 on:
   push:
-    branches: [main]
+    branches: [main, amirl/combined-code-coverage]
 
 permissions:
   contents: read
