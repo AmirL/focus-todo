@@ -133,31 +133,40 @@ jobs:
 
       - name: Restore flaky test history
         if: steps.check-env.outputs.skip != 'true'
-        uses: actions/cache/restore@v4
-        with:
-          path: flaky-history.json
-          key: flaky-test-history-dummy
-          restore-keys: |
-            flaky-test-history-
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Download the latest flaky-history artifact from previous runs
+          ARTIFACT_ID=$(gh api repos/${{ github.repository }}/actions/artifacts \
+            --jq '[.artifacts[] | select(.name == "flaky-test-history") | select(.expired == false)] | sort_by(.created_at) | last | .id' 2>/dev/null || echo "")
+          if [ -n "$ARTIFACT_ID" ] && [ "$ARTIFACT_ID" != "null" ]; then
+            gh api repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID/zip > /tmp/history.zip 2>/dev/null
+            unzip -o /tmp/history.zip -d . 2>/dev/null || echo "Could not extract history"
+            echo "Restored flaky history from artifact $ARTIFACT_ID"
+          else
+            echo "No previous flaky history found, starting fresh"
+          fi
 
       - name: Collect current test results
         if: steps.check-env.outputs.skip != 'true'
         run: |
-          node scripts/collect-test-results.js all-results > current-results.json
+          node scripts/collect-test-results.cjs all-results > current-results.json
           echo "Current results:"
           cat current-results.json | head -c 500
 
       - name: Analyze flaky tests and generate summary
         if: steps.check-env.outputs.skip != 'true'
         run: |
-          node scripts/analyze-flaky-tests.js flaky-history.json current-results.json >> $GITHUB_STEP_SUMMARY
+          node scripts/analyze-flaky-tests.cjs flaky-history.json current-results.json >> $GITHUB_STEP_SUMMARY
 
       - name: Save flaky test history
         if: always() && steps.check-env.outputs.skip != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/upload-artifact@v4
         with:
+          name: flaky-test-history
           path: flaky-history.json
-          key: flaky-test-history-${{ github.run_id }}
+          overwrite: true
+          retention-days: 90
 
       - name: Label PR if flaky tests detected
         if: steps.check-env.outputs.skip != 'true'
@@ -169,7 +178,7 @@ jobs:
             exit 0
           fi
 
-          FLAKY_COUNT=$(node -e "console.log(JSON.parse(require('fs').readFileSync('/tmp/flaky-test-names.json','utf8')).length)")
+          FLAKY_COUNT=$(node --input-type=commonjs -e "console.log(JSON.parse(require('fs').readFileSync('/tmp/flaky-test-names.json','utf8')).length)")
           echo "Found $FLAKY_COUNT unreliable test(s) in history"
 
           # Find the PR number for this deployment
