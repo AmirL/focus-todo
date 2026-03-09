@@ -95,7 +95,7 @@ jobs:
 
   detect-flaky:
     needs: cypress-run
-    if: always() && needs.cypress-run.result == 'success'
+    if: always() && !cancelled() && needs.cypress-run.result != 'skipped'
     runs-on: ubuntu-latest
     steps:
       - name: Skip if Production deployment
@@ -114,7 +114,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.deployment_status.deployment.sha }}
-          sparse-checkout: .
+          sparse-checkout: |
+            scripts
+
+      - name: Setup Node.js
+        if: steps.check-env.outputs.skip != 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
       - name: Download all mochawesome artifacts
         if: steps.check-env.outputs.skip != 'true'
@@ -124,61 +131,64 @@ jobs:
           path: all-results
           merge-multiple: false
 
-      - name: Detect flaky tests and label PR
+      - name: Restore flaky test history
         if: steps.check-env.outputs.skip != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Collect all merged reports from each container
-          REPORT_FILES=$(find all-results -name "merged-report.json" 2>/dev/null)
-          if [ -z "$REPORT_FILES" ]; then
-            echo "No merged reports found, skipping flaky test detection"
+          # Download the latest flaky-history artifact from previous runs
+          ARTIFACT_ID=$(gh api repos/${{ github.repository }}/actions/artifacts \
+            --jq '[.artifacts[] | select(.name == "flaky-test-history") | select(.expired == false)] | sort_by(.created_at) | last | .id' 2>/dev/null || echo "")
+          if [ -n "$ARTIFACT_ID" ] && [ "$ARTIFACT_ID" != "null" ]; then
+            gh api repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID/zip > /tmp/history.zip 2>/dev/null
+            unzip -o /tmp/history.zip -d . 2>/dev/null || echo "Could not extract history"
+            echo "Restored flaky history from artifact $ARTIFACT_ID"
+          else
+            echo "No previous flaky history found, starting fresh"
+          fi
+
+      - name: Collect current test results
+        if: steps.check-env.outputs.skip != 'true'
+        run: |
+          node scripts/collect-test-results.cjs all-results > current-results.json
+          echo "Current results:"
+          cat current-results.json | head -c 500
+
+      - name: Analyze flaky tests and generate summary
+        if: steps.check-env.outputs.skip != 'true'
+        run: |
+          node scripts/analyze-flaky-tests.cjs flaky-history.json current-results.json >> $GITHUB_STEP_SUMMARY
+
+      - name: Save flaky test history
+        if: always() && steps.check-env.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: flaky-test-history
+          path: flaky-history.json
+          overwrite: true
+          retention-days: 90
+
+      - name: Label PR if flaky tests detected
+        if: steps.check-env.outputs.skip != 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ ! -f /tmp/flaky-test-names.json ]; then
+            echo "No flaky tests detected"
             exit 0
           fi
 
-          echo "Found reports: $REPORT_FILES"
+          FLAKY_COUNT=$(node --input-type=commonjs -e "console.log(JSON.parse(require('fs').readFileSync('/tmp/flaky-test-names.json','utf8')).length)")
+          echo "Found $FLAKY_COUNT unreliable test(s) in history"
 
-          # Parse all reports for flaky tests
-          FLAKY_TESTS=$(node -e "
-            const fs = require('fs');
-            const files = process.argv.slice(1);
-            const flaky = [];
-            for (const file of files) {
-              const report = JSON.parse(fs.readFileSync(file, 'utf8'));
-              function walk(suites) {
-                for (const suite of (suites || [])) {
-                  for (const test of (suite.tests || [])) {
-                    const attempts = test.attempts || [];
-                    const passed = test.pass === true;
-                    const hadFailedAttempts = attempts.some(a => a.pass === false || a.error);
-                    if (passed && hadFailedAttempts) {
-                      flaky.push(test.fullTitle || test.title);
-                    }
-                  }
-                  walk(suite.suites);
-                }
-              }
-              walk(report.results ? report.results.map(r => r.suites).flat() : []);
-            }
-            if (flaky.length > 0) {
-              console.log(JSON.stringify(flaky));
-            }
-          " $REPORT_FILES 2>/dev/null || echo "")
+          # Find the PR number for this deployment
+          PR_NUMBER=$(gh pr list --search "${{ github.event.deployment_status.deployment.sha }}" --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
 
-          if [ -n "$FLAKY_TESTS" ] && [ "$FLAKY_TESTS" != "" ]; then
-            echo "Flaky tests detected: $FLAKY_TESTS"
-
-            # Find the PR number for this deployment
-            PR_NUMBER=$(gh pr list --search "${{ github.event.deployment_status.deployment.sha }}" --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
-
-            if [ -n "$PR_NUMBER" ]; then
-              gh pr edit "$PR_NUMBER" --add-label "flaky-tests" 2>/dev/null || \
-                (gh label create "flaky-tests" --color "FBCA04" --description "PR has flaky E2E tests" 2>/dev/null; \
-                 gh pr edit "$PR_NUMBER" --add-label "flaky-tests")
-              echo "Added 'flaky-tests' label to PR #$PR_NUMBER"
-            else
-              echo "Could not find PR for this deployment, skipping label"
-            fi
+          if [ -n "$PR_NUMBER" ]; then
+            gh pr edit "$PR_NUMBER" --add-label "flaky-tests" 2>/dev/null || \
+              (gh label create "flaky-tests" --color "FBCA04" --description "PR has flaky E2E tests" 2>/dev/null; \
+               gh pr edit "$PR_NUMBER" --add-label "flaky-tests")
+            echo "Added 'flaky-tests' label to PR #$PR_NUMBER"
           else
-            echo "No flaky tests detected"
+            echo "Could not find PR for this deployment, skipping label"
           fi
