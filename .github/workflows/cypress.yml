@@ -95,7 +95,7 @@ jobs:
 
   detect-flaky:
     needs: cypress-run
-    if: always() && needs.cypress-run.result == 'success'
+    if: always() && !cancelled() && needs.cypress-run.result != 'skipped'
     runs-on: ubuntu-latest
     steps:
       - name: Skip if Production deployment
