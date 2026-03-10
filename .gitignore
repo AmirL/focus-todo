@@ -53,3 +53,6 @@ playwright/.cache/
 test-results/
 .playwright/
 .playwright-mcp/
+
+*storybook.log
+storybook-static
