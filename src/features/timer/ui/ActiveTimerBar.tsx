@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { TimerBar } from '@/shared/ui/timer';
 import { useTimerStore } from '../model/timerStore';
 import { useStopTimerMutation, useUpdateTimeEntryMutation } from '@/shared/api/time-entries';
@@ -14,6 +14,24 @@ export function ActiveTimerBar() {
   const { data: tasks } = useTasksQuery();
   const [now, setNow] = useState(dayjs());
 
+  // Local state for time inputs to avoid overwriting during editing
+  const [localStartTime, setLocalStartTime] = useState('');
+  const [localEndTime, setLocalEndTime] = useState('');
+
+  // Sync local state from activeEntry when it changes
+  const startedAt = activeEntry?.startedAt;
+  const endedAt = activeEntry?.endedAt;
+  useEffect(() => {
+    if (startedAt) {
+      setLocalStartTime(dayjs(startedAt).format('HH:mm'));
+    }
+    if (endedAt) {
+      setLocalEndTime(dayjs(endedAt).format('HH:mm'));
+    } else {
+      setLocalEndTime('');
+    }
+  }, [startedAt, endedAt]);
+
   // Update "now" every second for live duration
   useEffect(() => {
     if (!activeEntry || activeEntry.endedAt) return;
@@ -21,13 +39,35 @@ export function ActiveTimerBar() {
     return () => clearInterval(interval);
   }, [activeEntry]);
 
+  const saveStartTime = useCallback(async () => {
+    if (!activeEntry) return;
+    const [h, m] = localStartTime.split(':').map(Number);
+    if (isNaN(h) || isNaN(m)) return;
+    const newStart = dayjs(activeEntry.startedAt).hour(h).minute(m).second(0);
+    const updated = await updateEntry.mutateAsync({
+      id: activeEntry.id,
+      startedAt: newStart.format('YYYY-MM-DD HH:mm:ss'),
+    });
+    setActiveEntry(updated);
+  }, [activeEntry, localStartTime, updateEntry, setActiveEntry]);
+
+  const saveEndTime = useCallback(async () => {
+    if (!activeEntry?.endedAt) return;
+    const [h, m] = localEndTime.split(':').map(Number);
+    if (isNaN(h) || isNaN(m)) return;
+    const newEnd = dayjs(activeEntry.endedAt).hour(h).minute(m).second(0);
+    const updated = await updateEntry.mutateAsync({
+      id: activeEntry.id,
+      endedAt: newEnd.format('YYYY-MM-DD HH:mm:ss'),
+    });
+    setActiveEntry(updated);
+  }, [activeEntry, localEndTime, updateEntry, setActiveEntry]);
+
   if (!activeEntry) return null;
 
   const task = tasks?.find((t) => String(t.id) === String(activeEntry.taskId));
   const taskName = task?.name ?? `Task #${activeEntry.taskId}`;
 
-  const startTime = dayjs(activeEntry.startedAt).format('HH:mm');
-  const endTime = activeEntry.endedAt ? dayjs(activeEntry.endedAt).format('HH:mm') : undefined;
   const isRunning = !activeEntry.endedAt;
 
   const endMoment = activeEntry.endedAt ? dayjs(activeEntry.endedAt) : now;
@@ -37,44 +77,26 @@ export function ActiveTimerBar() {
   const duration = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
 
   const handleStop = async () => {
-    await stopTimer.mutateAsync();
-    setActiveEntry(null);
+    const stopped = await stopTimer.mutateAsync();
+    // Keep the stopped entry visible so user can edit end time
+    setActiveEntry(stopped);
   };
 
   const handleDismiss = () => {
     setActiveEntry(null);
   };
 
-  const handleStartTimeChange = async (value: string) => {
-    const [h, m] = value.split(':').map(Number);
-    const newStart = dayjs(activeEntry.startedAt).hour(h).minute(m).second(0);
-    const updated = await updateEntry.mutateAsync({
-      id: activeEntry.id,
-      startedAt: newStart.format('YYYY-MM-DD HH:mm:ss'),
-    });
-    setActiveEntry(updated);
-  };
-
-  const handleEndTimeChange = async (value: string) => {
-    if (!activeEntry.endedAt) return;
-    const [h, m] = value.split(':').map(Number);
-    const newEnd = dayjs(activeEntry.endedAt).hour(h).minute(m).second(0);
-    const updated = await updateEntry.mutateAsync({
-      id: activeEntry.id,
-      endedAt: newEnd.format('YYYY-MM-DD HH:mm:ss'),
-    });
-    setActiveEntry(updated);
-  };
-
   return (
     <TimerBar
       taskName={taskName}
-      startTime={startTime}
-      endTime={endTime}
+      startTime={localStartTime}
+      endTime={activeEntry.endedAt ? localEndTime : undefined}
       duration={duration}
       isRunning={isRunning}
-      onStartTimeChange={handleStartTimeChange}
-      onEndTimeChange={handleEndTimeChange}
+      onStartTimeChange={setLocalStartTime}
+      onStartTimeBlur={saveStartTime}
+      onEndTimeChange={setLocalEndTime}
+      onEndTimeBlur={saveEndTime}
       onStop={handleStop}
       onDismiss={handleDismiss}
     />

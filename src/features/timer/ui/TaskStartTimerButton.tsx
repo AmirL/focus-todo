@@ -18,9 +18,8 @@ export function TaskStartTimerButton({ taskId }: TaskStartTimerButtonProps) {
   const handleClick = async () => {
     if (isRunning) {
       const stopped = await stopTimer.mutateAsync();
-      if (activeEntry?.id === stopped.id) {
-        setActiveEntry(null);
-      }
+      // Keep the stopped entry visible so user can edit end time in the timer bar
+      setActiveEntry(stopped);
     } else {
       const entry = await startTimer.mutateAsync(taskId);
       setActiveEntry(entry);

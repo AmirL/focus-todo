@@ -64,6 +64,33 @@ describe("Timer", () => {
     });
   });
 
+  it("should keep timer bar visible after stopping so user can edit end time", () => {
+    const taskName = `Edit test ${Date.now()}`;
+    createTaskAndGetId(taskName).then((taskId) => {
+      // Start timer
+      cy.get(`[data-testid="task-${taskId}"]`)
+        .find('[data-cy="start-timer-button"]')
+        .click();
+      cy.wait("@startTimer");
+      cy.get('[data-cy="timer-bar"]', { timeout: 10000 }).should("be.visible");
+
+      // Stop timer via bar
+      cy.get('[data-cy="timer-stop-button"]').click();
+      cy.wait("@stopTimer");
+
+      // Bar should still be visible after stopping (with editable end time)
+      cy.get('[data-cy="timer-bar"]').should("be.visible");
+      cy.get('[data-cy="timer-end-input"]').should("be.visible");
+
+      // Start time input should also be editable
+      cy.get('[data-cy="timer-start-input"]').should("be.visible");
+
+      // Dismiss the bar manually
+      cy.get('[data-cy="timer-dismiss-button"]').click();
+      cy.get('[data-cy="timer-bar"]').should("not.exist");
+    });
+  });
+
   it("should toggle timer on and off via the task button", () => {
     const taskName = `Toggle test ${Date.now()}`;
     createTaskAndGetId(taskName).then((taskId) => {
