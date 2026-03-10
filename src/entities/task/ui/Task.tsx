@@ -13,6 +13,7 @@ import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/
 import { useUpdateTaskMutation } from '@/shared/api/tasks';
 import { toggleMarkdownCheckbox } from '@/shared/lib/toggleMarkdownCheckbox';
 import { createInstance } from '@/shared/lib/instance-tools';
+import { TaskStartTimerButton, TaskTimeSpentBadge } from '@/features/timer';
 
 interface TaskProps {
   task: TaskModel;
@@ -88,6 +89,9 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
               {dragHandle}
             </div>
           )}
+          {!deleted && !task.completedAt && (
+            <TaskStartTimerButton taskId={Number(task.id)} />
+          )}
           <Checkbox
             id={`todo-${task.id}`}
             checked={!!task.completedAt}
@@ -107,6 +111,7 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
               />
             )}
             <EstimatedTimeButton task={task} />
+            <TaskTimeSpentBadge taskId={Number(task.id)} estimatedMinutes={task.estimatedDuration} />
           </div>
           <div className="flex-shrink-0">
             <CollapsibleActions>

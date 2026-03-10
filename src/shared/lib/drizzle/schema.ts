@@ -127,6 +127,19 @@ export const goalMilestonesTable = mysqlTable('goal_milestones', {
     .notNull(),
 });
 
+// Time Entries - time tracking per task
+export const timeEntriesTable = mysqlTable('time_entries', {
+  id: int('id').autoincrement().primaryKey().notNull(),
+  taskId: int('task_id').notNull().references(() => tasksTable.id, { onDelete: 'cascade' }),
+  userId: varchar('user_id', { length: 36 }).notNull().references(() => user.id, { onDelete: 'cascade' }),
+  startedAt: datetime('started_at').notNull(),
+  endedAt: datetime('ended_at'),
+  durationMinutes: int('duration_minutes'),
+  createdAt: datetime('created_at')
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
 // Current Initiative - daily focus rotation between lists
 export const currentInitiativeTable = mysqlTable('current_initiatives', {
   id: int('id').autoincrement().primaryKey().notNull(),

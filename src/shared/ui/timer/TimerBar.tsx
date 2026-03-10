@@ -10,7 +10,9 @@ interface TimerBarProps {
   duration: string;
   isRunning?: boolean;
   onStartTimeChange?: (value: string) => void;
+  onStartTimeBlur?: () => void;
   onEndTimeChange?: (value: string) => void;
+  onEndTimeBlur?: () => void;
   onStop?: () => void;
   onDismiss?: () => void;
   className?: string;
@@ -23,7 +25,9 @@ export function TimerBar({
   duration,
   isRunning = true,
   onStartTimeChange,
+  onStartTimeBlur,
   onEndTimeChange,
+  onEndTimeBlur,
   onStop,
   onDismiss,
   className,
@@ -48,6 +52,7 @@ export function TimerBar({
             type="time"
             value={startTime}
             onChange={(e) => onStartTimeChange?.(e.target.value)}
+            onBlur={() => onStartTimeBlur?.()}
             className="w-[110px] h-8 text-xs"
             data-cy="timer-start-input"
           />
@@ -61,13 +66,14 @@ export function TimerBar({
               type="time"
               value={endTime ?? ''}
               onChange={(e) => onEndTimeChange?.(e.target.value)}
+              onBlur={() => onEndTimeBlur?.()}
               className="w-[110px] h-8 text-xs"
               data-cy="timer-end-input"
             />
           )}
         </div>
 
-        <div className="flex-shrink-0 text-sm font-mono font-medium w-16 text-center">
+        <div className="flex-shrink-0 text-sm font-mono font-medium w-16 text-center" data-cy="timer-duration">
           {duration}
         </div>
 
