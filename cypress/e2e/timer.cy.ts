@@ -91,6 +91,42 @@ describe("Timer", () => {
     });
   });
 
+  it("should update duration when editing start/end times", () => {
+    cy.intercept("POST", "/api/update-time-entry").as("updateEntry");
+    const taskName = `Time edit test ${Date.now()}`;
+    createTaskAndGetId(taskName).then((taskId) => {
+      // Start and stop timer to get editable time inputs
+      cy.get(`[data-testid="task-${taskId}"]`)
+        .find('[data-cy="start-timer-button"]')
+        .click();
+      cy.wait("@startTimer");
+      cy.get('[data-cy="timer-bar"]', { timeout: 10000 }).should("be.visible");
+
+      cy.get('[data-cy="timer-stop-button"]').click();
+      cy.wait("@stopTimer");
+
+      // Both time inputs should be visible
+      cy.get('[data-cy="timer-start-input"]').should("be.visible");
+      cy.get('[data-cy="timer-end-input"]').should("be.visible");
+
+      // Edit start time to 1 hour earlier and verify the API call succeeds
+      cy.get('[data-cy="timer-start-input"]').then(($input) => {
+        const currentValue = $input.val() as string;
+        const [h, m] = currentValue.split(":").map(Number);
+        const newHour = String(h > 0 ? h - 1 : 23).padStart(2, "0");
+        const newTime = `${newHour}:${String(m).padStart(2, "0")}`;
+
+        cy.get('[data-cy="timer-start-input"]').clear().type(newTime).blur();
+        cy.wait("@updateEntry").then((interception) => {
+          expect(interception.response!.statusCode).to.equal(200);
+        });
+
+        // Duration should update (should show ~60m or 1h 0m since we moved start 1 hour earlier)
+        cy.get('[data-cy="timer-duration"]').should("contain.text", "1h");
+      });
+    });
+  });
+
   it("should toggle timer on and off via the task button", () => {
     const taskName = `Toggle test ${Date.now()}`;
     createTaskAndGetId(taskName).then((taskId) => {

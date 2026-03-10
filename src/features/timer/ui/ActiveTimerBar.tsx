@@ -46,7 +46,7 @@ export function ActiveTimerBar() {
     const newStart = dayjs(activeEntry.startedAt).hour(h).minute(m).second(0);
     const updated = await updateEntry.mutateAsync({
       id: activeEntry.id,
-      startedAt: newStart.format('YYYY-MM-DD HH:mm:ss'),
+      startedAt: newStart.toISOString(),
     });
     setActiveEntry(updated);
   }, [activeEntry, localStartTime, updateEntry, setActiveEntry]);
@@ -58,7 +58,7 @@ export function ActiveTimerBar() {
     const newEnd = dayjs(activeEntry.endedAt).hour(h).minute(m).second(0);
     const updated = await updateEntry.mutateAsync({
       id: activeEntry.id,
-      endedAt: newEnd.format('YYYY-MM-DD HH:mm:ss'),
+      endedAt: newEnd.toISOString(),
     });
     setActiveEntry(updated);
   }, [activeEntry, localEndTime, updateEntry, setActiveEntry]);
@@ -70,8 +70,17 @@ export function ActiveTimerBar() {
 
   const isRunning = !activeEntry.endedAt;
 
-  const endMoment = activeEntry.endedAt ? dayjs(activeEntry.endedAt) : now;
-  const diffMinutes = Math.max(0, endMoment.diff(dayjs(activeEntry.startedAt), 'minute'));
+  // Calculate duration from local edited values for immediate feedback
+  const getLocalDayjs = (base: string, localTime: string) => {
+    const [h, m] = localTime.split(':').map(Number);
+    if (isNaN(h) || isNaN(m)) return dayjs(base);
+    return dayjs(base).hour(h).minute(m).second(0);
+  };
+  const startMoment = localStartTime ? getLocalDayjs(activeEntry.startedAt, localStartTime) : dayjs(activeEntry.startedAt);
+  const endMoment = activeEntry.endedAt
+    ? (localEndTime ? getLocalDayjs(activeEntry.endedAt, localEndTime) : dayjs(activeEntry.endedAt))
+    : now;
+  const diffMinutes = Math.max(0, endMoment.diff(startMoment, 'minute'));
   const hours = Math.floor(diffMinutes / 60);
   const mins = diffMinutes % 60;
   const duration = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;

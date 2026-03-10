@@ -73,7 +73,7 @@ export function TimerBar({
           )}
         </div>
 
-        <div className="flex-shrink-0 text-sm font-mono font-medium w-16 text-center">
+        <div className="flex-shrink-0 text-sm font-mono font-medium w-16 text-center" data-cy="timer-duration">
           {duration}
         </div>
 
