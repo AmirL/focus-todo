@@ -11,8 +11,11 @@ permissions:
 
 jobs:
   cypress-run:
-    # Run when Vercel deployment succeeds
-    if: github.event.deployment_status.state == 'success' && contains(github.event.deployment_status.environment_url, 'vercel.app')
+    # Run when Vercel Preview deployment succeeds (skip Production/main - already tested in PR)
+    if: >-
+      github.event.deployment_status.state == 'success'
+      && contains(github.event.deployment_status.environment_url, 'vercel.app')
+      && github.event.deployment_status.environment != 'Production'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -20,49 +23,32 @@ jobs:
         containers: [1, 2, 3]
     steps:
       - name: Log deployment info
-        id: deployment-info
         run: |
           echo "Environment URL: ${{ github.event.deployment_status.environment_url }}"
           echo "Environment: ${{ github.event.deployment_status.environment }}"
           echo "Deployment ref: ${{ github.event.deployment_status.deployment.ref }}"
           echo "Deployment SHA: ${{ github.event.deployment_status.deployment.sha }}"
 
-          # Skip Production deployments (main branch) - already tested in PR
-          # Vercel sets environment to "Production" for main, "Preview" for PRs
-          # Note: deployment.ref is often empty for Production deployments
-          ENV="${{ github.event.deployment_status.environment }}"
-          if [ "$ENV" = "Production" ]; then
-            echo "skip=true" >> $GITHUB_OUTPUT
-            echo "Skipping: Production deployment (already tested in PR)"
-          else
-            echo "skip=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Checkout
-        if: steps.deployment-info.outputs.skip != 'true'
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.deployment_status.deployment.sha }}
 
       - name: Setup pnpm
-        if: steps.deployment-info.outputs.skip != 'true'
         uses: pnpm/action-setup@v2
         with:
           version: 10
 
       - name: Setup Node.js
-        if: steps.deployment-info.outputs.skip != 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
 
       - name: Install dependencies
-        if: steps.deployment-info.outputs.skip != 'true'
         run: pnpm install
 
       - name: Cache Cypress binary
-        if: steps.deployment-info.outputs.skip != 'true'
         uses: actions/cache@v4
         with:
           path: ~/.cache/Cypress
@@ -71,11 +57,9 @@ jobs:
             cypress-binary-${{ runner.os }}-
 
       - name: Install Cypress binary
-        if: steps.deployment-info.outputs.skip != 'true'
         run: npx cypress install
 
       - name: Cypress run against deployment
-        if: steps.deployment-info.outputs.skip != 'true'
         uses: cypress-io/github-action@v6
         with:
           install: false
@@ -91,12 +75,12 @@ jobs:
           SPLIT_INDEX: ${{ strategy.job-index }}
 
       - name: Merge mochawesome reports
-        if: always() && steps.deployment-info.outputs.skip != 'true'
+        if: always()
         run: |
           npx mochawesome-merge cypress/results/*.json -o cypress/results/merged-report.json 2>/dev/null || echo "No mochawesome reports to merge"
 
       - name: Upload Cypress artifacts
-        if: always() && steps.deployment-info.outputs.skip != 'true'
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: cypress-results-${{ github.run_id }}-${{ matrix.containers }}
@@ -112,19 +96,7 @@ jobs:
     if: always() && !cancelled() && needs.cypress-run.result != 'skipped'
     runs-on: ubuntu-latest
     steps:
-      - name: Skip if Production deployment
-        id: check-env
-        run: |
-          ENV="${{ github.event.deployment_status.environment }}"
-          if [ "$ENV" = "Production" ]; then
-            echo "skip=true" >> $GITHUB_OUTPUT
-            echo "Skipping: Production deployment"
-          else
-            echo "skip=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Checkout
-        if: steps.check-env.outputs.skip != 'true'
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.deployment_status.deployment.sha }}
@@ -132,13 +104,11 @@ jobs:
             scripts
 
       - name: Setup Node.js
-        if: steps.check-env.outputs.skip != 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Download all mochawesome artifacts
-        if: steps.check-env.outputs.skip != 'true'
         uses: actions/download-artifact@v4
         with:
           pattern: cypress-results-${{ github.run_id }}-*
@@ -146,7 +116,6 @@ jobs:
           merge-multiple: false
 
       - name: Restore flaky test history
-        if: steps.check-env.outputs.skip != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -162,19 +131,17 @@ jobs:
           fi
 
       - name: Collect current test results
-        if: steps.check-env.outputs.skip != 'true'
         run: |
           node scripts/collect-test-results.cjs all-results > current-results.json
           echo "Current results:"
           cat current-results.json | head -c 500
 
       - name: Analyze flaky tests and generate summary
-        if: steps.check-env.outputs.skip != 'true'
         run: |
           node scripts/analyze-flaky-tests.cjs flaky-history.json current-results.json >> $GITHUB_STEP_SUMMARY
 
       - name: Save flaky test history
-        if: always() && steps.check-env.outputs.skip != 'true'
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: flaky-test-history
@@ -183,7 +150,6 @@ jobs:
           retention-days: 90
 
       - name: Label PR if flaky tests detected
-        if: steps.check-env.outputs.skip != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
