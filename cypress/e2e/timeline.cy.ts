@@ -37,6 +37,9 @@ describe("Timeline", () => {
   }
 
   it("should show timeline on Today page with time blocks", () => {
+    // Navigate to Today filter first so the task gets a today date
+    cy.get('[data-cy="filter-today"]').click();
+
     const taskName = `Timeline test ${Date.now()}`;
     createTaskAndGetId(taskName).then((taskId) => {
       // Start and stop a timer to create a time entry
@@ -52,10 +55,7 @@ describe("Timeline", () => {
       // Dismiss the timer bar
       cy.get('[data-cy="timer-dismiss-button"]').click();
 
-      // Navigate to Today filter
-      cy.get('[data-cy="filter-today"]').click();
-
-      // Timeline container should appear
+      // Timeline container should appear (already on Today filter)
       cy.get('[data-cy="today-timeline"]', { timeout: 10000 }).should(
         "be.visible",
       );
@@ -72,6 +72,9 @@ describe("Timeline", () => {
   });
 
   it("should scroll to task when clicking a timeline block", () => {
+    // Navigate to Today filter first so the task gets a today date
+    cy.get('[data-cy="filter-today"]').click();
+
     const taskName = `Scroll test ${Date.now()}`;
     createTaskAndGetId(taskName).then((taskId) => {
       // Create a time entry
@@ -87,16 +90,17 @@ describe("Timeline", () => {
       // Dismiss the timer bar
       cy.get('[data-cy="timer-dismiss-button"]').click();
 
-      // Navigate to Today filter
-      cy.get('[data-cy="filter-today"]').click();
-
-      // Wait for timeline to appear
+      // Wait for timeline to appear with blocks
       cy.get('[data-cy="today-timeline"]', { timeout: 10000 }).should(
         "be.visible",
       );
+      cy.get('[data-cy="timeline-block"]', { timeout: 10000 }).should(
+        "have.length.at.least",
+        1,
+      );
 
-      // Click the timeline block
-      cy.get('[data-cy="timeline-block"]').first().click();
+      // Click the timeline block for our task
+      cy.get('[data-cy="timeline-block"]').contains(taskName).click();
 
       // The task should get highlighted (ring class added)
       cy.get(`[data-task-id="${taskId}"]`, { timeout: 5000 }).should(
