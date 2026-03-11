@@ -1,7 +1,9 @@
-import { Square, X } from 'lucide-react';
+import { Check, Square, X } from 'lucide-react';
 import { Input } from '@/shared/ui/input';
 import { Button } from '@/shared/ui/button';
 import { cn } from '@/shared/lib/utils';
+
+export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
 interface TimerBarProps {
   taskName: string;
@@ -9,6 +11,7 @@ interface TimerBarProps {
   endTime?: string;
   duration: string;
   isRunning?: boolean;
+  saveStatus?: SaveStatus;
   onStartTimeChange?: (value: string) => void;
   onStartTimeBlur?: () => void;
   onEndTimeChange?: (value: string) => void;
@@ -24,6 +27,7 @@ export function TimerBar({
   endTime,
   duration,
   isRunning = true,
+  saveStatus = 'idle',
   onStartTimeChange,
   onStartTimeBlur,
   onEndTimeChange,
@@ -70,6 +74,20 @@ export function TimerBar({
               className="w-[110px] h-8 text-xs"
               data-cy="timer-end-input"
             />
+          )}
+        </div>
+
+        <div className="flex-shrink-0 w-16 text-center" data-cy="timer-save-status">
+          {saveStatus === 'saved' && (
+            <span className="inline-flex items-center gap-0.5 text-xs text-green-600 animate-in fade-in duration-200">
+              <Check size={12} />
+              Saved
+            </span>
+          )}
+          {saveStatus === 'error' && (
+            <span className="text-xs text-red-600 font-medium">
+              Failed
+            </span>
           )}
         </div>
 
