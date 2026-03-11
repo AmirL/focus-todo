@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -51,16 +51,17 @@ export function QuickAddFromGapDialog({ gap, open, onOpenChange }: QuickAddFromG
   const [selectedListId, setSelectedListId] = useState<number | null>(null);
   const createCompletedTask = useCreateCompletedTaskMutation();
 
-  const handleOpenChange = (isOpen: boolean) => {
-    if (isOpen && gap) {
-      // Reset form and pre-fill times from gap
+  // Pre-fill times when dialog opens with a gap.
+  // Radix Dialog does not call onOpenChange when opened via the `open` prop,
+  // so we use an effect instead of relying on onOpenChange for initialization.
+  useEffect(() => {
+    if (open && gap) {
       setName('');
       setStartTime(formatTimeInput(gap.startedAt));
       setEndTime(formatTimeInput(gap.endedAt));
       setSelectedListId(null);
     }
-    onOpenChange(isOpen);
-  };
+  }, [open, gap]);
 
   const handleSubmit = () => {
     if (!name.trim() || !selectedListId || !gap) return;
@@ -91,7 +92,7 @@ export function QuickAddFromGapDialog({ gap, open, onOpenChange }: QuickAddFromG
   })();
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md" data-cy="quick-add-gap-dialog">
         <DialogHeader>
           <DialogTitle>Log Task</DialogTitle>

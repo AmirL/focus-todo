@@ -2,6 +2,20 @@
 
 describe("Quick-Add from Timeline Gap", () => {
   let createdTaskIds: number[] = [];
+  let workListId: number;
+
+  before(() => {
+    // Dynamically fetch a valid listId (may differ between local and preview)
+    const apiKey = Cypress.env("API_TEST_KEY");
+    cy.request({
+      method: "GET",
+      url: "/api/lists",
+      headers: { "x-api-key": apiKey },
+    }).then((response) => {
+      expect(response.body.lists.length).to.be.greaterThan(0);
+      workListId = response.body.lists[0].id;
+    });
+  });
 
   beforeEach(() => {
     cy.intercept("POST", "/api/create-completed-task").as(
@@ -62,13 +76,13 @@ describe("Quick-Add from Timeline Gap", () => {
       `Gap test A ${Date.now()}`,
       todayAt(9, 0),
       todayAt(10, 0),
-      1,
+      workListId,
     );
     createCompletedTaskViaApi(
       `Gap test B ${Date.now()}`,
       todayAt(11, 0),
       todayAt(12, 0),
-      1,
+      workListId,
     );
 
     // Navigate to Today filter to see the timeline
@@ -129,13 +143,13 @@ describe("Quick-Add from Timeline Gap", () => {
       `Cancel test A ${Date.now()}`,
       todayAt(9, 0),
       todayAt(10, 0),
-      1,
+      workListId,
     );
     createCompletedTaskViaApi(
       `Cancel test B ${Date.now()}`,
       todayAt(11, 0),
       todayAt(12, 0),
-      1,
+      workListId,
     );
 
     cy.get('[data-cy="filter-today"]').click();
@@ -164,13 +178,13 @@ describe("Quick-Add from Timeline Gap", () => {
       `Disabled test A ${Date.now()}`,
       todayAt(9, 0),
       todayAt(10, 0),
-      1,
+      workListId,
     );
     createCompletedTaskViaApi(
       `Disabled test B ${Date.now()}`,
       todayAt(11, 0),
       todayAt(12, 0),
-      1,
+      workListId,
     );
 
     cy.get('[data-cy="filter-today"]').click();
