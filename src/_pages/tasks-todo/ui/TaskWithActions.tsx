@@ -29,7 +29,7 @@ export function TaskWithActions({ task }: { task: TaskModel }) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes}>
+    <div ref={setNodeRef} style={style} data-task-id={task.id} {...attributes}>
       <Task
         task={task}
         isDragging={isCurrentTaskDragging}
