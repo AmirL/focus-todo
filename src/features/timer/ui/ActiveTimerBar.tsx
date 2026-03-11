@@ -1,6 +1,7 @@
 'use client';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { TimerBar } from '@/shared/ui/timer';
+import type { SaveStatus } from '@/shared/ui/timer/TimerBar';
 import { useTimerStore } from '../model/timerStore';
 import { useStopTimerMutation, useUpdateTimeEntryMutation } from '@/shared/api/time-entries';
 import { useTasksQuery } from '@/shared/api/tasks';
@@ -17,6 +18,10 @@ export function ActiveTimerBar() {
   // Local state for time inputs to avoid overwriting during editing
   const [localStartTime, setLocalStartTime] = useState('');
   const [localEndTime, setLocalEndTime] = useState('');
+
+  // Save status indicator
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Sync local state from activeEntry when it changes
   const startedAt = activeEntry?.startedAt;
@@ -39,29 +44,54 @@ export function ActiveTimerBar() {
     return () => clearInterval(interval);
   }, [activeEntry]);
 
+  const showSaveResult = useCallback((status: 'saved' | 'error') => {
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    setSaveStatus(status);
+    saveTimerRef.current = setTimeout(() => setSaveStatus('idle'), 2000);
+  }, []);
+
+  // Clean up timer on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
+  }, []);
+
   const saveStartTime = useCallback(async () => {
     if (!activeEntry) return;
     const [h, m] = localStartTime.split(':').map(Number);
     if (isNaN(h) || isNaN(m)) return;
     const newStart = dayjs(activeEntry.startedAt).hour(h).minute(m).second(0);
-    const updated = await updateEntry.mutateAsync({
-      id: activeEntry.id,
-      startedAt: newStart.toISOString(),
-    });
-    setActiveEntry(updated);
-  }, [activeEntry, localStartTime, updateEntry, setActiveEntry]);
+    setSaveStatus('saving');
+    try {
+      const updated = await updateEntry.mutateAsync({
+        id: activeEntry.id,
+        startedAt: newStart.toISOString(),
+      });
+      setActiveEntry(updated);
+      showSaveResult('saved');
+    } catch {
+      showSaveResult('error');
+    }
+  }, [activeEntry, localStartTime, updateEntry, setActiveEntry, showSaveResult]);
 
   const saveEndTime = useCallback(async () => {
     if (!activeEntry?.endedAt) return;
     const [h, m] = localEndTime.split(':').map(Number);
     if (isNaN(h) || isNaN(m)) return;
     const newEnd = dayjs(activeEntry.endedAt).hour(h).minute(m).second(0);
-    const updated = await updateEntry.mutateAsync({
-      id: activeEntry.id,
-      endedAt: newEnd.toISOString(),
-    });
-    setActiveEntry(updated);
-  }, [activeEntry, localEndTime, updateEntry, setActiveEntry]);
+    setSaveStatus('saving');
+    try {
+      const updated = await updateEntry.mutateAsync({
+        id: activeEntry.id,
+        endedAt: newEnd.toISOString(),
+      });
+      setActiveEntry(updated);
+      showSaveResult('saved');
+    } catch {
+      showSaveResult('error');
+    }
+  }, [activeEntry, localEndTime, updateEntry, setActiveEntry, showSaveResult]);
 
   if (!activeEntry) return null;
 
@@ -102,6 +132,7 @@ export function ActiveTimerBar() {
       endTime={activeEntry.endedAt ? localEndTime : undefined}
       duration={duration}
       isRunning={isRunning}
+      saveStatus={saveStatus}
       onStartTimeChange={setLocalStartTime}
       onStartTimeBlur={saveStartTime}
       onEndTimeChange={setLocalEndTime}

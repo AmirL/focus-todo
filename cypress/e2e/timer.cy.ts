@@ -127,6 +127,44 @@ describe("Timer", () => {
     });
   });
 
+  it("should show save confirmation after editing time", () => {
+    cy.intercept("POST", "/api/update-time-entry").as("updateEntry");
+    const taskName = `Save confirm test ${Date.now()}`;
+    createTaskAndGetId(taskName).then((taskId) => {
+      // Start and stop timer to get editable time inputs
+      cy.get(`[data-testid="task-${taskId}"]`)
+        .find('[data-cy="start-timer-button"]')
+        .click();
+      cy.wait("@startTimer");
+      cy.get('[data-cy="timer-bar"]', { timeout: 10000 }).should("be.visible");
+
+      cy.get('[data-cy="timer-stop-button"]').click();
+      cy.wait("@stopTimer");
+
+      // Edit start time and blur to trigger save
+      cy.get('[data-cy="timer-start-input"]').then(($input) => {
+        const currentValue = $input.val() as string;
+        const [h, m] = currentValue.split(":").map(Number);
+        const newHour = String(h > 0 ? h - 1 : 23).padStart(2, "0");
+        const newTime = `${newHour}:${String(m).padStart(2, "0")}`;
+
+        cy.get('[data-cy="timer-start-input"]').clear().type(newTime).blur();
+        cy.wait("@updateEntry");
+
+        // Save confirmation should appear
+        cy.get('[data-cy="timer-save-status"]')
+          .should("contain.text", "Saved")
+          .should("be.visible");
+
+        // Confirmation should fade away after ~2 seconds
+        cy.get('[data-cy="timer-save-status"]', { timeout: 5000 }).should(
+          "not.contain.text",
+          "Saved",
+        );
+      });
+    });
+  });
+
   it("should toggle timer on and off via the task button", () => {
     const taskName = `Toggle test ${Date.now()}`;
     createTaskAndGetId(taskName).then((taskId) => {

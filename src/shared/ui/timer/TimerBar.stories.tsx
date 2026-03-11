@@ -60,3 +60,25 @@ export const StoppedEditable: Story = {
     isRunning: false,
   },
 };
+
+export const SavedConfirmation: Story = {
+  args: {
+    taskName: 'Task with save confirmation',
+    startTime: '09:30',
+    endTime: '10:45',
+    duration: '1h 15m',
+    isRunning: false,
+    saveStatus: 'saved',
+  },
+};
+
+export const SaveFailed: Story = {
+  args: {
+    taskName: 'Task with save error',
+    startTime: '09:30',
+    endTime: '10:45',
+    duration: '1h 15m',
+    isRunning: false,
+    saveStatus: 'error',
+  },
+};
