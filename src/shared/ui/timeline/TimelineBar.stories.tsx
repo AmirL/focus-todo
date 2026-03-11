@@ -198,6 +198,38 @@ export const CurrentlyRunningTimer: Story = {
   },
 };
 
+export const ClickableGaps: Story = {
+  args: {
+    blocks: [
+      {
+        id: '1',
+        taskName: 'Morning standup',
+        startedAt: todayAt(9, 0),
+        endedAt: todayAt(9, 15),
+        listName: 'Work',
+        durationMinutes: 15,
+      },
+      {
+        id: '2',
+        taskName: 'Code review',
+        startedAt: todayAt(10, 0),
+        endedAt: todayAt(11, 0),
+        listName: 'Work',
+        durationMinutes: 60,
+      },
+      {
+        id: '3',
+        taskName: 'Lunch',
+        startedAt: todayAt(12, 30),
+        endedAt: todayAt(13, 0),
+        listName: 'Personal',
+        durationMinutes: 30,
+      },
+    ],
+    onGapClick: (gap) => console.log('Gap clicked:', gap),
+  },
+};
+
 export const MixedWorkAndPersonal: Story = {
   args: {
     blocks: [

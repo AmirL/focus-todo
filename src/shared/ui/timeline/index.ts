@@ -1,2 +1,2 @@
 export { TimelineBar } from './TimelineBar';
-export type { TimelineBlock } from './TimelineBar';
+export type { TimelineBlock, TimelineGap } from './TimelineBar';
