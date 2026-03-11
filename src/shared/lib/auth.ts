@@ -29,6 +29,14 @@ const getBaseURL = (): string | undefined => {
 export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: getBaseURL(),
+  trustedOrigins: (request) => {
+    const origin = request.headers.get("origin");
+    // Trust any Vercel preview deployment origin so login works on all preview URLs
+    if (origin && new URL(origin).hostname.endsWith(".vercel.app")) {
+      return [origin];
+    }
+    return [];
+  },
   database: drizzleAdapter(DB, {
     provider: "mysql",
     schema: schema,
