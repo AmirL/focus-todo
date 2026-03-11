@@ -12,9 +12,16 @@ export interface TimelineBlock {
   durationMinutes: number | null;
 }
 
+export interface TimelineGap {
+  startedAt: string; // ISO datetime
+  endedAt: string; // ISO datetime
+  durationMinutes: number;
+}
+
 interface TimelineBarProps {
   blocks: TimelineBlock[];
   onBlockClick?: (block: TimelineBlock) => void;
+  onGapClick?: (gap: TimelineGap) => void;
   className?: string;
 }
 
@@ -104,6 +111,7 @@ function computeLayout(blocks: TimelineBlock[]) {
     left: number;
     width: number;
     block?: typeof parsedBlocks[number];
+    gap?: TimelineGap;
   };
 
   const segments: Segment[] = [];
@@ -115,10 +123,18 @@ function computeLayout(blocks: TimelineBlock[]) {
 
     // Add gap if there's space before this block
     if (blockStart > cursor + 1) {
+      const gapDuration = Math.round(blockStart - cursor);
+      const gapStart = new Date(timelineStart.getTime() + cursor * 60 * 1000);
+      const gapEnd = new Date(timelineStart.getTime() + blockStart * 60 * 1000);
       segments.push({
         type: 'gap',
         left: (cursor / totalMinutes) * 100,
         width: ((blockStart - cursor) / totalMinutes) * 100,
+        gap: {
+          startedAt: gapStart.toISOString(),
+          endedAt: gapEnd.toISOString(),
+          durationMinutes: gapDuration,
+        },
       });
     }
 
@@ -135,7 +151,7 @@ function computeLayout(blocks: TimelineBlock[]) {
   return { hourMarks, segments, startHour, endHour };
 }
 
-export function TimelineBar({ blocks, onBlockClick, className }: TimelineBarProps) {
+export function TimelineBar({ blocks, onBlockClick, onGapClick, className }: TimelineBarProps) {
   const layout = useMemo(() => computeLayout(blocks), [blocks]);
 
   if (blocks.length === 0) {
@@ -171,11 +187,20 @@ export function TimelineBar({ blocks, onBlockClick, className }: TimelineBarProp
       <div className="relative h-10 rounded-md bg-muted/40 overflow-hidden">
         {layout.segments.map((seg, i) => {
           if (seg.type === 'gap') {
+            const gap = seg.gap!;
+            const gapStart = new Date(gap.startedAt);
+            const gapEnd = new Date(gap.endedAt);
             return (
-              <div
+              <button
                 key={`gap-${i}`}
-                className="absolute top-0 bottom-0 bg-muted/60"
+                data-cy="timeline-gap"
+                className={cn(
+                  'absolute top-0 bottom-0 bg-muted/60 transition-colors',
+                  onGapClick && 'hover:bg-orange-100 cursor-pointer border border-transparent hover:border-orange-300 hover:border-dashed',
+                )}
                 style={{ left: `${seg.left}%`, width: `${seg.width}%` }}
+                onClick={() => onGapClick?.(gap)}
+                title={`Gap: ${formatTime(gapStart)} - ${formatTime(gapEnd)} (${formatBlockDuration(gap.durationMinutes)})`}
               />
             );
           }

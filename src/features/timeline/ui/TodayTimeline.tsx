@@ -1,16 +1,19 @@
 'use client';
 
-import { useMemo, useCallback } from 'react';
-import { TimelineBar, type TimelineBlock } from '@/shared/ui/timeline';
+import { useMemo, useCallback, useState } from 'react';
+import { TimelineBar, type TimelineBlock, type TimelineGap } from '@/shared/ui/timeline';
 import { useTimeEntriesQuery } from '@/shared/api/time-entries';
 import { useTasksQuery } from '@/shared/api/tasks';
 import { useListNameMap } from '@/shared/lib/listUtils';
 import { mapTimeEntriesToBlocks, type TimelineBlockWithTaskId } from '../model/mapTimeEntriesToBlocks';
+import { QuickAddFromGapDialog } from './QuickAddFromGapDialog';
 
 export function TodayTimeline() {
   const { data: timeEntries = [] } = useTimeEntriesQuery();
   const { data: tasks = [] } = useTasksQuery();
   const listNameMap = useListNameMap();
+  const [selectedGap, setSelectedGap] = useState<TimelineGap | null>(null);
+  const [isGapDialogOpen, setIsGapDialogOpen] = useState(false);
 
   const blocks = useMemo(
     () => mapTimeEntriesToBlocks(timeEntries, tasks, listNameMap),
@@ -33,12 +36,23 @@ export function TodayTimeline() {
     }
   }, []);
 
+  const handleGapClick = useCallback((gap: TimelineGap) => {
+    setSelectedGap(gap);
+    setIsGapDialogOpen(true);
+  }, []);
+
   return (
     <div className="px-2 sm:px-4" data-cy="today-timeline">
       <TimelineBar
         blocks={blocks}
         onBlockClick={handleBlockClick}
+        onGapClick={handleGapClick}
         className="mb-2"
+      />
+      <QuickAddFromGapDialog
+        gap={selectedGap}
+        open={isGapDialogOpen}
+        onOpenChange={setIsGapDialogOpen}
       />
     </div>
   );
