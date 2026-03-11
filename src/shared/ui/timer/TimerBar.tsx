@@ -118,7 +118,7 @@ export function TimerBar({
         </div>
 
         <div className="flex items-center gap-1">
-          {isRunning ? (
+          {isRunning && (
             <Button
               variant="secondary"
               size="sm"
@@ -129,18 +129,20 @@ export function TimerBar({
               <Square size={10} />
               Stop
             </Button>
-          ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onDismiss}
-              className="h-7 gap-1 text-xs text-muted-foreground"
-              data-cy="timer-dismiss-button"
-            >
-              <X size={12} />
-              Dismiss
-            </Button>
           )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onDismiss}
+            className={cn(
+              'h-7 gap-1 text-xs',
+              isRunning ? 'text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10' : 'text-muted-foreground'
+            )}
+            data-cy="timer-dismiss-button"
+          >
+            <X size={12} />
+            Dismiss
+          </Button>
         </div>
       </div>
     </div>
