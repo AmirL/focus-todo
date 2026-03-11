@@ -17,7 +17,8 @@
     "cy:run": "cypress run",
     "cy:run:record": "cypress run --record",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "coverage": "bash scripts/coverage.sh"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
