@@ -48,7 +48,7 @@ jobs:
         if: steps.deployment-info.outputs.skip != 'true'
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 10
 
       - name: Setup Node.js
         if: steps.deployment-info.outputs.skip != 'true'
@@ -65,6 +65,7 @@ jobs:
         if: steps.deployment-info.outputs.skip != 'true'
         uses: cypress-io/github-action@v6
         with:
+          install: false
           wait-on: ${{ github.event.deployment_status.target_url }}
           wait-on-timeout: 120
         env:
