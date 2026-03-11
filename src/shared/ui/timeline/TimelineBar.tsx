@@ -76,21 +76,26 @@ function computeLayout(blocks: TimelineBlock[]) {
     parsedBlocks[0].end
   );
 
-  const startHour = earliest.getHours();
-  const endHour = Math.min(latest.getHours() + 1, 24);
-  const totalMinutes = (endHour - startHour) * 60;
+  const timelineStart = earliest;
+  const timelineEnd = latest;
+  const totalMinutes = (timelineEnd.getTime() - timelineStart.getTime()) / (1000 * 60);
 
   if (totalMinutes <= 0) return { hourMarks: [], segments: [], startHour: 0, endHour: 0 };
 
-  const timelineStart = new Date(earliest);
-  timelineStart.setHours(startHour, 0, 0, 0);
+  const startHour = earliest.getHours();
+  const endHour = Math.min(latest.getHours() + 1, 24);
 
   const minutesFromStart = (date: Date) =>
     (date.getTime() - timelineStart.getTime()) / (1000 * 60);
 
+  // Only show hour marks that fall within the actual timeline range
   const hourMarks: { label: string; percent: number }[] = [];
   for (let h = startHour; h <= endHour; h++) {
-    const percent = ((h - startHour) * 60 / totalMinutes) * 100;
+    const hourDate = new Date(earliest);
+    hourDate.setHours(h, 0, 0, 0);
+    const minutesOffset = minutesFromStart(hourDate);
+    if (minutesOffset < 0 || minutesOffset > totalMinutes) continue;
+    const percent = (minutesOffset / totalMinutes) * 100;
     hourMarks.push({ label: `${h.toString().padStart(2, '0')}:00`, percent });
   }
 
