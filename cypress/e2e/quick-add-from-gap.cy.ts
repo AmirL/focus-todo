@@ -21,8 +21,6 @@ describe("Quick-Add from Timeline Gap", () => {
     cy.intercept("POST", "/api/create-completed-task").as(
       "createCompletedTask",
     );
-    cy.visit("/");
-    cy.waitForAppLoad();
   });
 
   afterEach(() => {
@@ -67,26 +65,31 @@ describe("Quick-Add from Timeline Gap", () => {
     return d.toISOString();
   }
 
-  it("should open dialog when clicking a timeline gap and create a completed task", () => {
-    // Create two completed tasks with a 1-hour gap between them:
-    //   Task A: 09:00 - 10:00
-    //   Gap:    10:00 - 11:00
-    //   Task B: 11:00 - 12:00
+  /**
+   * Create two tasks with a 1-hour gap, then visit the page so React Query
+   * fetches fresh data including the new time entries.
+   */
+  function setupGapAndVisit(prefix: string) {
     createCompletedTaskViaApi(
-      `Gap test A ${Date.now()}`,
+      `${prefix} A ${Date.now()}`,
       todayAt(9, 0),
       todayAt(10, 0),
       workListId,
     );
     createCompletedTaskViaApi(
-      `Gap test B ${Date.now()}`,
+      `${prefix} B ${Date.now()}`,
       todayAt(11, 0),
       todayAt(12, 0),
       workListId,
     );
-
-    // Navigate to Today filter to see the timeline
+    // Visit after creating tasks so React Query fetches fresh data
+    cy.visit("/");
+    cy.waitForAppLoad();
     cy.get('[data-cy="filter-today"]').click();
+  }
+
+  it("should open dialog when clicking a timeline gap and create a completed task", () => {
+    setupGapAndVisit("Gap test");
 
     // Timeline should appear with blocks and a gap
     cy.get('[data-cy="today-timeline"]', { timeout: 10000 }).should(
@@ -138,21 +141,7 @@ describe("Quick-Add from Timeline Gap", () => {
   });
 
   it("should close dialog when clicking Cancel", () => {
-    // Create two tasks with a gap
-    createCompletedTaskViaApi(
-      `Cancel test A ${Date.now()}`,
-      todayAt(9, 0),
-      todayAt(10, 0),
-      workListId,
-    );
-    createCompletedTaskViaApi(
-      `Cancel test B ${Date.now()}`,
-      todayAt(11, 0),
-      todayAt(12, 0),
-      workListId,
-    );
-
-    cy.get('[data-cy="filter-today"]').click();
+    setupGapAndVisit("Cancel test");
 
     cy.get('[data-cy="today-timeline"]', { timeout: 10000 }).should(
       "be.visible",
@@ -174,20 +163,7 @@ describe("Quick-Add from Timeline Gap", () => {
   });
 
   it("should disable submit button when task name is empty", () => {
-    createCompletedTaskViaApi(
-      `Disabled test A ${Date.now()}`,
-      todayAt(9, 0),
-      todayAt(10, 0),
-      workListId,
-    );
-    createCompletedTaskViaApi(
-      `Disabled test B ${Date.now()}`,
-      todayAt(11, 0),
-      todayAt(12, 0),
-      workListId,
-    );
-
-    cy.get('[data-cy="filter-today"]').click();
+    setupGapAndVisit("Disabled test");
 
     cy.get('[data-cy="today-timeline"]', { timeout: 10000 }).should(
       "be.visible",
