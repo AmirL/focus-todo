@@ -13,6 +13,7 @@ import {
   setListArchivedStatus,
   userListFilter,
 } from '@/shared/lib/db/list-queries';
+import { validateListColor } from '@/shared/lib/colors';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -100,6 +101,14 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
 
     if (body.description !== undefined) {
       updateData.description = body.description;
+    }
+
+    if (body.color !== undefined) {
+      const colorValidation = validateListColor(body.color);
+      if (!colorValidation.isValid) {
+        return NextResponse.json({ error: colorValidation.error }, { status: 400 });
+      }
+      updateData.color = body.color;
     }
 
     if (body.participatesInInitiative !== undefined) {

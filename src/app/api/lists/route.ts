@@ -5,6 +5,7 @@ import { listsTable } from '@/shared/lib/drizzle/schema';
 import { getUserIdFromApiKey } from '@/app/api/api-auth';
 import { serializeList, handleApiError } from './serialize';
 import { getUserLists, findUserListByName } from '@/shared/lib/db/list-queries';
+import { validateListColor } from '@/shared/lib/colors';
 
 /**
  * GET /api/lists - List all lists for the authenticated user
@@ -44,6 +45,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'List name must be 255 characters or less' }, { status: 400 });
     }
 
+    const colorValidation = validateListColor(body.color);
+    if (!colorValidation.isValid) {
+      return NextResponse.json({ error: colorValidation.error }, { status: 400 });
+    }
+
     // Check for duplicate name
     const existing = await findUserListByName(userId, body.name.trim());
     if (existing.length > 0) {
@@ -63,6 +69,7 @@ export async function POST(req: NextRequest) {
       .values({
         name: body.name.trim(),
         description: body.description ?? null,
+        color: body.color ?? null,
         userId,
         isDefault: false,
         participatesInInitiative: body.participatesInInitiative ?? true,

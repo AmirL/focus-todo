@@ -49,6 +49,7 @@ const sampleList = {
   id: 1,
   name: 'Work',
   description: 'Work tasks',
+  color: null as string | null,
   userId: 'user-1',
   isDefault: true,
   participatesInInitiative: true,
