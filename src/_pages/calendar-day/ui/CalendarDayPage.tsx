@@ -6,9 +6,12 @@ import { DayTimeline } from '@/shared/ui/timeline';
 import type { TimelineBlock, TimelineGap } from '@/shared/ui/timeline';
 import { useTimeEntriesQuery, useUpdateTimeEntryMutation, useDeleteTimeEntryMutation } from '@/shared/api/time-entries';
 import { useTasksQuery } from '@/shared/api/tasks';
+import { useListsQuery } from '@/shared/api/lists';
 import { useListNameMap } from '@/shared/lib/listUtils';
 import { mapTimeEntriesToBlocks } from '@/features/timeline/model/mapTimeEntriesToBlocks';
+import { aggregateTimeByList } from '@/features/timeline/model/aggregateTimeByList';
 import { QuickAddFromGapDialog } from '@/features/timeline/ui/QuickAddFromGapDialog';
+import { DoughnutChart } from '@/shared/ui/charts';
 
 export function CalendarDayPage() {
   const [selectedDate, setSelectedDate] = useState(() => dayjs());
@@ -17,6 +20,7 @@ export function CalendarDayPage() {
 
   const { data: timeEntries = [] } = useTimeEntriesQuery();
   const { data: tasks = [] } = useTasksQuery();
+  const { data: lists = [] } = useListsQuery();
   const listNameMap = useListNameMap();
   const updateTimeEntry = useUpdateTimeEntryMutation();
   const deleteTimeEntry = useDeleteTimeEntryMutation();
@@ -24,6 +28,11 @@ export function CalendarDayPage() {
   const blocks = useMemo(
     () => mapTimeEntriesToBlocks(timeEntries, tasks, listNameMap, selectedDate),
     [timeEntries, tasks, listNameMap, selectedDate],
+  );
+
+  const doughnutSegments = useMemo(
+    () => aggregateTimeByList(timeEntries, tasks, lists, selectedDate),
+    [timeEntries, tasks, lists, selectedDate],
   );
 
   const handlePrevDay = useCallback(() => {
@@ -87,6 +96,9 @@ export function CalendarDayPage() {
           onGapClick={handleGapClick}
           onAddEntry={handleAddEntry}
         />
+        <div className="px-4 py-4 border-t border-border">
+          <DoughnutChart segments={doughnutSegments} />
+        </div>
       </div>
       <QuickAddFromGapDialog
         gap={selectedGap}

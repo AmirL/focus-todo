@@ -4,13 +4,17 @@ import { useMemo, useCallback, useState } from 'react';
 import { TimelineBar, type TimelineBlock, type TimelineGap } from '@/shared/ui/timeline';
 import { useTimeEntriesQuery } from '@/shared/api/time-entries';
 import { useTasksQuery } from '@/shared/api/tasks';
+import { useListsQuery } from '@/shared/api/lists';
 import { useListNameMap } from '@/shared/lib/listUtils';
 import { mapTimeEntriesToBlocks, type TimelineBlockWithTaskId } from '../model/mapTimeEntriesToBlocks';
+import { aggregateTimeByList } from '../model/aggregateTimeByList';
 import { QuickAddFromGapDialog } from './QuickAddFromGapDialog';
+import { DoughnutChart } from '@/shared/ui/charts';
 
 export function TodayTimeline() {
   const { data: timeEntries = [] } = useTimeEntriesQuery();
   const { data: tasks = [] } = useTasksQuery();
+  const { data: lists = [] } = useListsQuery();
   const listNameMap = useListNameMap();
   const [selectedGap, setSelectedGap] = useState<TimelineGap | null>(null);
   const [isGapDialogOpen, setIsGapDialogOpen] = useState(false);
@@ -18,6 +22,11 @@ export function TodayTimeline() {
   const blocks = useMemo(
     () => mapTimeEntriesToBlocks(timeEntries, tasks, listNameMap),
     [timeEntries, tasks, listNameMap],
+  );
+
+  const doughnutSegments = useMemo(
+    () => aggregateTimeByList(timeEntries, tasks, lists),
+    [timeEntries, tasks, lists],
   );
 
   const handleBlockClick = useCallback((block: TimelineBlock) => {
@@ -49,6 +58,7 @@ export function TodayTimeline() {
         onGapClick={handleGapClick}
         className="mb-2"
       />
+      <DoughnutChart segments={doughnutSegments} className="mt-4" />
       <QuickAddFromGapDialog
         gap={selectedGap}
         open={isGapDialogOpen}
