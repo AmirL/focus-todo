@@ -1,0 +1,18 @@
+project_id = 2
+view_id = 8
+poll_interval_secs = 30
+max_concurrent_agents = 3
+
+[buckets]
+ideas = 7
+review_plan = 8
+plan_approved = 11
+todo = 4
+doing = 5
+review = 9
+done = 6
+failed = 10
+
+[agent]
+model = "opus"
+max_budget_usCd = 5.0
