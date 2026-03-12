@@ -8,7 +8,7 @@ import "./commands";
 
 // Only load code coverage support when CYPRESS_COVERAGE=true (local coverage runs).
 // In CI, coverage is not needed and produces nyc warnings about missing instrumentation.
-if (Cypress.env("CYPRESS_COVERAGE") === "true") {
+if (Cypress.env("COVERAGE") === "true") {
   require("@cypress/code-coverage/support");
 }
 
