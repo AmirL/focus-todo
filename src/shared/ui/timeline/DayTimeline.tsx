@@ -154,15 +154,25 @@ function computeVerticalLayout(blocks: TimelineBlock[], startHour: number): {
       const gapEndDate = new Date(baseDate);
       gapEndDate.setHours(startHour + Math.floor(nextStart / 60), nextStart % 60, 0, 0);
 
-      gapPositions.push({
-        gap: {
-          startedAt: gapStartDate.toISOString(),
-          endedAt: gapEndDate.toISOString(),
-          durationMinutes: gapDuration,
-        },
-        topPx: minutesToTop(currentEnd),
-        heightPx: minutesToHeight(gapDuration),
-      });
+      // Use the rendered bottom of the previous block to avoid overlap
+      // (blocks have a minimum height of 24px which may extend past their time-based end)
+      const prevBlockBottom = blockPositions[i].topPx + blockPositions[i].heightPx;
+      const timeBasedGapTop = minutesToTop(currentEnd);
+      const gapTop = Math.max(timeBasedGapTop, prevBlockBottom);
+      const nextBlockTop = blockPositions[i + 1].topPx;
+      const gapHeight = Math.max(nextBlockTop - gapTop, 0);
+
+      if (gapHeight > 0) {
+        gapPositions.push({
+          gap: {
+            startedAt: gapStartDate.toISOString(),
+            endedAt: gapEndDate.toISOString(),
+            durationMinutes: gapDuration,
+          },
+          topPx: gapTop,
+          heightPx: gapHeight,
+        });
+      }
     }
   }
 
@@ -253,19 +263,23 @@ function TimeBlock({
   );
 
   const isShort = heightPx < 48;
+  const isVeryShort = heightPx < 32;
+  const tooltipText = `${block.taskName} (${formatTimeHHMM(block.startedAt)}–${block.endedAt ? formatTimeHHMM(block.endedAt) : 'now'})${durationStr ? ` ${durationStr}` : ''}`;
 
   return (
     <div
       data-cy="day-timeline-block"
       className={cn(
-        'absolute left-16 right-2 rounded-lg border transition-colors cursor-pointer',
+        'absolute left-16 right-2 rounded-lg border transition-colors cursor-pointer group/block',
         'flex flex-col px-3 py-1.5 overflow-hidden',
+        isVeryShort && 'hover:overflow-visible hover:z-20 hover:h-auto hover:min-h-[32px]',
         colors.bg,
         colors.border,
         colors.hover,
         isRunning && 'animate-pulse'
       )}
       style={{ top: `${topPx}px`, height: `${heightPx}px` }}
+      title={isShort ? tooltipText : undefined}
       onClick={onStartEdit}
     >
       <div className="flex items-center justify-between gap-1 min-w-0">
@@ -279,7 +293,7 @@ function TimeBlock({
             </span>
           )}
         </div>
-        <div className="flex items-center gap-0.5 flex-shrink-0">
+        <div className="flex items-center gap-0.5 flex-shrink-0 opacity-0 group-hover/block:opacity-100 transition-opacity">
           <button
             data-cy="day-timeline-edit-btn"
             className={cn(

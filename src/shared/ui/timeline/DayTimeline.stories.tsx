@@ -304,3 +304,64 @@ export const MixedWorkAndPersonal: Story = {
     onBlockEdit: (block, start, end) => console.log('Edit:', block.taskName, start, end),
   },
 };
+
+export const ShortEntries: Story = {
+  args: {
+    date: today,
+    blocks: [
+      {
+        id: '1',
+        taskName: 'Quick standup sync meeting with the whole team',
+        startedAt: todayAt(9, 0),
+        endedAt: todayAt(9, 10),
+        listName: 'Work',
+        durationMinutes: 10,
+      },
+      {
+        id: '2',
+        taskName: 'Coffee break',
+        startedAt: todayAt(9, 15),
+        endedAt: todayAt(9, 25),
+        listName: 'Personal',
+        durationMinutes: 10,
+      },
+      {
+        id: '3',
+        taskName: 'Deploy hotfix to production',
+        startedAt: todayAt(9, 30),
+        endedAt: todayAt(9, 45),
+        listName: 'Work',
+        durationMinutes: 15,
+      },
+      {
+        id: '4',
+        taskName: 'Long design review session',
+        startedAt: todayAt(10, 0),
+        endedAt: todayAt(11, 30),
+        listName: 'Work',
+        durationMinutes: 90,
+      },
+      {
+        id: '5',
+        taskName: 'Slack check',
+        startedAt: todayAt(11, 33),
+        endedAt: todayAt(11, 38),
+        listName: 'Work',
+        durationMinutes: 5,
+      },
+      {
+        id: '6',
+        taskName: 'Afternoon focus',
+        startedAt: todayAt(13, 0),
+        endedAt: todayAt(15, 0),
+        listName: 'Work',
+        durationMinutes: 120,
+      },
+    ] as TimelineBlock[],
+    onPrevDay: () => console.log('Previous day'),
+    onNextDay: () => console.log('Next day'),
+    onGapClick: (gap) => console.log('Gap clicked:', gap),
+    onBlockDelete: (block) => console.log('Delete:', block.taskName),
+    onBlockEdit: (block, start, end) => console.log('Edit:', block.taskName, start, end),
+  },
+};
