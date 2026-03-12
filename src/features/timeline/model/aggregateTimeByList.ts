@@ -8,6 +8,9 @@ import { getListColorHex } from '@/shared/lib/colors';
 /**
  * Aggregate time entries for a given day by list (category),
  * returning data ready for the DoughnutChart component.
+ *
+ * Uses String keys for all map lookups to avoid type mismatches
+ * between number and string IDs at runtime.
  */
 export function aggregateTimeByList(
   timeEntries: TimeEntry[],
@@ -16,24 +19,24 @@ export function aggregateTimeByList(
   date?: dayjs.Dayjs,
 ): DoughnutSegment[] {
   const targetDate = date ?? dayjs();
-  const taskMap = new Map(tasks.map((t) => [Number(t.id), t]));
-  const listMap = new Map(lists.map((l) => [Number(l.id), l]));
+  const taskMap = new Map(tasks.map((t) => [String(t.id), t]));
+  const listMap = new Map(lists.map((l) => [String(l.id), l]));
 
   // Sum minutes per list
-  const listTotals = new Map<number | null, { name: string; minutes: number; color: string }>();
+  const listTotals = new Map<string, { name: string; minutes: number; color: string }>();
 
   for (const entry of timeEntries) {
     if (!dayjs(entry.startedAt).isSame(targetDate, 'day')) continue;
     if (!entry.durationMinutes || entry.durationMinutes <= 0) continue;
 
-    const task = taskMap.get(entry.taskId);
+    const task = taskMap.get(String(entry.taskId));
     const listId = task ? task.listId : null;
-    const list = listId != null ? listMap.get(listId) : null;
+    const list = listId != null ? listMap.get(String(listId)) : null;
 
     const listName = list?.name ?? 'Other';
     const listColor = list?.color ?? null;
 
-    const key = listId ?? null;
+    const key = listId != null ? String(listId) : '__none__';
     const existing = listTotals.get(key);
     if (existing) {
       existing.minutes += entry.durationMinutes;

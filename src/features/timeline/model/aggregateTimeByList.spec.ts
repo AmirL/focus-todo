@@ -100,4 +100,35 @@ describe('aggregateTimeByList', () => {
     expect(result[0].name).toBe('Personal');
     expect(result[1].name).toBe('Work');
   });
+
+  it('handles numeric IDs passed as numbers (runtime type mismatch)', () => {
+    // At runtime, IDs from the database may be numbers even though typed as strings.
+    // This test simulates the actual runtime behavior where task.id and list.id are numbers.
+    const entries = [
+      makeEntry({ id: 1, taskId: 100, durationMinutes: 45 }),
+    ];
+    // Simulate runtime: task.id is a number, list.id is a number (not string)
+    const tasks = [{ id: 100, listId: 5 } as unknown as TaskModel];
+    const lists = [{ id: 5, name: 'Work', color: 'blue' } as unknown as ListModel];
+
+    const result = aggregateTimeByList(entries, tasks, lists, targetDate);
+
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe('Work');
+    expect(result[0].minutes).toBe(45);
+  });
+
+  it('handles mixed string/number ID types', () => {
+    // Task has string id, list has number id, entry has number taskId
+    const entries = [
+      makeEntry({ id: 1, taskId: 42, durationMinutes: 30 }),
+    ];
+    const tasks = [{ id: '42', listId: 7 } as unknown as TaskModel];
+    const lists = [{ id: 7, name: 'Personal', color: 'violet' } as unknown as ListModel];
+
+    const result = aggregateTimeByList(entries, tasks, lists, targetDate);
+
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe('Personal');
+  });
 });

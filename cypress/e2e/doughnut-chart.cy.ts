@@ -58,6 +58,12 @@ describe("Doughnut Chart", () => {
 
       // Legend should be visible with at least one entry
       cy.get('[data-cy="doughnut-chart-legend"]').should("be.visible");
+
+      // Legend should show an actual list name, not "Other"
+      cy.get('[data-cy="doughnut-chart-legend"]').should(
+        "not.contain.text",
+        "Other",
+      );
     });
   });
 
