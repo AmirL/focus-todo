@@ -8,6 +8,10 @@ import type { TimelineBlock, TimelineGap } from './TimelineBar';
 const DEFAULT_START_HOUR = 8;
 const DEFAULT_END_HOUR = 23;
 const HOUR_HEIGHT_PX = 64;
+/** Entries shorter than this are grouped side-by-side in columns */
+const SHORT_ENTRY_THRESHOLD_MIN = 30;
+/** Maximum gap (minutes) between short entries to still group them */
+const CLUSTER_GAP_THRESHOLD_MIN = 15;
 
 interface DayTimelineProps {
   date: Date;
@@ -110,6 +114,10 @@ interface BlockPosition {
   heightPx: number;
   startMin: number;
   endMin: number;
+  /** Column index within a short-entry cluster (0-based). undefined = full width. */
+  column?: number;
+  /** Total columns in the cluster. */
+  totalColumns?: number;
 }
 
 interface GapPosition {
@@ -142,27 +150,109 @@ function computeVerticalLayout(blocks: TimelineBlock[], startHour: number): {
     endMin,
   }));
 
+  // Group consecutive short entries into side-by-side clusters
+  let i = 0;
+  while (i < blockPositions.length) {
+    const duration = blockPositions[i].endMin - blockPositions[i].startMin;
+    if (duration < SHORT_ENTRY_THRESHOLD_MIN) {
+      // Start a potential cluster
+      let j = i + 1;
+      while (j < blockPositions.length) {
+        const nextDuration = blockPositions[j].endMin - blockPositions[j].startMin;
+        if (nextDuration >= SHORT_ENTRY_THRESHOLD_MIN) break;
+        const gap = blockPositions[j].startMin - blockPositions[j - 1].endMin;
+        if (gap > CLUSTER_GAP_THRESHOLD_MIN) break;
+        j++;
+      }
+
+      if (j - i >= 2) {
+        // Cluster of 2+ short entries: place side-by-side
+        const clusterTop = blockPositions[i].topPx;
+        const lastPos = blockPositions[j - 1];
+        const clusterBottom = lastPos.topPx + lastPos.heightPx;
+        const clusterHeight = Math.max(clusterBottom - clusterTop, 48);
+        const numColumns = j - i;
+
+        for (let k = i; k < j; k++) {
+          blockPositions[k].column = k - i;
+          blockPositions[k].totalColumns = numColumns;
+          blockPositions[k].topPx = clusterTop;
+          blockPositions[k].heightPx = clusterHeight;
+        }
+      }
+      i = j;
+    } else {
+      i++;
+    }
+  }
+
+  // Overlap-prevention pass: push blocks down when previous block's rendered
+  // bottom extends past the next block's time-based top position.
+  // This handles cases like a 13-minute entry (min-height 24px) visually
+  // overlapping a subsequent 1-hour entry that starts at its time-based position.
+  for (let idx = 0; idx < blockPositions.length - 1; idx++) {
+    const curr = blockPositions[idx];
+    const next = blockPositions[idx + 1];
+
+    // Skip entries within the same cluster (they're side-by-side, not stacked)
+    if (
+      curr.column !== undefined &&
+      next.column !== undefined &&
+      curr.totalColumns === next.totalColumns &&
+      curr.topPx === next.topPx
+    ) {
+      continue;
+    }
+
+    const currBottom = curr.topPx + curr.heightPx;
+    if (currBottom > next.topPx) {
+      next.topPx = currBottom;
+    }
+  }
+
+  // Compute gaps (skip gaps between entries in the same cluster)
   const gapPositions: GapPosition[] = [];
-  for (let i = 0; i < sorted.length - 1; i++) {
-    const currentEnd = sorted[i].endMin;
-    const nextStart = sorted[i + 1].startMin;
+  for (let idx = 0; idx < blockPositions.length - 1; idx++) {
+    // Skip gaps within a cluster (entries placed side-by-side, not stacked)
+    const curr = blockPositions[idx];
+    const next = blockPositions[idx + 1];
+    if (
+      curr.column !== undefined &&
+      next.column !== undefined &&
+      curr.totalColumns === next.totalColumns &&
+      curr.topPx === next.topPx
+    ) {
+      continue;
+    }
+
+    const currentEnd = sorted[idx].endMin;
+    const nextStart = sorted[idx + 1].startMin;
     if (nextStart - currentEnd > 1) {
       const gapDuration = nextStart - currentEnd;
-      const baseDate = new Date(sorted[i].block.startedAt);
+      const baseDate = new Date(sorted[idx].block.startedAt);
       const gapStartDate = new Date(baseDate);
       gapStartDate.setHours(startHour + Math.floor(currentEnd / 60), currentEnd % 60, 0, 0);
       const gapEndDate = new Date(baseDate);
       gapEndDate.setHours(startHour + Math.floor(nextStart / 60), nextStart % 60, 0, 0);
 
-      gapPositions.push({
-        gap: {
-          startedAt: gapStartDate.toISOString(),
-          endedAt: gapEndDate.toISOString(),
-          durationMinutes: gapDuration,
-        },
-        topPx: minutesToTop(currentEnd),
-        heightPx: minutesToHeight(gapDuration),
-      });
+      // Use the rendered bottom of the previous block to avoid overlap
+      const prevBlockBottom = curr.topPx + curr.heightPx;
+      const timeBasedGapTop = minutesToTop(currentEnd);
+      const gapTop = Math.max(timeBasedGapTop, prevBlockBottom);
+      const nextBlockTop = next.topPx;
+      const gapHeight = Math.max(nextBlockTop - gapTop, 0);
+
+      if (gapHeight > 0) {
+        gapPositions.push({
+          gap: {
+            startedAt: gapStartDate.toISOString(),
+            endedAt: gapEndDate.toISOString(),
+            durationMinutes: gapDuration,
+          },
+          topPx: gapTop,
+          heightPx: gapHeight,
+        });
+      }
     }
   }
 
@@ -252,20 +342,34 @@ function TimeBlock({
     [block, onEdit, onCancelEdit]
   );
 
-  const isShort = heightPx < 48;
+  const hasColumns = position.column !== undefined && position.totalColumns !== undefined;
+  const isShort = hasColumns || heightPx < 48;
+  const isVeryShort = !hasColumns && heightPx < 32;
+  const tooltipText = `${block.taskName} (${formatTimeHHMM(block.startedAt)}–${block.endedAt ? formatTimeHHMM(block.endedAt) : 'now'})${durationStr ? ` ${durationStr}` : ''}`;
+
+  // Column layout: compute left/width for side-by-side positioning
+  const columnStyle: React.CSSProperties = hasColumns
+    ? {
+        left: `calc(4rem + (100% - 4rem - 0.5rem) * ${position.column! / position.totalColumns!})`,
+        width: `calc((100% - 4rem - 0.5rem) / ${position.totalColumns!} - 2px)`,
+      }
+    : {};
 
   return (
     <div
       data-cy="day-timeline-block"
       className={cn(
-        'absolute left-16 right-2 rounded-lg border transition-colors cursor-pointer',
+        'absolute rounded-lg border transition-colors cursor-pointer group/block',
         'flex flex-col px-3 py-1.5 overflow-hidden',
+        !hasColumns && 'left-16 right-2',
+        isVeryShort && 'hover:overflow-visible hover:z-20 hover:h-auto hover:min-h-[32px]',
         colors.bg,
         colors.border,
         colors.hover,
         isRunning && 'animate-pulse'
       )}
-      style={{ top: `${topPx}px`, height: `${heightPx}px` }}
+      style={{ top: `${topPx}px`, height: `${heightPx}px`, ...columnStyle }}
+      title={isShort ? tooltipText : undefined}
       onClick={onStartEdit}
     >
       <div className="flex items-center justify-between gap-1 min-w-0">
@@ -279,7 +383,7 @@ function TimeBlock({
             </span>
           )}
         </div>
-        <div className="flex items-center gap-0.5 flex-shrink-0">
+        <div className="flex items-center gap-0.5 flex-shrink-0 opacity-0 group-hover/block:opacity-100 transition-opacity">
           <button
             data-cy="day-timeline-edit-btn"
             className={cn(
@@ -307,7 +411,12 @@ function TimeBlock({
           )}
         </div>
       </div>
-      {isShort && (
+      {hasColumns && (
+        <span className={cn('text-[10px] opacity-70', colors.text)}>
+          {formatTimeHHMM(block.startedAt)}–{block.endedAt ? formatTimeHHMM(block.endedAt) : 'now'}
+        </span>
+      )}
+      {isShort && !hasColumns && (
         <span className={cn('text-[10px] opacity-70', colors.text)}>{durationStr}</span>
       )}
       {isEditing && (
