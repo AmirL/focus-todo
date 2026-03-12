@@ -165,6 +165,36 @@ describe("Timer", () => {
     });
   });
 
+  it("should start a new timer for the same task when clicking Start again", () => {
+    const taskName = `Start again test ${Date.now()}`;
+    createTaskAndGetId(taskName).then((taskId) => {
+      // Start timer
+      cy.get(`[data-testid="task-${taskId}"]`)
+        .find('[data-cy="start-timer-button"]')
+        .click();
+      cy.wait("@startTimer");
+      cy.get('[data-cy="timer-bar"]', { timeout: 10000 }).should("be.visible");
+
+      // Stop timer
+      cy.get('[data-cy="timer-stop-button"]').click();
+      cy.wait("@stopTimer");
+
+      // Timer bar should show stopped state with Start again button
+      cy.get('[data-cy="timer-bar"]').should("be.visible");
+      cy.get('[data-cy="timer-start-again-button"]').should("be.visible");
+
+      // Click Start again
+      cy.get('[data-cy="timer-start-again-button"]').click();
+      cy.wait("@startTimer");
+
+      // Timer bar should now be in running state again with the same task
+      cy.get('[data-cy="timer-bar"]', { timeout: 10000 }).should("be.visible");
+      cy.get('[data-cy="timer-bar"]').should("contain.text", taskName);
+      cy.get('[data-cy="timer-stop-button"]').should("be.visible");
+      cy.get('[data-cy="timer-start-again-button"]').should("not.exist");
+    });
+  });
+
   it("should toggle timer on and off via the task button", () => {
     const taskName = `Toggle test ${Date.now()}`;
     createTaskAndGetId(taskName).then((taskId) => {
