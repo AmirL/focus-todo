@@ -5,7 +5,12 @@
 // ***********************************************************
 
 import "./commands";
-import "@cypress/code-coverage/support";
+
+// Only load code coverage support when CYPRESS_COVERAGE=true (local coverage runs).
+// In CI, coverage is not needed and produces nyc warnings about missing instrumentation.
+if (Cypress.env("CYPRESS_COVERAGE") === "true") {
+  require("@cypress/code-coverage/support");
+}
 
 // Hide fetch/XHR requests from command log for cleaner output
 const app = window.top;
