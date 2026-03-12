@@ -5,9 +5,8 @@ import { cn } from '@/shared/lib/utils';
 import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from 'lucide-react';
 import type { TimelineBlock, TimelineGap } from './TimelineBar';
 
-const START_HOUR = 8;
-const END_HOUR = 23;
-const TOTAL_HOURS = END_HOUR - START_HOUR;
+const DEFAULT_START_HOUR = 8;
+const DEFAULT_END_HOUR = 23;
 const HOUR_HEIGHT_PX = 64;
 
 interface DayTimelineProps {
@@ -65,9 +64,31 @@ function formatDateHeader(date: Date): string {
   });
 }
 
-function timeToMinutesFromStart(isoString: string): number {
+function computeHourRange(blocks: TimelineBlock[]): { startHour: number; endHour: number } {
+  if (blocks.length === 0) return { startHour: DEFAULT_START_HOUR, endHour: DEFAULT_END_HOUR };
+
+  const now = new Date();
+  let minHour = DEFAULT_START_HOUR;
+  let maxHour = DEFAULT_END_HOUR;
+
+  for (const b of blocks) {
+    const startDate = new Date(b.startedAt);
+    const startH = startDate.getHours();
+    const endDate = b.endedAt ? new Date(b.endedAt) : now;
+    // End hour needs to round up if there are minutes
+    const endH = endDate.getMinutes() > 0 ? endDate.getHours() + 1 : endDate.getHours();
+
+    if (startH < minHour) minHour = startH;
+    if (endH > maxHour) maxHour = endH;
+  }
+
+  // Clamp to valid range
+  return { startHour: Math.max(0, minHour), endHour: Math.min(24, maxHour) };
+}
+
+function timeToMinutesFromStart(isoString: string, startHour: number): number {
   const d = new Date(isoString);
-  return (d.getHours() - START_HOUR) * 60 + d.getMinutes();
+  return (d.getHours() - startHour) * 60 + d.getMinutes();
 }
 
 function minutesToTop(minutes: number): number {
@@ -97,7 +118,7 @@ interface GapPosition {
   heightPx: number;
 }
 
-function computeVerticalLayout(blocks: TimelineBlock[]): {
+function computeVerticalLayout(blocks: TimelineBlock[], startHour: number): {
   blockPositions: BlockPosition[];
   gapPositions: GapPosition[];
 } {
@@ -105,10 +126,10 @@ function computeVerticalLayout(blocks: TimelineBlock[]): {
 
   const sorted = [...blocks]
     .map((b) => {
-      const startMin = timeToMinutesFromStart(b.startedAt);
+      const startMin = timeToMinutesFromStart(b.startedAt, startHour);
       const endMin = b.endedAt
-        ? timeToMinutesFromStart(b.endedAt)
-        : (now.getHours() - START_HOUR) * 60 + now.getMinutes();
+        ? timeToMinutesFromStart(b.endedAt, startHour)
+        : (now.getHours() - startHour) * 60 + now.getMinutes();
       return { block: b, startMin, endMin };
     })
     .sort((a, b) => a.startMin - b.startMin);
@@ -129,9 +150,9 @@ function computeVerticalLayout(blocks: TimelineBlock[]): {
       const gapDuration = nextStart - currentEnd;
       const baseDate = new Date(sorted[i].block.startedAt);
       const gapStartDate = new Date(baseDate);
-      gapStartDate.setHours(START_HOUR + Math.floor(currentEnd / 60), currentEnd % 60, 0, 0);
+      gapStartDate.setHours(startHour + Math.floor(currentEnd / 60), currentEnd % 60, 0, 0);
       const gapEndDate = new Date(baseDate);
-      gapEndDate.setHours(START_HOUR + Math.floor(nextStart / 60), nextStart % 60, 0, 0);
+      gapEndDate.setHours(startHour + Math.floor(nextStart / 60), nextStart % 60, 0, 0);
 
       gapPositions.push({
         gap: {
@@ -345,16 +366,18 @@ export function DayTimeline({
   className,
 }: DayTimelineProps) {
   const [editingBlockId, setEditingBlockId] = useState<string | null>(null);
-  const layout = useMemo(() => computeVerticalLayout(blocks), [blocks]);
-  const totalHeight = TOTAL_HOURS * HOUR_HEIGHT_PX;
+  const { startHour, endHour } = useMemo(() => computeHourRange(blocks), [blocks]);
+  const totalHours = endHour - startHour;
+  const layout = useMemo(() => computeVerticalLayout(blocks, startHour), [blocks, startHour]);
+  const totalHeight = totalHours * HOUR_HEIGHT_PX;
 
   const hours = useMemo(() => {
     const result: number[] = [];
-    for (let h = START_HOUR; h <= END_HOUR; h++) {
+    for (let h = startHour; h <= endHour; h++) {
       result.push(h);
     }
     return result;
-  }, []);
+  }, [startHour, endHour]);
 
   return (
     <div data-cy="day-timeline" className={cn('flex flex-col', className)}>
@@ -381,10 +404,10 @@ export function DayTimeline({
       </div>
 
       {/* Timeline grid */}
-      <div className="relative overflow-y-auto" style={{ height: `${totalHeight}px` }}>
+      <div className="relative" style={{ minHeight: `${totalHeight}px` }}>
         {/* Hour grid lines and labels */}
         {hours.map((h) => {
-          const topPx = (h - START_HOUR) * HOUR_HEIGHT_PX;
+          const topPx = (h - startHour) * HOUR_HEIGHT_PX;
           const startTime = `${h.toString().padStart(2, '0')}:00`;
           const nextH = h + 1;
           const endTime = `${nextH.toString().padStart(2, '0')}:00`;
@@ -396,7 +419,7 @@ export function DayTimeline({
                 </span>
                 <div className="flex-1 border-t border-border/40" />
               </div>
-              {onAddEntry && h < END_HOUR && (
+              {onAddEntry && h < endHour && (
                 <button
                   data-cy="day-timeline-add-entry"
                   className="absolute right-2 top-1 z-10 opacity-0 group-hover/hour:opacity-100 transition-opacity rounded-full p-0.5 bg-primary/10 hover:bg-primary/20 text-primary"
