@@ -21,7 +21,7 @@ export function TodayTimeline() {
   const [isGapDialogOpen, setIsGapDialogOpen] = useState(false);
 
   const blocks = useMemo(
-    () => mapTimeEntriesToBlocks(timeEntries, tasks, listNameMap, listColorMap),
+    () => mapTimeEntriesToBlocks(timeEntries, tasks, listNameMap, undefined, listColorMap),
     [timeEntries, tasks, listNameMap, listColorMap],
   );
 

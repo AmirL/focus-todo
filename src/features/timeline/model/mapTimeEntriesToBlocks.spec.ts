@@ -118,7 +118,7 @@ describe('mapTimeEntriesToBlocks', () => {
       makeEntry({ id: 2, taskId: 20, startedAt: dayjs().hour(10).toISOString(), endedAt: dayjs().hour(11).toISOString(), durationMinutes: 60 }),
     ];
 
-    const blocks = mapTimeEntriesToBlocks(entries, tasks, listNameMap, listColorMap);
+    const blocks = mapTimeEntriesToBlocks(entries, tasks, listNameMap, undefined, listColorMap);
     expect(blocks[0].listColor).toBe('blue');
     expect(blocks[1].listColor).toBe('violet');
   });
