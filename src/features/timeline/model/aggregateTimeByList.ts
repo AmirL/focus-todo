@@ -17,27 +17,28 @@ export function aggregateTimeByList(
 ): DoughnutSegment[] {
   const targetDate = date ?? dayjs();
   const taskMap = new Map(tasks.map((t) => [Number(t.id), t]));
-  const listMap = new Map(lists.map((l) => [l.id, l]));
+  const listMap = new Map(lists.map((l) => [Number(l.id), l]));
 
   // Sum minutes per list
-  const listTotals = new Map<string, { name: string; minutes: number; color: string }>();
+  const listTotals = new Map<number | null, { name: string; minutes: number; color: string }>();
 
   for (const entry of timeEntries) {
     if (!dayjs(entry.startedAt).isSame(targetDate, 'day')) continue;
     if (!entry.durationMinutes || entry.durationMinutes <= 0) continue;
 
     const task = taskMap.get(entry.taskId);
-    const listId = task ? String(task.listId) : null;
-    const list = listId ? listMap.get(listId) : null;
+    const listId = task ? task.listId : null;
+    const list = listId != null ? listMap.get(listId) : null;
 
     const listName = list?.name ?? 'Other';
     const listColor = list?.color ?? null;
 
-    const existing = listTotals.get(listName);
+    const key = listId ?? null;
+    const existing = listTotals.get(key);
     if (existing) {
       existing.minutes += entry.durationMinutes;
     } else {
-      listTotals.set(listName, {
+      listTotals.set(key, {
         name: listName,
         minutes: entry.durationMinutes,
         color: getListColorHex(listColor),
