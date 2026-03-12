@@ -443,3 +443,65 @@ export const ShortEntriesSideBySide: Story = {
     onBlockEdit: (block, start, end) => console.log('Edit:', block.taskName, start, end),
   },
 };
+
+/** Short entry followed by a longer entry across hour boundary (overlap edge case) */
+export const CrossHourOverlap: Story = {
+  args: {
+    date: today,
+    blocks: [
+      {
+        id: '1',
+        taskName: 'Deep work',
+        startedAt: todayAt(10, 0),
+        endedAt: todayAt(12, 0),
+        listName: 'Work',
+        durationMinutes: 120,
+      },
+      {
+        id: '2',
+        taskName: 'Quick coffee',
+        startedAt: todayAt(12, 0),
+        endedAt: todayAt(12, 10),
+        listName: 'Personal',
+        durationMinutes: 10,
+      },
+      {
+        id: '3',
+        taskName: 'Обед',
+        startedAt: todayAt(13, 53),
+        endedAt: todayAt(14, 6),
+        listName: 'Personal',
+        durationMinutes: 13,
+      },
+      {
+        id: '4',
+        taskName: 'Meeting with Oskar',
+        startedAt: todayAt(14, 6),
+        endedAt: todayAt(15, 6),
+        listName: 'Work',
+        durationMinutes: 60,
+      },
+      {
+        id: '5',
+        taskName: 'Quick Slack check',
+        startedAt: todayAt(15, 10),
+        endedAt: todayAt(15, 15),
+        listName: 'Work',
+        durationMinutes: 5,
+      },
+      {
+        id: '6',
+        taskName: 'Afternoon coding',
+        startedAt: todayAt(15, 20),
+        endedAt: todayAt(17, 0),
+        listName: 'Work',
+        durationMinutes: 100,
+      },
+    ] as TimelineBlock[],
+    onPrevDay: () => console.log('Previous day'),
+    onNextDay: () => console.log('Next day'),
+    onGapClick: (gap) => console.log('Gap clicked:', gap),
+    onBlockDelete: (block) => console.log('Delete:', block.taskName),
+    onBlockEdit: (block, start, end) => console.log('Edit:', block.taskName, start, end),
+  },
+};

@@ -186,6 +186,30 @@ function computeVerticalLayout(blocks: TimelineBlock[], startHour: number): {
     }
   }
 
+  // Overlap-prevention pass: push blocks down when previous block's rendered
+  // bottom extends past the next block's time-based top position.
+  // This handles cases like a 13-minute entry (min-height 24px) visually
+  // overlapping a subsequent 1-hour entry that starts at its time-based position.
+  for (let idx = 0; idx < blockPositions.length - 1; idx++) {
+    const curr = blockPositions[idx];
+    const next = blockPositions[idx + 1];
+
+    // Skip entries within the same cluster (they're side-by-side, not stacked)
+    if (
+      curr.column !== undefined &&
+      next.column !== undefined &&
+      curr.totalColumns === next.totalColumns &&
+      curr.topPx === next.topPx
+    ) {
+      continue;
+    }
+
+    const currBottom = curr.topPx + curr.heightPx;
+    if (currBottom > next.topPx) {
+      next.topPx = currBottom;
+    }
+  }
+
   // Compute gaps (skip gaps between entries in the same cluster)
   const gapPositions: GapPosition[] = [];
   for (let idx = 0; idx < blockPositions.length - 1; idx++) {
