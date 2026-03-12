@@ -18,7 +18,11 @@
     "cy:run:record": "cypress run --record",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "coverage": "bash scripts/coverage.sh"
+    "coverage": "bash scripts/coverage.sh",
+    "quality": ".venv/bin/desloppify scan --path src",
+    "quality:next": ".venv/bin/desloppify next",
+    "quality:status": ".venv/bin/desloppify status",
+    "quality:setup": "pyenv install -s 3.13.2 && (python3.13 -m venv .venv || ~/.pyenv/versions/3.13.2/bin/python3 -m venv .venv) && .venv/bin/pip install -q desloppify"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

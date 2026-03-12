@@ -56,3 +56,7 @@ test-results/
 
 *storybook.log
 storybook-static
+
+# Python venv (desloppify)
+.venv/
+.desloppify/
