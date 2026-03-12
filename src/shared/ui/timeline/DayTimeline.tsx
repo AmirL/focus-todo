@@ -399,7 +399,7 @@ export function DayTimeline({
               {onAddEntry && h < END_HOUR && (
                 <button
                   data-cy="day-timeline-add-entry"
-                  className="absolute right-2 top-1 opacity-0 group-hover/hour:opacity-100 transition-opacity rounded-full p-0.5 bg-primary/10 hover:bg-primary/20 text-primary"
+                  className="absolute right-2 top-1 z-10 opacity-0 group-hover/hour:opacity-100 transition-opacity rounded-full p-0.5 bg-primary/10 hover:bg-primary/20 text-primary"
                   onClick={() => onAddEntry(startTime, endTime)}
                   title={`Add entry at ${startTime}`}
                 >

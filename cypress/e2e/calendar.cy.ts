@@ -204,11 +204,10 @@ describe("Calendar Day View", () => {
       "be.visible",
     );
 
-    // Force-show the add entry button (it's opacity-0 until hover)
+    // The add entry button is opacity-0 until hover; use force click
     cy.get('[data-cy="day-timeline-add-entry"]')
       .first()
-      .invoke("css", "opacity", "1")
-      .click();
+      .click({ force: true });
 
     cy.get('[data-cy="quick-add-gap-dialog"]', { timeout: 5000 }).should(
       "be.visible",
