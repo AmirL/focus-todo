@@ -50,6 +50,7 @@ export const FewEntries: Story = {
         startedAt: todayAt(9, 0),
         endedAt: todayAt(9, 15),
         listName: 'Work',
+        listColor: 'blue',
         durationMinutes: 15,
       },
       {
@@ -58,6 +59,7 @@ export const FewEntries: Story = {
         startedAt: todayAt(10, 0),
         endedAt: todayAt(12, 0),
         listName: 'Work',
+        listColor: 'blue',
         durationMinutes: 120,
       },
       {
@@ -66,6 +68,7 @@ export const FewEntries: Story = {
         startedAt: todayAt(12, 30),
         endedAt: todayAt(13, 15),
         listName: 'Personal',
+        listColor: 'violet',
         durationMinutes: 45,
       },
     ],
@@ -87,6 +90,7 @@ export const BusyDay: Story = {
         startedAt: todayAt(8, 0),
         endedAt: todayAt(8, 30),
         listName: 'Work',
+        listColor: 'blue',
         durationMinutes: 30,
       },
       {
@@ -95,6 +99,7 @@ export const BusyDay: Story = {
         startedAt: todayAt(8, 30),
         endedAt: todayAt(9, 30),
         listName: 'Work',
+        listColor: 'blue',
         durationMinutes: 60,
       },
       {
@@ -103,6 +108,7 @@ export const BusyDay: Story = {
         startedAt: todayAt(9, 45),
         endedAt: todayAt(12, 0),
         listName: 'Work',
+        listColor: 'blue',
         durationMinutes: 135,
       },
       {
@@ -111,6 +117,7 @@ export const BusyDay: Story = {
         startedAt: todayAt(12, 0),
         endedAt: todayAt(12, 45),
         listName: 'Personal',
+        listColor: 'violet',
         durationMinutes: 45,
       },
       {
@@ -119,6 +126,7 @@ export const BusyDay: Story = {
         startedAt: todayAt(13, 0),
         endedAt: todayAt(14, 30),
         listName: 'Work',
+        listColor: 'blue',
         durationMinutes: 90,
       },
       {
@@ -127,6 +135,7 @@ export const BusyDay: Story = {
         startedAt: todayAt(14, 30),
         endedAt: todayAt(16, 0),
         listName: 'Work',
+        listColor: 'blue',
         durationMinutes: 90,
       },
       {
@@ -135,6 +144,7 @@ export const BusyDay: Story = {
         startedAt: todayAt(16, 30),
         endedAt: todayAt(17, 30),
         listName: 'Personal',
+        listColor: 'violet',
         durationMinutes: 60,
       },
       {
@@ -143,6 +153,7 @@ export const BusyDay: Story = {
         startedAt: todayAt(20, 0),
         endedAt: todayAt(21, 0),
         listName: 'Personal',
+        listColor: 'violet',
         durationMinutes: 60,
       },
     ] as TimelineBlock[],
@@ -164,6 +175,7 @@ export const CurrentlyRunning: Story = {
         startedAt: todayAt(9, 0),
         endedAt: todayAt(10, 30),
         listName: 'Work',
+        listColor: 'blue',
         durationMinutes: 90,
       },
       {
@@ -172,6 +184,7 @@ export const CurrentlyRunning: Story = {
         startedAt: todayAt(11, 0),
         endedAt: null,
         listName: 'Work',
+        listColor: 'blue',
         durationMinutes: null,
       },
     ],
@@ -191,6 +204,7 @@ export const EditMode: Story = {
         startedAt: todayAt(9, 0),
         endedAt: todayAt(10, 30),
         listName: 'Work',
+        listColor: 'blue',
         durationMinutes: 90,
       },
       {
@@ -199,6 +213,7 @@ export const EditMode: Story = {
         startedAt: todayAt(11, 0),
         endedAt: todayAt(11, 30),
         listName: 'Personal',
+        listColor: 'violet',
         durationMinutes: 30,
       },
     ],
@@ -219,6 +234,7 @@ export const GapHover: Story = {
         startedAt: todayAt(9, 0),
         endedAt: todayAt(9, 15),
         listName: 'Work',
+        listColor: 'blue',
         durationMinutes: 15,
       },
       {
@@ -227,6 +243,7 @@ export const GapHover: Story = {
         startedAt: todayAt(11, 0),
         endedAt: todayAt(12, 0),
         listName: 'Work',
+        listColor: 'blue',
         durationMinutes: 60,
       },
       {
@@ -235,6 +252,7 @@ export const GapHover: Story = {
         startedAt: todayAt(14, 0),
         endedAt: todayAt(14, 30),
         listName: 'Personal',
+        listColor: 'violet',
         durationMinutes: 30,
       },
     ],
@@ -254,6 +272,7 @@ export const MixedWorkAndPersonal: Story = {
         startedAt: todayAt(9, 0),
         endedAt: todayAt(11, 0),
         listName: 'Work',
+        listColor: 'blue',
         durationMinutes: 120,
       },
       {
@@ -262,6 +281,7 @@ export const MixedWorkAndPersonal: Story = {
         startedAt: todayAt(11, 15),
         endedAt: todayAt(11, 30),
         listName: 'Personal',
+        listColor: 'violet',
         durationMinutes: 15,
       },
       {
@@ -270,6 +290,7 @@ export const MixedWorkAndPersonal: Story = {
         startedAt: todayAt(13, 0),
         endedAt: todayAt(14, 0),
         listName: 'Work',
+        listColor: 'blue',
         durationMinutes: 60,
       },
       {
@@ -278,6 +299,7 @@ export const MixedWorkAndPersonal: Story = {
         startedAt: todayAt(14, 30),
         endedAt: todayAt(14, 45),
         listName: 'Personal',
+        listColor: 'violet',
         durationMinutes: 15,
       },
       {
@@ -286,6 +308,7 @@ export const MixedWorkAndPersonal: Story = {
         startedAt: todayAt(15, 0),
         endedAt: todayAt(17, 0),
         listName: 'Work',
+        listColor: 'blue',
         durationMinutes: 120,
       },
       {
@@ -294,6 +317,7 @@ export const MixedWorkAndPersonal: Story = {
         startedAt: todayAt(18, 0),
         endedAt: todayAt(19, 0),
         listName: 'Personal',
+        listColor: 'violet',
         durationMinutes: 60,
       },
     ],

@@ -35,6 +35,7 @@ describe('useCreateList', () => {
       name: 'Work',
       description: 'desc',
       participatesInInitiative: true,
+      color: null,
     });
   });
 
@@ -66,6 +67,7 @@ describe('useCreateList', () => {
       name: 'Work',
       description: null,
       participatesInInitiative: false,
+      color: null,
     });
   });
 });

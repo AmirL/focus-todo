@@ -3,6 +3,7 @@
 import { Button } from '@/shared/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/shared/ui/alert-dialog';
 import { ListModel } from '@/entities/list';
+import { ColorSwatch } from '@/shared/ui/color-picker';
 import { Edit, Trash2, GripVertical, Archive, ArchiveRestore } from 'lucide-react';
 import { useDeleteList } from '../api/useDeleteList';
 import { useArchiveList } from '../api/useArchiveList';
@@ -47,6 +48,7 @@ export function ListItem({ list, isDragging, dragHandleRef, dragHandleListeners 
             <GripVertical className="h-4 w-4" />
           </button>
         )}
+        {list.color && <ColorSwatch color={list.color} data-cy="list-color-swatch" />}
         <span className="font-medium">{list.name}</span>
         {list.isDefault && (
           <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">

@@ -103,4 +103,33 @@ describe('mapTimeEntriesToBlocks', () => {
     const blocks = mapTimeEntriesToBlocks([], [], listNameMap);
     expect(blocks).toHaveLength(0);
   });
+
+  it('includes listColor when listColorMap is provided', () => {
+    const listColorMap = new Map<number, string | null>([
+      [1, 'blue'],
+      [2, 'violet'],
+    ]);
+    const tasks = [
+      makeTask({ id: '10', name: 'Write tests', listId: 1 }),
+      makeTask({ id: '20', name: 'Review PR', listId: 2 }),
+    ];
+    const entries = [
+      makeEntry({ id: 1, taskId: 10, startedAt: dayjs().hour(9).toISOString(), endedAt: dayjs().hour(10).toISOString(), durationMinutes: 60 }),
+      makeEntry({ id: 2, taskId: 20, startedAt: dayjs().hour(10).toISOString(), endedAt: dayjs().hour(11).toISOString(), durationMinutes: 60 }),
+    ];
+
+    const blocks = mapTimeEntriesToBlocks(entries, tasks, listNameMap, undefined, listColorMap);
+    expect(blocks[0].listColor).toBe('blue');
+    expect(blocks[1].listColor).toBe('violet');
+  });
+
+  it('returns null listColor when listColorMap is not provided', () => {
+    const tasks = [makeTask({ id: '10', name: 'Write tests', listId: 1 })];
+    const entries = [
+      makeEntry({ id: 1, taskId: 10, startedAt: dayjs().hour(9).toISOString(), endedAt: dayjs().hour(10).toISOString(), durationMinutes: 60 }),
+    ];
+
+    const blocks = mapTimeEntriesToBlocks(entries, tasks, listNameMap);
+    expect(blocks[0].listColor).toBeNull();
+  });
 });

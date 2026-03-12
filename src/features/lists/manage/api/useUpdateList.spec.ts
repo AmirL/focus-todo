@@ -30,6 +30,7 @@ describe('useUpdateList', () => {
       name: 'Updated',
       description: 'new desc',
       participatesInInitiative: true,
+      color: null,
     });
   });
 
@@ -62,6 +63,7 @@ describe('useUpdateList', () => {
       name: 'Work',
       description: null,
       participatesInInitiative: false,
+      color: null,
     });
   });
 });

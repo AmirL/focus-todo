@@ -5,7 +5,7 @@ import { TimelineBar, type TimelineBlock, type TimelineGap } from '@/shared/ui/t
 import { useTimeEntriesQuery } from '@/shared/api/time-entries';
 import { useTasksQuery } from '@/shared/api/tasks';
 import { useListsQuery } from '@/shared/api/lists';
-import { useListNameMap } from '@/shared/lib/listUtils';
+import { useListNameMap, useListColorMap } from '@/shared/lib/listUtils';
 import { mapTimeEntriesToBlocks, type TimelineBlockWithTaskId } from '../model/mapTimeEntriesToBlocks';
 import { aggregateTimeByList } from '../model/aggregateTimeByList';
 import { QuickAddFromGapDialog } from './QuickAddFromGapDialog';
@@ -16,12 +16,13 @@ export function TodayTimeline() {
   const { data: tasks = [] } = useTasksQuery();
   const { data: lists = [] } = useListsQuery();
   const listNameMap = useListNameMap();
+  const listColorMap = useListColorMap();
   const [selectedGap, setSelectedGap] = useState<TimelineGap | null>(null);
   const [isGapDialogOpen, setIsGapDialogOpen] = useState(false);
 
   const blocks = useMemo(
-    () => mapTimeEntriesToBlocks(timeEntries, tasks, listNameMap),
-    [timeEntries, tasks, listNameMap],
+    () => mapTimeEntriesToBlocks(timeEntries, tasks, listNameMap, undefined, listColorMap),
+    [timeEntries, tasks, listNameMap, listColorMap],
   );
 
   const doughnutSegments = useMemo(

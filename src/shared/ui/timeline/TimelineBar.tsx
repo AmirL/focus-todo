@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { cn } from '@/shared/lib/utils';
+import { getColorClasses } from '@/shared/lib/colors';
 
 export interface TimelineBlock {
   id: string;
@@ -9,6 +10,7 @@ export interface TimelineBlock {
   startedAt: string; // ISO datetime
   endedAt: string | null; // null = currently running
   listName: 'Work' | 'Personal' | string;
+  listColor?: string | null; // color name from list, used for timeline rendering
   durationMinutes: number | null;
 }
 
@@ -25,27 +27,8 @@ interface TimelineBarProps {
   className?: string;
 }
 
-const LIST_COLORS: Record<string, { bg: string; border: string; text: string }> = {
-  Work: {
-    bg: 'bg-blue-100',
-    border: 'border-blue-300',
-    text: 'text-blue-800',
-  },
-  Personal: {
-    bg: 'bg-violet-100',
-    border: 'border-violet-300',
-    text: 'text-violet-800',
-  },
-};
-
-const DEFAULT_COLORS = {
-  bg: 'bg-emerald-100',
-  border: 'border-emerald-300',
-  text: 'text-emerald-800',
-};
-
-function getListColors(listName: string) {
-  return LIST_COLORS[listName] ?? DEFAULT_COLORS;
+function getListColors(listColor: string | null | undefined) {
+  return getColorClasses(listColor);
 }
 
 function formatTime(date: Date): string {
@@ -207,7 +190,7 @@ export function TimelineBar({ blocks, onBlockClick, onGapClick, className }: Tim
 
           const block = seg.block!;
           const isRunning = block.endedAt === null;
-          const colors = getListColors(block.listName);
+          const colors = getListColors(block.listColor);
           const durationStr = isRunning
             ? formatBlockDuration(block.durationMinutes) || 'running'
             : formatBlockDuration(block.durationMinutes);
