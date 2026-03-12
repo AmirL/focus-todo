@@ -58,6 +58,22 @@ export function CalendarDayPage() {
     setIsGapDialogOpen(true);
   }, []);
 
+  const handleAddEntry = useCallback(
+    (startTime: string, endTime: string) => {
+      const dateStr = selectedDate.format('YYYY-MM-DD');
+      const startDate = new Date(`${dateStr}T${startTime}:00`);
+      const endDate = new Date(`${dateStr}T${endTime}:00`);
+      const durationMinutes = Math.round((endDate.getTime() - startDate.getTime()) / 60000);
+      setSelectedGap({
+        startedAt: startDate.toISOString(),
+        endedAt: endDate.toISOString(),
+        durationMinutes,
+      });
+      setIsGapDialogOpen(true);
+    },
+    [selectedDate],
+  );
+
   return (
     <div className="flex flex-col h-screen" data-cy="calendar-day-page">
       <div className="flex-1 overflow-y-auto">
@@ -69,6 +85,7 @@ export function CalendarDayPage() {
           onBlockEdit={handleBlockEdit}
           onBlockDelete={handleBlockDelete}
           onGapClick={handleGapClick}
+          onAddEntry={handleAddEntry}
         />
       </div>
       <QuickAddFromGapDialog

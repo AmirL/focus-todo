@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { cn } from '@/shared/lib/utils';
-import { ChevronLeft, ChevronRight, Pencil, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from 'lucide-react';
 import type { TimelineBlock, TimelineGap } from './TimelineBar';
 
 const START_HOUR = 8;
@@ -18,6 +18,7 @@ interface DayTimelineProps {
   onBlockEdit?: (block: TimelineBlock, startTime: string, endTime: string) => void;
   onBlockDelete?: (block: TimelineBlock) => void;
   onGapClick?: (gap: TimelineGap) => void;
+  onAddEntry?: (startTime: string, endTime: string) => void;
   className?: string;
 }
 
@@ -340,6 +341,7 @@ export function DayTimeline({
   onBlockEdit,
   onBlockDelete,
   onGapClick,
+  onAddEntry,
   className,
 }: DayTimelineProps) {
   const [editingBlockId, setEditingBlockId] = useState<string | null>(null);
@@ -383,14 +385,27 @@ export function DayTimeline({
         {/* Hour grid lines and labels */}
         {hours.map((h) => {
           const topPx = (h - START_HOUR) * HOUR_HEIGHT_PX;
+          const startTime = `${h.toString().padStart(2, '0')}:00`;
+          const nextH = h + 1;
+          const endTime = `${nextH.toString().padStart(2, '0')}:00`;
           return (
-            <div key={h} className="absolute left-0 right-0" style={{ top: `${topPx}px` }}>
+            <div key={h} className="absolute left-0 right-0 group/hour" style={{ top: `${topPx}px`, height: `${HOUR_HEIGHT_PX}px` }}>
               <div className="flex items-start">
                 <span className="w-14 text-right pr-2 text-xs text-muted-foreground -translate-y-1/2 select-none">
-                  {`${h.toString().padStart(2, '0')}:00`}
+                  {startTime}
                 </span>
                 <div className="flex-1 border-t border-border/40" />
               </div>
+              {onAddEntry && h < END_HOUR && (
+                <button
+                  data-cy="day-timeline-add-entry"
+                  className="absolute right-2 top-1 opacity-0 group-hover/hour:opacity-100 transition-opacity rounded-full p-0.5 bg-primary/10 hover:bg-primary/20 text-primary"
+                  onClick={() => onAddEntry(startTime, endTime)}
+                  title={`Add entry at ${startTime}`}
+                >
+                  <Plus className="h-4 w-4" />
+                </button>
+              )}
             </div>
           );
         })}

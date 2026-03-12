@@ -1,8 +1,7 @@
 'use client';
 
-import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button';
-import { Menu, ChevronDown, CheckSquare2, LogOut, Calendar, Clock, ListTodo, Tag, Settings } from 'lucide-react';
+import { CheckSquare2, Menu, LogOut, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useFilterStore } from '@/features/tasks/filter/model/filterStore';
@@ -115,19 +114,6 @@ export function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
                   <div className="px-2">
                     <Separator />
                     <div className="mt-4 space-y-1">
-                      <Button
-                        variant="ghost"
-                        className={cn(
-                          'w-full justify-start',
-                          pathname === '/calendar' && 'text-primary bg-primary/10 hover:bg-primary/20 hover:text-primary'
-                        )}
-                        asChild
-                      >
-                        <Link href="/calendar" data-cy="calendar-link">
-                          <Calendar className="mr-2 h-4 w-4" />
-                          Calendar
-                        </Link>
-                      </Button>
                       <Button
                         variant="ghost"
                         className="w-full justify-start"
