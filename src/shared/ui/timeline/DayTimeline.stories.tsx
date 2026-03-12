@@ -365,3 +365,81 @@ export const ShortEntries: Story = {
     onBlockEdit: (block, start, end) => console.log('Edit:', block.taskName, start, end),
   },
 };
+
+/** Four consecutive short entries placed side-by-side in columns */
+export const ShortEntriesSideBySide: Story = {
+  args: {
+    date: today,
+    blocks: [
+      {
+        id: '1',
+        taskName: 'Standup',
+        startedAt: todayAt(9, 0),
+        endedAt: todayAt(9, 15),
+        listName: 'Work',
+        durationMinutes: 15,
+      },
+      {
+        id: '2',
+        taskName: 'Quick email check',
+        startedAt: todayAt(9, 15),
+        endedAt: todayAt(9, 25),
+        listName: 'Work',
+        durationMinutes: 10,
+      },
+      {
+        id: '3',
+        taskName: 'Coffee break',
+        startedAt: todayAt(9, 25),
+        endedAt: todayAt(9, 35),
+        listName: 'Personal',
+        durationMinutes: 10,
+      },
+      {
+        id: '4',
+        taskName: 'Deploy hotfix',
+        startedAt: todayAt(9, 40),
+        endedAt: todayAt(9, 55),
+        listName: 'Work',
+        durationMinutes: 15,
+      },
+      {
+        id: '5',
+        taskName: 'Long feature development session',
+        startedAt: todayAt(10, 0),
+        endedAt: todayAt(12, 0),
+        listName: 'Work',
+        durationMinutes: 120,
+      },
+      {
+        id: '6',
+        taskName: 'Lunch walk',
+        startedAt: todayAt(12, 0),
+        endedAt: todayAt(12, 20),
+        listName: 'Personal',
+        durationMinutes: 20,
+      },
+      {
+        id: '7',
+        taskName: 'Quick review',
+        startedAt: todayAt(12, 25),
+        endedAt: todayAt(12, 40),
+        listName: 'Work',
+        durationMinutes: 15,
+      },
+      {
+        id: '8',
+        taskName: 'Afternoon deep work',
+        startedAt: todayAt(13, 0),
+        endedAt: todayAt(15, 0),
+        listName: 'Work',
+        durationMinutes: 120,
+      },
+    ] as TimelineBlock[],
+    onPrevDay: () => console.log('Previous day'),
+    onNextDay: () => console.log('Next day'),
+    onGapClick: (gap) => console.log('Gap clicked:', gap),
+    onBlockDelete: (block) => console.log('Delete:', block.taskName),
+    onBlockEdit: (block, start, end) => console.log('Edit:', block.taskName, start, end),
+  },
+};
