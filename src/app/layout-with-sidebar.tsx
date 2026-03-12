@@ -114,7 +114,20 @@ export function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
                   <TaskFilters />
                   <div className="px-2">
                     <Separator />
-                    <div className="mt-4">
+                    <div className="mt-4 space-y-1">
+                      <Button
+                        variant="ghost"
+                        className={cn(
+                          'w-full justify-start',
+                          pathname === '/calendar' && 'text-primary bg-primary/10 hover:bg-primary/20 hover:text-primary'
+                        )}
+                        asChild
+                      >
+                        <Link href="/calendar" data-cy="calendar-link">
+                          <Calendar className="mr-2 h-4 w-4" />
+                          Calendar
+                        </Link>
+                      </Button>
                       <Button
                         variant="ghost"
                         className="w-full justify-start"

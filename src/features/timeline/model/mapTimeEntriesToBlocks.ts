@@ -9,12 +9,13 @@ export function mapTimeEntriesToBlocks(
   timeEntries: TimeEntry[],
   tasks: TaskModel[],
   listNameMap: Map<number, string>,
+  date?: dayjs.Dayjs,
 ): TimelineBlockWithTaskId[] {
-  const today = dayjs();
+  const targetDate = date ?? dayjs();
   const taskMap = new Map(tasks.map((t) => [Number(t.id), t]));
 
   return timeEntries
-    .filter((entry) => dayjs(entry.startedAt).isSame(today, 'day'))
+    .filter((entry) => dayjs(entry.startedAt).isSame(targetDate, 'day'))
     .map((entry) => {
       const task = taskMap.get(entry.taskId);
       const listName = task ? (listNameMap.get(task.listId) ?? 'Unknown') : 'Unknown';
