@@ -95,10 +95,10 @@ describe("Doughnut Chart", () => {
         "be.visible",
       );
 
-      // Doughnut chart should show on calendar page
-      cy.get('[data-cy="doughnut-chart"]', { timeout: 10000 }).should(
-        "be.visible",
-      );
+      // Scroll down to the doughnut chart (it's below the timeline in a scrollable container)
+      cy.get('[data-cy="doughnut-chart"]', { timeout: 10000 })
+        .scrollIntoView()
+        .should("be.visible");
       cy.get('[data-cy="doughnut-chart-legend"]').should("be.visible");
     });
   });
