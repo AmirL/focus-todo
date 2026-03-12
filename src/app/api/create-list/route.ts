@@ -14,7 +14,7 @@ async function createListHandler(req: NextRequest, session: { user: { id: string
     return createErrorResponse(validation.error!, 400);
   }
 
-  const { name, description, participatesInInitiative } = validation;
+  const { name, description, participatesInInitiative, color } = validation;
 
   // Check if list with same name already exists for this user
   const existingList = await findUserListByName(session.user.id, name!);
@@ -35,6 +35,7 @@ async function createListHandler(req: NextRequest, session: { user: { id: string
   const [{ id }] = await DB.insert(listsTable).values({
     name: name!,
     description: description ?? null,
+    color: color ?? null,
     userId: session.user.id,
     isDefault: false,
     participatesInInitiative: participatesInInitiative ?? true,

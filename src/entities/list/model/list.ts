@@ -7,6 +7,7 @@ export type ListPlain = {
   id: string;
   name: string;
   description?: string | null;
+  color?: string | null;
   userId: string;
   isDefault: boolean;
   participatesInInitiative: boolean;
@@ -20,6 +21,7 @@ export class ListModel {
   id!: string;
   name!: string;
   description?: string | null;
+  color?: string | null;
   userId!: string;
   isDefault!: boolean;
   participatesInInitiative!: boolean;

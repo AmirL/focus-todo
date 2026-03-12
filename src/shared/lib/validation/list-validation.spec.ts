@@ -120,6 +120,30 @@ describe('validateCreateListRequest', () => {
     const result = validateCreateListRequest({ name: 'Work', description: '   ' });
     expect(result.description).toBeNull();
   });
+
+  it('should accept a valid color', () => {
+    const result = validateCreateListRequest({ name: 'Work', color: 'blue' });
+    expect(result.isValid).toBe(true);
+    expect(result.color).toBe('blue');
+  });
+
+  it('should accept null color', () => {
+    const result = validateCreateListRequest({ name: 'Work', color: null });
+    expect(result.isValid).toBe(true);
+    expect(result.color).toBeNull();
+  });
+
+  it('should default color to null when not provided', () => {
+    const result = validateCreateListRequest({ name: 'Work' });
+    expect(result.isValid).toBe(true);
+    expect(result.color).toBeNull();
+  });
+
+  it('should reject an invalid color', () => {
+    const result = validateCreateListRequest({ name: 'Work', color: 'rainbow' });
+    expect(result.isValid).toBe(false);
+    expect(result.error).toContain('Invalid color');
+  });
 });
 
 describe('validateUpdateListRequest', () => {
@@ -170,6 +194,29 @@ describe('validateUpdateListRequest', () => {
   it('should leave participatesInInitiative undefined when not provided', () => {
     const result = validateUpdateListRequest({ id: 1, name: 'Work' });
     expect(result.participatesInInitiative).toBeUndefined();
+  });
+
+  it('should accept a valid color on update', () => {
+    const result = validateUpdateListRequest({ id: 1, name: 'Work', color: 'emerald' });
+    expect(result.isValid).toBe(true);
+    expect(result.color).toBe('emerald');
+  });
+
+  it('should accept null color to clear it', () => {
+    const result = validateUpdateListRequest({ id: 1, name: 'Work', color: null });
+    expect(result.isValid).toBe(true);
+    expect(result.color).toBeNull();
+  });
+
+  it('should leave color undefined when not provided', () => {
+    const result = validateUpdateListRequest({ id: 1, name: 'Work' });
+    expect(result.color).toBeUndefined();
+  });
+
+  it('should reject an invalid color on update', () => {
+    const result = validateUpdateListRequest({ id: 1, name: 'Work', color: 'neon' });
+    expect(result.isValid).toBe(false);
+    expect(result.error).toContain('Invalid color');
   });
 });
 

@@ -109,8 +109,8 @@ export async function countListUsage(userId: string, listId: number) {
  */
 export async function createDefaultLists(userId: string) {
   const defaultLists = [
-    { name: 'Work', userId, isDefault: true, sortOrder: 0 },
-    { name: 'Personal', userId, isDefault: true, sortOrder: 1 }
+    { name: 'Work', userId, isDefault: true, sortOrder: 0, color: 'blue' },
+    { name: 'Personal', userId, isDefault: true, sortOrder: 1, color: 'violet' }
   ];
 
   return DB.insert(listsTable).values(defaultLists);

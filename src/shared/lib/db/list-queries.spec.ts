@@ -161,8 +161,8 @@ describe('list-queries', () => {
 
       expect(DB.insert).toHaveBeenCalled();
       expect(mockValues).toHaveBeenCalledWith([
-        { name: 'Work', userId: 'user-42', isDefault: true, sortOrder: 0 },
-        { name: 'Personal', userId: 'user-42', isDefault: true, sortOrder: 1 },
+        { name: 'Work', userId: 'user-42', isDefault: true, sortOrder: 0, color: 'blue' },
+        { name: 'Personal', userId: 'user-42', isDefault: true, sortOrder: 1, color: 'violet' },
       ]);
     });
   });

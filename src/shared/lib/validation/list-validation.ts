@@ -1,3 +1,5 @@
+import { validateListColor } from '@/shared/lib/colors';
+
 export interface ListNameValidationResult {
   isValid: boolean;
   error?: string;
@@ -29,10 +31,11 @@ export interface CreateListValidationResult {
   name?: string;
   description?: string | null;
   participatesInInitiative?: boolean;
+  color?: string | null;
 }
 
 export function validateCreateListRequest(requestBody: unknown): CreateListValidationResult {
-  const body = requestBody as { name?: unknown; description?: unknown; participatesInInitiative?: unknown };
+  const body = requestBody as { name?: unknown; description?: unknown; participatesInInitiative?: unknown; color?: unknown };
   const nameValidation = validateListName(body?.name);
 
   if (!nameValidation.isValid) {
@@ -42,11 +45,17 @@ export function validateCreateListRequest(requestBody: unknown): CreateListValid
     };
   }
 
+  const colorValidation = validateListColor(body.color);
+  if (!colorValidation.isValid) {
+    return { isValid: false, error: colorValidation.error };
+  }
+
   return {
     isValid: true,
     name: (body.name as string).trim(),
     description: body.description != null ? String(body.description).trim() || null : null,
-    participatesInInitiative: body.participatesInInitiative === undefined ? true : Boolean(body.participatesInInitiative)
+    participatesInInitiative: body.participatesInInitiative === undefined ? true : Boolean(body.participatesInInitiative),
+    color: body.color !== undefined ? (body.color as string | null) : null,
   };
 }
 
@@ -57,10 +66,11 @@ export interface UpdateListValidationResult {
   name?: string;
   description?: string | null;
   participatesInInitiative?: boolean;
+  color?: string | null;
 }
 
 export function validateUpdateListRequest(requestBody: unknown): UpdateListValidationResult {
-  const body = requestBody as { id?: unknown; name?: unknown; description?: unknown; participatesInInitiative?: unknown };
+  const body = requestBody as { id?: unknown; name?: unknown; description?: unknown; participatesInInitiative?: unknown; color?: unknown };
 
   if (!body?.id) {
     return {
@@ -78,12 +88,18 @@ export function validateUpdateListRequest(requestBody: unknown): UpdateListValid
     };
   }
 
+  const colorValidation = validateListColor(body.color);
+  if (!colorValidation.isValid) {
+    return { isValid: false, error: colorValidation.error };
+  }
+
   return {
     isValid: true,
     id: body.id as number,
     name: (body.name as string).trim(),
     description: body.description !== undefined ? (body.description != null ? String(body.description).trim() || null : null) : undefined,
-    participatesInInitiative: body.participatesInInitiative === undefined ? undefined : Boolean(body.participatesInInitiative)
+    participatesInInitiative: body.participatesInInitiative === undefined ? undefined : Boolean(body.participatesInInitiative),
+    color: body.color !== undefined ? (body.color as string | null) : undefined,
   };
 }
 
