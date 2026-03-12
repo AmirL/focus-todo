@@ -60,3 +60,56 @@ export function validateListColor(value: unknown): { isValid: boolean; error?: s
   }
   return { isValid: true };
 }
+
+/**
+ * Tailwind class sets for each list color.
+ * Used by timeline components, list items, and color pickers.
+ */
+export interface ColorClasses {
+  bg: string;
+  border: string;
+  text: string;
+  hover: string;
+  swatch: string; // solid background for small swatches
+}
+
+const COLOR_CLASS_MAP: Record<ListColor, ColorClasses> = {
+  blue: { bg: 'bg-blue-100', border: 'border-blue-300', text: 'text-blue-800', hover: 'hover:bg-blue-200', swatch: 'bg-blue-500' },
+  violet: { bg: 'bg-violet-100', border: 'border-violet-300', text: 'text-violet-800', hover: 'hover:bg-violet-200', swatch: 'bg-violet-500' },
+  emerald: { bg: 'bg-emerald-100', border: 'border-emerald-300', text: 'text-emerald-800', hover: 'hover:bg-emerald-200', swatch: 'bg-emerald-500' },
+  orange: { bg: 'bg-orange-100', border: 'border-orange-300', text: 'text-orange-800', hover: 'hover:bg-orange-200', swatch: 'bg-orange-500' },
+  red: { bg: 'bg-red-100', border: 'border-red-300', text: 'text-red-800', hover: 'hover:bg-red-200', swatch: 'bg-red-500' },
+  pink: { bg: 'bg-pink-100', border: 'border-pink-300', text: 'text-pink-800', hover: 'hover:bg-pink-200', swatch: 'bg-pink-500' },
+  cyan: { bg: 'bg-cyan-100', border: 'border-cyan-300', text: 'text-cyan-800', hover: 'hover:bg-cyan-200', swatch: 'bg-cyan-500' },
+  yellow: { bg: 'bg-yellow-100', border: 'border-yellow-300', text: 'text-yellow-800', hover: 'hover:bg-yellow-200', swatch: 'bg-yellow-500' },
+  slate: { bg: 'bg-slate-100', border: 'border-slate-300', text: 'text-slate-800', hover: 'hover:bg-slate-200', swatch: 'bg-slate-500' },
+  amber: { bg: 'bg-amber-100', border: 'border-amber-300', text: 'text-amber-800', hover: 'hover:bg-amber-200', swatch: 'bg-amber-500' },
+};
+
+const DEFAULT_COLOR_CLASSES: ColorClasses = COLOR_CLASS_MAP.emerald;
+
+/**
+ * Get Tailwind classes for a color name. Falls back to emerald for unknown colors.
+ */
+export function getColorClasses(color: string | null | undefined): ColorClasses {
+  if (color && isValidListColor(color)) {
+    return COLOR_CLASS_MAP[color];
+  }
+  return DEFAULT_COLOR_CLASSES;
+}
+
+/**
+ * Human-readable display names for colors.
+ */
+export const COLOR_DISPLAY_NAMES: Record<ListColor, string> = {
+  blue: 'Blue',
+  violet: 'Violet',
+  emerald: 'Emerald',
+  orange: 'Orange',
+  red: 'Red',
+  pink: 'Pink',
+  cyan: 'Cyan',
+  yellow: 'Yellow',
+  slate: 'Slate',
+  amber: 'Amber',
+};

@@ -6,10 +6,12 @@ import { Textarea } from '@/shared/ui/textarea';
 import { Label } from '@/shared/ui/label';
 import { Checkbox } from '@/shared/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
+import { ColorPicker } from '@/shared/ui/color-picker';
 import { useCreateList } from '../api/useCreateList';
 import { useUpdateList } from '../api/useUpdateList';
 import { useListsQuery } from '@/shared/api/lists';
 import { useState, useEffect } from 'react';
+import type { ListColor } from '@/shared/lib/colors';
 
 interface ListFormDialogProps {
   open: boolean;
@@ -33,6 +35,7 @@ export function ListFormDialog({
   const [value, setValue] = useState('');
   const [description, setDescription] = useState('');
   const [participatesInInitiative, setParticipatesInInitiative] = useState(true);
+  const [color, setColor] = useState<ListColor | null>(null);
 
   const list = listId ? lists.find(l => l.id === listId) : null;
   const isLoading = mode === 'create' ? isCreating : isUpdating;
@@ -43,33 +46,38 @@ export function ListFormDialog({
       const initialValue = mode === 'edit' && list ? list.name : '';
       const initialDescription = mode === 'edit' && list ? list.description ?? '' : '';
       const initialParticipates = mode === 'edit' && list ? list.participatesInInitiative : true;
+      const initialColor = mode === 'edit' && list ? (list.color as ListColor | null) ?? null : null;
       setValue(initialValue);
       setDescription(initialDescription);
       setParticipatesInInitiative(initialParticipates);
+      setColor(initialColor);
     }
   }, [open, mode, list]);
+
+  const resetForm = () => {
+    setValue('');
+    setDescription('');
+    setParticipatesInInitiative(true);
+    setColor(null);
+  };
 
   const handleSubmit = async () => {
     let success = false;
 
     if (mode === 'create') {
-      success = await createList(value, participatesInInitiative, description || null);
+      success = await createList(value, participatesInInitiative, description || null, color);
     } else if (mode === 'edit' && listId) {
-      success = await updateList(listId, value, participatesInInitiative, description || null);
+      success = await updateList(listId, value, participatesInInitiative, description || null, color);
     }
 
     if (success) {
-      setValue('');
-      setDescription('');
-      setParticipatesInInitiative(true);
+      resetForm();
       onCancel();
     }
   };
 
   const handleCancel = () => {
-    setValue('');
-    setDescription('');
-    setParticipatesInInitiative(true);
+    resetForm();
     onCancel();
   };
 
@@ -111,6 +119,10 @@ export function ListFormDialog({
               placeholder="Provide context for tasks in this list..."
               rows={3}
             />
+          </div>
+          <div>
+            <Label htmlFor="list-color">Color</Label>
+            <ColorPicker value={color} onChange={setColor} />
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox

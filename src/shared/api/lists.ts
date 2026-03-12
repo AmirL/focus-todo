@@ -101,18 +101,19 @@ export function useListsQuery(options?: { includeArchived?: boolean }) {
 // Create List Mutation
 export function useCreateListMutation() {
   return useOptimisticMutation({
-    mutationFn: async ({ name, description, participatesInInitiative }: { name: string; description?: string | null; participatesInInitiative: boolean }) => {
-      const response = (await fetchBackend('create-list', { name, description, participatesInInitiative })) as ListPlain;
+    mutationFn: async ({ name, description, participatesInInitiative, color }: { name: string; description?: string | null; participatesInInitiative: boolean; color?: string | null }) => {
+      const response = (await fetchBackend('create-list', { name, description, participatesInInitiative, color })) as ListPlain;
       return ListModel.toInstance(response);
     },
     queryKey: listKeys.all,
-    optimisticUpdate: (old, { name, description, participatesInInitiative }) => {
+    optimisticUpdate: (old, { name, description, participatesInInitiative, color }) => {
       // Optimistically add the new list to the cache
       const maxSortOrder = old ? Math.max(...old.map((l) => l.sortOrder), -1) : -1;
       const optimisticList = {
         id: 'temp-' + Date.now(),
         name,
         description: description ?? null,
+        color: color ?? null,
         userId: 'temp',
         isDefault: false,
         participatesInInitiative,
@@ -133,15 +134,15 @@ export function useCreateListMutation() {
 // Update List Mutation
 export function useUpdateListMutation() {
   return useOptimisticMutation({
-    mutationFn: async ({ id, name, description, participatesInInitiative }: { id: string; name: string; description?: string | null; participatesInInitiative: boolean }) => {
-      const response = (await fetchBackend('update-list', { id, name, description, participatesInInitiative })) as ListPlain;
+    mutationFn: async ({ id, name, description, participatesInInitiative, color }: { id: string; name: string; description?: string | null; participatesInInitiative: boolean; color?: string | null }) => {
+      const response = (await fetchBackend('update-list', { id, name, description, participatesInInitiative, color })) as ListPlain;
       return ListModel.toInstance(response);
     },
     queryKey: listKeys.all,
-    optimisticUpdate: (old, { id, name, description, participatesInInitiative }) => {
+    optimisticUpdate: (old, { id, name, description, participatesInInitiative, color }) => {
       if (!old) return [];
       return old.map((list) =>
-        list.id === id ? Object.assign(Object.create(Object.getPrototypeOf(list)), list, { name, ...(description !== undefined && { description }), participatesInInitiative, updatedAt: new Date() }) : list
+        list.id === id ? Object.assign(Object.create(Object.getPrototypeOf(list)), list, { name, ...(description !== undefined && { description }), ...(color !== undefined && { color }), participatesInInitiative, updatedAt: new Date() }) : list
       );
     },
     successMessage: 'List updated',

@@ -10,6 +10,7 @@ export function mapTimeEntriesToBlocks(
   tasks: TaskModel[],
   listNameMap: Map<number, string>,
   date?: dayjs.Dayjs,
+  listColorMap?: Map<number, string | null>,
 ): TimelineBlockWithTaskId[] {
   const targetDate = date ?? dayjs();
   const taskMap = new Map(tasks.map((t) => [Number(t.id), t]));
@@ -19,6 +20,7 @@ export function mapTimeEntriesToBlocks(
     .map((entry) => {
       const task = taskMap.get(entry.taskId);
       const listName = task ? (listNameMap.get(task.listId) ?? 'Unknown') : 'Unknown';
+      const listColor = task ? (listColorMap?.get(task.listId) ?? null) : null;
 
       return {
         id: String(entry.id),
@@ -26,6 +28,7 @@ export function mapTimeEntriesToBlocks(
         startedAt: entry.startedAt,
         endedAt: entry.endedAt,
         listName,
+        listColor,
         durationMinutes: entry.durationMinutes,
         taskId: String(entry.taskId),
       };

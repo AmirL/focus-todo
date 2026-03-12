@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { cn } from '@/shared/lib/utils';
+import { getColorClasses } from '@/shared/lib/colors';
 import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from 'lucide-react';
 import type { TimelineBlock, TimelineGap } from './TimelineBar';
 
@@ -25,30 +26,8 @@ interface DayTimelineProps {
   className?: string;
 }
 
-const LIST_COLORS: Record<string, { bg: string; border: string; text: string; hover: string }> = {
-  Work: {
-    bg: 'bg-blue-100',
-    border: 'border-blue-300',
-    text: 'text-blue-800',
-    hover: 'hover:bg-blue-200',
-  },
-  Personal: {
-    bg: 'bg-violet-100',
-    border: 'border-violet-300',
-    text: 'text-violet-800',
-    hover: 'hover:bg-violet-200',
-  },
-};
-
-const DEFAULT_COLORS = {
-  bg: 'bg-emerald-100',
-  border: 'border-emerald-300',
-  text: 'text-emerald-800',
-  hover: 'hover:bg-emerald-200',
-};
-
-function getListColors(listName: string) {
-  return LIST_COLORS[listName] ?? DEFAULT_COLORS;
+function getListColors(listColor: string | null | undefined) {
+  return getColorClasses(listColor);
 }
 
 function formatDuration(minutes: number | null): string {
@@ -329,7 +308,7 @@ function TimeBlock({
 }) {
   const { block, topPx, heightPx } = position;
   const isRunning = block.endedAt === null;
-  const colors = getListColors(block.listName);
+  const colors = getListColors(block.listColor);
   const durationStr = isRunning
     ? formatDuration(block.durationMinutes) || 'running'
     : formatDuration(block.durationMinutes);
