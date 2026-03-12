@@ -3,13 +3,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { TimerBar } from '@/shared/ui/timer';
 import type { SaveStatus } from '@/shared/ui/timer/TimerBar';
 import { useTimerStore } from '../model/timerStore';
-import { useStopTimerMutation, useUpdateTimeEntryMutation } from '@/shared/api/time-entries';
+import { useStartTimerMutation, useStopTimerMutation, useUpdateTimeEntryMutation } from '@/shared/api/time-entries';
 import { useTasksQuery } from '@/shared/api/tasks';
 import dayjs from 'dayjs';
 
 export function ActiveTimerBar() {
   const activeEntry = useTimerStore((s) => s.activeEntry);
   const setActiveEntry = useTimerStore((s) => s.setActiveEntry);
+  const startTimer = useStartTimerMutation();
   const stopTimer = useStopTimerMutation();
   const updateEntry = useUpdateTimeEntryMutation();
   const { data: tasks } = useTasksQuery();
@@ -121,6 +122,12 @@ export function ActiveTimerBar() {
     setActiveEntry(stopped);
   };
 
+  const handleStartAgain = async () => {
+    if (!activeEntry) return;
+    const newEntry = await startTimer.mutateAsync(activeEntry.taskId);
+    setActiveEntry(newEntry);
+  };
+
   const handleDismiss = () => {
     setActiveEntry(null);
   };
@@ -138,6 +145,7 @@ export function ActiveTimerBar() {
       onEndTimeChange={setLocalEndTime}
       onEndTimeBlur={saveEndTime}
       onStop={handleStop}
+      onStartAgain={handleStartAgain}
       onDismiss={handleDismiss}
     />
   );

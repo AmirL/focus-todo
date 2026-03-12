@@ -1,4 +1,4 @@
-import { Check, Square, Timer, X } from 'lucide-react';
+import { Check, Play, Square, Timer, X } from 'lucide-react';
 import { Input } from '@/shared/ui/input';
 import { Button } from '@/shared/ui/button';
 import { cn } from '@/shared/lib/utils';
@@ -17,6 +17,7 @@ interface TimerBarProps {
   onEndTimeChange?: (value: string) => void;
   onEndTimeBlur?: () => void;
   onStop?: () => void;
+  onStartAgain?: () => void;
   onDismiss?: () => void;
   className?: string;
 }
@@ -33,6 +34,7 @@ export function TimerBar({
   onEndTimeChange,
   onEndTimeBlur,
   onStop,
+  onStartAgain,
   onDismiss,
   className,
 }: TimerBarProps) {
@@ -118,7 +120,7 @@ export function TimerBar({
         </div>
 
         <div className="flex items-center gap-1">
-          {isRunning && (
+          {isRunning ? (
             <Button
               variant="secondary"
               size="sm"
@@ -128,6 +130,17 @@ export function TimerBar({
             >
               <Square size={10} />
               Stop
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onStartAgain}
+              className="h-7 gap-1 text-xs font-semibold"
+              data-cy="timer-start-again-button"
+            >
+              <Play size={10} />
+              Start again
             </Button>
           )}
           <Button
