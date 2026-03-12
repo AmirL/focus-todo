@@ -48,11 +48,7 @@ export function useCreateGoalMutation() {
       // If the mutation fails, use the context returned from onMutate to roll back
       queryClient.setQueryData<GoalModel[]>(goalKeys.all, context?.previousGoals);
     },
-    onSuccess: (createdGoal) => {
-      // No need to update cache here since it was already done optimistically
-    },
     onSettled: () => {
-      // Always refetch after error or success to ensure we have the latest data
       queryClient.invalidateQueries({ queryKey: goalKeys.all });
     },
   });
@@ -92,11 +88,7 @@ export function useUpdateGoalMutation() {
       // If the mutation fails, use the context returned from onMutate to roll back
       queryClient.setQueryData<GoalModel[]>(goalKeys.all, context?.previousGoals);
     },
-    onSuccess: (updatedGoal) => {
-      // No need to update cache here since it was already done optimistically
-    },
     onSettled: () => {
-      // Always refetch after error or success to ensure we have the latest data
       queryClient.invalidateQueries({ queryKey: goalKeys.all });
     },
   });

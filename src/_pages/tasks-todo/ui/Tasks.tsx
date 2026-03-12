@@ -85,13 +85,10 @@ export function Tasks() {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    console.log('Drag end event:', { activeId: active.id, overId: over?.id, over, activeData: active.data, overData: over?.data });
-
     setActiveTask(null);
     setIsDragging(false);
 
     if (!over || active.id === over.id) {
-      console.log('Early return - no over or same ID');
       return;
     }
 

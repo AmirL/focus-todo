@@ -113,11 +113,7 @@ export function useUpdateTaskMutation() {
       // If the mutation fails, use the context returned from onMutate to roll back
       queryClient.setQueryData<TaskModel[]>(taskKeys.all, context?.previousTasks);
     },
-    onSuccess: () => {
-      // No need to update cache here since it was already done optimistically
-    },
     onSettled: () => {
-      // Always refetch after error or success to ensure we have the latest data
       queryClient.invalidateQueries({ queryKey: taskKeys.all });
     },
   });

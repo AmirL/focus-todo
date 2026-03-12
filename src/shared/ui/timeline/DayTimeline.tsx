@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { cn } from '@/shared/lib/utils';
 import { getColorClasses } from '@/shared/lib/colors';
+import { formatDuration } from '@/shared/lib/format-duration';
 import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from 'lucide-react';
 import type { TimelineBlock, TimelineGap } from './TimelineBar';
 
@@ -24,18 +25,6 @@ interface DayTimelineProps {
   onGapClick?: (gap: TimelineGap) => void;
   onAddEntry?: (startTime: string, endTime: string) => void;
   className?: string;
-}
-
-function getListColors(listColor: string | null | undefined) {
-  return getColorClasses(listColor);
-}
-
-function formatDuration(minutes: number | null): string {
-  if (minutes === null || minutes <= 0) return '';
-  if (minutes < 60) return `${minutes}m`;
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return m === 0 ? `${h}h` : `${h}h ${m}m`;
 }
 
 function formatDateHeader(date: Date): string {
@@ -308,7 +297,7 @@ function TimeBlock({
 }) {
   const { block, topPx, heightPx } = position;
   const isRunning = block.endedAt === null;
-  const colors = getListColors(block.listColor);
+  const colors = getColorClasses(block.listColor);
   const durationStr = isRunning
     ? formatDuration(block.durationMinutes) || 'running'
     : formatDuration(block.durationMinutes);

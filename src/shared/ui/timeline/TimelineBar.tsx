@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { cn } from '@/shared/lib/utils';
 import { getColorClasses } from '@/shared/lib/colors';
+import { formatDuration } from '@/shared/lib/format-duration';
 
 export interface TimelineBlock {
   id: string;
@@ -27,24 +28,12 @@ interface TimelineBarProps {
   className?: string;
 }
 
-function getListColors(listColor: string | null | undefined) {
-  return getColorClasses(listColor);
-}
-
 function formatTime(date: Date): string {
   return date.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
     hour12: false,
   });
-}
-
-function formatBlockDuration(minutes: number | null): string {
-  if (minutes === null || minutes <= 0) return '';
-  if (minutes < 60) return `${minutes}m`;
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return m === 0 ? `${h}h` : `${h}h ${m}m`;
 }
 
 function computeLayout(blocks: TimelineBlock[]) {
@@ -183,17 +172,17 @@ export function TimelineBar({ blocks, onBlockClick, onGapClick, className }: Tim
                 )}
                 style={{ left: `${seg.left}%`, width: `${seg.width}%` }}
                 onClick={() => onGapClick?.(gap)}
-                title={`Gap: ${formatTime(gapStart)} - ${formatTime(gapEnd)} (${formatBlockDuration(gap.durationMinutes)})`}
+                title={`Gap: ${formatTime(gapStart)} - ${formatTime(gapEnd)} (${formatDuration(gap.durationMinutes)})`}
               />
             );
           }
 
           const block = seg.block!;
           const isRunning = block.endedAt === null;
-          const colors = getListColors(block.listColor);
+          const colors = getColorClasses(block.listColor);
           const durationStr = isRunning
-            ? formatBlockDuration(block.durationMinutes) || 'running'
-            : formatBlockDuration(block.durationMinutes);
+            ? formatDuration(block.durationMinutes) || 'running'
+            : formatDuration(block.durationMinutes);
 
           return (
             <button

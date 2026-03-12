@@ -12,9 +12,6 @@ export type RouteHandler<T = unknown> = (
   session: AuthenticatedSession
 ) => Promise<NextResponse<T | { error: string }>>;
 
-/**
- * Wraps API route handlers with common authentication and error handling logic
- */
 export function withAuthAndErrorHandling<T = unknown>(
   handler: RouteHandler<T>,
   routeName: string
@@ -33,16 +30,10 @@ export function withAuthAndErrorHandling<T = unknown>(
   };
 }
 
-/**
- * Helper function to create standardized error responses
- */
 export function createErrorResponse(message: string, status: number = 400) {
   return NextResponse.json({ error: message }, { status });
 }
 
-/**
- * Helper function to create standardized success responses
- */
 export function createSuccessResponse<T>(data: T, status: number = 200) {
   return NextResponse.json(data, { status });
 }
