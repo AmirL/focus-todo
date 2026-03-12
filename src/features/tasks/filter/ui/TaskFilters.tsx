@@ -13,6 +13,7 @@ import { formatTotalDuration } from '@/shared/lib/format-duration';
 import { useSidebar } from '@/shared/ui/sidebar';
 import { usePathname, useRouter } from 'next/navigation';
 import { navigateHome } from '@/features/tasks/filter/model/filterUrl';
+import Link from 'next/link';
 
 function FilterButton({
   filter,
@@ -152,6 +153,7 @@ export function TaskFilters() {
   const { statusFilter, listId } = useFilterStore();
   const { data: lists = [], isLoading } = useListsQuery();
   const { data: initiativeData } = useCurrentInitiativeQuery();
+  const pathname = usePathname();
 
   // Determine today's focus list ID (initiative uses number IDs)
   const todaysFocusListId = initiativeData?.today
@@ -194,6 +196,19 @@ export function TaskFilters() {
           <FilterButton filter={StatusFilterEnum.FUTURE} active={statusFilter === StatusFilterEnum.FUTURE} icon={Clock}>
             Future
           </FilterButton>
+          <Button
+            variant="ghost"
+            className={cn(
+              'w-full justify-start',
+              pathname === '/calendar' && 'text-primary bg-primary/10 hover:bg-primary/20 hover:text-primary'
+            )}
+            asChild
+          >
+            <Link href="/calendar" data-cy="calendar-link">
+              <Calendar className="mr-2 h-4 w-4" />
+              Calendar
+            </Link>
+          </Button>
         </div>
       </div>
 
