@@ -1,7 +1,6 @@
 import { defineConfig } from "cypress";
 import cypressSplit from "cypress-split";
 
-// E2E flaky test investigation
 export default defineConfig({
   e2e: {
     baseUrl: "http://localhost:3000",
