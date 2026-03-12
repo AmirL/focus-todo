@@ -5,8 +5,6 @@ import { signIn, signUp } from '@/shared/lib/auth-client';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
-import { useRouter } from 'next/navigation';
-
 // Types
 interface AuthFormData {
   email: string;
@@ -14,11 +12,17 @@ interface AuthFormData {
   name?: string;
 }
 
+// Use a hard navigation to ensure the browser sends the newly-set session cookie.
+// Next.js router.push() does a soft navigation where the middleware may not see
+// cookies set by a recent fetch response, causing the first login click to fail.
+function redirectAfterLogin() {
+  window.location.href = '/';
+}
+
 // Custom hook for authentication logic
 function useAuthentication() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const router = useRouter();
 
   const authenticate = async (data: AuthFormData, isSignUp: boolean) => {
     setIsLoading(true);
@@ -43,12 +47,10 @@ function useAuthentication() {
         throw new Error(result.error.message || 'Authentication failed');
       }
 
-      router.push('/');
-      router.refresh();
+      redirectAfterLogin();
     } catch (error) {
       console.error('Auth error:', error);
       setError('Authentication failed. Please check your credentials.');
-    } finally {
       setIsLoading(false);
     }
   };
@@ -68,8 +70,7 @@ function useAuthentication() {
         throw new Error(`Sign in failed: ${signInResult.error.message || 'Unknown error'}`);
       }
 
-      router.push('/');
-      router.refresh();
+      redirectAfterLogin();
     } catch (signInError) {
       // If sign in fails, try to create the user
       try {
@@ -83,14 +84,12 @@ function useAuthentication() {
           throw new Error(`Sign up failed: ${signUpResult.error.message || 'Unknown error'}`);
         }
 
-        router.push('/');
-        router.refresh();
+        redirectAfterLogin();
       } catch (signUpError) {
         console.error('Test user creation failed:', signUpError);
         setError(`Test user login failed: ${signUpError instanceof Error ? signUpError.message : 'Unknown error'}`);
+        setIsLoading(false);
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
