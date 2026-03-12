@@ -48,7 +48,7 @@ export function ListItem({ list, isDragging, dragHandleRef, dragHandleListeners 
             <GripVertical className="h-4 w-4" />
           </button>
         )}
-        {list.color && <ColorSwatch color={list.color} />}
+        {list.color && <ColorSwatch color={list.color} data-cy="list-color-swatch" />}
         <span className="font-medium">{list.name}</span>
         {list.isDefault && (
           <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">

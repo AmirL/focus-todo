@@ -10,11 +10,12 @@ interface ColorPickerProps {
   className?: string;
 }
 
-function ColorSwatch({ color, className }: { color: string; className?: string }) {
+function ColorSwatch({ color, className, ...props }: { color: string; className?: string } & React.HTMLAttributes<HTMLSpanElement>) {
   const classes = getColorClasses(color);
   return (
     <span
       className={cn('inline-block h-3.5 w-3.5 rounded-full flex-shrink-0', classes.swatch, className)}
+      {...props}
     />
   );
 }
