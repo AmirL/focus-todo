@@ -1,8 +1,4 @@
-/**
- * Formats duration in minutes to a concise string representation
- * @param minutes - Duration in minutes
- * @returns Formatted string like "15m", "1h", "1.5h", "2h 30m" or null if invalid
- */
+/** Formats duration in minutes to a concise string like "15m", "1h", "1.5h", "2h 30m", or null if invalid. */
 export function formatDuration(minutes: number | null | undefined): string | null {
   if (minutes === null || minutes === undefined || minutes <= 0) {
     return null;
@@ -30,11 +26,7 @@ export function formatDuration(minutes: number | null | undefined): string | nul
   }
 }
 
-/**
- * Formats total duration for display in filter tabs
- * @param minutes - Total duration in minutes
- * @returns Formatted string or empty string if zero
- */
+/** Formats total duration for display in filter tabs. Returns empty string if zero. */
 export function formatTotalDuration(minutes: number): string {
   if (minutes === 0) return '';
   return formatDuration(minutes) || '';

@@ -127,14 +127,14 @@ async function getHandler(
 }
 
 // The route wrapper doesn't pass context, so we capture it via closure
-export async function PATCH(req: NextRequest, context: RouteContext) {
+export function PATCH(req: NextRequest, context: RouteContext) {
   return withAuthAndErrorHandling(
     (r, s) => patchHandler(r, s, context),
     'PATCH /api/current-initiative/[date]'
   )(req);
 }
 
-export async function GET(req: NextRequest, context: RouteContext) {
+export function GET(req: NextRequest, context: RouteContext) {
   return withAuthAndErrorHandling(
     (r, s) => getHandler(r, s, context),
     'GET /api/current-initiative/[date]'
