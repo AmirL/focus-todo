@@ -4,7 +4,6 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
-export type { AiSuggestionField, AiSuggestions } from '@/shared/types/aiSuggestions';
 import type { AiSuggestions } from '@/shared/types/aiSuggestions';
 
 export type TaskPlain = {

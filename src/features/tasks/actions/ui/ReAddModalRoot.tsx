@@ -9,5 +9,3 @@ export function ReAddModalRoot() {
   return <ReAddDialog open={open} onOpenChange={(o) => (o ? null : close())} task={task} initialDate={initialDate} />;
 }
 
-export default ReAddModalRoot;
-

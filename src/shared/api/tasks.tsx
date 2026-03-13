@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { useEditTaskModalStore } from '@/features/tasks/edit/model/editTaskModalStore';
 import { timeEntryKeys, type TimeEntry } from '@/shared/api/time-entries';
 
-export const taskKeys = {
+const taskKeys = {
   all: ['tasks'] as const,
   lists: () => [...taskKeys.all, 'list'] as const,
   list: (filters: string) => [...taskKeys.lists(), { filters }] as const,

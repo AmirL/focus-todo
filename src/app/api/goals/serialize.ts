@@ -3,13 +3,13 @@ import { toISOString } from '@/shared/lib/api/serialize-helpers';
 
 export { handleApiError } from '@/shared/lib/api/serialize-helpers';
 
-export type GoalRow = typeof goalsTable.$inferSelect;
+type GoalRow = typeof goalsTable.$inferSelect;
 
-export type ApiGoal = Omit<GoalRow, '__list_deprecated' | 'deletedAt'> & {
+type ApiGoal = Omit<GoalRow, '__list_deprecated' | 'deletedAt'> & {
   deletedAt: string | null;
 };
 
-export type ApiGoalWithList = ApiGoal & { listName: string | null };
+type ApiGoalWithList = ApiGoal & { listName: string | null };
 
 export function serializeGoal(g: GoalRow): ApiGoal {
   const { __list_deprecated: _, ...rest } = g;

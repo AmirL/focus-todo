@@ -7,7 +7,7 @@ export interface AuthenticatedSession {
   };
 }
 
-export type RouteHandler<T = unknown> = (
+type RouteHandler<T = unknown> = (
   req: NextRequest,
   session: AuthenticatedSession
 ) => Promise<NextResponse<T | { error: string }>>;

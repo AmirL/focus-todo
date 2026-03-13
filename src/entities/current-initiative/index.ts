@@ -1,6 +1,4 @@
 export {
-  CurrentInitiativeModel,
-  type CurrentInitiativePlain,
   type ListWithLastTouched,
   type InitiativeBalance,
   calculateBalance,

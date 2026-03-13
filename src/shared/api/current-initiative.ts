@@ -55,7 +55,7 @@ interface SetInitiativeResponse {
 }
 
 // Query Keys
-export const initiativeKeys = {
+const initiativeKeys = {
   all: ['current-initiative'] as const,
   current: () => [...initiativeKeys.all, 'current'] as const,
   history: (days?: number) => [...initiativeKeys.all, 'history', { days }] as const,

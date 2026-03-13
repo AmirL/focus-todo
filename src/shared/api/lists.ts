@@ -61,7 +61,7 @@ function useOptimisticMutation<TData, TVariables>({
   });
 }
 
-export const listKeys = {
+const listKeys = {
   all: ['lists'] as const,
   active: ['lists', { includeArchived: false }] as const,
   withArchived: ['lists', { includeArchived: true }] as const,

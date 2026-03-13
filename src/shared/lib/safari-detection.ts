@@ -1,7 +1,3 @@
-interface NavigatorWithStandalone extends Navigator {
-  standalone?: boolean;
-}
-
 interface WindowWithSafari extends Window {
   safari?: unknown;
 }
@@ -18,22 +14,3 @@ export function isSafari(): boolean {
   return isSafariUA || hasSafariFeatures;
 }
 
-export function isSafariPWA(): boolean {
-  if (typeof window === 'undefined') return false;
-
-  const navigator = window.navigator as NavigatorWithStandalone;
-  return isSafari() && Boolean(navigator.standalone);
-}
-
-
-export function isMobileDevice(): boolean {
-  if (typeof window === 'undefined') return false;
-
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    window.navigator.userAgent
-  );
-}
-
-export function isSafariMobile(): boolean {
-  return isSafari() && isMobileDevice();
-}

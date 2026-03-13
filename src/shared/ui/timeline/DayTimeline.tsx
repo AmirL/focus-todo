@@ -541,4 +541,3 @@ export function DayTimeline({
   );
 }
 
-export type { DayTimelineProps };

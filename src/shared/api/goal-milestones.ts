@@ -4,7 +4,7 @@ import { GoalModel, GoalPlain } from '@/entities/goal/model/goal';
 import { fetchBackend } from '@/shared/lib/api';
 import { goalKeys } from '@/shared/api/goals';
 
-export const milestoneKeys = {
+const milestoneKeys = {
   byGoal: (goalId: string) => ['goal-milestones', goalId] as const,
 };
 

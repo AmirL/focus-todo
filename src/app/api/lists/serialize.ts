@@ -3,9 +3,9 @@ import { toISOString } from '@/shared/lib/api/serialize-helpers';
 
 export { handleApiError } from '@/shared/lib/api/serialize-helpers';
 
-export type ListRow = typeof listsTable.$inferSelect;
+type ListRow = typeof listsTable.$inferSelect;
 
-export type ApiList = Omit<ListRow, 'createdAt' | 'updatedAt' | 'archivedAt'> & {
+type ApiList = Omit<ListRow, 'createdAt' | 'updatedAt' | 'archivedAt'> & {
   createdAt: string | null;
   updatedAt: string | null;
   archivedAt: string | null;

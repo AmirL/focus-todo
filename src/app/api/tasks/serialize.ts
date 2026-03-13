@@ -3,9 +3,9 @@ import { toISOString } from '@/shared/lib/api/serialize-helpers';
 
 export { handleApiError } from '@/shared/lib/api/serialize-helpers';
 
-export type TaskRow = typeof tasksTable.$inferSelect;
+type TaskRow = typeof tasksTable.$inferSelect;
 
-export type ApiTask = Omit<
+type ApiTask = Omit<
   TaskRow,
   'date' | 'completedAt' | 'deletedAt' | 'selectedAt' | 'updatedAt' | 'createdAt' | '__list_deprecated'
 > & {
@@ -17,7 +17,7 @@ export type ApiTask = Omit<
   createdAt: string | null;
 };
 
-export type ApiTaskWithDescription = ApiTask & { listDescription: string | null };
+type ApiTaskWithDescription = ApiTask & { listDescription: string | null };
 
 export function serializeTask(t: TaskRow): ApiTask {
   const { __list_deprecated: _, ...rest } = t;

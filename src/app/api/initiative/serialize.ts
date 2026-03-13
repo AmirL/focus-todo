@@ -4,15 +4,15 @@ import dayjs from 'dayjs';
 
 export { handleApiError } from '@/shared/lib/api/serialize-helpers';
 
-export type InitiativeRow = typeof currentInitiativeTable.$inferSelect;
+type InitiativeRow = typeof currentInitiativeTable.$inferSelect;
 
-export type ApiInitiative = Omit<InitiativeRow, 'date' | 'setAt' | 'changedAt'> & {
+type ApiInitiative = Omit<InitiativeRow, 'date' | 'setAt' | 'changedAt'> & {
   date: string;
   setAt: string;
   changedAt: string | null;
 };
 
-export type ApiInitiativeWithLists = ApiInitiative & {
+type ApiInitiativeWithLists = ApiInitiative & {
   suggestedListName: string | null;
   chosenListName: string | null;
   effectiveListName: string | null;

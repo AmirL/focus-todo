@@ -2,7 +2,7 @@ import { eq, gt, gte, isNull, lt, or, SQL } from 'drizzle-orm';
 import dayjs from 'dayjs';
 import { tasksTable } from '@/shared/lib/drizzle/schema';
 
-export interface TaskListFilterParams {
+interface TaskListFilterParams {
   userId: string;
   on?: string | null;
   since?: string | null;
