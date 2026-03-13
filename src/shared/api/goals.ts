@@ -44,7 +44,7 @@ export function useCreateGoalMutation() {
       // Return a context object with the snapshotted value
       return { previousGoals };
     },
-    onError: (err, newGoal, context) => {
+    onError: (_err, _newGoal, context) => {
       // If the mutation fails, use the context returned from onMutate to roll back
       queryClient.setQueryData<GoalModel[]>(goalKeys.all, context?.previousGoals);
     },
@@ -66,7 +66,7 @@ export function useUpdateGoalMutation() {
       })) as GoalPlain;
       return GoalModel.toInstance(response);
     },
-    onMutate: async (updatedGoal) => {
+    onMutate: async (updatedGoal: GoalModel) => {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: goalKeys.all });
 
@@ -84,7 +84,7 @@ export function useUpdateGoalMutation() {
       // Return a context object with the snapshotted value
       return { previousGoals };
     },
-    onError: (err, updatedGoal, context) => {
+    onError: (_err, _updatedGoal, context) => {
       // If the mutation fails, use the context returned from onMutate to roll back
       queryClient.setQueryData<GoalModel[]>(goalKeys.all, context?.previousGoals);
     },

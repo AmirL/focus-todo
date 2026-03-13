@@ -4,16 +4,13 @@ import { and, eq } from 'drizzle-orm';
 import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema';
 import { getUserIdFromApiKey } from '@/app/api/api-auth';
 import { serializeInitiative, handleApiError } from '../serialize';
+import { toDate } from '@/shared/lib/api/initiative-helpers';
 import dayjs from 'dayjs';
 
 type RouteContext = { params: Promise<{ date: string }> };
 
 function isValidDate(dateStr: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(dateStr) && dayjs(dateStr, 'YYYY-MM-DD', true).isValid();
-}
-
-function toDate(dateStr: string): Date {
-  return dayjs(dateStr).toDate();
 }
 
 /**

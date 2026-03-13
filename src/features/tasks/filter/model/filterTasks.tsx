@@ -1,6 +1,5 @@
 import {
   TaskModel,
-  isTaskDeleted,
   isTaskDeletedAgo,
   isTaskCompletedAgo,
   isTaskInBacklog,

@@ -1,7 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { eq, isNull, isNotNull, and, SQL } from 'drizzle-orm';
+import { describe, it, expect } from 'vitest';
+import { and, SQL } from 'drizzle-orm';
 import { CasingCache } from 'drizzle-orm/casing';
-import { tasksTable } from '@/shared/lib/drizzle/schema';
 import { buildTaskListConditions } from './buildTaskListConditions';
 
 const casing = new CasingCache();

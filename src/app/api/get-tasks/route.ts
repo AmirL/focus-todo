@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateUserSession } from '../user-auth';
 import { DB } from '@/shared/lib/db';
-import { and, eq, gt, isNull, lt, or } from 'drizzle-orm';
+import { and, eq, gt, isNull, or } from 'drizzle-orm';
 import dayjs from 'dayjs';
 import { tasksTable } from '@/shared/lib/drizzle/schema';
 
-export async function POST(req: NextRequest) {
+export async function POST(_req: NextRequest) {
   try {
     const session = await validateUserSession();
 

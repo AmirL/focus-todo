@@ -6,7 +6,7 @@ import { Clock, X } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { Calendar as CalendarComponent } from '@/shared/ui/calendar';
 import dayjs from 'dayjs';
-import { hasSafariDialogIssues } from '@/shared/lib/safari-detection';
+import { isSafari as checkIsSafari } from '@/shared/lib/safari-detection';
 
 interface DatePickerButtonProps {
   selectedDate: Date | null;
@@ -15,11 +15,10 @@ interface DatePickerButtonProps {
 
 export function DatePickerButton({ selectedDate, onDateChange }: DatePickerButtonProps) {
   const [calendarOpen, setCalendarOpen] = useState(false);
-  const [isSafari, setIsSafari] = useState(false);
+  const [isSafariBrowser, setIsSafariBrowser] = useState(false);
 
-  // Detect Safari browser for conditional fixes
   useEffect(() => {
-    setIsSafari(hasSafariDialogIssues());
+    setIsSafariBrowser(checkIsSafari());
   }, []);
 
   const handleCalendarOpenChange = (open: boolean) => {
@@ -47,7 +46,7 @@ export function DatePickerButton({ selectedDate, onDateChange }: DatePickerButto
     <Popover 
       open={calendarOpen} 
       onOpenChange={handleCalendarOpenChange}
-      modal={!isSafari} // Disable modal mode for Safari to fix dialog focus issues
+      modal={!isSafariBrowser} // Disable modal mode for Safari to fix dialog focus issues
     >
       <PopoverTrigger asChild>
         <Button 
@@ -83,7 +82,7 @@ export function DatePickerButton({ selectedDate, onDateChange }: DatePickerButto
             WebkitUserSelect: 'none',
             userSelect: 'none',
             // Safari-specific focus fixes
-            ...(isSafari && {
+            ...(isSafariBrowser && {
               WebkitTransform: 'translateZ(0)',
               transform: 'translateZ(0)',
               isolation: 'isolate',
@@ -128,7 +127,7 @@ export function DatePickerButton({ selectedDate, onDateChange }: DatePickerButto
             mode="single" 
             selected={selectedDate ?? undefined} 
             onSelect={onDateSelect} 
-            initialFocus={!isSafari} // Disable initialFocus for Safari to prevent focus conflicts
+            initialFocus={!isSafariBrowser} // Disable initialFocus for Safari to prevent focus conflicts
           />
         </div>
       </PopoverContent>

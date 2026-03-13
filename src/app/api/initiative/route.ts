@@ -5,18 +5,11 @@ import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema'
 import { getUserIdFromApiKey } from '@/app/api/api-auth';
 import { getSuggestedList, calculateBalance, type ListWithLastTouched } from '@/entities/current-initiative';
 import { serializeInitiative, handleApiError } from './serialize';
+import { toDate, formatDate, getParticipatingLists } from '@/shared/lib/api/initiative-helpers';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
 dayjs.extend(utc);
-
-function toDate(dateStr: string): Date {
-  return dayjs(dateStr).toDate();
-}
-
-function formatDate(date: Date): string {
-  return dayjs(date).format('YYYY-MM-DD');
-}
 
 /**
  * GET /api/initiative - Get today's and tomorrow's initiative with balance data
@@ -34,7 +27,7 @@ export async function GET(req: NextRequest) {
       .from(listsTable)
       .where(and(eq(listsTable.userId, userId), isNull(listsTable.archivedAt)));
 
-    const participatingLists = lists.filter((l) => l.participatesInInitiative);
+    const participatingLists = getParticipatingLists(lists);
 
     // Get today's and tomorrow's initiatives
     const initiatives = await DB.select()

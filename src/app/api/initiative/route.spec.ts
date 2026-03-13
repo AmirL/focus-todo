@@ -3,10 +3,8 @@ import { NextRequest } from 'next/server';
 import dayjs from 'dayjs';
 
 // Mock DB
-const mockSelect = vi.fn();
 const mockFrom = vi.fn();
 const mockWhere = vi.fn();
-const mockInsert = vi.fn();
 const mockValues = vi.fn();
 const mockReturningId = vi.fn();
 

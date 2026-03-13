@@ -10,7 +10,7 @@ const mockLeftJoin = vi.fn();
 
 vi.mock('@/shared/lib/db', () => ({
   DB: {
-    select: (...args: unknown[]) => ({ from: mockFrom }),
+    select: () => ({ from: mockFrom }),
     update: () => ({ set: mockSet }),
     delete: () => ({ where: mockDeleteWhere }),
   },

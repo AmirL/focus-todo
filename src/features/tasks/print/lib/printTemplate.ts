@@ -36,17 +36,13 @@ function renderTaskSection(listType: string, tasks: TaskModel[]): string {
 function renderNewTaskLines(): string {
   return Array.from(
     { length: 6 },
-    (_, i) => `
+    () => `
     <div class="new-task-line">
       <input type="checkbox" class="new-task-checkbox" />
       <div class="new-task-line-border"></div>
     </div>
   `
   ).join('');
-}
-
-function renderNoteLines(): string {
-  return Array.from({ length: 4 }, () => '<div class="note-line"></div>').join('');
 }
 
 export function generatePrintHTML(

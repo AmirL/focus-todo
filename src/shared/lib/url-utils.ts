@@ -5,9 +5,6 @@ export function getSearchParams(): URLSearchParams {
   return new URLSearchParams(window.location.search);
 }
 
-export function getSearchParam(key: string): string | null {
-  return getSearchParams().get(key);
-}
 
 export function updateSearchParams(updates: Record<string, string | null | undefined>) {
   if (typeof window === 'undefined') return;

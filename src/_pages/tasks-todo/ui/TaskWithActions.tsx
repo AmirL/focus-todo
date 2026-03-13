@@ -5,14 +5,12 @@ import { ReAddButton } from '@/features/tasks/actions/ui/ReAddButton';
 import { SnoozeButton } from '@/features/tasks/actions/ui/SnoozeButton';
 import { StarButton } from '@/features/tasks/actions/ui/StarButton';
 import { BlockerButton } from '@/features/tasks/actions/ui/BlockerButton';
-import { useReorderStore } from '@/features/tasks/reorder';
 import type { TaskModel } from '@/entities/task/model/task';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 
 export function TaskWithActions({ task }: { task: TaskModel }) {
-  const { isDragging } = useReorderStore();
   const {
     attributes,
     listeners,

@@ -8,19 +8,10 @@ import { DB } from '@/shared/lib/db';
 import { and, eq, gte, isNull, lte, or } from 'drizzle-orm';
 import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema';
 import { getSuggestedList, calculateBalance, type ListWithLastTouched } from '@/entities/current-initiative';
+import { toDate, formatDate, getParticipatingLists } from '@/shared/lib/api/initiative-helpers';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
-
-// Helper to convert date string to Date object for DB queries
-function toDate(dateStr: string): Date {
-  return dayjs(dateStr).toDate();
-}
-
-// Helper to format Date to YYYY-MM-DD string
-function formatDate(date: Date): string {
-  return dayjs(date).format('YYYY-MM-DD');
-}
 
 type InitiativeRow = typeof currentInitiativeTable.$inferSelect;
 type ListRow = typeof listsTable.$inferSelect;
@@ -38,7 +29,7 @@ interface InitiativeResponse {
  * Returns today's and tomorrow's initiative, plus balance data and suggestion
  */
 async function getInitiativeHandler(
-  req: NextRequest,
+  _req: NextRequest,
   session: { user: { id: string } }
 ) {
   const userId = session.user.id;
@@ -52,7 +43,7 @@ async function getInitiativeHandler(
     .from(listsTable)
     .where(and(eq(listsTable.userId, userId), isNull(listsTable.archivedAt)));
 
-  const participatingLists = lists.filter((l) => l.participatesInInitiative);
+  const participatingLists = getParticipatingLists(lists);
 
   // Get today's and tomorrow's initiatives
   const initiatives = await DB.select()

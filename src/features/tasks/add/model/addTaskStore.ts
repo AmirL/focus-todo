@@ -5,7 +5,7 @@ type AddTasksState = {
   setCreateTaskInput: (input: string) => void;
 };
 
-export const useAddTasksStore = create<AddTasksState>((set, get) => ({
+export const useAddTasksStore = create<AddTasksState>((set) => ({
   createTaskInput: '',
   setCreateTaskInput: (input: string) => {
     set({ createTaskInput: input });

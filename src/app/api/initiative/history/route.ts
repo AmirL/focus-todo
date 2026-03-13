@@ -5,15 +5,8 @@ import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema'
 import { getUserIdFromApiKey } from '@/app/api/api-auth';
 import { calculateBalance } from '@/entities/current-initiative';
 import { serializeInitiativeWithLists, handleApiError } from '../serialize';
+import { toDate, formatDate, getParticipatingLists } from '@/shared/lib/api/initiative-helpers';
 import dayjs from 'dayjs';
-
-function toDate(dateStr: string): Date {
-  return dayjs(dateStr).toDate();
-}
-
-function formatDate(date: Date): string {
-  return dayjs(date).format('YYYY-MM-DD');
-}
 
 /**
  * GET /api/initiative/history - Get initiative history with balance data
@@ -60,7 +53,7 @@ export async function GET(req: NextRequest) {
       .orderBy(desc(currentInitiativeTable.date));
 
     // Calculate balance
-    const participatingLists = lists.filter((l) => l.participatesInInitiative);
+    const participatingLists = getParticipatingLists(lists);
     const balance = calculateBalance(
       initiatives.map((i) => ({
         id: i.id,

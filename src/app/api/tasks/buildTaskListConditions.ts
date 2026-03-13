@@ -1,4 +1,4 @@
-import { eq, gt, gte, isNull, lt, or, isNotNull, SQL } from 'drizzle-orm';
+import { eq, gt, gte, isNull, lt, or, SQL } from 'drizzle-orm';
 import dayjs from 'dayjs';
 import { tasksTable } from '@/shared/lib/drizzle/schema';
 

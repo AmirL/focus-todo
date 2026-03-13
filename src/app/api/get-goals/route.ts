@@ -4,7 +4,7 @@ import { DB } from '@/shared/lib/db';
 import { and, eq, isNull } from 'drizzle-orm';
 import { goalsTable } from '@/shared/lib/drizzle/schema';
 
-export async function POST(req: NextRequest) {
+export async function POST(_req: NextRequest) {
   try {
     const session = await validateUserSession();
 

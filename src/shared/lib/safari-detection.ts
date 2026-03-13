@@ -25,10 +25,6 @@ export function isSafariPWA(): boolean {
   return isSafari() && Boolean(navigator.standalone);
 }
 
-/** Equivalent to isSafari() since isSafariPWA() is a subset of isSafari(). */
-export function hasSafariDialogIssues(): boolean {
-  return isSafari();
-}
 
 export function isMobileDevice(): boolean {
   if (typeof window === 'undefined') return false;

@@ -7,15 +7,8 @@ import { DB } from '@/shared/lib/db';
 import { and, eq, gte, lte, desc } from 'drizzle-orm';
 import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema';
 import { calculateBalance } from '@/entities/current-initiative';
+import { toDate, formatDate, getParticipatingLists } from '@/shared/lib/api/initiative-helpers';
 import dayjs from 'dayjs';
-
-function toDate(dateStr: string): Date {
-  return dayjs(dateStr).toDate();
-}
-
-function formatDate(date: Date): string {
-  return dayjs(date).format('YYYY-MM-DD');
-}
 
 type InitiativeRow = typeof currentInitiativeTable.$inferSelect;
 type ListRow = typeof listsTable.$inferSelect;
@@ -96,7 +89,7 @@ async function getHistoryHandler(
   });
 
   // Calculate balance
-  const participatingLists = lists.filter((l) => l.participatesInInitiative);
+  const participatingLists = getParticipatingLists(lists);
   const balance = calculateBalance(
     initiatives.map((i) => ({
       id: i.id,

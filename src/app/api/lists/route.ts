@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { DB } from '@/shared/lib/db';
-import { and, eq, isNull, sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { listsTable } from '@/shared/lib/drizzle/schema';
 import { getUserIdFromApiKey } from '@/app/api/api-auth';
 import { serializeList, handleApiError } from './serialize';

@@ -4,7 +4,6 @@ import { NextRequest } from 'next/server';
 // Mock DB
 const mockFrom = vi.fn();
 const mockWhere = vi.fn();
-const mockUpdate = vi.fn();
 const mockSet = vi.fn();
 const mockUpdateWhere = vi.fn();
 

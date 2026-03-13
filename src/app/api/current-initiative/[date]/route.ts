@@ -3,6 +3,7 @@ import { validateUserSession } from '@/app/api/user-auth';
 import { DB } from '@/shared/lib/db';
 import { and, eq } from 'drizzle-orm';
 import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema';
+import { toDate } from '@/shared/lib/api/initiative-helpers';
 import dayjs from 'dayjs';
 
 type RouteContext = { params: Promise<{ date: string }> };
@@ -15,10 +16,6 @@ function handleError(error: unknown, operation: string) {
 
 function isValidDate(dateStr: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(dateStr) && dayjs(dateStr, 'YYYY-MM-DD', true).isValid();
-}
-
-function toDate(dateStr: string): Date {
-  return dayjs(dateStr).toDate();
 }
 
 interface ChangeInitiativeBody {
@@ -122,7 +119,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
  * GET /api/current-initiative/[date]
  * Get the initiative for a specific date
  */
-export async function GET(req: NextRequest, context: RouteContext) {
+export async function GET(_req: NextRequest, context: RouteContext) {
   try {
     const session = await validateUserSession();
     const userId = session.user.id;
