@@ -88,7 +88,7 @@ export function EditTaskDialog({
     updateTaskMutation.mutate(updatedTask);
   };
 
-  const onSubmit = async (e: React.FormEvent) => {
+  const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     const updatedTask = createInstance(TaskModel, {

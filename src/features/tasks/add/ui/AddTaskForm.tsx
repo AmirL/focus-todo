@@ -70,7 +70,7 @@ export function AddTaskForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAddTaskOpen, statusFilter, listId]);
 
-  const handleAddTaskClick = async () => {
+  const handleAddTaskClick = () => {
     if (!name.trim()) return;
 
     const newTask = createInstance(TaskModel, {

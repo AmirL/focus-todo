@@ -9,7 +9,7 @@ export function StarButton({ task }: { task: TaskModel }) {
   const updateTaskMutation = useUpdateTaskMutation();
   const isSelected = isTaskSelected(task);
 
-  const toggleTodayTask = async (task: TaskModel) => {
+  const toggleTodayTask = (task: TaskModel) => {
     const selectedAt = isSelected ? null : new Date();
     const updatedTask = createInstance(TaskModel, { ...task, selectedAt, updatedAt: new Date() });
     updateTaskMutation.mutate(updatedTask);

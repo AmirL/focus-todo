@@ -11,7 +11,7 @@ export function SnoozeButton({ task }: { task: TaskModel }) {
   const [popoverOpen, setPopoverOpen] = useState(false);
   const updateTaskMutation = useUpdateTaskMutation();
 
-  const onDateSelect = async (date: Date | null) => {
+  const onDateSelect = (date: Date | null) => {
     const updatedTask = createInstance(TaskModel, { ...task, date, updatedAt: new Date() });
     updateTaskMutation.mutate(updatedTask);
     setPopoverOpen(false);
