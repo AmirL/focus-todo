@@ -177,15 +177,7 @@ export function useDeleteListMutation() {
 export function useReorderListsMutation() {
   return useOptimisticMutation({
     mutationFn: async (listIds: string[]) => {
-      const response = await fetch('/api/reorder-lists', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ listIds }),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to reorder lists');
-      }
-      return response.json();
+      return fetchBackend('reorder-lists', { listIds });
     },
     queryKey: listKeys.all,
     optimisticUpdate: (old, listIds) => {

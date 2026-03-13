@@ -18,14 +18,14 @@ export function getApiKeyFromHeaders(): string | null {
 }
 
 export function getApiKeyFromRequest(req: NextRequest): string | null {
-  // Prefer explicit query param first for simple integrations
-  try {
-    const url = new URL(req.url);
-    const qp = url.searchParams.get('apiKey');
-    if (qp && qp.trim().length > 0) return qp.trim();
-  } catch {}
-  // Fallback to headers
-  return getApiKeyFromHeaders();
+  const authHeader = req.headers.get('authorization') || req.headers.get('Authorization');
+  const xApiKey = req.headers.get('x-api-key') || req.headers.get('X-Api-Key') || req.headers.get('X-API-Key');
+
+  if (xApiKey && xApiKey.trim().length > 0) return xApiKey.trim();
+  if (authHeader && authHeader.toLowerCase().startsWith('bearer ')) {
+    return authHeader.slice(7).trim();
+  }
+  return null;
 }
 
 export function hashApiKey(key: string) {

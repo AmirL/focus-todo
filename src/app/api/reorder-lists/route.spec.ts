@@ -29,14 +29,14 @@ vi.mock('next/headers', () => ({
   headers: () => new Map(),
 }));
 
-import { PUT } from './route';
+import { POST } from './route';
 import { validateUserSession } from '../user-auth';
 
 const mockedValidate = vi.mocked(validateUserSession);
 
 function makeRequest(body: unknown) {
   return new NextRequest('http://localhost:3000/api/reorder-lists', {
-    method: 'PUT',
+    method: 'POST',
     body: JSON.stringify(body),
     headers: { 'Content-Type': 'application/json' },
   });
@@ -47,7 +47,7 @@ const mockSession = {
   session: { id: 'session-1' },
 };
 
-describe('PUT /api/reorder-lists', () => {
+describe('POST /api/reorder-lists', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockSelect.mockReturnValue({ from: mockFrom });
@@ -56,14 +56,14 @@ describe('PUT /api/reorder-lists', () => {
   });
 
   it('returns 400 when listIds is missing', async () => {
-    const res = await PUT(makeRequest({}));
+    const res = await POST(makeRequest({}));
     expect(res.status).toBe(400);
     const body = await res.json();
     expect(body.error).toContain('listIds');
   });
 
   it('returns 400 when listIds is empty', async () => {
-    const res = await PUT(makeRequest({ listIds: [] }));
+    const res = await POST(makeRequest({ listIds: [] }));
     expect(res.status).toBe(400);
     const body = await res.json();
     expect(body.error).toContain('non-empty');
@@ -71,7 +71,7 @@ describe('PUT /api/reorder-lists', () => {
 
   it('returns 403 when some lists do not belong to user', async () => {
     mockWhere.mockResolvedValue([{ id: 1 }]); // only 1 of 2 found
-    const res = await PUT(makeRequest({ listIds: ['1', '2'] }));
+    const res = await POST(makeRequest({ listIds: ['1', '2'] }));
     expect(res.status).toBe(403);
     const body = await res.json();
     expect(body.error).toContain('do not belong');
@@ -93,7 +93,7 @@ describe('PUT /api/reorder-lists', () => {
     ];
     mockWhere.mockResolvedValueOnce(updatedLists); // fetch updated
 
-    const res = await PUT(makeRequest({ listIds }));
+    const res = await POST(makeRequest({ listIds }));
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.success).toBe(true);
@@ -103,14 +103,14 @@ describe('PUT /api/reorder-lists', () => {
 
   it('returns 500 when session validation fails', async () => {
     mockedValidate.mockRejectedValue(new Error('No session'));
-    const res = await PUT(makeRequest({ listIds: ['1'] }));
+    const res = await POST(makeRequest({ listIds: ['1'] }));
     expect(res.status).toBe(500);
   });
 
   it('returns 500 when database transaction fails', async () => {
     mockWhere.mockResolvedValueOnce([{ id: 1 }]);
     mockTransaction.mockRejectedValue(new Error('DB error'));
-    const res = await PUT(makeRequest({ listIds: ['1'] }));
+    const res = await POST(makeRequest({ listIds: ['1'] }));
     expect(res.status).toBe(500);
   });
 });

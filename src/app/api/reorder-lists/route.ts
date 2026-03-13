@@ -8,7 +8,7 @@ type ReorderListsRequestBody = {
   listIds: string[];
 };
 
-export async function PUT(req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
     const session = await validateUserSession();
     const { listIds }: ReorderListsRequestBody = await req.json();

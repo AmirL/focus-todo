@@ -145,52 +145,58 @@ describe('api-auth', () => {
   });
 
   describe('getApiKeyFromRequest', () => {
-    function makeRequest(url: string): NextRequest {
-      return { url } as NextRequest;
+    function makeRequest(url: string, reqHeaders?: Record<string, string>): NextRequest {
+      return {
+        url,
+        headers: {
+          get: (name: string) => {
+            if (!reqHeaders) return null;
+            return reqHeaders[name] ?? reqHeaders[name.toLowerCase()] ?? null;
+          },
+        },
+      } as unknown as NextRequest;
     }
 
-    it('should extract key from query parameter', () => {
-      vi.mocked(headers).mockReturnValue({
-        get: () => null,
-      } as unknown as ReturnType<typeof headers>);
-
-      const req = makeRequest('http://localhost:3000/api/tasks?apiKey=query-key');
-      expect(getApiKeyFromRequest(req)).toBe('query-key');
-    });
-
-    it('should prefer query parameter over headers', () => {
-      const mockHeaders = new Map([['x-api-key', 'header-key']]);
-      vi.mocked(headers).mockReturnValue({
-        get: (name: string) => mockHeaders.get(name.toLowerCase()) ?? null,
-      } as unknown as ReturnType<typeof headers>);
-
-      const req = makeRequest('http://localhost:3000/api/tasks?apiKey=query-key');
-      expect(getApiKeyFromRequest(req)).toBe('query-key');
-    });
-
-    it('should fall back to headers when no query parameter', () => {
-      const mockHeaders = new Map([['x-api-key', 'header-key']]);
-      vi.mocked(headers).mockReturnValue({
-        get: (name: string) => mockHeaders.get(name.toLowerCase()) ?? null,
-      } as unknown as ReturnType<typeof headers>);
-
-      const req = makeRequest('http://localhost:3000/api/tasks');
+    it('should extract key from x-api-key header', () => {
+      const req = makeRequest('http://localhost:3000/api/tasks', { 'x-api-key': 'header-key' });
       expect(getApiKeyFromRequest(req)).toBe('header-key');
     });
 
-    it('should return null when no key is provided anywhere', () => {
-      vi.mocked(headers).mockReturnValue({
-        get: () => null,
-      } as unknown as ReturnType<typeof headers>);
+    it('should extract key from authorization bearer header', () => {
+      const req = makeRequest('http://localhost:3000/api/tasks', { authorization: 'Bearer bearer-key' });
+      expect(getApiKeyFromRequest(req)).toBe('bearer-key');
+    });
 
+    it('should prefer x-api-key over authorization header', () => {
+      const req = makeRequest('http://localhost:3000/api/tasks', {
+        'x-api-key': 'xapi-key',
+        authorization: 'Bearer bearer-key',
+      });
+      expect(getApiKeyFromRequest(req)).toBe('xapi-key');
+    });
+
+    it('should ignore query parameter apiKey for security', () => {
+      const req = makeRequest('http://localhost:3000/api/tasks?apiKey=query-key');
+      expect(getApiKeyFromRequest(req)).toBeNull();
+    });
+
+    it('should return null when no key is provided anywhere', () => {
       const req = makeRequest('http://localhost:3000/api/tasks');
       expect(getApiKeyFromRequest(req)).toBeNull();
     });
   });
 
   describe('getUserIdFromApiKey', () => {
-    function makeRequest(url: string): NextRequest {
-      return { url } as NextRequest;
+    function makeRequest(url: string, reqHeaders?: Record<string, string>): NextRequest {
+      return {
+        url,
+        headers: {
+          get: (name: string) => {
+            if (!reqHeaders) return null;
+            return reqHeaders[name] ?? reqHeaders[name.toLowerCase()] ?? null;
+          },
+        },
+      } as unknown as NextRequest;
     }
 
     function setupDbMock(rows: Array<{ id: number; userId: string; hashedKey: string }>) {
@@ -211,37 +217,23 @@ describe('api-auth', () => {
       const apiKey = 'valid-api-key';
       const hashedKey = hashApiKey(apiKey);
 
-      const mockHeaders = new Map([['x-api-key', apiKey]]);
-      vi.mocked(headers).mockReturnValue({
-        get: (name: string) => mockHeaders.get(name.toLowerCase()) ?? null,
-      } as unknown as ReturnType<typeof headers>);
-
       setupDbMock([{ id: 1, userId: 'user-123', hashedKey }]);
       setupUpdateMock();
 
-      const req = makeRequest('http://localhost:3000/api/tasks');
+      const req = makeRequest('http://localhost:3000/api/tasks', { 'x-api-key': apiKey });
       const userId = await getUserIdFromApiKey(req);
       expect(userId).toBe('user-123');
     });
 
     it('should throw when no API key is provided', async () => {
-      vi.mocked(headers).mockReturnValue({
-        get: () => null,
-      } as unknown as ReturnType<typeof headers>);
-
       const req = makeRequest('http://localhost:3000/api/tasks');
       await expect(getUserIdFromApiKey(req)).rejects.toThrow('API key required');
     });
 
     it('should throw when the API key is not found in the database', async () => {
-      const mockHeaders = new Map([['x-api-key', 'unknown-key']]);
-      vi.mocked(headers).mockReturnValue({
-        get: (name: string) => mockHeaders.get(name.toLowerCase()) ?? null,
-      } as unknown as ReturnType<typeof headers>);
-
       setupDbMock([]);
 
-      const req = makeRequest('http://localhost:3000/api/tasks');
+      const req = makeRequest('http://localhost:3000/api/tasks', { 'x-api-key': 'unknown-key' });
       await expect(getUserIdFromApiKey(req)).rejects.toThrow('Invalid or revoked API key');
     });
 
@@ -249,15 +241,10 @@ describe('api-auth', () => {
       const apiKey = 'track-usage-key';
       const hashedKey = hashApiKey(apiKey);
 
-      const mockHeaders = new Map([['x-api-key', apiKey]]);
-      vi.mocked(headers).mockReturnValue({
-        get: (name: string) => mockHeaders.get(name.toLowerCase()) ?? null,
-      } as unknown as ReturnType<typeof headers>);
-
       setupDbMock([{ id: 42, userId: 'user-456', hashedKey }]);
       const { setFn } = setupUpdateMock();
 
-      const req = makeRequest('http://localhost:3000/api/tasks');
+      const req = makeRequest('http://localhost:3000/api/tasks', { 'x-api-key': apiKey });
       await getUserIdFromApiKey(req);
 
       expect(DB.update).toHaveBeenCalled();
@@ -270,11 +257,6 @@ describe('api-auth', () => {
       const apiKey = 'resilient-key';
       const hashedKey = hashApiKey(apiKey);
 
-      const mockHeaders = new Map([['x-api-key', apiKey]]);
-      vi.mocked(headers).mockReturnValue({
-        get: (name: string) => mockHeaders.get(name.toLowerCase()) ?? null,
-      } as unknown as ReturnType<typeof headers>);
-
       setupDbMock([{ id: 1, userId: 'user-789', hashedKey }]);
 
       // Make the update throw
@@ -282,7 +264,7 @@ describe('api-auth', () => {
       const setFn = vi.fn().mockReturnValue({ where: updateWhereFn });
       vi.mocked(DB.update).mockReturnValue({ set: setFn } as never);
 
-      const req = makeRequest('http://localhost:3000/api/tasks');
+      const req = makeRequest('http://localhost:3000/api/tasks', { 'x-api-key': apiKey });
       const userId = await getUserIdFromApiKey(req);
       expect(userId).toBe('user-789');
     });
@@ -290,14 +272,9 @@ describe('api-auth', () => {
     it('should query with hashed key and non-revoked condition', async () => {
       const apiKey = 'check-query-key';
 
-      const mockHeaders = new Map([['x-api-key', apiKey]]);
-      vi.mocked(headers).mockReturnValue({
-        get: (name: string) => mockHeaders.get(name.toLowerCase()) ?? null,
-      } as unknown as ReturnType<typeof headers>);
-
       const { whereFn } = setupDbMock([]);
 
-      const req = makeRequest('http://localhost:3000/api/tasks');
+      const req = makeRequest('http://localhost:3000/api/tasks', { 'x-api-key': apiKey });
       try { await getUserIdFromApiKey(req); } catch {}
 
       expect(DB.select).toHaveBeenCalled();
