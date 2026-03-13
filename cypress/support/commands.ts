@@ -79,7 +79,9 @@ Cypress.Commands.add("navigateToFilter", (filter) => {
   cy.contains("button", filterMap[filter]).click();
 });
 
-// Login command - uses API and session caching
+// Login command - uses API and session caching with validation.
+// The validate callback detects stale sessions (e.g. when parallel CI containers
+// invalidate each other's sessions) and forces a fresh login.
 Cypress.Commands.add("login", () => {
   const email = Cypress.env("TEST_EMAIL");
   const password = Cypress.env("TEST_PASSWORD");
@@ -102,6 +104,18 @@ Cypress.Commands.add("login", () => {
         expect(response.status).to.eq(200);
         expect(response.body).to.have.property("user");
       });
+    },
+    {
+      validate() {
+        cy.request({
+          method: "GET",
+          url: "/api/auth/get-session",
+          failOnStatusCode: false,
+        }).then((response) => {
+          expect(response.status).to.eq(200);
+          expect(response.body).to.have.property("user");
+        });
+      },
     },
   );
 });
