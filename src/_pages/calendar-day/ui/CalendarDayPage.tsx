@@ -7,7 +7,7 @@ import type { TimelineBlock, TimelineGap } from '@/shared/ui/timeline';
 import { useTimeEntriesQuery, useUpdateTimeEntryMutation, useDeleteTimeEntryMutation } from '@/shared/api/time-entries';
 import { useTasksQuery } from '@/shared/api/tasks';
 import { useListsQuery } from '@/shared/api/lists';
-import { useListNameMap } from '@/shared/lib/listUtils';
+import { useListNameMap, useListColorMap } from '@/shared/lib/listUtils';
 import { mapTimeEntriesToBlocks } from '@/features/timeline/model/mapTimeEntriesToBlocks';
 import { aggregateTimeByList } from '@/features/timeline/model/aggregateTimeByList';
 import { QuickAddFromGapDialog } from '@/features/timeline/ui/QuickAddFromGapDialog';
@@ -22,12 +22,13 @@ export function CalendarDayPage() {
   const { data: tasks = [] } = useTasksQuery();
   const { data: lists = [] } = useListsQuery();
   const listNameMap = useListNameMap();
+  const listColorMap = useListColorMap();
   const updateTimeEntry = useUpdateTimeEntryMutation();
   const deleteTimeEntry = useDeleteTimeEntryMutation();
 
   const blocks = useMemo(
-    () => mapTimeEntriesToBlocks(timeEntries, tasks, listNameMap, selectedDate),
-    [timeEntries, tasks, listNameMap, selectedDate],
+    () => mapTimeEntriesToBlocks(timeEntries, tasks, listNameMap, selectedDate, listColorMap),
+    [timeEntries, tasks, listNameMap, selectedDate, listColorMap],
   );
 
   const doughnutSegments = useMemo(
