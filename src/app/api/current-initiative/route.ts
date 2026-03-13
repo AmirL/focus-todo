@@ -5,13 +5,11 @@ import {
   createErrorResponse,
 } from '@/shared/lib/api/route-wrapper';
 import { DB } from '@/shared/lib/db';
-import { and, eq, gte, isNull, lte, or } from 'drizzle-orm';
+import { and, eq, isNull, or } from 'drizzle-orm';
 import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema';
-import { getSuggestedList, calculateBalance, type ListWithLastTouched } from '@/entities/current-initiative';
-import { toDate, formatDate, getParticipatingLists, toBalanceEntries } from '@/shared/lib/api/initiative-helpers';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-dayjs.extend(utc);
+import { calculateBalance, type ListWithLastTouched } from '@/entities/current-initiative';
+import { toDate, formatDate, getParticipatingLists, fetchBalanceAndSuggestion } from '@/shared/lib/api/initiative-helpers';
+import dayjs from '@/shared/lib/dayjs';
 
 type InitiativeRow = typeof currentInitiativeTable.$inferSelect;
 type ListRow = typeof listsTable.$inferSelect;
@@ -61,39 +59,12 @@ async function getInitiativeHandler(
   const todayInitiative = initiatives.find((i) => formatDate(i.date) === todayStr) ?? null;
   const tomorrowInitiative = initiatives.find((i) => formatDate(i.date) === tomorrowStr) ?? null;
 
-  // Get last 30 days of initiatives for balance calculation
-  const thirtyDaysAgoDate = toDate(dayjs().subtract(30, 'day').format('YYYY-MM-DD'));
-  const recentInitiatives = await DB.select()
-    .from(currentInitiativeTable)
-    .where(
-      and(
-        eq(currentInitiativeTable.userId, userId),
-        gte(currentInitiativeTable.date, thirtyDaysAgoDate),
-        lte(currentInitiativeTable.date, todayDate)
-      )
-    );
+  // Calculate balance and suggestion
+  const { balance, suggestedList: suggested } = await fetchBalanceAndSuggestion(userId, participatingLists);
 
-  // Calculate balance
-  const balance = calculateBalance(
-    toBalanceEntries(recentInitiatives),
-    participatingLists.map((l) => ({ id: l.id, name: l.name }))
-  );
-
-  // Get suggested list for tomorrow (if not already set)
-  let suggestedList: ListWithLastTouched | null = null;
-  if (!tomorrowInitiative || !todayInitiative) {
-    // Build list with last touched info from initiatives
-    const listsWithLastTouched: ListWithLastTouched[] = participatingLists.map((list) => {
-      const listBalance = balance.find((b) => b.listId === list.id);
-      return {
-        id: list.id,
-        name: list.name,
-        participatesInInitiative: list.participatesInInitiative ?? true,
-        lastTouchedAt: listBalance?.lastUsedDate ? new Date(listBalance.lastUsedDate) : null,
-      };
-    });
-    suggestedList = getSuggestedList(listsWithLastTouched);
-  }
+  // Only include suggestion if not both days are already set
+  const suggestedList: ListWithLastTouched | null =
+    (!tomorrowInitiative || !todayInitiative) ? suggested : null;
 
   const response: InitiativeResponse = {
     today: todayInitiative,
@@ -184,35 +155,8 @@ async function createInitiativeHandler(
       )
     );
 
-  // Get recent initiatives to calculate suggestion
-  const thirtyDaysAgoDate = toDate(dayjs().subtract(30, 'day').format('YYYY-MM-DD'));
-  const todayDate = toDate(todayStr);
-  const recentInitiatives = await DB.select()
-    .from(currentInitiativeTable)
-    .where(
-      and(
-        eq(currentInitiativeTable.userId, userId),
-        gte(currentInitiativeTable.date, thirtyDaysAgoDate),
-        lte(currentInitiativeTable.date, todayDate)
-      )
-    );
-
-  const balance = calculateBalance(
-    toBalanceEntries(recentInitiatives),
-    lists.map((l) => ({ id: l.id, name: l.name }))
-  );
-
-  const listsWithLastTouched: ListWithLastTouched[] = lists.map((l) => {
-    const listBalance = balance.find((b) => b.listId === l.id);
-    return {
-      id: l.id,
-      name: l.name,
-      participatesInInitiative: l.participatesInInitiative ?? true,
-      lastTouchedAt: listBalance?.lastUsedDate ? new Date(listBalance.lastUsedDate) : null,
-    };
-  });
-
-  const suggested = getSuggestedList(listsWithLastTouched);
+  // Calculate suggestion using shared balance pipeline
+  const { suggestedList: suggested } = await fetchBalanceAndSuggestion(userId, lists);
   const suggestedListId = suggested?.id ?? null;
 
   // If user chose the suggested list, store it as suggested only (chosenListId = null)

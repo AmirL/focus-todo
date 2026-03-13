@@ -225,7 +225,7 @@ describe('PATCH /api/lists/:id', () => {
   it('returns 409 when duplicate name exists', async () => {
     mockedGetUserId.mockResolvedValue('user-1');
     mockedFindById.mockResolvedValue(sampleList);
-    mockedFindByName.mockResolvedValue([{ ...sampleList, id: 2, name: 'Other' }]);
+    mockedFindByName.mockResolvedValue({ ...sampleList, id: 2, name: 'Other' });
 
     const res = await PATCH(
       makeRequest('http://localhost:3000/api/lists/1', {
@@ -240,7 +240,7 @@ describe('PATCH /api/lists/:id', () => {
   it('allows same name for same list (no-op rename)', async () => {
     mockedGetUserId.mockResolvedValue('user-1');
     mockedFindById.mockResolvedValue(sampleList);
-    mockedFindByName.mockResolvedValue([sampleList]); // same ID
+    mockedFindByName.mockResolvedValue(sampleList); // same ID
     mockWhere.mockResolvedValue([sampleList]);
 
     const res = await PATCH(

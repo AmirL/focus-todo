@@ -91,8 +91,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       }
 
       // Check for duplicate name
-      const duplicates = await findUserListByName(userId, body.name.trim());
-      if (duplicates.length > 0 && duplicates[0].id !== listId) {
+      const duplicate = await findUserListByName(userId, body.name.trim());
+      if (duplicate && duplicate.id !== listId) {
         return NextResponse.json({ error: 'A list with this name already exists' }, { status: 409 });
       }
 

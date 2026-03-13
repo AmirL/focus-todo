@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/shared/ui/button';
 import { Clock, X } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
@@ -15,11 +15,7 @@ interface DatePickerButtonProps {
 
 export function DatePickerButton({ selectedDate, onDateChange }: DatePickerButtonProps) {
   const [calendarOpen, setCalendarOpen] = useState(false);
-  const [isSafariBrowser, setIsSafariBrowser] = useState(false);
-
-  useEffect(() => {
-    setIsSafariBrowser(checkIsSafari());
-  }, []);
+  const isSafariBrowser = checkIsSafari();
 
   const handleCalendarOpenChange = (open: boolean) => {
     setCalendarOpen(open);

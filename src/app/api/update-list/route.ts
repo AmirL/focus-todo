@@ -48,7 +48,7 @@ async function updateListHandler(req: NextRequest, session: { user: { id: string
 
   const duplicateList = await findUserListByName(session.user.id, name!);
 
-  if (duplicateList.length > 0 && duplicateList[0].id !== id) {
+  if (duplicateList && duplicateList.id !== id) {
     return createErrorResponse('A list with this name already exists', 409);
   }
 

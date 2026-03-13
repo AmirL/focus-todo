@@ -156,7 +156,7 @@ describe('POST /api/lists', () => {
 
   it('returns 409 when duplicate name exists', async () => {
     mockedGetUserId.mockResolvedValue('user-1');
-    mockedFindUserListByName.mockResolvedValue([sampleList]);
+    mockedFindUserListByName.mockResolvedValue(sampleList);
 
     const res = await POST(
       makeRequest('http://localhost:3000/api/lists', {
@@ -171,7 +171,7 @@ describe('POST /api/lists', () => {
 
   it('creates a list and returns 201', async () => {
     mockedGetUserId.mockResolvedValue('user-1');
-    mockedFindUserListByName.mockResolvedValue([]);
+    mockedFindUserListByName.mockResolvedValue(null);
     // maxSortOrder query
     mockWhere.mockResolvedValueOnce([{ maxSortOrder: 1 }]);
     mock$returningId.mockResolvedValue([{ id: 3 }]);

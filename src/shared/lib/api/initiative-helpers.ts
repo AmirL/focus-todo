@@ -1,5 +1,8 @@
 import dayjs from 'dayjs';
+import { and, eq, gte, lte } from 'drizzle-orm';
 import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema';
+import { DB } from '@/shared/lib/db';
+import { calculateBalance, getSuggestedList, type ListWithLastTouched } from '@/entities/current-initiative';
 
 type ListRow = typeof listsTable.$inferSelect;
 type InitiativeRow = typeof currentInitiativeTable.$inferSelect;
@@ -33,4 +36,43 @@ export function toBalanceEntries(initiatives: InitiativeRow[]) {
     getEffectiveListId: () => i.chosenListId ?? i.suggestedListId,
     wasChanged: () => i.chosenListId !== null && i.chosenListId !== i.suggestedListId,
   }));
+}
+
+/** Fetch recent initiatives and compute balance + suggested list for a user */
+export async function fetchBalanceAndSuggestion(
+  userId: string,
+  participatingLists: ListRow[]
+) {
+  const todayStr = dayjs().format('YYYY-MM-DD');
+  const thirtyDaysAgoDate = toDate(dayjs().subtract(30, 'day').format('YYYY-MM-DD'));
+  const todayDate = toDate(todayStr);
+
+  const recentInitiatives = await DB.select()
+    .from(currentInitiativeTable)
+    .where(
+      and(
+        eq(currentInitiativeTable.userId, userId),
+        gte(currentInitiativeTable.date, thirtyDaysAgoDate),
+        lte(currentInitiativeTable.date, todayDate)
+      )
+    );
+
+  const balance = calculateBalance(
+    toBalanceEntries(recentInitiatives),
+    participatingLists.map((l) => ({ id: l.id, name: l.name }))
+  );
+
+  const listsWithLastTouched: ListWithLastTouched[] = participatingLists.map((list) => {
+    const listBalance = balance.find((b) => b.listId === list.id);
+    return {
+      id: list.id,
+      name: list.name,
+      participatesInInitiative: list.participatesInInitiative ?? true,
+      lastTouchedAt: listBalance?.lastUsedDate ? new Date(listBalance.lastUsedDate) : null,
+    };
+  });
+
+  const suggestedList = getSuggestedList(listsWithLastTouched);
+
+  return { balance, suggestedList };
 }

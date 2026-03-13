@@ -1,7 +1,5 @@
 import { instanceToPlain, plainToInstance, Transform } from 'class-transformer';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-dayjs.extend(utc);
+import dayjs from '@/shared/lib/dayjs';
 
 type CurrentInitiativePlain = {
   id: number;

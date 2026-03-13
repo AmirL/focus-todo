@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     // Check for duplicate name
     const existing = await findUserListByName(userId, body.name.trim());
-    if (existing.length > 0) {
+    if (existing) {
       return NextResponse.json({ error: 'A list with this name already exists' }, { status: 409 });
     }
 

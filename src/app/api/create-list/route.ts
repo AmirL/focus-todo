@@ -19,7 +19,7 @@ async function createListHandler(req: NextRequest, session: { user: { id: string
   // Check if list with same name already exists for this user
   const existingList = await findUserListByName(session.user.id, name!);
 
-  if (existingList.length > 0) {
+  if (existingList) {
     return createErrorResponse('A list with this name already exists', 409);
   }
 

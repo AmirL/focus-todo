@@ -1,9 +1,6 @@
 import { clsx, type ClassValue } from 'clsx';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
+import dayjs from '@/shared/lib/dayjs';
 import { twMerge } from 'tailwind-merge';
-
-dayjs.extend(utc);
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

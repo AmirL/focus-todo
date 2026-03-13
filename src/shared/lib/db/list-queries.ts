@@ -61,12 +61,12 @@ export async function findUserListById(userId: string, listId: number) {
 /**
  * Finds a list by name that belongs to the user
  */
-export async function findUserListByName(userId: string, listName: string) {
-  const lists = await DB.select()
+export async function findUserListByName(userId: string, listName: string): Promise<typeof listsTable.$inferSelect | null> {
+  const [list] = await DB.select()
     .from(listsTable)
     .where(userListByNameFilter(userId, listName));
-  
-  return lists;
+
+  return list || null;
 }
 
 /**
