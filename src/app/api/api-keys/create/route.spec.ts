@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
+import { AuthError } from '@/shared/lib/api/auth-errors';
 
 const mockInsert = vi.fn();
 const mockValues = vi.fn();
@@ -16,7 +17,7 @@ mockValues.mockReturnValue({ $returningId: mock$returningId });
 
 vi.mock('@/shared/lib/auth/user-auth', () => ({
   validateUserSession: vi.fn(),
-  AuthError: class AuthError extends Error {},
+  AuthError,
 }));
 
 vi.mock('@/app/api/api-auth', async (importOriginal) => {

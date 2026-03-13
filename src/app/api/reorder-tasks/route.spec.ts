@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
+import { AuthError } from '@/shared/lib/api/auth-errors';
 
 const mockSelect = vi.fn();
 const mockFrom = vi.fn();
@@ -23,9 +24,7 @@ mockSet.mockReturnValue({ where: vi.fn() });
 
 vi.mock('@/shared/lib/auth/user-auth', () => ({
   validateUserSession: vi.fn(),
-  AuthError: class AuthError extends Error {
-    constructor(message: string) { super(message); this.name = 'AuthError'; }
-  },
+  AuthError,
 }));
 
 vi.mock('next/headers', () => ({
@@ -125,7 +124,6 @@ describe('POST /api/reorder-tasks', () => {
   });
 
   it('returns 401 when session validation fails with AuthError', async () => {
-    const { AuthError } = await import('@/shared/lib/auth/user-auth');
     mockedValidate.mockRejectedValue(new AuthError('No session'));
     const res = await POST(makeRequest({
       taskIds: ['1'],

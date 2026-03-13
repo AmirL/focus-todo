@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { validateUserSession, AuthError } from '@/shared/lib/auth/user-auth';
+import { validateUserSession } from '@/shared/lib/auth/user-auth';
+import { isAuthError } from '@/shared/lib/api/auth-errors';
 
 export interface AuthenticatedSession {
   user: {
@@ -21,14 +22,12 @@ export function withAuthAndErrorHandling<T = unknown>(
       const session = await validateUserSession();
       return await handler(req, session);
     } catch (error) {
-      console.error(`Error in ${routeName}:`, error);
-      if (error instanceof AuthError) {
-        return NextResponse.json({ error: error.message }, { status: 401 });
+      const msg = error instanceof Error ? error.message : 'Unknown error occurred';
+      const status = isAuthError(error) ? 401 : 500;
+      if (!isAuthError(error)) {
+        console.error(`Error in ${routeName}:`, error);
       }
-      return NextResponse.json(
-        { error: error instanceof Error ? error.message : 'Unknown error occurred' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: msg }, { status });
     }
   };
 }

@@ -4,13 +4,9 @@ import { DB } from '@/shared/lib/db';
 import { apiKeysTable } from '@/shared/lib/drizzle/schema';
 import { and, eq, isNull } from 'drizzle-orm';
 import crypto from 'crypto';
+import { ApiAuthError } from '@/shared/lib/api/auth-errors';
 
-export class ApiAuthError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'ApiAuthError';
-  }
-}
+export { ApiAuthError };
 
 function extractApiKey(headerGetter: (name: string) => string | null): string | null {
   const authHeader = headerGetter('authorization') || headerGetter('Authorization');

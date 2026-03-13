@@ -7,14 +7,9 @@ import {
 import { DB } from '@/shared/lib/db';
 import { and, eq } from 'drizzle-orm';
 import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema';
-import { toDate } from '@/shared/lib/api/initiative-helpers';
-import dayjs from 'dayjs';
+import { toDate, isValidDate } from '@/shared/lib/api/initiative-helpers';
 
 type RouteContext = { params: Promise<{ date: string }> };
-
-function isValidDate(dateStr: string): boolean {
-  return /^\d{4}-\d{2}-\d{2}$/.test(dateStr) && dayjs(dateStr, 'YYYY-MM-DD', true).isValid();
-}
 
 interface ChangeInitiativeBody {
   listId: number;

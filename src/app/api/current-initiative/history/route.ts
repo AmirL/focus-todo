@@ -3,27 +3,8 @@ import {
   withAuthAndErrorHandling,
   createSuccessResponse,
 } from '@/shared/lib/api/route-wrapper';
-import { currentInitiativeTable } from '@/shared/lib/drizzle/schema';
-import { calculateBalance } from '@/entities/current-initiative';
 import { fetchInitiativeHistory } from '@/shared/lib/api/initiative-helpers';
-
-type InitiativeRow = typeof currentInitiativeTable.$inferSelect;
-
-interface InitiativeWithList extends InitiativeRow {
-  suggestedListName: string | null;
-  chosenListName: string | null;
-  effectiveListName: string | null;
-}
-
-interface HistoryResponse {
-  initiatives: InitiativeWithList[];
-  balance: ReturnType<typeof calculateBalance>;
-  period: {
-    startDate: string;
-    endDate: string;
-    days: number;
-  };
-}
+import { serializeInitiativeWithLists } from '@/app/api/initiative/serialize';
 
 /**
  * GET /api/current-initiative/history
@@ -38,7 +19,6 @@ async function getHistoryHandler(
 ) {
   const userId = session.user.id;
 
-  // Parse query params
   const { searchParams } = new URL(req.url);
   const daysParam = searchParams.get('days');
   let days = 30;
@@ -51,24 +31,11 @@ async function getHistoryHandler(
 
   const { initiatives, listMap, balance, period } = await fetchInitiativeHistory(userId, days);
 
-  // Enrich initiatives with list names
-  const enrichedInitiatives: InitiativeWithList[] = initiatives.map((i) => {
-    const effectiveListId = i.chosenListId ?? i.suggestedListId;
-    return {
-      ...i,
-      suggestedListName: i.suggestedListId ? listMap.get(i.suggestedListId) ?? null : null,
-      chosenListName: i.chosenListId ? listMap.get(i.chosenListId) ?? null : null,
-      effectiveListName: effectiveListId ? listMap.get(effectiveListId) ?? null : null,
-    };
-  });
-
-  const response: HistoryResponse = {
-    initiatives: enrichedInitiatives,
+  return createSuccessResponse({
+    initiatives: initiatives.map((i) => serializeInitiativeWithLists(i, listMap)),
     balance,
     period,
-  };
-
-  return createSuccessResponse(response, 200);
+  }, 200);
 }
 
 export const GET = withAuthAndErrorHandling(getHistoryHandler, 'GET /api/current-initiative/history');

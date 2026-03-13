@@ -12,6 +12,11 @@ export function toDate(dateStr: string): Date {
   return dayjs(dateStr).toDate();
 }
 
+/** Validate that a date string is a valid YYYY-MM-DD format */
+export function isValidDate(dateStr: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}$/.test(dateStr) && dayjs(dateStr, 'YYYY-MM-DD', true).isValid();
+}
+
 /** Format a Date to YYYY-MM-DD string */
 function formatDateKey(date: Date): string {
   return dayjs(date).format('YYYY-MM-DD');

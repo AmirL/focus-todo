@@ -6,20 +6,15 @@ import {
   createSuccessResponse,
 } from './route-wrapper';
 
-const { MockAuthError } = vi.hoisted(() => {
-  class MockAuthError extends Error {
-    constructor(message: string) {
-      super(message);
-      this.name = 'AuthError';
-    }
-  }
-  return { MockAuthError };
+vi.mock('@/shared/lib/auth/user-auth', async () => {
+  const { AuthError } = await import('@/shared/lib/api/auth-errors');
+  return {
+    validateUserSession: vi.fn(),
+    AuthError,
+  };
 });
 
-vi.mock('@/shared/lib/auth/user-auth', () => ({
-  validateUserSession: vi.fn(),
-  AuthError: MockAuthError,
-}));
+import { AuthError } from '@/shared/lib/api/auth-errors';
 
 import { validateUserSession } from '@/shared/lib/auth/user-auth';
 
@@ -117,7 +112,7 @@ describe('route-wrapper', () => {
     });
 
     it('should return 401 with error message when validateUserSession throws AuthError', async () => {
-      mockedValidateUserSession.mockRejectedValue(new MockAuthError('No session found'));
+      mockedValidateUserSession.mockRejectedValue(new AuthError('No session found'));
 
       const handler = vi.fn();
 

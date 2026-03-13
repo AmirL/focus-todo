@@ -32,10 +32,7 @@ const DurationPopoverContent = ({ onChange, value, onOpenChange }: PopoverConten
     avoidCollisions={true}
     sticky="always"
   >
-    <div
-      className="relative z-50"
-      onClick={(e) => e.stopPropagation()}
-    >
+    <div className="relative z-50">
       <div className="p-2 border-b border-border flex justify-between items-center h-[44px]">
         <span className="text-xs font-medium text-muted-foreground">Estimated Duration</span>
         {value && (
@@ -57,8 +54,7 @@ const DurationPopoverContent = ({ onChange, value, onOpenChange }: PopoverConten
           variant="ghost"
           size="sm"
           className="w-full justify-start text-sm"
-          onClick={(e) => {
-            e.stopPropagation();
+          onClick={() => {
             onChange(null);
             onOpenChange(false);
           }}
@@ -71,8 +67,7 @@ const DurationPopoverContent = ({ onChange, value, onOpenChange }: PopoverConten
             variant="ghost"
             size="sm"
             className="w-full justify-start text-sm"
-            onClick={(e) => {
-              e.stopPropagation();
+            onClick={() => {
               onChange(option.value);
               onOpenChange(false);
             }}
@@ -95,10 +90,6 @@ export function EstimatedDurationSelector({
 }: EstimatedDurationSelectorProps) {
   const [popoverOpen, setPopoverOpen] = useState(false);
 
-  const handleOpenChange = (open: boolean) => {
-    setPopoverOpen(open);
-  };
-
   return (
     <div className={className}>
       {showLabel && (
@@ -106,8 +97,8 @@ export function EstimatedDurationSelector({
           {label}
         </Label>
       )}
-      
-      <Popover open={popoverOpen} onOpenChange={handleOpenChange}>
+
+      <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
         <PopoverTrigger 
           id={id}
           className={cn(
@@ -141,10 +132,10 @@ export function EstimatedDurationSelector({
           <ChevronDown size={16} />
         </PopoverTrigger>
 
-        <DurationPopoverContent 
-          onChange={onChange} 
+        <DurationPopoverContent
+          onChange={onChange}
           value={value}
-          onOpenChange={handleOpenChange}
+          onOpenChange={setPopoverOpen}
         />
       </Popover>
     </div>

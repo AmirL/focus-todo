@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import { ApiAuthError } from '@/app/api/api-auth';
+import { isAuthError, ApiAuthError } from '@/shared/lib/api/auth-errors';
+
+export { ApiAuthError } from '@/shared/lib/api/auth-errors';
 
 export function toISOString(d: Date | string | null | undefined): string | null {
   if (!d) return null;
@@ -10,9 +12,8 @@ export function toISOString(d: Date | string | null | undefined): string | null 
 
 export function handleApiError(error: unknown, operation: string) {
   const msg = error instanceof Error ? error.message : 'Unknown error occurred';
-  const isAuth = error instanceof ApiAuthError;
-  const status = isAuth ? 401 : 500;
-  if (!isAuth) {
+  const status = isAuthError(error) ? 401 : 500;
+  if (!isAuthError(error)) {
     console.error(`Error in ${operation}:`, error);
   }
   return NextResponse.json({ error: msg }, { status });

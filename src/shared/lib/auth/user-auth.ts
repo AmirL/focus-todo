@@ -1,13 +1,8 @@
 import { auth } from '@/shared/lib/auth';
 import { headers } from 'next/headers';
-// Session-based auth helpers only. API-key helpers live in './api-auth'.
+import { AuthError } from '@/shared/lib/api/auth-errors';
 
-export class AuthError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'AuthError';
-  }
-}
+export { AuthError } from '@/shared/lib/api/auth-errors';
 
 export async function validateUserSession() {
   const headerValues = headers();

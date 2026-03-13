@@ -20,7 +20,6 @@ type ApiInitiativeWithLists = ApiInitiative & {
 
 function toDateString(d: Date | string | null | undefined): string {
   if (!d) return '';
-  if (d instanceof Date) return dayjs(d).format('YYYY-MM-DD');
   return dayjs(d).format('YYYY-MM-DD');
 }
 
