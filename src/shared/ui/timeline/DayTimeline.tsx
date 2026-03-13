@@ -88,6 +88,15 @@ interface BlockPosition {
   totalColumns?: number;
 }
 
+function inSameCluster(a: BlockPosition, b: BlockPosition): boolean {
+  return (
+    a.column !== undefined &&
+    b.column !== undefined &&
+    a.totalColumns === b.totalColumns &&
+    a.topPx === b.topPx
+  );
+}
+
 interface GapPosition {
   gap: TimelineGap;
   topPx: number;
@@ -163,12 +172,7 @@ function computeVerticalLayout(blocks: TimelineBlock[], startHour: number): {
     const next = blockPositions[idx + 1];
 
     // Skip entries within the same cluster (they're side-by-side, not stacked)
-    if (
-      curr.column !== undefined &&
-      next.column !== undefined &&
-      curr.totalColumns === next.totalColumns &&
-      curr.topPx === next.topPx
-    ) {
+    if (inSameCluster(curr, next)) {
       continue;
     }
 
@@ -184,12 +188,7 @@ function computeVerticalLayout(blocks: TimelineBlock[], startHour: number): {
     // Skip gaps within a cluster (entries placed side-by-side, not stacked)
     const curr = blockPositions[idx];
     const next = blockPositions[idx + 1];
-    if (
-      curr.column !== undefined &&
-      next.column !== undefined &&
-      curr.totalColumns === next.totalColumns &&
-      curr.topPx === next.topPx
-    ) {
+    if (inSameCluster(curr, next)) {
       continue;
     }
 

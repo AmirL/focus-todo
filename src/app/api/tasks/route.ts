@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
     const { id: _id, userId: _userId, createdAt: _createdAt, ...taskFields } = body;
 
     // Parse date fields and set defaults
-    const processedTask = parseDateFields(
+    const taskWithParsedDates = parseDateFields(
       {
         ...taskFields,
         __list_deprecated: '',
@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
       TaskDateKeys
     );
 
-    const [{ id }] = await DB.insert(tasksTable).values(processedTask).$returningId();
+    const [{ id }] = await DB.insert(tasksTable).values(taskWithParsedDates).$returningId();
     const [createdTask] = await DB.select().from(tasksTable).where(eq(tasksTable.id, id));
 
     return NextResponse.json({ task: serializeTask(createdTask) }, { status: 201 });

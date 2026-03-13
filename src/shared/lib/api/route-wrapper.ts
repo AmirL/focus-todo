@@ -30,10 +30,10 @@ export function withAuthAndErrorHandling<T = unknown>(
   };
 }
 
-export function createErrorResponse(message: string, status: number = 400) {
+export function createErrorResponse(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });
 }
 
-export function createSuccessResponse<T>(data: T, status: number = 200) {
+export function createSuccessResponse<T>(data: T, status = 200) {
   return NextResponse.json(data, { status });
 }

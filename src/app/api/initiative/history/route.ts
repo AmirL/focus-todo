@@ -5,7 +5,7 @@ import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema'
 import { getUserIdFromApiKey } from '@/app/api/api-auth';
 import { calculateBalance } from '@/entities/current-initiative';
 import { serializeInitiativeWithLists, handleApiError } from '../serialize';
-import { toDate, formatDate, getParticipatingLists } from '@/shared/lib/api/initiative-helpers';
+import { toDate, getParticipatingLists, toBalanceEntries } from '@/shared/lib/api/initiative-helpers';
 import dayjs from 'dayjs';
 
 /**
@@ -55,18 +55,7 @@ export async function GET(req: NextRequest) {
     // Calculate balance
     const participatingLists = getParticipatingLists(lists);
     const balance = calculateBalance(
-      initiatives.map((i) => ({
-        id: i.id,
-        userId: i.userId,
-        date: formatDate(i.date),
-        suggestedListId: i.suggestedListId,
-        chosenListId: i.chosenListId,
-        reason: i.reason,
-        setAt: i.setAt,
-        changedAt: i.changedAt,
-        getEffectiveListId: () => i.chosenListId ?? i.suggestedListId,
-        wasChanged: () => i.chosenListId !== null && i.chosenListId !== i.suggestedListId,
-      })),
+      toBalanceEntries(initiatives),
       participatingLists.map((l) => ({ id: l.id, name: l.name }))
     );
 

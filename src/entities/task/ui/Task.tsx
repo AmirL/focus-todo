@@ -58,7 +58,7 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
       target.closest('button') ||
       target.closest('a') ||
       target.closest('input') ||
-      target.closest('[data-testid="task-details"]')
+      target.closest('[data-cy="task-details"]')
     ) {
       return;
     }
@@ -80,6 +80,7 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
         !deleted && 'cursor-pointer',
         isTempSelectedTask && 'bg-blue-50 hover:bg-blue-100'
       )}
+      data-cy={`task-${task.id}`}
       data-testid={`task-${task.id}`}
     >
       <div className="px-2 sm:px-4 py-3">

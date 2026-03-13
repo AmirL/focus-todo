@@ -67,7 +67,7 @@ function ResetSelectedButton() {
   const { data: allTasks = [] } = useTasksQuery();
   const updateTaskMutation = useUpdateTaskMutation();
 
-  const resetAllSelected = async () => {
+  const resetAllSelected = () => {
     const selectedTasks = allTasks.filter((task) => task.selectedAt && !task.completedAt);
 
     for (const task of selectedTasks) {

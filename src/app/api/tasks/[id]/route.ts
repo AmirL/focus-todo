@@ -83,13 +83,13 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     const { id: _id, userId: _userId, createdAt: _createdAt, ...updateFields } = body;
 
     // Parse date fields
-    const processedFields = parseDateFields(
+    const fieldsWithParsedDates = parseDateFields(
       { ...updateFields, updatedAt: new Date() },
       TaskDateKeys
     );
 
     await DB.update(tasksTable)
-      .set(processedFields)
+      .set(fieldsWithParsedDates)
       .where(and(eq(tasksTable.id, taskId), eq(tasksTable.userId, userId)));
 
     const [updatedRow] = await DB.select({

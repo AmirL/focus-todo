@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
 
   const { task } = await req.json();
 
-  const processedTask = parseDateFields({
+  const taskWithParsedDates = parseDateFields({
     ...task,
     __list_deprecated: '',
     createdAt: undefined,
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     userId: session.user.id
   }, TaskDateKeys);
 
-  const [{ id }] = await DB.insert(tasksTable).values(processedTask).$returningId();
+  const [{ id }] = await DB.insert(tasksTable).values(taskWithParsedDates).$returningId();
   const [createdTask] = await DB.select().from(tasksTable).where(eq(tasksTable.id, id));
 
   return NextResponse.json(createdTask, { status: 200 });

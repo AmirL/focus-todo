@@ -10,10 +10,10 @@ export async function POST(req: NextRequest) {
 
   const { id, task } = await req.json();
 
-  const processedTask = parseDateFields({ ...task, createdAt: undefined }, TaskDateKeys);
+  const taskWithParsedDates = parseDateFields({ ...task, createdAt: undefined }, TaskDateKeys);
 
   await DB.update(tasksTable)
-    .set(processedTask)
+    .set(taskWithParsedDates)
     .where(and(eq(tasksTable.id, id), eq(tasksTable.userId, session.user.id)));
     
   const [updatedTask] = await DB.select()

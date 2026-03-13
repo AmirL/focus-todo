@@ -5,7 +5,7 @@ import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema'
 import { getUserIdFromApiKey } from '@/app/api/api-auth';
 import { getSuggestedList, calculateBalance, type ListWithLastTouched } from '@/entities/current-initiative';
 import { serializeInitiative, handleApiError } from './serialize';
-import { toDate, formatDate, getParticipatingLists } from '@/shared/lib/api/initiative-helpers';
+import { toDate, formatDate, getParticipatingLists, toBalanceEntries } from '@/shared/lib/api/initiative-helpers';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
@@ -58,18 +58,7 @@ export async function GET(req: NextRequest) {
       );
 
     const balance = calculateBalance(
-      recentInitiatives.map((i) => ({
-        id: i.id,
-        userId: i.userId,
-        date: formatDate(i.date),
-        suggestedListId: i.suggestedListId,
-        chosenListId: i.chosenListId,
-        reason: i.reason,
-        setAt: i.setAt,
-        changedAt: i.changedAt,
-        getEffectiveListId: () => i.chosenListId ?? i.suggestedListId,
-        wasChanged: () => i.chosenListId !== null && i.chosenListId !== i.suggestedListId,
-      })),
+      toBalanceEntries(recentInitiatives),
       participatingLists.map((l) => ({ id: l.id, name: l.name }))
     );
 
@@ -187,18 +176,7 @@ export async function POST(req: NextRequest) {
       );
 
     const balance = calculateBalance(
-      recentInitiatives.map((i) => ({
-        id: i.id,
-        userId: i.userId,
-        date: formatDate(i.date),
-        suggestedListId: i.suggestedListId,
-        chosenListId: i.chosenListId,
-        reason: i.reason,
-        setAt: i.setAt,
-        changedAt: i.changedAt,
-        getEffectiveListId: () => i.chosenListId ?? i.suggestedListId,
-        wasChanged: () => i.chosenListId !== null && i.chosenListId !== i.suggestedListId,
-      })),
+      toBalanceEntries(recentInitiatives),
       allLists.map((l) => ({ id: l.id, name: l.name }))
     );
 

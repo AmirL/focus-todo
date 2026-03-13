@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { DB } from "./db";
 import * as schema from "./drizzle/schema";
+import { createDefaultLists } from "./db/list-queries";
 
 function invariant(condition: unknown, message: string): asserts condition {
   if (!condition) {
@@ -80,12 +81,7 @@ export const auth = betterAuth({
       create: {
         after: async (user) => {
           try {
-            // Create default lists for new user
-            const defaultLists = [
-              { name: 'Work', userId: user.id, isDefault: true },
-              { name: 'Personal', userId: user.id, isDefault: true }
-            ];
-            await DB.insert(schema.listsTable).values(defaultLists);
+            await createDefaultLists(user.id);
           } catch (error) {
             console.error('Failed to create default lists:', error);
           }

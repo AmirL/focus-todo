@@ -8,7 +8,7 @@ import { DB } from '@/shared/lib/db';
 import { and, eq, gte, isNull, lte, or } from 'drizzle-orm';
 import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema';
 import { getSuggestedList, calculateBalance, type ListWithLastTouched } from '@/entities/current-initiative';
-import { toDate, formatDate, getParticipatingLists } from '@/shared/lib/api/initiative-helpers';
+import { toDate, formatDate, getParticipatingLists, toBalanceEntries } from '@/shared/lib/api/initiative-helpers';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
@@ -75,18 +75,7 @@ async function getInitiativeHandler(
 
   // Calculate balance
   const balance = calculateBalance(
-    recentInitiatives.map((i) => ({
-      id: i.id,
-      userId: i.userId,
-      date: formatDate(i.date),
-      suggestedListId: i.suggestedListId,
-      chosenListId: i.chosenListId,
-      reason: i.reason,
-      setAt: i.setAt,
-      changedAt: i.changedAt,
-      getEffectiveListId: () => i.chosenListId ?? i.suggestedListId,
-      wasChanged: () => i.chosenListId !== null && i.chosenListId !== i.suggestedListId,
-    })),
+    toBalanceEntries(recentInitiatives),
     participatingLists.map((l) => ({ id: l.id, name: l.name }))
   );
 
@@ -127,7 +116,7 @@ interface SetInitiativeBody {
  * POST /api/current-initiative
  * Set tomorrow's focus. Creates a new initiative record for tomorrow.
  */
-async function setInitiativeHandler(
+async function createInitiativeHandler(
   req: NextRequest,
   session: { user: { id: string } }
 ) {
@@ -209,18 +198,7 @@ async function setInitiativeHandler(
     );
 
   const balance = calculateBalance(
-    recentInitiatives.map((i) => ({
-      id: i.id,
-      userId: i.userId,
-      date: formatDate(i.date),
-      suggestedListId: i.suggestedListId,
-      chosenListId: i.chosenListId,
-      reason: i.reason,
-      setAt: i.setAt,
-      changedAt: i.changedAt,
-      getEffectiveListId: () => i.chosenListId ?? i.suggestedListId,
-      wasChanged: () => i.chosenListId !== null && i.chosenListId !== i.suggestedListId,
-    })),
+    toBalanceEntries(recentInitiatives),
     lists.map((l) => ({ id: l.id, name: l.name }))
   );
 
@@ -261,4 +239,4 @@ async function setInitiativeHandler(
 }
 
 export const GET = withAuthAndErrorHandling(getInitiativeHandler, 'GET /api/current-initiative');
-export const POST = withAuthAndErrorHandling(setInitiativeHandler, 'POST /api/current-initiative');
+export const POST = withAuthAndErrorHandling(createInitiativeHandler, 'POST /api/current-initiative');

@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 
   // Create the task as completed
   const now = dayjs().format('YYYY-MM-DD HH:mm:ss');
-  const processedTask = parseDateFields({
+  const taskWithParsedDates = parseDateFields({
     ...task,
     __list_deprecated: '',
     completedAt: now,
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     userId: session.user.id,
   }, TaskDateKeys);
 
-  const [{ id: taskId }] = await DB.insert(tasksTable).values(processedTask).$returningId();
+  const [{ id: taskId }] = await DB.insert(tasksTable).values(taskWithParsedDates).$returningId();
 
   // Create the time entry
   const [{ id: timeEntryId }] = await DB.insert(timeEntriesTable).values({

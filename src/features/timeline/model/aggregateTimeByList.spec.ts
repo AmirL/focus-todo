@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import dayjs from 'dayjs';
 import { aggregateTimeByList } from './aggregateTimeByList';
 import type { TimeEntry } from '@/shared/api/time-entries';

@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ListModel, ListPlain } from '@/entities/list';
 import { fetchBackend } from '@/shared/lib/api';
 import toast from 'react-hot-toast';
+import { cloneInstance } from '@/shared/lib/instance-tools';
 
 // Context type for optimistic mutations
 interface OptimisticMutationContext {
@@ -142,7 +143,7 @@ export function useUpdateListMutation() {
     optimisticUpdate: (old, { id, name, description, participatesInInitiative, color }) => {
       if (!old) return [];
       return old.map((list) =>
-        list.id === id ? Object.assign(Object.create(Object.getPrototypeOf(list)), list, { name, ...(description !== undefined && { description }), ...(color !== undefined && { color }), participatesInInitiative, updatedAt: new Date() }) : list
+        list.id === id ? cloneInstance(list, { name, ...(description !== undefined && { description }), ...(color !== undefined && { color }), participatesInInitiative, updatedAt: new Date() } as Partial<ListModel>) : list
       );
     },
     successMessage: 'List updated',
@@ -216,7 +217,7 @@ export function useReorderListsMutation() {
       return listIds
         .map((id) => listMap.get(id))
         .filter((list): list is ListModel => list !== undefined)
-        .map((list, index) => Object.assign(Object.create(Object.getPrototypeOf(list)), list, { sortOrder: index }));
+        .map((list, index) => cloneInstance(list, { sortOrder: index } as Partial<ListModel>));
     },
     errorMessage: 'Failed to reorder lists',
   });
