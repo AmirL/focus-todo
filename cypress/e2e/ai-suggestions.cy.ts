@@ -52,14 +52,14 @@ function visitAndWaitForTasks() {
 }
 
 function findTaskElement(taskId: number) {
-  return cy.get(`[data-testid="task-${taskId}"]`);
+  return cy.get(`[data-cy="task-${taskId}"]`);
 }
 
 function openEditDialog(taskId: number) {
   // The edit button is inside CollapsibleActions and only visible on hover (desktop).
   // Trigger hover on the task element first, then click the edit button.
   findTaskElement(taskId).trigger("mouseover");
-  cy.get(`[data-testid="edit-task-${taskId}"]`).click({ force: true });
+  cy.get(`[data-cy="edit-task-${taskId}"]`).click({ force: true });
   cy.get('[role="dialog"]').should("be.visible");
 }
 
@@ -190,7 +190,7 @@ describe("AI Suggestions", () => {
         cy.get('[data-cy="accept-suggestion-name"]').click();
 
         // Name input should now have the suggested value
-        cy.get('[data-testid="task-name-input"]').should(
+        cy.get('[data-cy="task-name-input"]').should(
           "have.value",
           "Improved task title"
         );
@@ -251,7 +251,7 @@ describe("AI Suggestions", () => {
 
         openEditDialog(taskId);
         cy.get('[data-cy="accept-suggestion-name"]').click();
-        cy.get('[data-testid="save-task-changes-button"]').click();
+        cy.get('[data-cy="save-task-changes-button"]').click();
 
         cy.wait("@updateTask").then((interception) => {
           const task = interception.request.body.task;
@@ -273,7 +273,7 @@ describe("AI Suggestions", () => {
 
         openEditDialog(taskId);
         cy.get('[data-cy="reject-suggestion-details"]').click();
-        cy.get('[data-testid="save-task-changes-button"]').click();
+        cy.get('[data-cy="save-task-changes-button"]').click();
 
         cy.wait("@updateTask").then((interception) => {
           const task = interception.request.body.task;
@@ -297,7 +297,7 @@ describe("AI Suggestions", () => {
 
         openEditDialog(taskId);
         cy.get('[data-cy="accept-suggestion-name"]').click();
-        cy.get('[data-testid="save-task-changes-button"]').click();
+        cy.get('[data-cy="save-task-changes-button"]').click();
 
         // Badge should be gone after save
         findTaskElement(taskId)

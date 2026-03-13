@@ -145,7 +145,7 @@ export function EditTaskDialog({
                 Clear suggestions
               </Button>
             )}
-            <Button type="submit" data-testid="save-task-changes-button">
+            <Button type="submit" data-cy="save-task-changes-button">
               Save changes
             </Button>
           </DialogFooter>

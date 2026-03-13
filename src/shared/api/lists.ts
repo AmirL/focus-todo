@@ -4,12 +4,10 @@ import { fetchBackend } from '@/shared/lib/api';
 import toast from 'react-hot-toast';
 import { cloneInstance } from '@/shared/lib/instance-tools';
 
-// Context type for optimistic mutations
 interface OptimisticMutationContext {
   previousLists: ListModel[] | undefined;
 }
 
-// Generic optimistic mutation hook types
 interface OptimisticMutationOptions<TData, TVariables> {
   mutationFn: (variables: TVariables) => Promise<TData>;
   queryKey: readonly unknown[];
@@ -21,7 +19,6 @@ interface OptimisticMutationOptions<TData, TVariables> {
   errorMessage?: string;
 }
 
-// Generic optimistic mutation hook
 function useOptimisticMutation<TData, TVariables>({
   mutationFn,
   queryKey,
@@ -37,20 +34,12 @@ function useOptimisticMutation<TData, TVariables>({
   return useMutation({
     mutationFn,
     onMutate: async (variables): Promise<OptimisticMutationContext> => {
-      // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey });
-
-      // Snapshot the previous value
       const previousLists = queryClient.getQueryData<ListModel[]>(queryKey);
-
-      // Apply optimistic update
       queryClient.setQueryData<ListModel[]>(queryKey, (old) => optimisticUpdate(old, variables));
-
-      // Return context object with the snapshotted value
       return { previousLists };
     },
     onError: (err, variables, context) => {
-      // Roll back to previous state
       if (context?.previousLists) {
         queryClient.setQueryData<ListModel[]>(queryKey, context.previousLists);
       }
@@ -66,14 +55,12 @@ function useOptimisticMutation<TData, TVariables>({
       onSuccess?.(data, variables, context);
     },
     onSettled: (data, error, variables, context) => {
-      // Always refetch after error or success to ensure we have the latest data
       queryClient.invalidateQueries({ queryKey });
       onSettled?.(data, error, variables, context);
     },
   });
 }
 
-// Query Keys
 export const listKeys = {
   all: ['lists'] as const,
   active: ['lists', { includeArchived: false }] as const,
@@ -82,7 +69,6 @@ export const listKeys = {
   detail: (id: string) => [...listKeys.details(), id] as const,
 };
 
-// Fetch Lists Query
 export function useListsQuery(options?: { includeArchived?: boolean }) {
   const includeArchived = options?.includeArchived ?? false;
   const queryKey = includeArchived ? listKeys.withArchived : listKeys.active;
@@ -99,7 +85,6 @@ export function useListsQuery(options?: { includeArchived?: boolean }) {
   });
 }
 
-// Create List Mutation
 export function useCreateListMutation() {
   return useOptimisticMutation({
     mutationFn: async ({ name, description, participatesInInitiative, color }: { name: string; description?: string | null; participatesInInitiative: boolean; color?: string | null }) => {
@@ -108,7 +93,6 @@ export function useCreateListMutation() {
     },
     queryKey: listKeys.all,
     optimisticUpdate: (old, { name, description, participatesInInitiative, color }) => {
-      // Optimistically add the new list to the cache
       const maxSortOrder = old ? Math.max(...old.map((l) => l.sortOrder), -1) : -1;
       const optimisticList = {
         id: 'temp-' + Date.now(),
@@ -132,7 +116,6 @@ export function useCreateListMutation() {
   });
 }
 
-// Update List Mutation
 export function useUpdateListMutation() {
   return useOptimisticMutation({
     mutationFn: async ({ id, name, description, participatesInInitiative, color }: { id: string; name: string; description?: string | null; participatesInInitiative: boolean; color?: string | null }) => {
@@ -151,7 +134,6 @@ export function useUpdateListMutation() {
   });
 }
 
-// Archive List Mutation
 export function useArchiveListMutation() {
   const queryClient = useQueryClient();
 
@@ -162,7 +144,6 @@ export function useArchiveListMutation() {
     },
     onSuccess: (_data, { archived }) => {
       toast.success(archived ? 'List archived' : 'List unarchived');
-      // Invalidate all list queries (both active and withArchived)
       queryClient.invalidateQueries({ queryKey: listKeys.all });
     },
     onError: () => {
@@ -171,7 +152,6 @@ export function useArchiveListMutation() {
   });
 }
 
-// Delete List Mutation
 export function useDeleteListMutation() {
   const queryClient = useQueryClient();
 
@@ -188,14 +168,12 @@ export function useDeleteListMutation() {
     successMessage: 'List deleted',
     errorMessage: 'Failed to delete list',
     onSuccess: () => {
-      // Also invalidate tasks and goals queries since they might be affected
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['goals'] });
     },
   });
 }
 
-// Reorder Lists Mutation
 export function useReorderListsMutation() {
   return useOptimisticMutation({
     mutationFn: async (listIds: string[]) => {
@@ -212,7 +190,6 @@ export function useReorderListsMutation() {
     queryKey: listKeys.all,
     optimisticUpdate: (old, listIds) => {
       if (!old) return [];
-      // Reorder the lists based on the new order
       const listMap = new Map(old.map((list) => [list.id, list]));
       return listIds
         .map((id) => listMap.get(id))

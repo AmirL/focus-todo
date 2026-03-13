@@ -13,7 +13,7 @@ declare global {
       waitForAppLoad(): Chainable<void>;
 
       /**
-       * Get element by data-testid attribute
+       * Get element by data-cy attribute
        */
       getByTestId(testId: string): Chainable<JQuery<HTMLElement>>;
 
@@ -61,9 +61,9 @@ Cypress.Commands.add("waitForAppLoad", () => {
   cy.get('[data-cy="filter-backlog"]', { timeout: 30000 }).should("be.visible");
 });
 
-// Get element by data-testid
+// Get element by data-cy
 Cypress.Commands.add("getByTestId", (testId: string) => {
-  return cy.get(`[data-testid="${testId}"]`);
+  return cy.get(`[data-cy="${testId}"]`);
 });
 
 // Navigate to a specific filter view

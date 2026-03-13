@@ -22,7 +22,7 @@ interface EstimatedTimeButtonProps {
 export function EstimatedTimeButton({ task }: EstimatedTimeButtonProps) {
   const updateTaskMutation = useUpdateTaskMutation();
 
-  const handleDurationChange = async (minutes: number | null) => {
+  const handleDurationChange = (minutes: number | null) => {
     const updatedTask = createInstance(TaskModel, { ...task, estimatedDuration: minutes, updatedAt: new Date() });
     updateTaskMutation.mutate(updatedTask);
   };
@@ -42,7 +42,7 @@ export function EstimatedTimeButton({ task }: EstimatedTimeButtonProps) {
             cursor: 'pointer',
             color: task.estimatedDuration ? 'inherit' : '#999',
           }}
-          data-testid={`estimated-time-task-${task.id}`}
+          data-cy={`estimated-time-task-${task.id}`}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

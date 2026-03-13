@@ -2,6 +2,7 @@
 
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { cn } from '@/shared/lib/utils';
+import { formatDuration } from '@/shared/lib/format-duration';
 
 export interface DoughnutSegment {
   name: string;
@@ -12,14 +13,6 @@ export interface DoughnutSegment {
 interface DoughnutChartProps {
   segments: DoughnutSegment[];
   className?: string;
-}
-
-function formatDuration(minutes: number): string {
-  if (minutes <= 0) return '0m';
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  if (h === 0) return `${m}m`;
-  return m === 0 ? `${h}h` : `${h}h ${m}m`;
 }
 
 function EmptyState() {

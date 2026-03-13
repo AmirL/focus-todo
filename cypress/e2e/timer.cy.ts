@@ -23,14 +23,14 @@ describe("Timer", () => {
   });
 
   function createTaskAndGetId(name: string): Cypress.Chainable<number> {
-    cy.get('[data-testid="add-task-button"]').click();
-    cy.get('[data-testid="task-name-input"]').type(name);
-    cy.get('[data-testid="save-task-button"]').click();
+    cy.get('[data-cy="add-task-button"]').click();
+    cy.get('[data-cy="task-name-input"]').type(name);
+    cy.get('[data-cy="save-task-button"]').click();
     return cy.wait("@createTask").then((interception) => {
       const taskId = interception.response!.body.id as number;
       createdTaskIds.push(taskId);
       // Wait for the real task (with server ID) to appear in the DOM
-      cy.get(`[data-testid="task-${taskId}"]`, { timeout: 15000 }).should(
+      cy.get(`[data-cy="task-${taskId}"]`, { timeout: 15000 }).should(
         "be.visible",
       );
       return cy.wrap(taskId);
@@ -41,7 +41,7 @@ describe("Timer", () => {
     const taskName = `Timer test ${Date.now()}`;
     createTaskAndGetId(taskName).then((taskId) => {
       // Click the start timer button scoped to the created task
-      cy.get(`[data-testid="task-${taskId}"]`)
+      cy.get(`[data-cy="task-${taskId}"]`)
         .find('[data-cy="start-timer-button"]')
         .click();
       cy.wait("@startTimer");
@@ -68,7 +68,7 @@ describe("Timer", () => {
     const taskName = `Edit test ${Date.now()}`;
     createTaskAndGetId(taskName).then((taskId) => {
       // Start timer
-      cy.get(`[data-testid="task-${taskId}"]`)
+      cy.get(`[data-cy="task-${taskId}"]`)
         .find('[data-cy="start-timer-button"]')
         .click();
       cy.wait("@startTimer");
@@ -96,7 +96,7 @@ describe("Timer", () => {
     const taskName = `Time edit test ${Date.now()}`;
     createTaskAndGetId(taskName).then((taskId) => {
       // Start and stop timer to get editable time inputs
-      cy.get(`[data-testid="task-${taskId}"]`)
+      cy.get(`[data-cy="task-${taskId}"]`)
         .find('[data-cy="start-timer-button"]')
         .click();
       cy.wait("@startTimer");
@@ -132,7 +132,7 @@ describe("Timer", () => {
     const taskName = `Save confirm test ${Date.now()}`;
     createTaskAndGetId(taskName).then((taskId) => {
       // Start and stop timer to get editable time inputs
-      cy.get(`[data-testid="task-${taskId}"]`)
+      cy.get(`[data-cy="task-${taskId}"]`)
         .find('[data-cy="start-timer-button"]')
         .click();
       cy.wait("@startTimer");
@@ -169,7 +169,7 @@ describe("Timer", () => {
     const taskName = `Start again test ${Date.now()}`;
     createTaskAndGetId(taskName).then((taskId) => {
       // Start timer
-      cy.get(`[data-testid="task-${taskId}"]`)
+      cy.get(`[data-cy="task-${taskId}"]`)
         .find('[data-cy="start-timer-button"]')
         .click();
       cy.wait("@startTimer");
@@ -199,14 +199,14 @@ describe("Timer", () => {
     const taskName = `Toggle test ${Date.now()}`;
     createTaskAndGetId(taskName).then((taskId) => {
       // Start timer via task button
-      cy.get(`[data-testid="task-${taskId}"]`)
+      cy.get(`[data-cy="task-${taskId}"]`)
         .find('[data-cy="start-timer-button"]')
         .click();
       cy.wait("@startTimer");
       cy.get('[data-cy="timer-bar"]', { timeout: 10000 }).should("be.visible");
 
       // Stop timer via task button (not the bar stop button)
-      cy.get(`[data-testid="task-${taskId}"]`)
+      cy.get(`[data-cy="task-${taskId}"]`)
         .find('[data-cy="start-timer-button"]')
         .click();
       cy.wait("@stopTimer");

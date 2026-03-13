@@ -1,5 +1,6 @@
 import { TaskModel } from '@/entities/task/model/task';
 import dayjs from 'dayjs';
+import { formatDuration as sharedFormatDuration } from '@/shared/lib/format-duration';
 
 export interface GroupedTasks {
   [listType: string]: TaskModel[];
@@ -36,12 +37,7 @@ export function formatDate(date: Date | null): string {
 }
 
 export function formatDuration(minutes: number | null): string {
-  if (!minutes) return '0m';
-  if (minutes >= 60) {
-    const hours = minutes / 60;
-    return `${hours}h`;
-  }
-  return `${minutes}m`;
+  return sharedFormatDuration(minutes) ?? '0m';
 }
 
 export function calculateTotalDuration(tasks: TaskModel[]): number {

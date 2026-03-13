@@ -22,13 +22,13 @@ describe("Doughnut Chart", () => {
   });
 
   function createTaskAndGetId(name: string): Cypress.Chainable<number> {
-    cy.get('[data-testid="add-task-button"]').click();
-    cy.get('[data-testid="task-name-input"]').type(name);
-    cy.get('[data-testid="save-task-button"]').click();
+    cy.get('[data-cy="add-task-button"]').click();
+    cy.get('[data-cy="task-name-input"]').type(name);
+    cy.get('[data-cy="save-task-button"]').click();
     return cy.wait("@createTask").then((interception) => {
       const taskId = interception.response!.body.id as number;
       createdTaskIds.push(taskId);
-      cy.get(`[data-testid="task-${taskId}"]`, { timeout: 15000 }).should(
+      cy.get(`[data-cy="task-${taskId}"]`, { timeout: 15000 }).should(
         "be.visible",
       );
       return cy.wrap(taskId);
@@ -41,7 +41,7 @@ describe("Doughnut Chart", () => {
     const taskName = `Chart test ${Date.now()}`;
     createTaskAndGetId(taskName).then((taskId) => {
       // Start and stop timer to create time entry
-      cy.get(`[data-testid="task-${taskId}"]`)
+      cy.get(`[data-cy="task-${taskId}"]`)
         .find('[data-cy="start-timer-button"]')
         .click();
       cy.wait("@startTimer");
@@ -85,7 +85,7 @@ describe("Doughnut Chart", () => {
     const taskName = `Calendar chart ${Date.now()}`;
     createTaskAndGetId(taskName).then((taskId) => {
       // Create a time entry
-      cy.get(`[data-testid="task-${taskId}"]`)
+      cy.get(`[data-cy="task-${taskId}"]`)
         .find('[data-cy="start-timer-button"]')
         .click();
       cy.wait("@startTimer");

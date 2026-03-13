@@ -93,7 +93,7 @@ export function AddTaskForm() {
         <Button
           className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg"
           onClick={() => setIsAddTaskOpen(true)}
-          data-testid="add-task-button"
+          data-cy="add-task-button"
         >
           <Plus className="h-6 w-6" />
         </Button>
@@ -133,7 +133,7 @@ function DialogFooterButtons({ onCancel, onAdd, isAddDisabled }: DialogFooterBut
       <Button variant="outline" onClick={onCancel}>
         Cancel
       </Button>
-      <Button onClick={onAdd} disabled={isAddDisabled} data-testid="save-task-button">
+      <Button onClick={onAdd} disabled={isAddDisabled} data-cy="save-task-button">
         <PlusCircle className="h-4 w-4 mr-2" />
         Add Task
       </Button>

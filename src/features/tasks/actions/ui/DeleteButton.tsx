@@ -8,7 +8,7 @@ export function DeleteButton({ task }: { task: TaskModel }) {
   const updateTaskMutation = useUpdateTaskMutation();
   const isDeleted = isTaskDeleted(task);
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     const deletedAt = isDeleted ? null : new Date();
     const updatedTask = createInstance(TaskModel, { ...task, deletedAt, updatedAt: new Date() });
     updateTaskMutation.mutate(updatedTask);
@@ -24,7 +24,7 @@ export function DeleteButton({ task }: { task: TaskModel }) {
           ? 'text-muted-foreground hover:text-green-600' 
           : 'text-muted-foreground hover:text-destructive'
       }`}
-      data-testid={`delete-task-${task.id}`}
+      data-cy={`delete-task-${task.id}`}
     >
       {isDeleted ? <Undo2 className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
     </Button>

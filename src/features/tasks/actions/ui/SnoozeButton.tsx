@@ -24,7 +24,7 @@ export function SnoozeButton({ task }: { task: TaskModel }) {
   return (
     <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" data-testid={`snooze-task-${task.id}`}>
+        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" data-cy={`snooze-task-${task.id}`}>
           <Clock className="h-4 w-4" />
         </Button>
       </PopoverTrigger>

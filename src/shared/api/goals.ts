@@ -2,12 +2,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { GoalModel, GoalPlain } from '@/entities/goal/model/goal';
 import { fetchBackend } from '@/shared/lib/api';
 
-// Query Keys
 export const goalKeys = {
   all: ['goals'] as const,
 };
 
-// Fetch Goals Query
 export function useGoalsQuery() {
   return useQuery({
     queryKey: goalKeys.all,
@@ -19,7 +17,6 @@ export function useGoalsQuery() {
   });
 }
 
-// Create Goal Mutation
 export function useCreateGoalMutation() {
   const queryClient = useQueryClient();
 
@@ -29,23 +26,15 @@ export function useCreateGoalMutation() {
       return GoalModel.toInstance(response);
     },
     onMutate: async (newGoal) => {
-      // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: goalKeys.all });
-
-      // Snapshot the previous value
       const previousGoals = queryClient.getQueryData<GoalModel[]>(goalKeys.all);
-
-      // Optimistically update to the new value
       queryClient.setQueryData<GoalModel[]>(goalKeys.all, (old) => {
         if (!old) return [newGoal];
         return [...old, newGoal];
       });
-
-      // Return a context object with the snapshotted value
       return { previousGoals };
     },
     onError: (_err, _newGoal, context) => {
-      // If the mutation fails, use the context returned from onMutate to roll back
       queryClient.setQueryData<GoalModel[]>(goalKeys.all, context?.previousGoals);
     },
     onSettled: () => {
@@ -54,7 +43,6 @@ export function useCreateGoalMutation() {
   });
 }
 
-// Update Goal Mutation
 export function useUpdateGoalMutation() {
   const queryClient = useQueryClient();
 
@@ -67,25 +55,15 @@ export function useUpdateGoalMutation() {
       return GoalModel.toInstance(response);
     },
     onMutate: async (updatedGoal: GoalModel) => {
-      // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: goalKeys.all });
-
-      // Snapshot the previous value
       const previousGoals = queryClient.getQueryData<GoalModel[]>(goalKeys.all);
-
-      // Optimistically update to the new value
       queryClient.setQueryData<GoalModel[]>(goalKeys.all, (old) => {
         if (!old) return [updatedGoal];
-        
-        // Always update the goal in the cache (keep deleted goals visible)
         return old.map((g) => (g.id === updatedGoal.id ? updatedGoal : g));
       });
-
-      // Return a context object with the snapshotted value
       return { previousGoals };
     },
     onError: (_err, _updatedGoal, context) => {
-      // If the mutation fails, use the context returned from onMutate to roll back
       queryClient.setQueryData<GoalModel[]>(goalKeys.all, context?.previousGoals);
     },
     onSettled: () => {

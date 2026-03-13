@@ -30,9 +30,9 @@ describe("Task Categories", () => {
     beforeEach(() => {
       // Create a task so there's always one to act on
       const taskName = `Category test task ${Date.now()}`;
-      cy.get('[data-testid="add-task-button"]').click();
-      cy.get('[data-testid="task-name-input"]').type(taskName);
-      cy.get('[data-testid="save-task-button"]').click();
+      cy.get('[data-cy="add-task-button"]').click();
+      cy.get('[data-cy="task-name-input"]').type(taskName);
+      cy.get('[data-cy="save-task-button"]').click();
       cy.wait("@createTask").then((interception) => {
         createdTaskIds.push(interception.response!.body.id);
       });
@@ -41,9 +41,9 @@ describe("Task Categories", () => {
 
     it("should create a task", () => {
       const taskName = `Categorized task ${Date.now()}`;
-      cy.get('[data-testid="add-task-button"]').click();
-      cy.get('[data-testid="task-name-input"]').type(taskName);
-      cy.get('[data-testid="save-task-button"]').click();
+      cy.get('[data-cy="add-task-button"]').click();
+      cy.get('[data-cy="task-name-input"]').type(taskName);
+      cy.get('[data-cy="save-task-button"]').click();
       cy.contains(taskName).should("be.visible");
 
       cy.wait("@createTask").then((interception) => {
@@ -52,9 +52,9 @@ describe("Task Categories", () => {
     });
 
     it("should edit a task", () => {
-      cy.get('[data-testid^="edit-task-"]').first().click();
+      cy.get('[data-cy^="edit-task-"]').first().click();
       cy.get('[role="dialog"]').should("be.visible");
-      cy.get('[data-testid="save-task-changes-button"]').click();
+      cy.get('[data-cy="save-task-changes-button"]').click();
     });
   });
 });
