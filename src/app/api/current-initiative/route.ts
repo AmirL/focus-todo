@@ -4,19 +4,19 @@ import {
   createSuccessResponse,
   createErrorResponse,
 } from '@/shared/lib/api/route-wrapper';
-import { DB } from '@/shared/lib/db';
-import { and, eq, isNull, or } from 'drizzle-orm';
-import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema';
 import { calculateBalance, type ListWithLastTouched } from '@/entities/current-initiative';
-import { toDate, formatDateKey, getParticipatingLists, fetchBalanceAndSuggestion } from '@/shared/lib/api/initiative-helpers';
-import dayjs from '@/shared/lib/dayjs';
+import {
+  fetchTodayTomorrowInitiative,
+  parseCreateInitiativeBody,
+  createInitiative,
+  type ListRow,
+} from '@/shared/lib/api/initiative-helpers';
 
-type InitiativeRow = typeof currentInitiativeTable.$inferSelect;
-type ListRow = typeof listsTable.$inferSelect;
+type InitiativeRow = Parameters<typeof createSuccessResponse>[0];
 
 interface InitiativeResponse {
-  today: InitiativeRow | null;
-  tomorrow: InitiativeRow | null;
+  today: unknown;
+  tomorrow: unknown;
   suggestedList: ListWithLastTouched | null;
   balance: ReturnType<typeof calculateBalance>;
   participatingLists: ListRow[];
@@ -30,41 +30,8 @@ async function getInitiativeHandler(
   _req: NextRequest,
   session: { user: { id: string } }
 ) {
-  const userId = session.user.id;
-  const todayStr = dayjs().format('YYYY-MM-DD');
-  const tomorrowStr = dayjs().add(1, 'day').format('YYYY-MM-DD');
-  const todayDate = toDate(todayStr);
-  const tomorrowDate = toDate(tomorrowStr);
-
-  // Get all non-archived participating lists for this user
-  const lists = await DB.select()
-    .from(listsTable)
-    .where(and(eq(listsTable.userId, userId), isNull(listsTable.archivedAt)));
-
-  const participatingLists = getParticipatingLists(lists);
-
-  // Get today's and tomorrow's initiatives
-  const initiatives = await DB.select()
-    .from(currentInitiativeTable)
-    .where(
-      and(
-        eq(currentInitiativeTable.userId, userId),
-        or(
-          eq(currentInitiativeTable.date, todayDate),
-          eq(currentInitiativeTable.date, tomorrowDate)
-        )
-      )
-    );
-
-  const todayInitiative = initiatives.find((i) => formatDateKey(i.date) === todayStr) ?? null;
-  const tomorrowInitiative = initiatives.find((i) => formatDateKey(i.date) === tomorrowStr) ?? null;
-
-  // Calculate balance and suggestion
-  const { balance, suggestedList: suggested } = await fetchBalanceAndSuggestion(userId, participatingLists);
-
-  // Only include suggestion if not both days are already set
-  const suggestedList: ListWithLastTouched | null =
-    (!tomorrowInitiative || !todayInitiative) ? suggested : null;
+  const { todayInitiative, tomorrowInitiative, suggestedList, balance, participatingLists } =
+    await fetchTodayTomorrowInitiative(session.user.id);
 
   const response: InitiativeResponse = {
     today: todayInitiative,
@@ -77,12 +44,6 @@ async function getInitiativeHandler(
   return createSuccessResponse(response, 200);
 }
 
-interface SetInitiativeBody {
-  listId: number;
-  date?: string; // YYYY-MM-DD, defaults to tomorrow
-  reason?: string;
-}
-
 /**
  * POST /api/current-initiative
  * Set tomorrow's focus. Creates a new initiative record for tomorrow.
@@ -91,101 +52,25 @@ async function createInitiativeHandler(
   req: NextRequest,
   session: { user: { id: string } }
 ) {
-  const userId = session.user.id;
-
   const body = await req.json() as Record<string, unknown>;
+  const parsed = parseCreateInitiativeBody(body);
 
-  if (!body.listId || typeof body.listId !== 'number' || !Number.isFinite(body.listId)) {
-    return createErrorResponse('listId must be a valid number', 400);
+  if (parsed.error) {
+    return createErrorResponse(parsed.error, 400);
   }
 
-  const typedBody: SetInitiativeBody = {
-    listId: body.listId,
-    date: typeof body.date === 'string' ? body.date : undefined,
-    reason: typeof body.reason === 'string' ? body.reason : undefined,
-  };
+  const result = await createInitiative(
+    session.user.id,
+    parsed.listId!,
+    parsed.date,
+    parsed.reason,
+  );
 
-  // Determine target date: use provided date or default to tomorrow
-  const todayStr = dayjs().format('YYYY-MM-DD');
-  const tomorrowStr = dayjs().add(1, 'day').format('YYYY-MM-DD');
-
-  if (typedBody.date) {
-    const isValid = /^\d{4}-\d{2}-\d{2}$/.test(typedBody.date) && dayjs(typedBody.date, 'YYYY-MM-DD', true).isValid();
-    if (!isValid) {
-      return createErrorResponse('Invalid date format. Use YYYY-MM-DD', 400);
-    }
-    if (typedBody.date !== todayStr && typedBody.date !== tomorrowStr) {
-      return createErrorResponse('Can only set initiative for today or tomorrow', 400);
-    }
+  if ('error' in result) {
+    return createErrorResponse(result.error, result.status);
   }
 
-  const targetDateStr = typedBody.date ?? tomorrowStr;
-  const targetDate = toDate(targetDateStr);
-
-  // Verify the list exists and belongs to the user
-  const [list] = await DB.select()
-    .from(listsTable)
-    .where(
-      and(
-        eq(listsTable.id, typedBody.listId),
-        eq(listsTable.userId, userId)
-      )
-    );
-
-  if (!list) {
-    return createErrorResponse('List not found', 404);
-  }
-
-  // Check if initiative already exists for target date
-  const [existing] = await DB.select()
-    .from(currentInitiativeTable)
-    .where(
-      and(
-        eq(currentInitiativeTable.userId, userId),
-        eq(currentInitiativeTable.date, targetDate)
-      )
-    );
-
-  if (existing) {
-    return createErrorResponse('Initiative for this date already exists. Use PATCH to change it.', 409);
-  }
-
-  // Calculate the suggested list to store what the system would have suggested
-  const lists = await DB.select()
-    .from(listsTable)
-    .where(
-      and(
-        eq(listsTable.userId, userId),
-        eq(listsTable.participatesInInitiative, true),
-        isNull(listsTable.archivedAt)
-      )
-    );
-
-  // Calculate suggestion using shared balance pipeline
-  const { suggestedList: suggested } = await fetchBalanceAndSuggestion(userId, lists);
-  const suggestedListId = suggested?.id ?? null;
-
-  // If user chose the suggested list, store it as suggested only (chosenListId = null)
-  // If user chose a different list, store both suggested and chosen
-  const chosenListId = typedBody.listId === suggestedListId ? null : typedBody.listId;
-
-  const [inserted] = await DB.insert(currentInitiativeTable)
-    .values({
-      userId,
-      date: targetDate,
-      suggestedListId,
-      chosenListId,
-      reason: typedBody.reason ?? null,
-      setAt: new Date(),
-    })
-    .$returningId();
-
-  // Fetch the created record
-  const [created] = await DB.select()
-    .from(currentInitiativeTable)
-    .where(eq(currentInitiativeTable.id, inserted.id));
-
-  return createSuccessResponse({ initiative: created }, 201);
+  return createSuccessResponse({ initiative: result.initiative }, 201);
 }
 
 export const GET = withAuthAndErrorHandling(getInitiativeHandler, 'GET /api/current-initiative');

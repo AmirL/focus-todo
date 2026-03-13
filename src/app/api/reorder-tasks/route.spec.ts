@@ -21,7 +21,7 @@ mockFrom.mockReturnValue({ where: mockWhere });
 mockUpdate.mockReturnValue({ set: mockSet });
 mockSet.mockReturnValue({ where: vi.fn() });
 
-vi.mock('@/app/api/user-auth', () => ({
+vi.mock('@/shared/lib/auth/user-auth', () => ({
   validateUserSession: vi.fn(),
   AuthError: class AuthError extends Error {
     constructor(message: string) { super(message); this.name = 'AuthError'; }
@@ -33,7 +33,7 @@ vi.mock('next/headers', () => ({
 }));
 
 import { POST } from './route';
-import { validateUserSession } from '@/app/api/user-auth';
+import { validateUserSession } from '@/shared/lib/auth/user-auth';
 
 const mockedValidate = vi.mocked(validateUserSession);
 
@@ -125,7 +125,7 @@ describe('POST /api/reorder-tasks', () => {
   });
 
   it('returns 401 when session validation fails with AuthError', async () => {
-    const { AuthError } = await import('@/app/api/user-auth');
+    const { AuthError } = await import('@/shared/lib/auth/user-auth');
     mockedValidate.mockRejectedValue(new AuthError('No session'));
     const res = await POST(makeRequest({
       taskIds: ['1'],

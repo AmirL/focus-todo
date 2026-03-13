@@ -79,19 +79,36 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
 
     const body = await req.json();
 
-    const allowedFields = [
-      'name', 'details', 'date', 'estimatedDuration', 'completedAt',
-      'listId', 'isBlocker', 'selectedAt', 'deletedAt', 'sortOrder',
-      'aiSuggestions', 'goalId',
-    ] as const;
-
-    const updateFields: Partial<typeof tasksTable.$inferInsert> = {};
-
-    for (const field of allowedFields) {
-      if (body[field] !== undefined) {
-        (updateFields as Record<string, unknown>)[field] = body[field];
-      }
+    interface TaskUpdateFields {
+      name?: string;
+      details?: string | null;
+      date?: Date | string | null;
+      estimatedDuration?: number | null;
+      completedAt?: Date | string | null;
+      listId?: number;
+      isBlocker?: boolean;
+      selectedAt?: Date | string | null;
+      deletedAt?: Date | string | null;
+      sortOrder?: number | null;
+      aiSuggestions?: string | null;
+      goalId?: number | null;
+      updatedAt?: Date;
     }
+
+    const updateFields: TaskUpdateFields = {};
+
+    if (body.name !== undefined) updateFields.name = body.name;
+    if (body.details !== undefined) updateFields.details = body.details;
+    if (body.date !== undefined) updateFields.date = body.date;
+    if (body.estimatedDuration !== undefined) updateFields.estimatedDuration = body.estimatedDuration;
+    if (body.completedAt !== undefined) updateFields.completedAt = body.completedAt;
+    if (body.listId !== undefined) updateFields.listId = body.listId;
+    if (body.isBlocker !== undefined) updateFields.isBlocker = body.isBlocker;
+    if (body.selectedAt !== undefined) updateFields.selectedAt = body.selectedAt;
+    if (body.deletedAt !== undefined) updateFields.deletedAt = body.deletedAt;
+    if (body.sortOrder !== undefined) updateFields.sortOrder = body.sortOrder;
+    if (body.aiSuggestions !== undefined) updateFields.aiSuggestions = body.aiSuggestions;
+    if (body.goalId !== undefined) updateFields.goalId = body.goalId;
     updateFields.updatedAt = new Date();
 
     const fieldsWithParsedDates = parseDateFields(updateFields as Record<string, unknown>, TaskDateKeys);

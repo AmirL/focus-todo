@@ -1,12 +1,8 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
-import { Label } from '@/shared/ui/label';
-import { Input } from '@/shared/ui/input';
-import { Slider } from '@/shared/ui/slider';
-import { Textarea } from '@/shared/ui/textarea';
 import { useCreateGoalMutation } from '@/shared/api/goals';
-import { GoalModel } from '@/entities/goal';
+import { GoalModel, GoalFormFields } from '@/entities/goal';
 import { createInstance } from '@/shared/lib/instance-tools';
 import { useListsQuery } from '@/shared/api/lists';
 
@@ -39,35 +35,12 @@ export function AddGoalDialog() {
           <DialogHeader>
             <DialogTitle>New Goal</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-2">
-            <div>
-              <Label htmlFor="title">Title</Label>
-              <Input id="title" name="title" required data-cy="goal-title-input" />
-            </div>
-            <div>
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe this goal..."
-                className="min-h-[80px]"
-                data-cy="goal-description-input"
-              />
-            </div>
-            <div>
-              <Label htmlFor="progress">Progress: {progress}%</Label>
-              <Slider
-                id="progress"
-                min={0}
-                max={100}
-                step={5}
-                value={[progress]}
-                onValueChange={(value) => setProgress(value[0])}
-                className="mt-2"
-              />
-            </div>
-          </div>
+          <GoalFormFields
+            description={description}
+            onDescriptionChange={setDescription}
+            progress={progress}
+            onProgressChange={setProgress}
+          />
           <DialogFooter>
             <DialogTrigger asChild>
               <Button type="submit" data-cy="create-goal-button">Create</Button>

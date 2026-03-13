@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { validateUserSession, AuthError } from '@/app/api/user-auth';
+import { validateUserSession, AuthError } from '@/shared/lib/auth/user-auth';
 
 export interface AuthenticatedSession {
   user: {

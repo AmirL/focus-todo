@@ -24,10 +24,10 @@ export class GoalModel {
   }
 
   static fromPlainArray(data: GoalPlain[]): GoalModel[] {
-    return data.map((task) => this.toInstance(task));
+    return data.map((goal) => this.toInstance(goal));
   }
 
-  static toPlain(task: GoalModel): GoalPlain {
-    return instanceToPlain(task) as GoalPlain;
+  static toPlain(goal: GoalModel): GoalPlain {
+    return instanceToPlain(goal) as GoalPlain;
   }
 }
