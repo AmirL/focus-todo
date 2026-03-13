@@ -60,3 +60,9 @@ storybook-static
 # Python venv (desloppify)
 .venv/
 .desloppify/
+
+# Playwright CLI artifacts
+.playwright-cli/
+
+# Claude skills (local only)
+.claude/skills/
