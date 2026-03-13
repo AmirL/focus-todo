@@ -43,7 +43,7 @@ This project follows **Feature-Sliced Design (FSD)** architecture. For complete 
 **Component Organization:**
 
 - **shared/ui/task/**: Task-specific reusable components
-- **shared/ui/goal/**: Goal-specific reusable components
+- **entities/goal/ui/**: Goal-specific reusable components
 - **shared/ui/**: Generic reusable components
 - **features/[feature]/ui/**: Feature-specific components (NOT reused elsewhere)
 

@@ -33,11 +33,16 @@ async function patchHandler(
     return createErrorResponse('Invalid date format. Use YYYY-MM-DD', 400);
   }
 
-  const body: ChangeInitiativeBody = await req.json();
+  const rawBody = await req.json() as Record<string, unknown>;
 
-  if (!body.listId) {
-    return createErrorResponse('listId is required', 400);
+  if (!rawBody.listId || typeof rawBody.listId !== 'number' || !Number.isFinite(rawBody.listId)) {
+    return createErrorResponse('listId must be a valid number', 400);
   }
+
+  const body: ChangeInitiativeBody = {
+    listId: rawBody.listId,
+    reason: typeof rawBody.reason === 'string' ? rawBody.reason : undefined,
+  };
 
   // Verify the list exists and belongs to the user
   const [list] = await DB.select()

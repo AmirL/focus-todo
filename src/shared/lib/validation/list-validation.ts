@@ -72,10 +72,10 @@ interface UpdateListValidationResult {
 export function validateUpdateListRequest(requestBody: unknown): UpdateListValidationResult {
   const body = requestBody as { id?: unknown; name?: unknown; description?: unknown; participatesInInitiative?: unknown; color?: unknown };
 
-  if (!body?.id) {
+  if (!body?.id || typeof body.id !== 'number' || !Number.isFinite(body.id)) {
     return {
       isValid: false,
-      error: 'List ID and name are required'
+      error: 'List ID must be a valid number'
     };
   }
 
@@ -95,7 +95,7 @@ export function validateUpdateListRequest(requestBody: unknown): UpdateListValid
 
   return {
     isValid: true,
-    id: body.id as number,
+    id: body.id,
     name: (body.name as string).trim(),
     description: body.description !== undefined ? (body.description != null ? String(body.description).trim() || null : null) : undefined,
     participatesInInitiative: body.participatesInInitiative === undefined ? undefined : Boolean(body.participatesInInitiative),
@@ -113,13 +113,13 @@ interface ArchiveListValidationResult {
 export function validateArchiveListRequest(requestBody: unknown): ArchiveListValidationResult {
   const body = requestBody as { id?: unknown; archived?: unknown };
 
-  if (!body?.id) {
-    return { isValid: false, error: 'List ID is required' };
+  if (!body?.id || typeof body.id !== 'number' || !Number.isFinite(body.id)) {
+    return { isValid: false, error: 'List ID must be a valid number' };
   }
 
   if (typeof body.archived !== 'boolean') {
     return { isValid: false, error: 'archived must be a boolean' };
   }
 
-  return { isValid: true, id: body.id as number, archived: body.archived };
+  return { isValid: true, id: body.id, archived: body.archived };
 }

@@ -96,16 +96,16 @@ export function isTaskSelected(task: TaskModel) {
   return !!task.selectedAt;
 }
 
-export function isTaskToday(task: TaskModel) {
-  return task.date && dayjs(task.date).isSame(dayjs(), 'day');
+export function isTaskToday(task: TaskModel): boolean {
+  return !!task.date && dayjs(task.date).isSame(dayjs(), 'day');
 }
 
-export function isTaskTomorrow(task: TaskModel) {
-  return task.date && dayjs(task.date).isSame(dayjs().add(1, 'day'), 'day');
+export function isTaskTomorrow(task: TaskModel): boolean {
+  return !!task.date && dayjs(task.date).isSame(dayjs().add(1, 'day'), 'day');
 }
 
-export function isTaskOverdue(task: TaskModel) {
-  return task.date && dayjs(task.date).isBefore(dayjs(), 'day') && !task.completedAt;
+export function isTaskOverdue(task: TaskModel): boolean {
+  return !!task.date && dayjs(task.date).isBefore(dayjs(), 'day') && !task.completedAt;
 }
 
 function transformDateToUTCString({ value }: { value: Date | null }) {

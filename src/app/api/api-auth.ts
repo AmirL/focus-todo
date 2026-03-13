@@ -53,6 +53,8 @@ export async function getUserIdFromApiKey(req: NextRequest): Promise<string> {
     await DB.update(apiKeysTable)
       .set({ lastUsedAt: new Date() })
       .where(eq(apiKeysTable.id, key.id));
-  } catch {}
+  } catch (error) {
+    console.error('Failed to update API key lastUsedAt:', error);
+  }
   return key.userId as string;
 }

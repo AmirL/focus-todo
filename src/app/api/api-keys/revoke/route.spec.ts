@@ -14,8 +14,9 @@ vi.mock('@/shared/lib/db', () => ({
 mockUpdate.mockReturnValue({ set: mockSet });
 mockSet.mockReturnValue({ where: mockWhere });
 
-vi.mock('../../user-auth', () => ({
+vi.mock('@/app/api/user-auth', () => ({
   validateUserSession: vi.fn(),
+  AuthError: class AuthError extends Error {},
 }));
 
 vi.mock('next/headers', () => ({
@@ -23,7 +24,7 @@ vi.mock('next/headers', () => ({
 }));
 
 import { POST } from './route';
-import { validateUserSession } from '../../user-auth';
+import { validateUserSession } from '@/app/api/user-auth';
 
 const mockedValidate = vi.mocked(validateUserSession);
 

@@ -1,0 +1,60 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e7]:
+      - link "Focus Todo Stay productive" [ref=e9] [cursor=pointer]:
+        - /url: /
+        - img [ref=e11]
+        - generic [ref=e14]:
+          - heading "Focus Todo" [level=1] [ref=e15]
+          - paragraph [ref=e16]: Stay productive
+      - generic [ref=e18]:
+        - generic [ref=e19]:
+          - generic [ref=e20]:
+            - heading "Filters" [level=2] [ref=e21]
+            - generic [ref=e22]:
+              - button "Backlog" [ref=e23] [cursor=pointer]:
+                - img
+                - text: Backlog
+              - button "Selected" [ref=e24] [cursor=pointer]:
+                - img
+                - text: Selected
+              - button "Today" [ref=e25] [cursor=pointer]:
+                - generic [ref=e26]:
+                  - img
+                  - text: Today
+              - button "Tomorrow" [ref=e27] [cursor=pointer]:
+                - generic [ref=e28]:
+                  - img
+                  - text: Tomorrow
+              - button "Future" [ref=e29] [cursor=pointer]:
+                - img
+                - text: Future
+              - link "Calendar" [ref=e30] [cursor=pointer]:
+                - /url: /calendar
+                - img
+                - text: Calendar
+          - generic [ref=e31]:
+            - heading "Categories" [level=2] [ref=e32]
+            - generic [ref=e34]: Loading...
+        - link "Settings" [ref=e37] [cursor=pointer]:
+          - /url: /settings
+          - img
+          - text: Settings
+      - generic [ref=e41]:
+        - generic [ref=e42]:
+          - paragraph [ref=e43]: Test
+          - paragraph [ref=e44]: test@example.com
+        - button [ref=e45] [cursor=pointer]:
+          - img
+    - generic [ref=e50]:
+      - generic [ref=e51]:
+        - heading "Goals" [level=2] [ref=e52]
+        - generic [ref=e55]: Loading...
+      - generic [ref=e57]:
+        - heading "backlog" [level=2] [ref=e58]
+        - button "Search tasks" [ref=e60] [cursor=pointer]:
+          - img
+      - generic [ref=e61]: Loading...
+      - button [ref=e62] [cursor=pointer]:
+        - img
+  - alert [ref=e63]

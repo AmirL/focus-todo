@@ -1,0 +1,270 @@
+- generic:
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - generic:
+                - link:
+                  - /url: /
+                  - generic:
+                    - img
+                  - generic:
+                    - heading [level=1]: Focus Todo
+                    - paragraph: Stay productive
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - heading [level=2]: Filters
+                      - generic:
+                        - button:
+                          - img
+                          - text: Backlog
+                        - button:
+                          - img
+                          - text: Selected
+                        - button:
+                          - generic:
+                            - img
+                            - text: Today
+                        - button:
+                          - generic:
+                            - img
+                            - text: Tomorrow
+                        - button:
+                          - img
+                          - text: Future
+                        - link:
+                          - /url: /calendar
+                          - img
+                          - text: Calendar
+                    - generic:
+                      - heading [level=2]: Categories
+                      - generic:
+                        - button:
+                          - generic:
+                            - img
+                            - text: Personal
+                        - button:
+                          - generic:
+                            - img
+                            - text: Final Test List - Updated
+                        - button:
+                          - generic:
+                            - img
+                            - text: Updated QA Test List
+                        - button:
+                          - generic:
+                            - img
+                            - text: Automation Test List - Edited - 2026-02-01
+                        - button:
+                          - generic:
+                            - img
+                            - text: Automation Test List - 2026-02-01
+                        - button:
+                          - generic:
+                            - img
+                            - text: Final Test List
+                        - button:
+                          - generic:
+                            - img
+                            - text: General
+                  - generic:
+                    - generic:
+                      - link:
+                        - /url: /settings
+                        - img
+                        - text: Settings
+              - generic:
+                - generic:
+                  - heading [level=3]: Focus Balance
+                  - generic:
+                    - generic:
+                      - generic: Personal
+                      - generic:
+                        - generic: never
+                        - img
+                    - generic:
+                      - generic: Updated QA Test List
+                      - generic:
+                        - generic: never
+                        - img
+                    - generic:
+                      - generic: Automation Test List - Edited - 2026-02-01
+                      - generic:
+                        - generic: never
+                        - img
+                    - generic:
+                      - generic: Automation Test List - 2026-02-01
+                      - generic:
+                        - generic: never
+                        - img
+                    - generic:
+                      - generic: Final Test List
+                      - generic:
+                        - generic: never
+                        - img
+                    - generic:
+                      - generic: General
+                      - generic:
+                        - generic: never
+                        - img
+                - generic:
+                  - generic:
+                    - generic:
+                      - paragraph: Test
+                      - paragraph: test@example.com
+                    - button:
+                      - img
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - generic:
+                - button:
+                  - img
+                - heading [level=2]: Friday, March 13, 2026
+                - button:
+                  - img
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: 08:00
+                  - button:
+                    - img
+                - generic:
+                  - generic:
+                    - generic: 09:00
+                  - button:
+                    - img
+                - generic:
+                  - generic:
+                    - generic: 10:00
+                  - button:
+                    - img
+                - generic:
+                  - generic:
+                    - generic: 11:00
+                  - button:
+                    - img
+                - generic:
+                  - generic:
+                    - generic: 12:00
+                  - button:
+                    - img
+                - generic:
+                  - generic:
+                    - generic: 13:00
+                  - button:
+                    - img
+                - generic:
+                  - generic:
+                    - generic: 14:00
+                  - button:
+                    - img
+                - generic:
+                  - generic:
+                    - generic: 15:00
+                  - button:
+                    - img
+                - generic:
+                  - generic:
+                    - generic: 16:00
+                  - button:
+                    - img
+                - generic:
+                  - generic:
+                    - generic: 17:00
+                  - button:
+                    - img
+                - generic:
+                  - generic:
+                    - generic: 18:00
+                  - button:
+                    - img
+                - generic:
+                  - generic:
+                    - generic: 19:00
+                  - button:
+                    - img
+                - generic:
+                  - generic:
+                    - generic: 20:00
+                  - button:
+                    - img
+                - generic:
+                  - generic:
+                    - generic: 21:00
+                  - button:
+                    - img
+                - generic:
+                  - generic:
+                    - generic: 22:00
+                  - button:
+                    - img
+                - generic:
+                  - generic:
+                    - generic: 23:00
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: Design meeting
+                      - generic: 1h
+                    - generic:
+                      - button:
+                        - img
+                      - button:
+                        - img
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - application
+                - generic:
+                  - generic:
+                    - generic: Personal
+                    - generic: 1h
+                  - generic:
+                    - generic:
+                      - generic: Total
+                      - generic: 1h
+  - generic:
+    - generic:
+      - img
+    - button:
+      - img
+  - alert
+  - dialog "Log Task" [ref=e433]:
+    - generic [ref=e434]:
+      - heading "Log Task" [level=2] [ref=e435]
+      - paragraph [ref=e436]: Fill in what you were doing during this gap.
+    - generic [ref=e437]:
+      - generic [ref=e438]:
+        - text: Task name
+        - textbox "Task name" [ref=e439]:
+          - /placeholder: What were you doing?
+          - text: Code review
+      - generic [ref=e440]:
+        - generic [ref=e441]:
+          - text: Start
+          - textbox "Start" [ref=e442]: 10:00
+        - generic [ref=e443]:
+          - text: End
+          - textbox "End" [ref=e444]: 11:00
+        - generic [ref=e446]: 1h
+      - generic [ref=e447]:
+        - text: Category
+        - combobox [active] [ref=e449] [cursor=pointer]:
+          - generic: General
+          - img [ref=e450]
+    - generic [ref=e452]:
+      - button "Cancel" [ref=e453] [cursor=pointer]
+      - button "Log Task" [ref=e458] [cursor=pointer]:
+        - img
+        - text: Log Task
+    - button "Close" [ref=e454] [cursor=pointer]:
+      - img [ref=e455]
+      - generic [ref=e457]: Close

@@ -13,7 +13,7 @@ export function toDate(dateStr: string): Date {
 }
 
 /** Format a Date to YYYY-MM-DD string */
-export function formatDate(date: Date): string {
+export function formatDateKey(date: Date): string {
   return dayjs(date).format('YYYY-MM-DD');
 }
 
@@ -23,11 +23,11 @@ export function getParticipatingLists(lists: ListRow[]): ListRow[] {
 }
 
 /** Map raw initiative DB rows to the shape expected by calculateBalance */
-export function toBalanceEntries(initiatives: InitiativeRow[]) {
+function toBalanceEntries(initiatives: InitiativeRow[]) {
   return initiatives.map((i) => ({
     id: i.id,
     userId: i.userId,
-    date: formatDate(i.date),
+    date: formatDateKey(i.date),
     suggestedListId: i.suggestedListId,
     chosenListId: i.chosenListId,
     reason: i.reason,

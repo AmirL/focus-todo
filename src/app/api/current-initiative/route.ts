@@ -8,7 +8,7 @@ import { DB } from '@/shared/lib/db';
 import { and, eq, isNull, or } from 'drizzle-orm';
 import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema';
 import { calculateBalance, type ListWithLastTouched } from '@/entities/current-initiative';
-import { toDate, formatDate, getParticipatingLists, fetchBalanceAndSuggestion } from '@/shared/lib/api/initiative-helpers';
+import { toDate, formatDateKey, getParticipatingLists, fetchBalanceAndSuggestion } from '@/shared/lib/api/initiative-helpers';
 import dayjs from '@/shared/lib/dayjs';
 
 type InitiativeRow = typeof currentInitiativeTable.$inferSelect;
@@ -56,8 +56,8 @@ async function getInitiativeHandler(
       )
     );
 
-  const todayInitiative = initiatives.find((i) => formatDate(i.date) === todayStr) ?? null;
-  const tomorrowInitiative = initiatives.find((i) => formatDate(i.date) === tomorrowStr) ?? null;
+  const todayInitiative = initiatives.find((i) => formatDateKey(i.date) === todayStr) ?? null;
+  const tomorrowInitiative = initiatives.find((i) => formatDateKey(i.date) === tomorrowStr) ?? null;
 
   // Calculate balance and suggestion
   const { balance, suggestedList: suggested } = await fetchBalanceAndSuggestion(userId, participatingLists);
@@ -93,27 +93,33 @@ async function createInitiativeHandler(
 ) {
   const userId = session.user.id;
 
-  const body: SetInitiativeBody = await req.json();
+  const body = await req.json() as Record<string, unknown>;
 
-  if (!body.listId) {
-    return createErrorResponse('listId is required', 400);
+  if (!body.listId || typeof body.listId !== 'number' || !Number.isFinite(body.listId)) {
+    return createErrorResponse('listId must be a valid number', 400);
   }
+
+  const typedBody: SetInitiativeBody = {
+    listId: body.listId,
+    date: typeof body.date === 'string' ? body.date : undefined,
+    reason: typeof body.reason === 'string' ? body.reason : undefined,
+  };
 
   // Determine target date: use provided date or default to tomorrow
   const todayStr = dayjs().format('YYYY-MM-DD');
   const tomorrowStr = dayjs().add(1, 'day').format('YYYY-MM-DD');
 
-  if (body.date) {
-    const isValid = /^\d{4}-\d{2}-\d{2}$/.test(body.date) && dayjs(body.date, 'YYYY-MM-DD', true).isValid();
+  if (typedBody.date) {
+    const isValid = /^\d{4}-\d{2}-\d{2}$/.test(typedBody.date) && dayjs(typedBody.date, 'YYYY-MM-DD', true).isValid();
     if (!isValid) {
       return createErrorResponse('Invalid date format. Use YYYY-MM-DD', 400);
     }
-    if (body.date !== todayStr && body.date !== tomorrowStr) {
+    if (typedBody.date !== todayStr && typedBody.date !== tomorrowStr) {
       return createErrorResponse('Can only set initiative for today or tomorrow', 400);
     }
   }
 
-  const targetDateStr = body.date ?? tomorrowStr;
+  const targetDateStr = typedBody.date ?? tomorrowStr;
   const targetDate = toDate(targetDateStr);
 
   // Verify the list exists and belongs to the user
@@ -121,7 +127,7 @@ async function createInitiativeHandler(
     .from(listsTable)
     .where(
       and(
-        eq(listsTable.id, body.listId),
+        eq(listsTable.id, typedBody.listId),
         eq(listsTable.userId, userId)
       )
     );
@@ -161,7 +167,7 @@ async function createInitiativeHandler(
 
   // If user chose the suggested list, store it as suggested only (chosenListId = null)
   // If user chose a different list, store both suggested and chosen
-  const chosenListId = body.listId === suggestedListId ? null : body.listId;
+  const chosenListId = typedBody.listId === suggestedListId ? null : typedBody.listId;
 
   const [inserted] = await DB.insert(currentInitiativeTable)
     .values({
@@ -169,7 +175,7 @@ async function createInitiativeHandler(
       date: targetDate,
       suggestedListId,
       chosenListId,
-      reason: body.reason ?? null,
+      reason: typedBody.reason ?? null,
       setAt: new Date(),
     })
     .$returningId();

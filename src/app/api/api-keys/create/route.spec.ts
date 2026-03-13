@@ -14,8 +14,9 @@ vi.mock('@/shared/lib/db', () => ({
 mockInsert.mockReturnValue({ values: mockValues });
 mockValues.mockReturnValue({ $returningId: mock$returningId });
 
-vi.mock('../../user-auth', () => ({
+vi.mock('@/app/api/user-auth', () => ({
   validateUserSession: vi.fn(),
+  AuthError: class AuthError extends Error {},
 }));
 
 vi.mock('@/app/api/api-auth', () => ({
@@ -27,7 +28,7 @@ vi.mock('next/headers', () => ({
 }));
 
 import { POST } from './route';
-import { validateUserSession } from '../../user-auth';
+import { validateUserSession } from '@/app/api/user-auth';
 
 const mockedValidate = vi.mocked(validateUserSession);
 

@@ -17,7 +17,6 @@ export async function PUT(req: NextRequest) {
     const session = await validateUserSession();
     const { taskIds, context }: ReorderRequestBody = await req.json();
 
-    // Validate input
     if (!Array.isArray(taskIds) || taskIds.length === 0) {
       return NextResponse.json(
         { error: 'taskIds must be a non-empty array' },
@@ -32,7 +31,6 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    // Verify all tasks belong to the authenticated user
     const userTasks = await DB.select({ id: tasksTable.id })
       .from(tasksTable)
       .where(
@@ -49,7 +47,6 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    // Update sortOrder for each task in bulk using a transaction
     await DB.transaction(async (tx) => {
       for (let i = 0; i < taskIds.length; i++) {
         await tx
@@ -64,7 +61,6 @@ export async function PUT(req: NextRequest) {
       }
     });
 
-    // Fetch and return the updated tasks
     const updatedTasks = await DB.select()
       .from(tasksTable)
       .where(

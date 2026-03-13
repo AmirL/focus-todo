@@ -18,6 +18,11 @@ async function updateTaskHandler(req: NextRequest, session: { user: { id: string
     .from(tasksTable)
     .where(and(eq(tasksTable.id, id), eq(tasksTable.userId, session.user.id)));
 
+  if (!updatedTask) {
+    const { createErrorResponse } = await import('@/shared/lib/api/route-wrapper');
+    return createErrorResponse('Task not found', 404);
+  }
+
   return createSuccessResponse(updatedTask);
 }
 

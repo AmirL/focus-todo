@@ -5,7 +5,7 @@ import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema'
 import { getUserIdFromApiKey } from '@/app/api/api-auth';
 import { type ListWithLastTouched } from '@/entities/current-initiative';
 import { serializeInitiative, handleApiError } from './serialize';
-import { toDate, formatDate, getParticipatingLists, fetchBalanceAndSuggestion } from '@/shared/lib/api/initiative-helpers';
+import { toDate, formatDateKey, getParticipatingLists, fetchBalanceAndSuggestion } from '@/shared/lib/api/initiative-helpers';
 import dayjs from '@/shared/lib/dayjs';
 
 /**
@@ -39,8 +39,8 @@ export async function GET(req: NextRequest) {
         )
       );
 
-    const todayInitiative = initiatives.find((i) => formatDate(i.date) === todayStr) ?? null;
-    const tomorrowInitiative = initiatives.find((i) => formatDate(i.date) === tomorrowStr) ?? null;
+    const todayInitiative = initiatives.find((i) => formatDateKey(i.date) === todayStr) ?? null;
+    const tomorrowInitiative = initiatives.find((i) => formatDateKey(i.date) === tomorrowStr) ?? null;
 
     // Calculate balance and suggestion
     const { balance, suggestedList: suggested } = await fetchBalanceAndSuggestion(userId, participatingLists);

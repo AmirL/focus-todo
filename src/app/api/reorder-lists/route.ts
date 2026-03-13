@@ -13,7 +13,6 @@ export async function POST(req: NextRequest) {
     const session = await validateUserSession();
     const { listIds }: ReorderListsRequestBody = await req.json();
 
-    // Validate input
     if (!Array.isArray(listIds) || listIds.length === 0) {
       return NextResponse.json(
         { error: 'listIds must be a non-empty array' },
@@ -21,7 +20,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verify all lists belong to the authenticated user
     const userLists = await DB.select({ id: listsTable.id })
       .from(listsTable)
       .where(
@@ -38,7 +36,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Update sortOrder for each list in bulk using a transaction
     await DB.transaction(async (tx) => {
       for (let i = 0; i < listIds.length; i++) {
         await tx
@@ -53,7 +50,6 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    // Fetch and return the updated lists
     const updatedLists = await DB.select()
       .from(listsTable)
       .where(

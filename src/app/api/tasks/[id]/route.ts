@@ -85,21 +85,19 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       'aiSuggestions', 'goalId',
     ] as const;
 
-    type AllowedField = typeof allowedFields[number];
-    const updateFields = {} as Record<AllowedField, unknown> & { updatedAt: Date };
+    const updateFields: Partial<typeof tasksTable.$inferInsert> = {};
 
     for (const field of allowedFields) {
       if (body[field] !== undefined) {
-        updateFields[field] = body[field];
+        (updateFields as Record<string, unknown>)[field] = body[field];
       }
     }
     updateFields.updatedAt = new Date();
 
-    const fieldsWithParsedDates = parseDateFields(updateFields, TaskDateKeys);
+    const fieldsWithParsedDates = parseDateFields(updateFields as Record<string, unknown>, TaskDateKeys);
 
     await DB.update(tasksTable)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .set(fieldsWithParsedDates as any)
+      .set(fieldsWithParsedDates as Partial<typeof tasksTable.$inferInsert>)
       .where(and(eq(tasksTable.id, taskId), eq(tasksTable.userId, userId)));
 
     const [updatedRow] = await DB.select({
