@@ -21,8 +21,11 @@ mockFrom.mockReturnValue({ where: mockWhere });
 mockUpdate.mockReturnValue({ set: mockSet });
 mockSet.mockReturnValue({ where: vi.fn() });
 
-vi.mock('../user-auth', () => ({
+vi.mock('@/app/api/user-auth', () => ({
   validateUserSession: vi.fn(),
+  AuthError: class AuthError extends Error {
+    constructor(message: string) { super(message); this.name = 'AuthError'; }
+  },
 }));
 
 vi.mock('next/headers', () => ({
@@ -30,7 +33,7 @@ vi.mock('next/headers', () => ({
 }));
 
 import { PUT } from './route';
-import { validateUserSession } from '../user-auth';
+import { validateUserSession } from '@/app/api/user-auth';
 
 const mockedValidate = vi.mocked(validateUserSession);
 
@@ -84,7 +87,7 @@ describe('PUT /api/reorder-tasks', () => {
   });
 
   it('returns 403 when some tasks do not belong to user', async () => {
-    mockWhere.mockResolvedValue([{ id: 1 }]); // only 1 of 2 tasks found
+    mockWhere.mockResolvedValue([{ id: 1 }]);
     const res = await PUT(makeRequest({
       taskIds: ['1', '2'],
       context: { statusFilter: 'active', listId: 1 },
@@ -96,7 +99,7 @@ describe('PUT /api/reorder-tasks', () => {
 
   it('returns 200 and reorders tasks successfully', async () => {
     const taskIds = ['3', '1', '2'];
-    mockWhere.mockResolvedValueOnce([{ id: 3 }, { id: 1 }, { id: 2 }]); // ownership check
+    mockWhere.mockResolvedValueOnce([{ id: 3 }, { id: 1 }, { id: 2 }]);
     mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
       const txUpdate = vi.fn().mockReturnValue({
         set: vi.fn().mockReturnValue({ where: vi.fn() }),
@@ -108,7 +111,7 @@ describe('PUT /api/reorder-tasks', () => {
       { id: 1, sortOrder: 1 },
       { id: 2, sortOrder: 2 },
     ];
-    mockWhere.mockResolvedValueOnce(updatedTasks); // fetch updated
+    mockWhere.mockResolvedValueOnce(updatedTasks);
 
     const res = await PUT(makeRequest({
       taskIds,
@@ -121,13 +124,14 @@ describe('PUT /api/reorder-tasks', () => {
     expect(body.message).toContain('3 tasks');
   });
 
-  it('returns 500 when session validation fails', async () => {
-    mockedValidate.mockRejectedValue(new Error('No session'));
+  it('returns 401 when session validation fails with AuthError', async () => {
+    const { AuthError } = await import('@/app/api/user-auth');
+    mockedValidate.mockRejectedValue(new AuthError('No session'));
     const res = await PUT(makeRequest({
       taskIds: ['1'],
       context: { statusFilter: 'active', listId: 1 },
     }));
-    expect(res.status).toBe(500);
+    expect(res.status).toBe(401);
   });
 
   it('returns 500 when database transaction fails', async () => {

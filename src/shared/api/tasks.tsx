@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { TaskModel, TaskPlain } from '@/entities/task/model/task';
 import { fetchBackend } from '@/shared/lib/api';
 import toast from 'react-hot-toast';
-import { useEditTaskModalStore } from '@/features/tasks/edit';
 import { timeEntryKeys, type TimeEntry } from '@/shared/api/time-entries';
 
 const taskKeys = {
@@ -25,7 +24,7 @@ export function useTasksQuery() {
   });
 }
 
-export function useCreateTaskMutation() {
+export function useCreateTaskMutation(options?: { onSuccess?: (task: TaskModel) => void }) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -46,23 +45,11 @@ export function useCreateTaskMutation() {
       queryClient.setQueryData<TaskModel[]>(taskKeys.all, context?.previousTasks);
     },
     onSuccess: (createdTask) => {
-      toast.success(
-        (t) => (
-          <span className="flex items-center gap-2">
-            Task created: {createdTask.name}
-            <button
-              onClick={() => {
-                useEditTaskModalStore.getState().openWithTask(createdTask);
-                toast.dismiss(t.id);
-              }}
-              className="ml-2 text-blue-600 underline hover:text-blue-800"
-            >
-              Edit
-            </button>
-          </span>
-        ),
-        { duration: 5000 }
-      );
+      if (options?.onSuccess) {
+        options.onSuccess(createdTask);
+      } else {
+        toast.success(`Task created: ${createdTask.name}`, { duration: 5000 });
+      }
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: taskKeys.all });

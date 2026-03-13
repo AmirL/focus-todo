@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserIdFromApiKey } from '@/app/api/api-auth';
+import { authenticateApiKey } from '@/app/api/api-auth';
 import { serializeInitiativeWithLists, handleApiError } from '../serialize';
 import { fetchInitiativeHistory } from '@/shared/lib/api/initiative-helpers';
 
@@ -11,7 +11,7 @@ import { fetchInitiativeHistory } from '@/shared/lib/api/initiative-helpers';
  */
 export async function GET(req: NextRequest) {
   try {
-    const userId = await getUserIdFromApiKey(req);
+    const userId = await authenticateApiKey(req);
 
     const { searchParams } = new URL(req.url);
     const daysParam = searchParams.get('days');

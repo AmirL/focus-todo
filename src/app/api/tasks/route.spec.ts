@@ -22,7 +22,7 @@ mockValues.mockReturnValue({ $returningId: mock$returningId });
 // Mock auth
 vi.mock('@/app/api/api-auth', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/app/api/api-auth')>();
-  return { ...actual, getUserIdFromApiKey: vi.fn() };
+  return { ...actual, authenticateApiKey: vi.fn() };
 });
 
 // Mock next/headers
@@ -36,9 +36,9 @@ vi.mock('./buildTaskListConditions', () => ({
 }));
 
 import { GET, POST } from './route';
-import { getUserIdFromApiKey, ApiAuthError } from '@/app/api/api-auth';
+import { authenticateApiKey, ApiAuthError } from '@/app/api/api-auth';
 
-const mockedGetUserId = vi.mocked(getUserIdFromApiKey);
+const mockedGetUserId = vi.mocked(authenticateApiKey);
 
 function makeRequest(url: string, init?: RequestInit) {
   return new NextRequest(new URL(url, 'http://localhost:3000'), init as never);

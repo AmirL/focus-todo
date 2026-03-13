@@ -32,7 +32,7 @@ vi.mock('@/shared/lib/drizzle/schema', () => ({
 
 import { headers } from 'next/headers';
 import { DB } from '@/shared/lib/db';
-import { hashApiKey, getUserIdFromApiKey, getApiKeyFromHeaders, getApiKeyFromRequest } from './api-auth';
+import { hashApiKey, authenticateApiKey, getApiKeyFromHeaders, getApiKeyFromRequest } from './api-auth';
 import type { NextRequest } from 'next/server';
 
 const TEST_SECRET = 'test-secret-key-for-unit-tests';
@@ -186,7 +186,7 @@ describe('api-auth', () => {
     });
   });
 
-  describe('getUserIdFromApiKey', () => {
+  describe('authenticateApiKey', () => {
     function makeRequest(url: string, reqHeaders?: Record<string, string>): NextRequest {
       return {
         url,
@@ -221,20 +221,20 @@ describe('api-auth', () => {
       setupUpdateMock();
 
       const req = makeRequest('http://localhost:3000/api/tasks', { 'x-api-key': apiKey });
-      const userId = await getUserIdFromApiKey(req);
+      const userId = await authenticateApiKey(req);
       expect(userId).toBe('user-123');
     });
 
     it('should throw when no API key is provided', async () => {
       const req = makeRequest('http://localhost:3000/api/tasks');
-      await expect(getUserIdFromApiKey(req)).rejects.toThrow('API key required');
+      await expect(authenticateApiKey(req)).rejects.toThrow('API key required');
     });
 
     it('should throw when the API key is not found in the database', async () => {
       setupDbMock([]);
 
       const req = makeRequest('http://localhost:3000/api/tasks', { 'x-api-key': 'unknown-key' });
-      await expect(getUserIdFromApiKey(req)).rejects.toThrow('Invalid or revoked API key');
+      await expect(authenticateApiKey(req)).rejects.toThrow('Invalid or revoked API key');
     });
 
     it('should update lastUsedAt after successful lookup', async () => {
@@ -245,7 +245,7 @@ describe('api-auth', () => {
       const { setFn } = setupUpdateMock();
 
       const req = makeRequest('http://localhost:3000/api/tasks', { 'x-api-key': apiKey });
-      await getUserIdFromApiKey(req);
+      await authenticateApiKey(req);
 
       expect(DB.update).toHaveBeenCalled();
       expect(setFn).toHaveBeenCalledWith(
@@ -265,7 +265,7 @@ describe('api-auth', () => {
       vi.mocked(DB.update).mockReturnValue({ set: setFn } as never);
 
       const req = makeRequest('http://localhost:3000/api/tasks', { 'x-api-key': apiKey });
-      const userId = await getUserIdFromApiKey(req);
+      const userId = await authenticateApiKey(req);
       expect(userId).toBe('user-789');
     });
 
@@ -275,7 +275,7 @@ describe('api-auth', () => {
       const { whereFn } = setupDbMock([]);
 
       const req = makeRequest('http://localhost:3000/api/tasks', { 'x-api-key': apiKey });
-      try { await getUserIdFromApiKey(req); } catch {}
+      try { await authenticateApiKey(req); } catch {}
 
       expect(DB.select).toHaveBeenCalled();
       expect(whereFn).toHaveBeenCalled();

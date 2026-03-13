@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { and, eq } from 'drizzle-orm';
 import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema';
-import { getUserIdFromApiKey } from '@/app/api/api-auth';
+import { authenticateApiKey } from '@/app/api/api-auth';
 import { serializeInitiative, handleApiError } from '../serialize';
 import { toDate } from '@/shared/lib/api/initiative-helpers';
 import dayjs from 'dayjs';
@@ -18,7 +18,7 @@ function isValidDate(dateStr: string): boolean {
  */
 export async function GET(req: NextRequest, context: RouteContext) {
   try {
-    const userId = await getUserIdFromApiKey(req);
+    const userId = await authenticateApiKey(req);
     const { date } = await context.params;
 
     if (!isValidDate(date)) {
@@ -53,7 +53,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
  */
 export async function PATCH(req: NextRequest, context: RouteContext) {
   try {
-    const userId = await getUserIdFromApiKey(req);
+    const userId = await authenticateApiKey(req);
     const { date } = await context.params;
 
     if (!isValidDate(date)) {

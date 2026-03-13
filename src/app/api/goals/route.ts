@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { and, eq, isNull } from 'drizzle-orm';
 import { goalsTable, listsTable } from '@/shared/lib/drizzle/schema';
-import { getUserIdFromApiKey } from '@/app/api/api-auth';
+import { authenticateApiKey } from '@/app/api/api-auth';
 import { serializeGoalWithList, handleApiError } from './serialize';
 
 /**
@@ -14,7 +14,7 @@ import { serializeGoalWithList, handleApiError } from './serialize';
  */
 export async function GET(req: NextRequest) {
   try {
-    const userId = await getUserIdFromApiKey(req);
+    const userId = await authenticateApiKey(req);
     const { searchParams } = new URL(req.url);
 
     const listIdParam = searchParams.get('listId');
@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    const userId = await getUserIdFromApiKey(req);
+    const userId = await authenticateApiKey(req);
     const body = await req.json();
 
     if (!body.title || typeof body.title !== 'string' || body.title.trim() === '') {

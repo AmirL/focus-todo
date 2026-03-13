@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { eq } from 'drizzle-orm';
 import { listsTable } from '@/shared/lib/drizzle/schema';
-import { getUserIdFromApiKey } from '@/app/api/api-auth';
+import { authenticateApiKey } from '@/app/api/api-auth';
 import { serializeList, handleApiError } from '../serialize';
 import {
   findUserListById,
@@ -22,7 +22,7 @@ type RouteContext = { params: Promise<{ id: string }> };
  */
 export async function GET(req: NextRequest, context: RouteContext) {
   try {
-    const userId = await getUserIdFromApiKey(req);
+    const userId = await authenticateApiKey(req);
     const { id } = await context.params;
     const listId = parseInt(id, 10);
 
@@ -49,7 +49,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
  */
 export async function PATCH(req: NextRequest, context: RouteContext) {
   try {
-    const userId = await getUserIdFromApiKey(req);
+    const userId = await authenticateApiKey(req);
     const { id } = await context.params;
     const listId = parseInt(id, 10);
 
@@ -143,7 +143,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
  */
 export async function DELETE(req: NextRequest, context: RouteContext) {
   try {
-    const userId = await getUserIdFromApiKey(req);
+    const userId = await authenticateApiKey(req);
     const { id } = await context.params;
     const listId = parseInt(id, 10);
 

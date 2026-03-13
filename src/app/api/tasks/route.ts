@@ -3,7 +3,7 @@ import { DB } from '@/shared/lib/db';
 import { and, eq } from 'drizzle-orm';
 import dayjs from 'dayjs';
 import { tasksTable } from '@/shared/lib/drizzle/schema';
-import { getUserIdFromApiKey } from '@/app/api/api-auth';
+import { authenticateApiKey } from '@/app/api/api-auth';
 import { parseDateFields, TaskDateKeys } from '@/shared/lib/utils';
 import { serializeTask, handleApiError } from './serialize';
 import { buildTaskListConditions } from './buildTaskListConditions';
@@ -20,7 +20,7 @@ function clamp(n: number, min: number, max: number) {
 export async function GET(req: NextRequest) {
   try {
     // Accept API key via Authorization/X-Api-Key only (no session fallback)
-    const userId = await getUserIdFromApiKey(req);
+    const userId = await authenticateApiKey(req);
 
     const { searchParams } = new URL(req.url);
     const tzOffsetParam = searchParams.get('tzOffset'); // minutes offset from UTC (e.g., -120 for UTC+2)
@@ -100,7 +100,7 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    const userId = await getUserIdFromApiKey(req);
+    const userId = await authenticateApiKey(req);
 
     const body = await req.json();
 

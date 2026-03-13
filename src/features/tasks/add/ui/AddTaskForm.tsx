@@ -13,16 +13,38 @@ import {
 import { createInstance } from '@/shared/lib/instance-tools';
 import { TaskModel } from '@/entities/task/model/task';
 import { useCreateTaskMutation } from '@/shared/api/tasks';
+import { useEditTaskModalStore } from '@/features/tasks/edit';
 import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter';
 import { TaskFormFields } from '@/shared/ui/task/TaskFormFields';
 import { useTaskMetadata } from '@/shared/ui/task/useTaskMetadata';
+import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 
 export function AddTaskForm() {
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
   const [name, setName] = useState('');
   const [details, setDetails] = useState('');
-  const createTaskMutation = useCreateTaskMutation();
+  const createTaskMutation = useCreateTaskMutation({
+    onSuccess: (createdTask) => {
+      toast.success(
+        (t) => (
+          <span className="flex items-center gap-2">
+            Task created: {createdTask.name}
+            <button
+              onClick={() => {
+                useEditTaskModalStore.getState().openWithTask(createdTask);
+                toast.dismiss(t.id);
+              }}
+              className="ml-2 text-blue-600 underline hover:text-blue-800"
+            >
+              Edit
+            </button>
+          </span>
+        ),
+        { duration: 5000 }
+      );
+    },
+  });
 
   const { metadata, updateMetadata, resetMetadata } = useTaskMetadata();
   const { statusFilter, listId } = useFilterStore();

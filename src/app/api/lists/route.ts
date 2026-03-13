@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { eq, sql } from 'drizzle-orm';
 import { listsTable } from '@/shared/lib/drizzle/schema';
-import { getUserIdFromApiKey } from '@/app/api/api-auth';
+import { authenticateApiKey } from '@/app/api/api-auth';
 import { serializeList, handleApiError } from './serialize';
 import { getUserLists, findUserListByName } from '@/shared/lib/db/list-queries';
 import { validateListColor } from '@/shared/lib/colors';
@@ -15,7 +15,7 @@ import { validateListColor } from '@/shared/lib/colors';
  */
 export async function GET(req: NextRequest) {
   try {
-    const userId = await getUserIdFromApiKey(req);
+    const userId = await authenticateApiKey(req);
     const { searchParams } = new URL(req.url);
     const includeArchived = searchParams.get('includeArchived') === 'true';
 
@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    const userId = await getUserIdFromApiKey(req);
+    const userId = await authenticateApiKey(req);
     const body = await req.json();
 
     if (!body.name || typeof body.name !== 'string' || body.name.trim() === '') {

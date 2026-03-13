@@ -19,7 +19,7 @@ mockSet.mockReturnValue({ where: vi.fn().mockResolvedValue(undefined) });
 // Mock auth
 vi.mock('@/app/api/api-auth', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/app/api/api-auth')>();
-  return { ...actual, getUserIdFromApiKey: vi.fn() };
+  return { ...actual, authenticateApiKey: vi.fn() };
 });
 
 // Mock next/headers
@@ -39,7 +39,7 @@ vi.mock('@/shared/lib/db/list-queries', () => ({
 }));
 
 import { GET, PATCH, DELETE } from './route';
-import { getUserIdFromApiKey, ApiAuthError } from '@/app/api/api-auth';
+import { authenticateApiKey, ApiAuthError } from '@/app/api/api-auth';
 import {
   findUserListById,
   findUserListByName,
@@ -49,7 +49,7 @@ import {
   setListArchivedStatus,
 } from '@/shared/lib/db/list-queries';
 
-const mockedGetUserId = vi.mocked(getUserIdFromApiKey);
+const mockedGetUserId = vi.mocked(authenticateApiKey);
 const mockedFindById = vi.mocked(findUserListById);
 const mockedFindByName = vi.mocked(findUserListByName);
 const mockedCountUsage = vi.mocked(countListUsage);

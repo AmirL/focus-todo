@@ -21,8 +21,11 @@ mockFrom.mockReturnValue({ where: mockWhere });
 mockUpdate.mockReturnValue({ set: mockSet });
 mockSet.mockReturnValue({ where: vi.fn() });
 
-vi.mock('../user-auth', () => ({
+vi.mock('@/app/api/user-auth', () => ({
   validateUserSession: vi.fn(),
+  AuthError: class AuthError extends Error {
+    constructor(message: string) { super(message); this.name = 'AuthError'; }
+  },
 }));
 
 vi.mock('next/headers', () => ({
@@ -30,7 +33,7 @@ vi.mock('next/headers', () => ({
 }));
 
 import { POST } from './route';
-import { validateUserSession } from '../user-auth';
+import { validateUserSession } from '@/app/api/user-auth';
 
 const mockedValidate = vi.mocked(validateUserSession);
 
@@ -70,7 +73,7 @@ describe('POST /api/reorder-lists', () => {
   });
 
   it('returns 403 when some lists do not belong to user', async () => {
-    mockWhere.mockResolvedValue([{ id: 1 }]); // only 1 of 2 found
+    mockWhere.mockResolvedValue([{ id: 1 }]);
     const res = await POST(makeRequest({ listIds: ['1', '2'] }));
     expect(res.status).toBe(403);
     const body = await res.json();
@@ -79,7 +82,7 @@ describe('POST /api/reorder-lists', () => {
 
   it('returns 200 and reorders lists successfully', async () => {
     const listIds = ['2', '1', '3'];
-    mockWhere.mockResolvedValueOnce([{ id: 2 }, { id: 1 }, { id: 3 }]); // ownership check
+    mockWhere.mockResolvedValueOnce([{ id: 2 }, { id: 1 }, { id: 3 }]);
     mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
       const txUpdate = vi.fn().mockReturnValue({
         set: vi.fn().mockReturnValue({ where: vi.fn() }),
@@ -91,7 +94,7 @@ describe('POST /api/reorder-lists', () => {
       { id: 1, sortOrder: 1 },
       { id: 3, sortOrder: 2 },
     ];
-    mockWhere.mockResolvedValueOnce(updatedLists); // fetch updated
+    mockWhere.mockResolvedValueOnce(updatedLists);
 
     const res = await POST(makeRequest({ listIds }));
     expect(res.status).toBe(200);
@@ -101,10 +104,11 @@ describe('POST /api/reorder-lists', () => {
     expect(body.message).toContain('3 lists');
   });
 
-  it('returns 500 when session validation fails', async () => {
-    mockedValidate.mockRejectedValue(new Error('No session'));
+  it('returns 401 when session validation fails with AuthError', async () => {
+    const { AuthError } = await import('@/app/api/user-auth');
+    mockedValidate.mockRejectedValue(new AuthError('No session'));
     const res = await POST(makeRequest({ listIds: ['1'] }));
-    expect(res.status).toBe(500);
+    expect(res.status).toBe(401);
   });
 
   it('returns 500 when database transaction fails', async () => {

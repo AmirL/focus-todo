@@ -12,10 +12,9 @@ export class ApiAuthError extends Error {
   }
 }
 
-export function getApiKeyFromHeaders(): string | null {
-  const hs = headers();
-  const authHeader = hs.get('authorization') || hs.get('Authorization');
-  const xApiKey = hs.get('x-api-key') || hs.get('X-Api-Key') || hs.get('X-API-Key');
+function extractApiKey(headerGetter: (name: string) => string | null): string | null {
+  const authHeader = headerGetter('authorization') || headerGetter('Authorization');
+  const xApiKey = headerGetter('x-api-key') || headerGetter('X-Api-Key') || headerGetter('X-API-Key');
 
   if (xApiKey && xApiKey.trim().length > 0) return xApiKey.trim();
   if (authHeader && authHeader.toLowerCase().startsWith('bearer ')) {
@@ -24,15 +23,13 @@ export function getApiKeyFromHeaders(): string | null {
   return null;
 }
 
-export function getApiKeyFromRequest(req: NextRequest): string | null {
-  const authHeader = req.headers.get('authorization') || req.headers.get('Authorization');
-  const xApiKey = req.headers.get('x-api-key') || req.headers.get('X-Api-Key') || req.headers.get('X-API-Key');
+export function getApiKeyFromHeaders(): string | null {
+  const hs = headers();
+  return extractApiKey((name) => hs.get(name));
+}
 
-  if (xApiKey && xApiKey.trim().length > 0) return xApiKey.trim();
-  if (authHeader && authHeader.toLowerCase().startsWith('bearer ')) {
-    return authHeader.slice(7).trim();
-  }
-  return null;
+export function getApiKeyFromRequest(req: NextRequest): string | null {
+  return extractApiKey((name) => req.headers.get(name));
 }
 
 export function hashApiKey(key: string) {
@@ -43,7 +40,7 @@ export function hashApiKey(key: string) {
   return crypto.createHmac('sha256', secret).update(key).digest('hex');
 }
 
-export async function getUserIdFromApiKey(req: NextRequest): Promise<string> {
+export async function authenticateApiKey(req: NextRequest): Promise<string> {
   const apiKey = getApiKeyFromRequest(req);
   if (!apiKey) {
     throw new ApiAuthError('API key required');
@@ -60,8 +57,9 @@ export async function getUserIdFromApiKey(req: NextRequest): Promise<string> {
     await DB.update(apiKeysTable)
       .set({ lastUsedAt: new Date() })
       .where(eq(apiKeysTable.id, key.id));
-  } catch (error) {
-    console.error('Failed to update API key lastUsedAt:', error);
+  } catch {
+    // Non-critical: lastUsedAt tracking failure should not block authentication
   }
   return key.userId as string;
 }
+

@@ -35,8 +35,11 @@ interface CreateListValidationResult {
 }
 
 export function validateCreateListRequest(requestBody: unknown): CreateListValidationResult {
-  const body = requestBody as { name?: unknown; description?: unknown; participatesInInitiative?: unknown; color?: unknown };
-  const nameValidation = validateListName(body?.name);
+  if (!requestBody || typeof requestBody !== 'object') {
+    return { isValid: false, error: 'Request body must be a non-null object' };
+  }
+  const body = requestBody as Record<string, unknown>;
+  const nameValidation = validateListName(body.name);
 
   if (!nameValidation.isValid) {
     return {
@@ -52,10 +55,10 @@ export function validateCreateListRequest(requestBody: unknown): CreateListValid
 
   return {
     isValid: true,
-    name: (body.name as string).trim(),
+    name: String(body.name).trim(),
     description: body.description != null ? String(body.description).trim() || null : null,
     participatesInInitiative: body.participatesInInitiative === undefined ? true : Boolean(body.participatesInInitiative),
-    color: body.color !== undefined ? (body.color as string | null) : null,
+    color: body.color !== undefined ? (body.color === null ? null : String(body.color)) : null,
   };
 }
 
@@ -70,9 +73,12 @@ interface UpdateListValidationResult {
 }
 
 export function validateUpdateListRequest(requestBody: unknown): UpdateListValidationResult {
-  const body = requestBody as { id?: unknown; name?: unknown; description?: unknown; participatesInInitiative?: unknown; color?: unknown };
+  if (!requestBody || typeof requestBody !== 'object') {
+    return { isValid: false, error: 'Request body must be a non-null object' };
+  }
+  const body = requestBody as Record<string, unknown>;
 
-  if (!body?.id || typeof body.id !== 'number' || !Number.isFinite(body.id)) {
+  if (!body.id || typeof body.id !== 'number' || !Number.isFinite(body.id)) {
     return {
       isValid: false,
       error: 'List ID must be a valid number'
@@ -96,10 +102,10 @@ export function validateUpdateListRequest(requestBody: unknown): UpdateListValid
   return {
     isValid: true,
     id: body.id,
-    name: (body.name as string).trim(),
+    name: String(body.name).trim(),
     description: body.description !== undefined ? (body.description != null ? String(body.description).trim() || null : null) : undefined,
     participatesInInitiative: body.participatesInInitiative === undefined ? undefined : Boolean(body.participatesInInitiative),
-    color: body.color !== undefined ? (body.color as string | null) : undefined,
+    color: body.color !== undefined ? (body.color === null ? null : String(body.color)) : undefined,
   };
 }
 
@@ -111,7 +117,10 @@ interface ArchiveListValidationResult {
 }
 
 export function validateArchiveListRequest(requestBody: unknown): ArchiveListValidationResult {
-  const body = requestBody as { id?: unknown; archived?: unknown };
+  if (!requestBody || typeof requestBody !== 'object') {
+    return { isValid: false, error: 'Request body must be a non-null object' };
+  }
+  const body = requestBody as Record<string, unknown>;
 
   if (!body?.id || typeof body.id !== 'number' || !Number.isFinite(body.id)) {
     return { isValid: false, error: 'List ID must be a valid number' };

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { and, eq, isNull, or } from 'drizzle-orm';
 import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema';
-import { getUserIdFromApiKey } from '@/app/api/api-auth';
+import { authenticateApiKey } from '@/app/api/api-auth';
 import { type ListWithLastTouched } from '@/entities/current-initiative';
 import { serializeInitiative, handleApiError } from './serialize';
 import { toDate, formatDateKey, getParticipatingLists, fetchBalanceAndSuggestion } from '@/shared/lib/api/initiative-helpers';
@@ -13,7 +13,7 @@ import dayjs from '@/shared/lib/dayjs';
  */
 export async function GET(req: NextRequest) {
   try {
-    const userId = await getUserIdFromApiKey(req);
+    const userId = await authenticateApiKey(req);
     const todayStr = dayjs().format('YYYY-MM-DD');
     const tomorrowStr = dayjs().add(1, 'day').format('YYYY-MM-DD');
     const todayDate = toDate(todayStr);
@@ -75,7 +75,7 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    const userId = await getUserIdFromApiKey(req);
+    const userId = await authenticateApiKey(req);
     const body = await req.json() as Record<string, unknown>;
 
     if (!body.listId || typeof body.listId !== 'number' || !Number.isFinite(body.listId)) {
