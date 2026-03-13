@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { withAuthAndErrorHandling, createSuccessResponse, type AuthenticatedSession } from '@/shared/lib/api/route-wrapper';
+import { NextRequest } from 'next/server';
+import { withAuthAndErrorHandling, createSuccessResponse, createErrorResponse, type AuthenticatedSession } from '@/shared/lib/api/route-wrapper';
 import { DB } from '@/shared/lib/db';
 import { and, eq, inArray } from 'drizzle-orm';
 import { tasksTable } from '@/shared/lib/drizzle/schema';
@@ -16,17 +16,11 @@ async function reorderTasksHandler(req: NextRequest, session: AuthenticatedSessi
   const { taskIds, context }: ReorderRequestBody = await req.json();
 
   if (!Array.isArray(taskIds) || taskIds.length === 0) {
-    return NextResponse.json(
-      { error: 'taskIds must be a non-empty array' },
-      { status: 400 }
-    );
+    return createErrorResponse('taskIds must be a non-empty array', 400);
   }
 
   if (!context || !context.statusFilter || !context.listId) {
-    return NextResponse.json(
-      { error: 'context with statusFilter and listId is required' },
-      { status: 400 }
-    );
+    return createErrorResponse('context with statusFilter and listId is required', 400);
   }
 
   const userTasks = await DB.select({ id: tasksTable.id })
@@ -39,10 +33,7 @@ async function reorderTasksHandler(req: NextRequest, session: AuthenticatedSessi
     );
 
   if (userTasks.length !== taskIds.length) {
-    return NextResponse.json(
-      { error: 'Some tasks do not belong to the authenticated user' },
-      { status: 403 }
-    );
+    return createErrorResponse('Some tasks do not belong to the authenticated user', 403);
   }
 
   await DB.transaction(async (tx) => {
@@ -75,4 +66,4 @@ async function reorderTasksHandler(req: NextRequest, session: AuthenticatedSessi
   });
 }
 
-export const PUT = withAuthAndErrorHandling(reorderTasksHandler, 'reorder-tasks');
+export const POST = withAuthAndErrorHandling(reorderTasksHandler, 'reorder-tasks');

@@ -32,14 +32,14 @@ vi.mock('next/headers', () => ({
   headers: () => new Map(),
 }));
 
-import { PUT } from './route';
+import { POST } from './route';
 import { validateUserSession } from '@/app/api/user-auth';
 
 const mockedValidate = vi.mocked(validateUserSession);
 
 function makeRequest(body: unknown) {
   return new NextRequest('http://localhost:3000/api/reorder-tasks', {
-    method: 'PUT',
+    method: 'POST',
     body: JSON.stringify(body),
     headers: { 'Content-Type': 'application/json' },
   });
@@ -50,7 +50,7 @@ const mockSession = {
   session: { id: 'session-1' },
 };
 
-describe('PUT /api/reorder-tasks', () => {
+describe('POST /api/reorder-tasks', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockSelect.mockReturnValue({ from: mockFrom });
@@ -59,28 +59,28 @@ describe('PUT /api/reorder-tasks', () => {
   });
 
   it('returns 400 when taskIds is missing', async () => {
-    const res = await PUT(makeRequest({ context: { statusFilter: 'active', listId: 1 } }));
+    const res = await POST(makeRequest({ context: { statusFilter: 'active', listId: 1 } }));
     expect(res.status).toBe(400);
     const body = await res.json();
     expect(body.error).toContain('taskIds');
   });
 
   it('returns 400 when taskIds is empty', async () => {
-    const res = await PUT(makeRequest({ taskIds: [], context: { statusFilter: 'active', listId: 1 } }));
+    const res = await POST(makeRequest({ taskIds: [], context: { statusFilter: 'active', listId: 1 } }));
     expect(res.status).toBe(400);
     const body = await res.json();
     expect(body.error).toContain('non-empty');
   });
 
   it('returns 400 when context is missing', async () => {
-    const res = await PUT(makeRequest({ taskIds: ['1', '2'] }));
+    const res = await POST(makeRequest({ taskIds: ['1', '2'] }));
     expect(res.status).toBe(400);
     const body = await res.json();
     expect(body.error).toContain('context');
   });
 
   it('returns 400 when context is incomplete', async () => {
-    const res = await PUT(makeRequest({ taskIds: ['1', '2'], context: { statusFilter: 'active' } }));
+    const res = await POST(makeRequest({ taskIds: ['1', '2'], context: { statusFilter: 'active' } }));
     expect(res.status).toBe(400);
     const body = await res.json();
     expect(body.error).toContain('context');
@@ -88,7 +88,7 @@ describe('PUT /api/reorder-tasks', () => {
 
   it('returns 403 when some tasks do not belong to user', async () => {
     mockWhere.mockResolvedValue([{ id: 1 }]);
-    const res = await PUT(makeRequest({
+    const res = await POST(makeRequest({
       taskIds: ['1', '2'],
       context: { statusFilter: 'active', listId: 1 },
     }));
@@ -113,7 +113,7 @@ describe('PUT /api/reorder-tasks', () => {
     ];
     mockWhere.mockResolvedValueOnce(updatedTasks);
 
-    const res = await PUT(makeRequest({
+    const res = await POST(makeRequest({
       taskIds,
       context: { statusFilter: 'active', listId: 1 },
     }));
@@ -127,7 +127,7 @@ describe('PUT /api/reorder-tasks', () => {
   it('returns 401 when session validation fails with AuthError', async () => {
     const { AuthError } = await import('@/app/api/user-auth');
     mockedValidate.mockRejectedValue(new AuthError('No session'));
-    const res = await PUT(makeRequest({
+    const res = await POST(makeRequest({
       taskIds: ['1'],
       context: { statusFilter: 'active', listId: 1 },
     }));
@@ -137,7 +137,7 @@ describe('PUT /api/reorder-tasks', () => {
   it('returns 500 when database transaction fails', async () => {
     mockWhere.mockResolvedValueOnce([{ id: 1 }]);
     mockTransaction.mockRejectedValue(new Error('DB error'));
-    const res = await PUT(makeRequest({
+    const res = await POST(makeRequest({
       taskIds: ['1'],
       context: { statusFilter: 'active', listId: 1 },
     }));
