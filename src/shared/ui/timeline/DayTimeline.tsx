@@ -460,7 +460,7 @@ export function DayTimeline({
       {/* Date header */}
       <div
         data-cy="day-timeline-header"
-        className="flex items-center justify-between px-4 py-3 border-b border-border"
+        className="flex items-center justify-between pl-14 pr-4 md:px-4 py-3 border-b border-border"
       >
         <button
           data-cy="day-timeline-prev"
