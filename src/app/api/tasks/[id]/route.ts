@@ -80,6 +80,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     const body = await req.json();
 
     interface TaskUpdateFields {
+      [key: string]: string | number | boolean | Date | null | undefined;
       name?: string;
       details?: string | null;
       date?: Date | string | null;
@@ -111,7 +112,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     if (body.goalId !== undefined) updateFields.goalId = body.goalId;
     updateFields.updatedAt = new Date();
 
-    const fieldsWithParsedDates = parseDateFields(updateFields as Record<string, unknown>, TaskDateKeys);
+    const fieldsWithParsedDates = parseDateFields(updateFields, TaskDateKeys);
 
     await DB.update(tasksTable)
       .set(fieldsWithParsedDates as Partial<typeof tasksTable.$inferInsert>)
