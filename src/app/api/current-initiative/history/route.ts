@@ -3,15 +3,11 @@ import {
   withAuthAndErrorHandling,
   createSuccessResponse,
 } from '@/shared/lib/api/route-wrapper';
-import { DB } from '@/shared/lib/db';
-import { and, eq, gte, lte, desc } from 'drizzle-orm';
-import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema';
+import { currentInitiativeTable } from '@/shared/lib/drizzle/schema';
 import { calculateBalance } from '@/entities/current-initiative';
-import { toDate, getParticipatingLists, toBalanceEntries } from '@/shared/lib/api/initiative-helpers';
-import dayjs from 'dayjs';
+import { fetchInitiativeHistory } from '@/shared/lib/api/initiative-helpers';
 
 type InitiativeRow = typeof currentInitiativeTable.$inferSelect;
-type ListRow = typeof listsTable.$inferSelect;
 
 interface InitiativeWithList extends InitiativeRow {
   suggestedListName: string | null;
@@ -53,29 +49,7 @@ async function getHistoryHandler(
     }
   }
 
-  const todayStr = dayjs().format('YYYY-MM-DD');
-  const startDateStr = dayjs().subtract(days, 'day').format('YYYY-MM-DD');
-  const todayDate = toDate(todayStr);
-  const startDate = toDate(startDateStr);
-
-  // Get all lists for name lookup
-  const lists = await DB.select()
-    .from(listsTable)
-    .where(eq(listsTable.userId, userId));
-
-  const listMap = new Map(lists.map((l) => [l.id, l.name]));
-
-  // Get initiatives for the period
-  const initiatives = await DB.select()
-    .from(currentInitiativeTable)
-    .where(
-      and(
-        eq(currentInitiativeTable.userId, userId),
-        gte(currentInitiativeTable.date, startDate),
-        lte(currentInitiativeTable.date, todayDate)
-      )
-    )
-    .orderBy(desc(currentInitiativeTable.date));
+  const { initiatives, listMap, balance, period } = await fetchInitiativeHistory(userId, days);
 
   // Enrich initiatives with list names
   const enrichedInitiatives: InitiativeWithList[] = initiatives.map((i) => {
@@ -88,21 +62,10 @@ async function getHistoryHandler(
     };
   });
 
-  // Calculate balance
-  const participatingLists = getParticipatingLists(lists);
-  const balance = calculateBalance(
-    toBalanceEntries(initiatives),
-    participatingLists.map((l) => ({ id: l.id, name: l.name }))
-  );
-
   const response: HistoryResponse = {
     initiatives: enrichedInitiatives,
     balance,
-    period: {
-      startDate: startDateStr,
-      endDate: todayStr,
-      days,
-    },
+    period,
   };
 
   return createSuccessResponse(response, 200);

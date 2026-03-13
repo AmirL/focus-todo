@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { validateUserSession } from '@/app/api/user-auth';
+import { validateUserSession, AuthError } from '@/app/api/user-auth';
 
 export interface AuthenticatedSession {
   user: {
@@ -22,6 +22,9 @@ export function withAuthAndErrorHandling<T = unknown>(
       return await handler(req, session);
     } catch (error) {
       console.error(`Error in ${routeName}:`, error);
+      if (error instanceof AuthError) {
+        return NextResponse.json({ error: error.message }, { status: 401 });
+      }
       return NextResponse.json(
         { error: error instanceof Error ? error.message : 'Unknown error occurred' },
         { status: 500 }

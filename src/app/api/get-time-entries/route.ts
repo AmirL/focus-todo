@@ -4,7 +4,6 @@ import { DB } from '@/shared/lib/db';
 import { eq } from 'drizzle-orm';
 import { timeEntriesTable } from '@/shared/lib/drizzle/schema';
 
-// POST - list all time entries for the current user (internal session-based route)
 export async function POST() {
   const session = await validateUserSession();
 

@@ -75,9 +75,23 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     }
 
     const body = await req.json();
-    const { id: _id, userId: _userId, __list_deprecated: _dep, ...updateFields } = body;
 
-    // Validate listId if provided
+    const updateFields: {
+      title?: string;
+      description?: string;
+      progress?: number;
+      listId?: number;
+      deletedAt?: Date | null;
+    } = {};
+
+    if (body.title !== undefined) updateFields.title = body.title;
+    if (body.description !== undefined) updateFields.description = body.description;
+    if (body.progress !== undefined) updateFields.progress = body.progress;
+    if (body.listId !== undefined) updateFields.listId = body.listId;
+    if (body.deletedAt !== undefined) {
+      updateFields.deletedAt = body.deletedAt ? new Date(body.deletedAt) : null;
+    }
+
     if (updateFields.listId !== undefined) {
       const [list] = await DB.select()
         .from(listsTable)
@@ -86,11 +100,6 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       if (!list) {
         return NextResponse.json({ error: 'List not found' }, { status: 404 });
       }
-    }
-
-    // Convert deletedAt string to Date if present
-    if (updateFields.deletedAt && typeof updateFields.deletedAt === 'string') {
-      updateFields.deletedAt = new Date(updateFields.deletedAt);
     }
 
     await DB.update(goalsTable)

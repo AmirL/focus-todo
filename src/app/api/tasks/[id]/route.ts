@@ -79,17 +79,27 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
 
     const body = await req.json();
 
-    // Remove fields that should not be updated via API
-    const { id: _id, userId: _userId, createdAt: _createdAt, ...updateFields } = body;
+    const allowedFields = [
+      'name', 'details', 'date', 'estimatedDuration', 'completedAt',
+      'listId', 'isBlocker', 'selectedAt', 'deletedAt', 'sortOrder',
+      'aiSuggestions', 'goalId',
+    ] as const;
 
-    // Parse date fields
-    const fieldsWithParsedDates = parseDateFields(
-      { ...updateFields, updatedAt: new Date() },
-      TaskDateKeys
-    );
+    type AllowedField = typeof allowedFields[number];
+    const updateFields = {} as Record<AllowedField, unknown> & { updatedAt: Date };
+
+    for (const field of allowedFields) {
+      if (body[field] !== undefined) {
+        updateFields[field] = body[field];
+      }
+    }
+    updateFields.updatedAt = new Date();
+
+    const fieldsWithParsedDates = parseDateFields(updateFields, TaskDateKeys);
 
     await DB.update(tasksTable)
-      .set(fieldsWithParsedDates)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .set(fieldsWithParsedDates as any)
       .where(and(eq(tasksTable.id, taskId), eq(tasksTable.userId, userId)));
 
     const [updatedRow] = await DB.select({
