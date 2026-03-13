@@ -1,6 +1,6 @@
 import { validateListColor } from '@/shared/lib/colors';
 
-export interface ListNameValidationResult {
+interface ListNameValidationResult {
   isValid: boolean;
   error?: string;
 }
@@ -25,7 +25,7 @@ export function validateListName(name: unknown): ListNameValidationResult {
   };
 }
 
-export interface CreateListValidationResult {
+interface CreateListValidationResult {
   isValid: boolean;
   error?: string;
   name?: string;
@@ -59,7 +59,7 @@ export function validateCreateListRequest(requestBody: unknown): CreateListValid
   };
 }
 
-export interface UpdateListValidationResult {
+interface UpdateListValidationResult {
   isValid: boolean;
   error?: string;
   id?: number;
@@ -103,7 +103,7 @@ export function validateUpdateListRequest(requestBody: unknown): UpdateListValid
   };
 }
 
-export interface ArchiveListValidationResult {
+interface ArchiveListValidationResult {
   isValid: boolean;
   error?: string;
   id?: number;

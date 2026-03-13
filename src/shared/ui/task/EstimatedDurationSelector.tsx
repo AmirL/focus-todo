@@ -192,6 +192,3 @@ export function EstimatedDurationSelector({
   );
 }
 
-// Export duration options for reuse in other components
-export { DURATION_OPTIONS };
-export type { EstimatedDurationSelectorProps };

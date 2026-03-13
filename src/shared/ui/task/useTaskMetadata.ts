@@ -9,7 +9,7 @@ export interface TaskMetadata {
   selectedGoalId: number | null;
 }
 
-export interface UseTaskMetadataReturn {
+interface UseTaskMetadataReturn {
   metadata: TaskMetadata;
   updateMetadata: (updates: Partial<TaskMetadata>) => void;
   resetMetadata: () => void;

@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
-export type CurrentInitiativePlain = {
+type CurrentInitiativePlain = {
   id: number;
   userId: string;
   date: string;
