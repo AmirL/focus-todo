@@ -75,7 +75,7 @@ function expandDescription(name: string) {
   cy.contains(name)
     .parents('[data-testid^="task-"]')
     .first()
-    .find('[data-testid="subtask-checkbox"]')
+    .find('[data-cy="subtask-checkbox"]')
     .should("have.length.at.least", 1);
 }
 
@@ -84,7 +84,7 @@ function getTaskCheckboxes(name: string) {
     .contains(name)
     .parents('[data-testid^="task-"]')
     .first()
-    .find('[data-testid="subtask-checkbox"]');
+    .find('[data-cy="subtask-checkbox"]');
 }
 
 describe("Subtask Checkboxes", () => {

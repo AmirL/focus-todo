@@ -10,7 +10,7 @@ import { cn } from '@/shared/lib/utils';
 function getCheckboxIndexFromEvent(e: React.ChangeEvent<HTMLInputElement>): number {
   const container = e.target.closest('[data-md-view]');
   if (!container) return -1;
-  const allCheckboxes = container.querySelectorAll('[data-testid="subtask-checkbox"]');
+  const allCheckboxes = container.querySelectorAll('[data-cy="subtask-checkbox"]');
   return Array.from(allCheckboxes).indexOf(e.target);
 }
 
@@ -66,7 +66,7 @@ export function MarkdownAreaField(props: {
                       checked={checked ?? false}
                       onChange={handleCheckboxChange}
                       className="cursor-pointer accent-primary h-4 w-4 mr-1"
-                      data-testid="subtask-checkbox"
+                      data-cy="subtask-checkbox"
                     />
                   );
                 },
