@@ -1,4 +1,4 @@
-import { GoalModel } from '@/entities/goal/model/goal';
+import { GoalModel } from '@/entities/goal';
 import { Button } from '@/shared/ui/button';
 import { Trash2 } from 'lucide-react';
 import { useUpdateGoalMutation } from '@/shared/api/goals';

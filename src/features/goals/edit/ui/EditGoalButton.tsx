@@ -1,4 +1,4 @@
-import { GoalModel } from '@/entities/goal/model/goal';
+import { GoalModel } from '@/entities/goal';
 import { Pencil } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { EditGoalDialog } from './EditGoalDialog';

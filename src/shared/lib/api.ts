@@ -1,4 +1,4 @@
-export async function fetchBackend(endpoint: string, body: object | undefined = undefined) {
+export async function fetchBackend<T = unknown>(endpoint: string, body: object | undefined = undefined): Promise<T> {
   const options = {
     method: 'POST',
     headers: {
@@ -19,7 +19,7 @@ export async function fetchBackend(endpoint: string, body: object | undefined = 
     throw new Error(`HTTP error! status: ${response.status}, message: ${errorMessage}`);
   }
 
-  return response.json();
+  return response.json() as Promise<T>;
 }
 
 function redirectToLoginIfAuthError(status: number, errorMessage: string) {

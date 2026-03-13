@@ -9,7 +9,7 @@ import { createInstance } from '@/shared/lib/instance-tools';
 import { hasAnySuggestions } from '@/shared/lib/aiSuggestions';
 import { TaskFormFields } from '@/shared/ui/task/TaskFormFields';
 import { useTaskMetadata } from '@/shared/ui/task/useTaskMetadata';
-import { ReAddButton } from '@/features/tasks/actions/ui/ReAddButton';
+import { ReAddButton } from '@/features/tasks/actions';
 
 export function EditTaskDialog({
   task,

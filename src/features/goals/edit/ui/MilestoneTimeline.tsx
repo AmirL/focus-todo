@@ -1,4 +1,4 @@
-import { MilestoneModel } from '@/entities/goal/model/milestone';
+import { MilestoneModel } from '@/entities/goal';
 import dayjs from 'dayjs';
 
 export function MilestoneTimeline({

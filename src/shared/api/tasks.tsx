@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { TaskModel, TaskPlain } from '@/entities/task/model/task';
 import { fetchBackend } from '@/shared/lib/api';
 import toast from 'react-hot-toast';
-import { useEditTaskModalStore } from '@/features/tasks/edit/model/editTaskModalStore';
+import { useEditTaskModalStore } from '@/features/tasks/edit';
 import { timeEntryKeys, type TimeEntry } from '@/shared/api/time-entries';
 
 const taskKeys = {
@@ -17,7 +17,7 @@ export function useTasksQuery() {
   return useQuery({
     queryKey: taskKeys.all,
     queryFn: async () => {
-      const data = (await fetchBackend('get-tasks')) as { tasks: TaskPlain[] };
+      const data = await fetchBackend<{ tasks: TaskPlain[] }>('get-tasks');
       return TaskModel.fromPlainArray(data.tasks);
     },
     staleTime: 1 * 60 * 1000, // 1 minute
@@ -30,7 +30,7 @@ export function useCreateTaskMutation() {
 
   return useMutation({
     mutationFn: async (task: TaskModel) => {
-      const response = (await fetchBackend('create-task', { task: TaskModel.toPlain(task) })) as TaskPlain;
+      const response = await fetchBackend<TaskPlain>('create-task', { task: TaskModel.toPlain(task) });
       return TaskModel.toInstance(response);
     },
     onMutate: async (newTask) => {
@@ -75,14 +75,14 @@ export function useUpdateTaskMutation() {
 
   return useMutation({
     mutationFn: async (task: TaskModel) => {
-      const response = (await fetchBackend(`update-task`, { id: task.id, task: TaskModel.toPlain(task) })) as TaskPlain;
+      const response = await fetchBackend<TaskPlain>(`update-task`, { id: task.id, task: TaskModel.toPlain(task) });
       return TaskModel.toInstance(response);
     },
     onMutate: async (updatedTask) => {
       await queryClient.cancelQueries({ queryKey: taskKeys.all });
       const previousTasks = queryClient.getQueryData<TaskModel[]>(taskKeys.all);
       queryClient.setQueryData<TaskModel[]>(taskKeys.all, (old) => {
-        if (!old) return [updatedTask];
+        if (!old) return [];
         return old.map((task) => (task.id === updatedTask.id ? updatedTask : task));
       });
       return { previousTasks };
@@ -105,10 +105,10 @@ export function useCreateCompletedTaskMutation() {
       startedAt: string;
       endedAt: string;
     }) => {
-      const response = (await fetchBackend('create-completed-task', data)) as {
+      const response = await fetchBackend<{
         task: TaskPlain;
         timeEntry: TimeEntry;
-      };
+      }>('create-completed-task', data);
       return { task: TaskModel.toInstance(response.task), timeEntry: response.timeEntry };
     },
     onSuccess: ({ task }) => {

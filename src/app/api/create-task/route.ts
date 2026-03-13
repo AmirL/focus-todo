@@ -1,13 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { validateUserSession } from '../user-auth';
+import { NextRequest } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { eq } from 'drizzle-orm';
 import { tasksTable } from '@/shared/lib/drizzle/schema';
 import { parseDateFields, TaskDateKeys } from '@/shared/lib/utils';
+import { withAuthAndErrorHandling, createSuccessResponse } from '@/shared/lib/api/route-wrapper';
 
-export async function POST(req: NextRequest) {
-  const session = await validateUserSession();
-
+async function createTaskHandler(req: NextRequest, session: { user: { id: string } }) {
   const { task } = await req.json();
 
   const taskWithParsedDates = parseDateFields({
@@ -21,5 +19,7 @@ export async function POST(req: NextRequest) {
   const [{ id }] = await DB.insert(tasksTable).values(taskWithParsedDates).$returningId();
   const [createdTask] = await DB.select().from(tasksTable).where(eq(tasksTable.id, id));
 
-  return NextResponse.json(createdTask, { status: 200 });
+  return createSuccessResponse(createdTask);
 }
+
+export const POST = withAuthAndErrorHandling(createTaskHandler, 'create-task');

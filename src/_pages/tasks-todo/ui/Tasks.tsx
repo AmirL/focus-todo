@@ -1,8 +1,8 @@
-import { useApplyFilters } from '@/features/tasks/filter/model/filterTasks';
+import { useApplyFilters } from '@/features/tasks/filter';
 import { useSortedTasks } from '../model/sortTasks';
 import { useTasksLoader } from '../api/useTasksLoader';
 import { useGroupedTasksByList } from '../model/groupTasks';
-import { useFilterStore, StatusFilterEnum } from '@/features/tasks/filter/model/filterStore';
+import { useFilterStore, StatusFilterEnum } from '@/features/tasks/filter';
 import { useReorderStore, useReorderMutation } from '@/features/tasks/reorder';
 import { ErrorState } from './ErrorState';
 import { TaskWithActions } from './TaskWithActions';

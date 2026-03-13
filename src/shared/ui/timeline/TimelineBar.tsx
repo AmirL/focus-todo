@@ -10,7 +10,7 @@ export interface TimelineBlock {
   taskName: string;
   startedAt: string; // ISO datetime
   endedAt: string | null; // null = currently running
-  listName: 'Work' | 'Personal' | string;
+  listName: string;
   listColor?: string | null; // color name from list, used for timeline rendering
   durationMinutes: number | null;
 }

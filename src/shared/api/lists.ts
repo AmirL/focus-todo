@@ -77,7 +77,7 @@ export function useListsQuery(options?: { includeArchived?: boolean }) {
     queryKey,
     queryFn: async () => {
       const body = includeArchived ? { includeArchived: true } : undefined;
-      const data = (await fetchBackend('get-lists', body)) as { lists: ListPlain[] };
+      const data = await fetchBackend<{ lists: ListPlain[] }>('get-lists', body);
       return ListModel.fromPlainArray(data.lists);
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -88,7 +88,7 @@ export function useListsQuery(options?: { includeArchived?: boolean }) {
 export function useCreateListMutation() {
   return useOptimisticMutation({
     mutationFn: async ({ name, description, participatesInInitiative, color }: { name: string; description?: string | null; participatesInInitiative: boolean; color?: string | null }) => {
-      const response = (await fetchBackend('create-list', { name, description, participatesInInitiative, color })) as ListPlain;
+      const response = await fetchBackend<ListPlain>('create-list', { name, description, participatesInInitiative, color });
       return ListModel.toInstance(response);
     },
     queryKey: listKeys.all,
@@ -119,7 +119,7 @@ export function useCreateListMutation() {
 export function useUpdateListMutation() {
   return useOptimisticMutation({
     mutationFn: async ({ id, name, description, participatesInInitiative, color }: { id: string; name: string; description?: string | null; participatesInInitiative: boolean; color?: string | null }) => {
-      const response = (await fetchBackend('update-list', { id, name, description, participatesInInitiative, color })) as ListPlain;
+      const response = await fetchBackend<ListPlain>('update-list', { id, name, description, participatesInInitiative, color });
       return ListModel.toInstance(response);
     },
     queryKey: listKeys.all,
@@ -139,7 +139,7 @@ export function useArchiveListMutation() {
 
   return useMutation({
     mutationFn: async ({ id, archived }: { id: string; archived: boolean }) => {
-      const response = (await fetchBackend('update-list', { id, archived })) as ListPlain;
+      const response = await fetchBackend<ListPlain>('update-list', { id, archived });
       return ListModel.toInstance(response);
     },
     onSuccess: (_data, { archived }) => {

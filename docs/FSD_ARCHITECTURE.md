@@ -177,7 +177,7 @@ export type { Song } from '../model/song.ts';
 
 ### Goal-Related Components
 
-- **Generic goal UI**: `shared/ui/goal/`
+- **Generic goal UI**: `entities/goal/ui/`
 - **Goal business logic**: `entities/goal/`
 - **Goal features**: `features/goals/`
 

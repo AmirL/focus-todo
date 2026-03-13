@@ -13,7 +13,7 @@ import {
 import { createInstance } from '@/shared/lib/instance-tools';
 import { TaskModel } from '@/entities/task/model/task';
 import { useCreateTaskMutation } from '@/shared/api/tasks';
-import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
+import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter';
 import { TaskFormFields } from '@/shared/ui/task/TaskFormFields';
 import { useTaskMetadata } from '@/shared/ui/task/useTaskMetadata';
 import dayjs from 'dayjs';

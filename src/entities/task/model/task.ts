@@ -93,7 +93,7 @@ export function isTaskCompletedAgo(task: TaskModel) {
 }
 
 export function isTaskSelected(task: TaskModel) {
-  return !!task.selectedAt; // && dayjs(task.selectedAt).isSame(dayjs(), 'day');
+  return !!task.selectedAt;
 }
 
 export function isTaskToday(task: TaskModel) {

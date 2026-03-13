@@ -1,4 +1,4 @@
-import { GoalModel } from '@/entities/goal/model/goal';
+import { GoalModel } from '@/entities/goal';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
 import { Label } from '@/shared/ui/label';

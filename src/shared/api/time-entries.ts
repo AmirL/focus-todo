@@ -21,7 +21,7 @@ export function useTimeEntriesQuery() {
   return useQuery({
     queryKey: timeEntryKeys.all,
     queryFn: async () => {
-      const data = (await fetchBackend('get-time-entries')) as { entries: TimeEntry[] };
+      const data = await fetchBackend<{ entries: TimeEntry[] }>('get-time-entries');
       return data.entries;
     },
     staleTime: 30 * 1000,
@@ -33,7 +33,7 @@ export function useStartTimerMutation() {
 
   return useMutation({
     mutationFn: async (taskId: number) => {
-      return (await fetchBackend('start-timer', { taskId })) as TimeEntry;
+      return await fetchBackend<TimeEntry>('start-timer', { taskId });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: timeEntryKeys.all });
@@ -46,7 +46,7 @@ export function useStopTimerMutation() {
 
   return useMutation({
     mutationFn: async () => {
-      return (await fetchBackend('stop-timer', {})) as TimeEntry;
+      return await fetchBackend<TimeEntry>('stop-timer', {});
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: timeEntryKeys.all });
@@ -59,7 +59,7 @@ export function useUpdateTimeEntryMutation() {
 
   return useMutation({
     mutationFn: async (data: { id: number; startedAt?: string; endedAt?: string }) => {
-      return (await fetchBackend('update-time-entry', data)) as TimeEntry;
+      return await fetchBackend<TimeEntry>('update-time-entry', data);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: timeEntryKeys.all });
@@ -72,7 +72,7 @@ export function useDeleteTimeEntryMutation() {
 
   return useMutation({
     mutationFn: async (id: number) => {
-      return (await fetchBackend('delete-time-entry', { id })) as { success: boolean };
+      return await fetchBackend<{ success: boolean }>('delete-time-entry', { id });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: timeEntryKeys.all });

@@ -99,8 +99,8 @@ export async function countListUsage(userId: string, listId: number) {
     .where(userGoalsByListFilter(userId, listId));
 
   return {
-    tasksCount: tasksCountResult?.count || 0,
-    goalsCount: goalsCountResult?.count || 0
+    tasksCount: Number(tasksCountResult?.count) || 0,
+    goalsCount: Number(goalsCountResult?.count) || 0
   };
 }
 

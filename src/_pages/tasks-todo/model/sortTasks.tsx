@@ -1,5 +1,5 @@
 import { TaskModel } from '@/entities/task/model/task';
-import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
+import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter';
 import { useReorderStore } from '@/features/tasks/reorder';
 import dayjs from 'dayjs';
 

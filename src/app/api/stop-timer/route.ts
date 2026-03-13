@@ -1,14 +1,11 @@
-import { NextResponse } from 'next/server';
-import { validateUserSession } from '../user-auth';
+import { NextRequest } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { and, eq, isNull } from 'drizzle-orm';
 import { timeEntriesTable } from '@/shared/lib/drizzle/schema';
 import { stopRunningTimers } from '../timer-helpers';
+import { withAuthAndErrorHandling, createErrorResponse, createSuccessResponse } from '@/shared/lib/api/route-wrapper';
 
-// POST - stop the currently running timer
-export async function POST() {
-  const session = await validateUserSession();
-
+async function stopTimerHandler(_req: NextRequest, session: { user: { id: string } }) {
   const [running] = await DB.select()
     .from(timeEntriesTable)
     .where(and(
@@ -17,7 +14,7 @@ export async function POST() {
     ));
 
   if (!running) {
-    return NextResponse.json({ error: 'No running timer' }, { status: 404 });
+    return createErrorResponse('No running timer', 404);
   }
 
   await stopRunningTimers(session.user.id);
@@ -26,5 +23,7 @@ export async function POST() {
     .from(timeEntriesTable)
     .where(eq(timeEntriesTable.id, running.id));
 
-  return NextResponse.json(stopped, { status: 200 });
+  return createSuccessResponse(stopped);
 }
+
+export const POST = withAuthAndErrorHandling(stopTimerHandler, 'stop-timer');

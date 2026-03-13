@@ -3,13 +3,13 @@ import { isTaskSelected, TaskModel, isTaskDeleted } from '@/entities/task/model/
 import { Checkbox } from '@/shared/ui/checkbox';
 import { cn } from '@/shared/lib/utils';
 import { useToggleTaskCompleted } from '../model/toggleCompleted';
-import { EstimatedTimeButton } from '@/features/tasks/actions/ui/EstimatedTimeButton';
+import { EstimatedTimeButton } from '@/features/tasks/actions';
 import { CollapsibleActions } from '@/shared/ui/collapsible-actions';
 import { TaskBadges } from './TaskBadges';
 import { TaskDetails, DescriptionIndicator } from './TaskDetails';
 import { TaskName } from './TaskName';
 import { useTempSelectStore } from '@/features/tasks/temp-select';
-import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
+import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter';
 import { useUpdateTaskMutation } from '@/shared/api/tasks';
 import { toggleMarkdownCheckbox } from '@/shared/lib/toggleMarkdownCheckbox';
 import { createInstance } from '@/shared/lib/instance-tools';

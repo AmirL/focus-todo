@@ -9,7 +9,7 @@ export function useCreateApiKeyMutation() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (name: string | undefined) => {
-      return (await fetchBackend('api-keys/create', { name })) as CreatedKey;
+      return await fetchBackend<CreatedKey>('api-keys/create', { name });
     },
     onSuccess: () => {
       toast.success('API key created');

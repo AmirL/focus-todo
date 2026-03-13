@@ -6,7 +6,7 @@ import { Input } from '@/shared/ui/input';
 import { Slider } from '@/shared/ui/slider';
 import { Textarea } from '@/shared/ui/textarea';
 import { useCreateGoalMutation } from '@/shared/api/goals';
-import { GoalModel } from '@/entities/goal/model/goal';
+import { GoalModel } from '@/entities/goal';
 import { createInstance } from '@/shared/lib/instance-tools';
 import { useListsQuery } from '@/shared/api/lists';
 

@@ -1,12 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { validateUserSession } from '../user-auth';
+import { NextRequest } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { eq } from 'drizzle-orm';
 import { goalsTable } from '@/shared/lib/drizzle/schema';
+import { withAuthAndErrorHandling, createSuccessResponse } from '@/shared/lib/api/route-wrapper';
 
-export async function POST(req: NextRequest) {
-  const session = await validateUserSession();
-
+async function createGoalHandler(req: NextRequest, session: { user: { id: string } }) {
   const { goal } = await req.json();
 
   const goalWithUser = { ...goal, userId: session.user.id };
@@ -14,5 +12,7 @@ export async function POST(req: NextRequest) {
   const [{ id }] = await DB.insert(goalsTable).values(goalWithUser).$returningId();
   const [createdGoal] = await DB.select().from(goalsTable).where(eq(goalsTable.id, id));
 
-  return NextResponse.json(createdGoal, { status: 200 });
+  return createSuccessResponse(createdGoal);
 }
+
+export const POST = withAuthAndErrorHandling(createGoalHandler, 'create-goal');
