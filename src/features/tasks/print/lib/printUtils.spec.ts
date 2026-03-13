@@ -5,7 +5,7 @@ import {
   filterPrintableTasks,
   groupTasksByList,
   sortTasksByDuration,
-  formatDate,
+  formatPrintDate,
   formatDuration,
   calculateTotalDuration,
 } from './printUtils';
@@ -202,7 +202,7 @@ describe('sortTasksByDuration', () => {
   });
 });
 
-describe('formatDate', () => {
+describe('formatPrintDate', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2024-06-15T12:00:00Z'));
@@ -214,11 +214,11 @@ describe('formatDate', () => {
 
   it('should format a valid date', () => {
     const date = new Date('2024-03-25T00:00:00Z');
-    expect(formatDate(date)).toBe('25/03/2024');
+    expect(formatPrintDate(date)).toBe('25/03/2024');
   });
 
   it('should return today date when date is null', () => {
-    expect(formatDate(null)).toBe('15/06/2024');
+    expect(formatPrintDate(null)).toBe('15/06/2024');
   });
 });
 

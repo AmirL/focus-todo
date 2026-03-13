@@ -76,10 +76,18 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const userId = await getUserIdFromApiKey(req);
-    const body = await req.json();
+    const body = await req.json() as Record<string, unknown>;
 
-    if (!body.listId) {
-      return NextResponse.json({ error: 'listId is required' }, { status: 400 });
+    if (!body.listId || typeof body.listId !== 'number' || !Number.isFinite(body.listId)) {
+      return NextResponse.json({ error: 'listId must be a valid number' }, { status: 400 });
+    }
+
+    if (body.date !== undefined && typeof body.date !== 'string') {
+      return NextResponse.json({ error: 'date must be a string in YYYY-MM-DD format' }, { status: 400 });
+    }
+
+    if (body.reason !== undefined && typeof body.reason !== 'string') {
+      return NextResponse.json({ error: 'reason must be a string' }, { status: 400 });
     }
 
     const todayStr = dayjs().format('YYYY-MM-DD');

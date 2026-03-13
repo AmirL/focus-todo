@@ -1,12 +1,12 @@
 'use client';
-import { AddTaskForm } from '@/features/tasks/add/ui/AddTaskForm';
+import { AddTaskForm } from '@/features/tasks/add';
 import { Goals } from '@/_pages/tasks-todo/ui/Goals';
 import { Tasks } from '@/_pages/tasks-todo/ui/Tasks';
 import { useSession } from '@/shared/lib/auth-client';
 import { useFilterStore, StatusFilterEnum } from '@/features/tasks/filter';
 import { TaskActions } from './TaskActions';
 import { EditTaskModalRoot } from '@/features/tasks/edit';
-import { Spotlight } from '@/features/tasks/search/ui/Spotlight';
+import { Spotlight } from '@/features/tasks/search';
 import { ReAddModalRoot } from '@/features/tasks/actions';
 import { LastSelectedTaskHeader } from './LastSelectedTaskHeader';
 import { useTasksLoader } from '../api/useTasksLoader';

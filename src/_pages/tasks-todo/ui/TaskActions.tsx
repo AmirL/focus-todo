@@ -7,7 +7,7 @@ import { useApplyFilters } from '@/features/tasks/filter';
 import { useSortedTasks } from '../model/sortTasks';
 import toast from 'react-hot-toast';
 import { createInstance } from '@/shared/lib/instance-tools';
-import { PrintButton } from '@/features/tasks/print/ui/PrintButton';
+import { PrintButton } from '@/features/tasks/print';
 
 export function TaskActions() {
   const { statusFilter } = useFilterStore();

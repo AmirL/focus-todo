@@ -3,12 +3,25 @@ import { DB } from '@/shared/lib/db';
 import { and, eq } from 'drizzle-orm';
 import { tasksTable } from '@/shared/lib/drizzle/schema';
 import { parseDateFields, TaskDateKeys } from '@/shared/lib/utils';
-import { withAuthAndErrorHandling, createSuccessResponse } from '@/shared/lib/api/route-wrapper';
+import { withAuthAndErrorHandling, createSuccessResponse, createErrorResponse } from '@/shared/lib/api/route-wrapper';
+
+const allowedFields = [
+  'name', 'details', 'date', 'estimatedDuration', 'completedAt',
+  'listId', 'isBlocker', 'selectedAt', 'deletedAt', 'sortOrder',
+  'aiSuggestions', 'goalId',
+] as const;
 
 async function updateTaskHandler(req: NextRequest, session: { user: { id: string } }) {
   const { id, task } = await req.json();
 
-  const taskWithParsedDates = parseDateFields({ ...task, createdAt: undefined }, TaskDateKeys);
+  const updateFields: Record<string, unknown> = {};
+  for (const field of allowedFields) {
+    if (task[field] !== undefined) {
+      updateFields[field] = task[field];
+    }
+  }
+
+  const taskWithParsedDates = parseDateFields(updateFields, TaskDateKeys);
 
   await DB.update(tasksTable)
     .set(taskWithParsedDates)
@@ -19,7 +32,6 @@ async function updateTaskHandler(req: NextRequest, session: { user: { id: string
     .where(and(eq(tasksTable.id, id), eq(tasksTable.userId, session.user.id)));
 
   if (!updatedTask) {
-    const { createErrorResponse } = await import('@/shared/lib/api/route-wrapper');
     return createErrorResponse('Task not found', 404);
   }
 

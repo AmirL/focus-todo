@@ -69,15 +69,7 @@ export function useCurrentInitiativeQuery() {
   return useQuery({
     queryKey: initiativeKeys.current(),
     queryFn: async (): Promise<CurrentInitiativeResponse> => {
-      const response = await fetch('/api/current-initiative', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Failed to fetch current initiative');
-      }
-      return response.json();
+      return fetchBackend<CurrentInitiativeResponse>('current-initiative', undefined, 'GET');
     },
     staleTime: 1 * 60 * 1000, // 1 minute
     refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
@@ -91,15 +83,7 @@ export function useInitiativeHistoryQuery(days: number = 30) {
   return useQuery({
     queryKey: initiativeKeys.history(days),
     queryFn: async (): Promise<HistoryResponse> => {
-      const response = await fetch(`/api/current-initiative/history?days=${days}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Failed to fetch initiative history');
-      }
-      return response.json();
+      return fetchBackend<HistoryResponse>(`current-initiative/history?days=${days}`, undefined, 'GET');
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -152,16 +136,7 @@ export function useChangeInitiativeMutation() {
       listId: number;
       reason?: string;
     }): Promise<SetInitiativeResponse> => {
-      const response = await fetch(`/api/current-initiative/${date}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ listId, reason }),
-      });
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-        throw new Error(errorData.error || 'Failed to change initiative');
-      }
-      return response.json();
+      return fetchBackend<SetInitiativeResponse>(`current-initiative/${date}`, { listId, reason }, 'PATCH');
     },
     onSuccess: (_, variables) => {
       toast.success(`Focus for ${variables.date} has been changed`);

@@ -1,10 +1,14 @@
-export async function fetchBackend<T = unknown>(endpoint: string, body: object | undefined = undefined): Promise<T> {
-  const options = {
-    method: 'POST',
+export async function fetchBackend<T = unknown>(
+  endpoint: string,
+  body: object | undefined = undefined,
+  method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE' = 'POST'
+): Promise<T> {
+  const options: RequestInit = {
+    method,
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(body),
+    ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
   };
 
   const response = await fetch(`/api/${endpoint}`, options);

@@ -19,9 +19,10 @@ vi.mock('@/app/api/user-auth', () => ({
   AuthError: class AuthError extends Error {},
 }));
 
-vi.mock('@/app/api/api-auth', () => ({
-  hashApiKey: vi.fn(() => 'hashed-key-value'),
-}));
+vi.mock('@/app/api/api-auth', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/app/api/api-auth')>();
+  return { ...actual, hashApiKey: vi.fn(() => 'hashed-key-value') };
+});
 
 vi.mock('next/headers', () => ({
   headers: () => new Map(),

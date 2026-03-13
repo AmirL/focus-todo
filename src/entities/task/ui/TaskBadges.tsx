@@ -2,7 +2,7 @@ import { Badge } from '@/shared/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
 import { AlertTriangle, Sparkles, Target } from 'lucide-react';
 import { TaskModel, isTaskDeleted, isTaskOverdue } from '@/entities/task/model/task';
-import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
+import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter';
 import { isFutureDate, isToday } from '@/shared/lib/utils';
 import { hasPendingSuggestions } from '@/shared/lib/aiSuggestions';
 import { useGoalsQuery } from '@/shared/api/goals';

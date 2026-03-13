@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { ApiAuthError } from '@/app/api/api-auth';
 
 export function toISOString(d: Date | string | null | undefined): string | null {
   if (!d) return null;
@@ -9,8 +10,7 @@ export function toISOString(d: Date | string | null | undefined): string | null 
 
 export function handleApiError(error: unknown, operation: string) {
   const msg = error instanceof Error ? error.message : 'Unknown error occurred';
-  const lower = msg.toLowerCase();
-  const isAuth = lower.includes('api key required') || lower.includes('invalid or revoked api key');
+  const isAuth = error instanceof ApiAuthError;
   const status = isAuth ? 401 : 500;
   if (!isAuth) {
     console.error(`Error in ${operation}:`, error);

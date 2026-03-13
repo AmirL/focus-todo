@@ -25,7 +25,7 @@ export function MilestoneTimeline({
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-sm break-words">{milestone.description}</p>
-            <p className="text-xs text-muted-foreground">{formatDate(milestone.createdAt)}</p>
+            <p className="text-xs text-muted-foreground">{formatMilestoneDate(milestone.createdAt)}</p>
           </div>
         </div>
       ))}
@@ -33,7 +33,7 @@ export function MilestoneTimeline({
   );
 }
 
-function formatDate(dateValue: string): string {
+function formatMilestoneDate(dateValue: string): string {
   const date = dayjs(dateValue);
   const today = dayjs();
   const yesterday = today.subtract(1, 'day');

@@ -5,6 +5,13 @@ import { apiKeysTable } from '@/shared/lib/drizzle/schema';
 import { and, eq, isNull } from 'drizzle-orm';
 import crypto from 'crypto';
 
+export class ApiAuthError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ApiAuthError';
+  }
+}
+
 export function getApiKeyFromHeaders(): string | null {
   const hs = headers();
   const authHeader = hs.get('authorization') || hs.get('Authorization');
@@ -39,14 +46,14 @@ export function hashApiKey(key: string) {
 export async function getUserIdFromApiKey(req: NextRequest): Promise<string> {
   const apiKey = getApiKeyFromRequest(req);
   if (!apiKey) {
-    throw new Error('API key required');
+    throw new ApiAuthError('API key required');
   }
   const hashed = hashApiKey(apiKey);
   const rows = await DB.select()
     .from(apiKeysTable)
     .where(and(eq(apiKeysTable.hashedKey, hashed), isNull(apiKeysTable.revokedAt)));
   if (rows.length === 0) {
-    throw new Error('Invalid or revoked API key');
+    throw new ApiAuthError('Invalid or revoked API key');
   }
   const key = rows[0];
   try {

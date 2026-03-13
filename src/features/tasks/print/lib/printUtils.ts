@@ -31,7 +31,7 @@ export function sortTasksByDuration(groupedTasks: GroupedTasks): void {
   });
 }
 
-export function formatDate(date: Date | null): string {
+export function formatPrintDate(date: Date | null): string {
   if (!date) return dayjs().format('DD/MM/YYYY');
   return dayjs(date).format('DD/MM/YYYY');
 }

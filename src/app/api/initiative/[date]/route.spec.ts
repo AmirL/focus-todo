@@ -18,16 +18,17 @@ mockFrom.mockReturnValue({ where: mockWhere });
 mockSet.mockReturnValue({ where: mockUpdateWhere });
 
 // Mock api-auth
-vi.mock('@/app/api/api-auth', () => ({
-  getUserIdFromApiKey: vi.fn(),
-}));
+vi.mock('@/app/api/api-auth', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/app/api/api-auth')>();
+  return { ...actual, getUserIdFromApiKey: vi.fn() };
+});
 
 // Mock next/headers
 vi.mock('next/headers', () => ({
   headers: vi.fn(() => new Map()),
 }));
 
-import { getUserIdFromApiKey } from '@/app/api/api-auth';
+import { getUserIdFromApiKey, ApiAuthError } from '@/app/api/api-auth';
 import { GET, PATCH } from './route';
 
 const mockedGetUserId = vi.mocked(getUserIdFromApiKey);
@@ -86,7 +87,7 @@ describe('GET /api/initiative/:date', () => {
   });
 
   it('should return 401 when API key is missing', async () => {
-    mockedGetUserId.mockRejectedValue(new Error('API key required'));
+    mockedGetUserId.mockRejectedValue(new ApiAuthError('API key required'));
 
     const req = makeRequest('http://localhost:3000/api/initiative/2026-03-08');
     const res = await GET(req, makeContext('2026-03-08'));
@@ -185,7 +186,7 @@ describe('PATCH /api/initiative/:date', () => {
   });
 
   it('should return 401 when API key is missing', async () => {
-    mockedGetUserId.mockRejectedValue(new Error('API key required'));
+    mockedGetUserId.mockRejectedValue(new ApiAuthError('API key required'));
 
     const req = makeRequest('http://localhost:3000/api/initiative/2026-03-08', {
       method: 'PATCH',

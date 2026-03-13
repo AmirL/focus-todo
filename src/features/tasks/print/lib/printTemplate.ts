@@ -1,5 +1,5 @@
 import { TaskModel } from '@/entities/task/model/task';
-import { GroupedTasks, formatDate, formatDuration } from './printUtils';
+import { GroupedTasks, formatPrintDate, formatDuration } from './printUtils';
 import { PRINT_STYLES } from './printStyles';
 
 function renderTask(task: TaskModel): string {
@@ -59,13 +59,13 @@ export function generatePrintHTML(
     <!DOCTYPE html>
     <html>
       <head>
-        <title>Daily Tasks - ${formatDate(firstTaskDate)}</title>
+        <title>Daily Tasks - ${formatPrintDate(firstTaskDate)}</title>
         <style>${PRINT_STYLES}</style>
       </head>
       <body>
         <div class="header">
           <h1>Daily Tasks</h1>
-          <div class="date-info">${formatDate(firstTaskDate)} • Total: ${formatDuration(totalDuration)}</div>
+          <div class="date-info">${formatPrintDate(firstTaskDate)} • Total: ${formatDuration(totalDuration)}</div>
         </div>
 
         ${taskSections}
