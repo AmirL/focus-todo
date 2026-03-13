@@ -31,17 +31,9 @@ export function EstimatedTimeButton({ task }: EstimatedTimeButtonProps) {
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
         <button
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            padding: '4px 8px',
-            fontSize: '12px',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            background: 'white',
-            cursor: 'pointer',
-            color: task.estimatedDuration ? 'inherit' : '#999',
-          }}
+          className={`inline-flex items-center px-2 py-1 text-xs border border-gray-300 rounded bg-white cursor-pointer ${
+            task.estimatedDuration ? 'text-inherit' : 'text-gray-400'
+          }`}
           data-cy={`estimated-time-task-${task.id}`}
         >
           <svg
@@ -54,7 +46,7 @@ export function EstimatedTimeButton({ task }: EstimatedTimeButtonProps) {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            style={{ marginRight: '4px' }}
+            className="mr-1"
           >
             <circle cx="12" cy="12" r="10"></circle>
             <polyline points="12 6 12 12 16 14"></polyline>
@@ -65,30 +57,17 @@ export function EstimatedTimeButton({ task }: EstimatedTimeButtonProps) {
 
       <DropdownMenu.Portal>
         <DropdownMenu.Content
-          style={{
-            minWidth: '160px',
-            padding: '8px',
-            backgroundColor: 'white',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            zIndex: 9999,
-          }}
+          className="min-w-[160px] p-2 bg-white border border-gray-300 rounded shadow-lg z-[9999]"
           sideOffset={5}
           align="end"
         >
-          <div style={{ padding: '4px 8px', fontSize: '12px', fontWeight: 'bold', color: '#666' }}>
+          <div className="px-2 py-1 text-xs font-bold text-gray-500">
             Estimated Duration
           </div>
-          <div style={{ height: '1px', backgroundColor: '#eee', margin: '4px 0' }}></div>
+          <div className="h-px bg-gray-200 my-1"></div>
 
           <DropdownMenu.Item
-            style={{
-              padding: '8px',
-              fontSize: '14px',
-              cursor: 'pointer',
-              borderRadius: '2px',
-            }}
+            className="p-2 text-sm cursor-pointer rounded-sm"
             onSelect={() => handleDurationChange(null)}
           >
             None
@@ -97,12 +76,7 @@ export function EstimatedTimeButton({ task }: EstimatedTimeButtonProps) {
           {DURATION_OPTIONS.map((option) => (
             <DropdownMenu.Item
               key={option.value}
-              style={{
-                padding: '8px',
-                fontSize: '14px',
-                cursor: 'pointer',
-                borderRadius: '2px',
-              }}
+              className="p-2 text-sm cursor-pointer rounded-sm"
               onSelect={() => handleDurationChange(option.value)}
             >
               {option.label}

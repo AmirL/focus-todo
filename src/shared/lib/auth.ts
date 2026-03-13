@@ -83,6 +83,9 @@ export const auth = betterAuth({
           try {
             await createDefaultLists(user.id);
           } catch (error) {
+            // Intentionally swallowed: default list creation is non-critical.
+            // The user can still use the app and create lists manually.
+            // We log the error for debugging but don't block signup.
             console.error('Failed to create default lists:', error);
           }
         }

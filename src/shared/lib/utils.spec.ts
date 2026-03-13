@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import dayjs from '@/shared/lib/dayjs';
 import { isFutureDate, isToday, isOverdue, parseDateFields, TaskDateKeys } from './utils';
 
 describe('isFutureDate', () => {

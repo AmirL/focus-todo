@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { and, eq, gte, lte } from 'drizzle-orm';
+import { and, eq, gte, lte, desc } from 'drizzle-orm';
 import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema';
 import { DB } from '@/shared/lib/db';
 import { calculateBalance, getSuggestedList, type ListWithLastTouched } from '@/entities/current-initiative';
@@ -75,4 +75,45 @@ export async function fetchBalanceAndSuggestion(
   const suggestedList = getSuggestedList(listsWithLastTouched);
 
   return { balance, suggestedList };
+}
+
+/** Fetch initiative history for a date range, including balance data and list name map */
+export async function fetchInitiativeHistory(userId: string, days: number) {
+  const todayStr = dayjs().format('YYYY-MM-DD');
+  const startDateStr = dayjs().subtract(days, 'day').format('YYYY-MM-DD');
+  const todayDate = toDate(todayStr);
+  const startDate = toDate(startDateStr);
+
+  // Get all lists for name lookup
+  const lists = await DB.select()
+    .from(listsTable)
+    .where(eq(listsTable.userId, userId));
+
+  const listMap = new Map(lists.map((l) => [l.id, l.name]));
+
+  // Get initiatives for the period
+  const initiatives = await DB.select()
+    .from(currentInitiativeTable)
+    .where(
+      and(
+        eq(currentInitiativeTable.userId, userId),
+        gte(currentInitiativeTable.date, startDate),
+        lte(currentInitiativeTable.date, todayDate)
+      )
+    )
+    .orderBy(desc(currentInitiativeTable.date));
+
+  // Calculate balance
+  const participatingLists = getParticipatingLists(lists);
+  const balance = calculateBalance(
+    toBalanceEntries(initiatives),
+    participatingLists.map((l) => ({ id: l.id, name: l.name }))
+  );
+
+  return {
+    initiatives,
+    listMap,
+    balance,
+    period: { startDate: startDateStr, endDate: todayStr, days },
+  };
 }
