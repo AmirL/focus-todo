@@ -1,6 +1,8 @@
 import { defineConfig } from "cypress";
 import cypressSplit from "cypress-split";
 
+const coverageEnabled = process.env.CYPRESS_COVERAGE === "true";
+
 export default defineConfig({
   e2e: {
     baseUrl: "http://localhost:3000",
@@ -16,9 +18,11 @@ export default defineConfig({
     },
     screenshotOnRunFailure: true,
     env: {
-      codeCoverage: {
-        url: "/api/coverage-data",
-      },
+      ...(coverageEnabled && {
+        codeCoverage: {
+          url: "/api/coverage-data",
+        },
+      }),
     },
     experimentalStudio: true,
     experimentalPromptCommand: true,
@@ -31,8 +35,10 @@ export default defineConfig({
     },
     setupNodeEvents(on, config) {
       cypressSplit(on, config);
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      require("@cypress/code-coverage/task")(on, config);
+      if (coverageEnabled) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        require("@cypress/code-coverage/task")(on, config);
+      }
       return config;
     },
   },
