@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticateApiKey } from '@/app/api/api-auth';
 import { handleApiError } from '@/shared/lib/api/auth-errors';
 
-export { handleApiError };
-
 type ApiKeyRouteHandler = (
   req: NextRequest,
   userId: string
