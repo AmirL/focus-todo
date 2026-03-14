@@ -242,6 +242,55 @@ export async function createInitiative(
   return { initiative: created };
 }
 
+/** Find an initiative record for a specific user and date */
+export async function findInitiativeByDate(userId: string, dateObj: Date) {
+  const [initiative] = await DB.select()
+    .from(currentInitiativeTable)
+    .where(
+      and(
+        eq(currentInitiativeTable.userId, userId),
+        eq(currentInitiativeTable.date, dateObj)
+      )
+    );
+  return initiative ?? null;
+}
+
+/** Update an initiative's chosen list and reason, returning the updated row */
+export async function updateInitiativeChoice(
+  userId: string,
+  dateObj: Date,
+  listId: number,
+  reason: string | undefined,
+  existingReason: string | null
+) {
+  await DB.update(currentInitiativeTable)
+    .set({
+      chosenListId: listId,
+      reason: reason ?? existingReason,
+      changedAt: new Date(),
+    })
+    .where(
+      and(
+        eq(currentInitiativeTable.userId, userId),
+        eq(currentInitiativeTable.date, dateObj)
+      )
+    );
+  return findInitiativeByDate(userId, dateObj);
+}
+
+/** Verify that a list belongs to a specific user */
+export async function verifyListOwnership(listId: number, userId: string) {
+  const [list] = await DB.select()
+    .from(listsTable)
+    .where(
+      and(
+        eq(listsTable.id, listId),
+        eq(listsTable.userId, userId)
+      )
+    );
+  return list ?? null;
+}
+
 /** Fetch initiative history for a date range, including balance data and list name map */
 export async function fetchInitiativeHistory(userId: string, days: number) {
   const todayStr = dayjs().format('YYYY-MM-DD');

@@ -4,10 +4,14 @@ import {
   createSuccessResponse,
   createErrorResponse,
 } from '@/shared/lib/api/route-wrapper';
-import { DB } from '@/shared/lib/db';
-import { and, eq } from 'drizzle-orm';
-import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema';
-import { toDate, isValidDate } from '@/shared/lib/api/initiative-helpers';
+import {
+  toDate,
+  isValidDate,
+  findInitiativeByDate,
+  updateInitiativeChoice,
+  verifyListOwnership,
+} from '@/shared/lib/api/initiative-helpers';
+import { serializeInitiative } from '@/app/api/initiative/serialize';
 
 type RouteContext = { params: Promise<{ date: string }> };
 
@@ -40,14 +44,7 @@ async function patchHandler(
   };
 
   // Verify the list exists and belongs to the user
-  const [list] = await DB.select()
-    .from(listsTable)
-    .where(
-      and(
-        eq(listsTable.id, body.listId),
-        eq(listsTable.userId, userId)
-      )
-    );
+  const list = await verifyListOwnership(body.listId, userId);
 
   if (!list) {
     return createErrorResponse('List not found', 404);
@@ -56,44 +53,22 @@ async function patchHandler(
   const dateObj = toDate(date);
 
   // Find existing initiative for this date
-  const [existing] = await DB.select()
-    .from(currentInitiativeTable)
-    .where(
-      and(
-        eq(currentInitiativeTable.userId, userId),
-        eq(currentInitiativeTable.date, dateObj)
-      )
-    );
+  const existing = await findInitiativeByDate(userId, dateObj);
 
   if (!existing) {
     return createErrorResponse('No initiative found for this date. Use POST to create one.', 404);
   }
 
   // Update the initiative with the new choice
-  await DB.update(currentInitiativeTable)
-    .set({
-      chosenListId: body.listId,
-      reason: body.reason ?? existing.reason,
-      changedAt: new Date(),
-    })
-    .where(
-      and(
-        eq(currentInitiativeTable.userId, userId),
-        eq(currentInitiativeTable.date, dateObj)
-      )
-    );
+  const updated = await updateInitiativeChoice(
+    userId,
+    dateObj,
+    body.listId,
+    body.reason,
+    existing.reason
+  );
 
-  // Fetch the updated record
-  const [updated] = await DB.select()
-    .from(currentInitiativeTable)
-    .where(
-      and(
-        eq(currentInitiativeTable.userId, userId),
-        eq(currentInitiativeTable.date, dateObj)
-      )
-    );
-
-  return createSuccessResponse({ initiative: updated });
+  return createSuccessResponse({ initiative: serializeInitiative(updated!) });
 }
 
 async function getHandler(
@@ -109,21 +84,13 @@ async function getHandler(
   }
 
   const dateObj = toDate(date);
-
-  const [initiative] = await DB.select()
-    .from(currentInitiativeTable)
-    .where(
-      and(
-        eq(currentInitiativeTable.userId, userId),
-        eq(currentInitiativeTable.date, dateObj)
-      )
-    );
+  const initiative = await findInitiativeByDate(userId, dateObj);
 
   if (!initiative) {
     return createErrorResponse('No initiative found for this date', 404);
   }
 
-  return createSuccessResponse({ initiative });
+  return createSuccessResponse({ initiative: serializeInitiative(initiative) });
 }
 
 // The route wrapper doesn't pass context, so we capture it via closure

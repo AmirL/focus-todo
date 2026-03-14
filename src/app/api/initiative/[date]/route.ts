@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { DB } from '@/shared/lib/db';
-import { and, eq } from 'drizzle-orm';
-import { currentInitiativeTable, listsTable } from '@/shared/lib/drizzle/schema';
 import { authenticateApiKey } from '@/app/api/api-auth';
 import { serializeInitiative, handleApiError } from '../serialize';
-import { toDate, isValidDate } from '@/shared/lib/api/initiative-helpers';
+import {
+  toDate,
+  isValidDate,
+  findInitiativeByDate,
+  updateInitiativeChoice,
+  verifyListOwnership,
+} from '@/shared/lib/api/initiative-helpers';
 
 type RouteContext = { params: Promise<{ date: string }> };
 
@@ -21,15 +24,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
     }
 
     const dateObj = toDate(date);
-
-    const [initiative] = await DB.select()
-      .from(currentInitiativeTable)
-      .where(
-        and(
-          eq(currentInitiativeTable.userId, userId),
-          eq(currentInitiativeTable.date, dateObj)
-        )
-      );
+    const initiative = await findInitiativeByDate(userId, dateObj);
 
     if (!initiative) {
       return NextResponse.json({ error: 'No initiative found for this date' }, { status: 404 });
@@ -62,9 +57,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     }
 
     // Verify list belongs to user
-    const [list] = await DB.select()
-      .from(listsTable)
-      .where(and(eq(listsTable.id, body.listId), eq(listsTable.userId, userId)));
+    const list = await verifyListOwnership(body.listId, userId);
 
     if (!list) {
       return NextResponse.json({ error: 'List not found' }, { status: 404 });
@@ -73,14 +66,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     const dateObj = toDate(date);
 
     // Find existing initiative
-    const [existing] = await DB.select()
-      .from(currentInitiativeTable)
-      .where(
-        and(
-          eq(currentInitiativeTable.userId, userId),
-          eq(currentInitiativeTable.date, dateObj)
-        )
-      );
+    const existing = await findInitiativeByDate(userId, dateObj);
 
     if (!existing) {
       return NextResponse.json(
@@ -90,29 +76,15 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     }
 
     // Update
-    await DB.update(currentInitiativeTable)
-      .set({
-        chosenListId: body.listId,
-        reason: body.reason ?? existing.reason,
-        changedAt: new Date(),
-      })
-      .where(
-        and(
-          eq(currentInitiativeTable.userId, userId),
-          eq(currentInitiativeTable.date, dateObj)
-        )
-      );
+    const updated = await updateInitiativeChoice(
+      userId,
+      dateObj,
+      body.listId,
+      body.reason,
+      existing.reason
+    );
 
-    const [updated] = await DB.select()
-      .from(currentInitiativeTable)
-      .where(
-        and(
-          eq(currentInitiativeTable.userId, userId),
-          eq(currentInitiativeTable.date, dateObj)
-        )
-      );
-
-    return NextResponse.json({ initiative: serializeInitiative(updated) }, { status: 200 });
+    return NextResponse.json({ initiative: serializeInitiative(updated!) }, { status: 200 });
   } catch (error) {
     return handleApiError(error, 'PATCH /api/initiative/:date');
   }

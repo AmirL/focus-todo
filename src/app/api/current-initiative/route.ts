@@ -11,6 +11,7 @@ import {
   createInitiative,
   type ListRow,
 } from '@/shared/lib/api/initiative-helpers';
+import { serializeInitiative } from '@/app/api/initiative/serialize';
 
 type InitiativeRow = Parameters<typeof createSuccessResponse>[0];
 
@@ -34,8 +35,8 @@ async function getInitiativeHandler(
     await fetchTodayTomorrowInitiative(session.user.id);
 
   const response: InitiativeResponse = {
-    today: todayInitiative,
-    tomorrow: tomorrowInitiative,
+    today: todayInitiative ? serializeInitiative(todayInitiative) : null,
+    tomorrow: tomorrowInitiative ? serializeInitiative(tomorrowInitiative) : null,
     suggestedList,
     balance,
     participatingLists,

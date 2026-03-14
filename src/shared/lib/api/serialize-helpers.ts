@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { isAuthError, ApiAuthError } from '@/shared/lib/api/auth-errors';
+import { isAuthError } from '@/shared/lib/api/auth-errors';
 
 export { ApiAuthError } from '@/shared/lib/api/auth-errors';
 
