@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { authenticateApiKey } from '@/app/api/api-auth';
-import { serializeInitiative, handleApiError } from '../serialize';
+import { withApiAuth } from '@/shared/lib/api/api-route-wrapper';
+import { serializeInitiative } from '../serialize';
 import {
   toDate,
   isValidDate,
@@ -14,9 +14,8 @@ type RouteContext = { params: Promise<{ date: string }> };
 /**
  * GET /api/initiative/:date - Get initiative for a specific date
  */
-export async function GET(req: NextRequest, context: RouteContext) {
-  try {
-    const userId = await authenticateApiKey(req);
+export function GET(req: NextRequest, context: RouteContext) {
+  return withApiAuth(async (r, userId) => {
     const { date } = await context.params;
 
     if (!isValidDate(date)) {
@@ -31,9 +30,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
     }
 
     return NextResponse.json({ initiative: serializeInitiative(initiative) }, { status: 200 });
-  } catch (error) {
-    return handleApiError(error, 'GET /api/initiative/:date');
-  }
+  }, 'GET /api/initiative/:date')(req);
 }
 
 /**
@@ -41,16 +38,15 @@ export async function GET(req: NextRequest, context: RouteContext) {
  *
  * Body: { listId: number, reason?: string }
  */
-export async function PATCH(req: NextRequest, context: RouteContext) {
-  try {
-    const userId = await authenticateApiKey(req);
+export function PATCH(req: NextRequest, context: RouteContext) {
+  return withApiAuth(async (r, userId) => {
     const { date } = await context.params;
 
     if (!isValidDate(date)) {
       return NextResponse.json({ error: 'Invalid date format. Use YYYY-MM-DD' }, { status: 400 });
     }
 
-    const body = await req.json();
+    const body = await r.json();
 
     if (!body.listId) {
       return NextResponse.json({ error: 'listId is required' }, { status: 400 });
@@ -84,8 +80,10 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       existing.reason
     );
 
-    return NextResponse.json({ initiative: serializeInitiative(updated!) }, { status: 200 });
-  } catch (error) {
-    return handleApiError(error, 'PATCH /api/initiative/:date');
-  }
+    if (!updated) {
+      return NextResponse.json({ error: 'Initiative not found after update' }, { status: 404 });
+    }
+
+    return NextResponse.json({ initiative: serializeInitiative(updated) }, { status: 200 });
+  }, 'PATCH /api/initiative/:date')(req);
 }

@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { and, eq, isNull } from 'drizzle-orm';
 import { goalsTable, listsTable } from '@/shared/lib/drizzle/schema';
-import { authenticateApiKey } from '@/app/api/api-auth';
-import { serializeGoalWithList, handleApiError } from '../serialize';
+import { withApiAuth } from '@/shared/lib/api/api-route-wrapper';
+import { serializeGoalWithList } from '../serialize';
 import dayjs from 'dayjs';
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -11,9 +11,8 @@ type RouteContext = { params: Promise<{ id: string }> };
 /**
  * GET /api/goals/:id - Get a single goal by ID
  */
-export async function GET(req: NextRequest, context: RouteContext) {
-  try {
-    const userId = await authenticateApiKey(req);
+export function GET(req: NextRequest, context: RouteContext) {
+  return withApiAuth(async (r, userId) => {
     const { id } = await context.params;
     const goalId = parseInt(id, 10);
 
@@ -40,9 +39,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
     }
 
     return NextResponse.json({ goal: serializeGoalWithList(row.goal, row.listName) }, { status: 200 });
-  } catch (error) {
-    return handleApiError(error, 'GET /api/goals/:id');
-  }
+  }, 'GET /api/goals/:id')(req);
 }
 
 /**
@@ -50,9 +47,8 @@ export async function GET(req: NextRequest, context: RouteContext) {
  *
  * Body: Partial goal fields (title, description, progress, listId)
  */
-export async function PATCH(req: NextRequest, context: RouteContext) {
-  try {
-    const userId = await authenticateApiKey(req);
+export function PATCH(req: NextRequest, context: RouteContext) {
+  return withApiAuth(async (r, userId) => {
     const { id } = await context.params;
     const goalId = parseInt(id, 10);
 
@@ -74,7 +70,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: 'Goal not found' }, { status: 404 });
     }
 
-    const body = await req.json();
+    const body = await r.json();
 
     const updateFields: {
       title?: string;
@@ -115,9 +111,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       .where(and(eq(goalsTable.id, goalId), eq(goalsTable.userId, userId)));
 
     return NextResponse.json({ goal: serializeGoalWithList(updatedRow.goal, updatedRow.listName) }, { status: 200 });
-  } catch (error) {
-    return handleApiError(error, 'PATCH /api/goals/:id');
-  }
+  }, 'PATCH /api/goals/:id')(req);
 }
 
 /**
@@ -127,9 +121,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
  *   - permanent=true: Hard delete (permanent removal)
  *   - Default: Soft delete (sets deletedAt)
  */
-export async function DELETE(req: NextRequest, context: RouteContext) {
-  try {
-    const userId = await authenticateApiKey(req);
+export function DELETE(req: NextRequest, context: RouteContext) {
+  return withApiAuth(async (r, userId) => {
     const { id } = await context.params;
     const goalId = parseInt(id, 10);
 
@@ -150,7 +143,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: 'Goal not found' }, { status: 404 });
     }
 
-    const { searchParams } = new URL(req.url);
+    const { searchParams } = new URL(r.url);
     const permanent = searchParams.get('permanent') === 'true';
 
     if (permanent) {
@@ -165,7 +158,5 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
 
       return NextResponse.json({ message: 'Goal deleted' }, { status: 200 });
     }
-  } catch (error) {
-    return handleApiError(error, 'DELETE /api/goals/:id');
-  }
+  }, 'DELETE /api/goals/:id')(req);
 }

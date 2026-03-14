@@ -1,8 +1,6 @@
 import { goalsTable } from '@/shared/lib/drizzle/schema';
 import { toISOString } from '@/shared/lib/api/serialize-helpers';
 
-export { handleApiError } from '@/shared/lib/api/serialize-helpers';
-
 type GoalRow = typeof goalsTable.$inferSelect;
 
 type ApiGoal = Omit<GoalRow, '__list_deprecated' | 'deletedAt'> & {

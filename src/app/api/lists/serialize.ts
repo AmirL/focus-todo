@@ -1,8 +1,6 @@
 import { listsTable } from '@/shared/lib/drizzle/schema';
 import { toISOString } from '@/shared/lib/api/serialize-helpers';
 
-export { handleApiError } from '@/shared/lib/api/serialize-helpers';
-
 type ListRow = typeof listsTable.$inferSelect;
 
 type ApiList = Omit<ListRow, 'createdAt' | 'updatedAt' | 'archivedAt'> & {

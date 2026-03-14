@@ -128,8 +128,14 @@ export async function fetchTodayTomorrowInitiative(userId: string) {
   };
 }
 
+export interface CreateInitiativeBody {
+  listId?: number;
+  date?: string;
+  reason?: string;
+}
+
 /** Validate and parse the body for creating an initiative */
-export function parseCreateInitiativeBody(body: Record<string, unknown>): {
+export function parseCreateInitiativeBody(body: CreateInitiativeBody): {
   error?: string;
   listId?: number;
   date?: string;

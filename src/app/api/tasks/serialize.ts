@@ -1,8 +1,6 @@
 import { tasksTable } from '@/shared/lib/drizzle/schema';
 import { toISOString } from '@/shared/lib/api/serialize-helpers';
 
-export { handleApiError } from '@/shared/lib/api/serialize-helpers';
-
 type TaskRow = typeof tasksTable.$inferSelect;
 
 type ApiTask = Omit<

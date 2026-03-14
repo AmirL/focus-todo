@@ -32,7 +32,7 @@ async function patchHandler(
     return createErrorResponse('Invalid date format. Use YYYY-MM-DD', 400);
   }
 
-  const rawBody = await req.json() as Record<string, unknown>;
+  const rawBody = await req.json() as ChangeInitiativeBody;
 
   if (!rawBody.listId || typeof rawBody.listId !== 'number' || !Number.isFinite(rawBody.listId)) {
     return createErrorResponse('listId must be a valid number', 400);
@@ -68,7 +68,11 @@ async function patchHandler(
     existing.reason
   );
 
-  return createSuccessResponse({ initiative: serializeInitiative(updated!) });
+  if (!updated) {
+    return createErrorResponse('Initiative not found after update', 404);
+  }
+
+  return createSuccessResponse({ initiative: serializeInitiative(updated) });
 }
 
 async function getHandler(

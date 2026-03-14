@@ -21,6 +21,24 @@ export function isOverdue(date: Date | null | undefined) {
   return dayjs(date).isBefore(dayjs(), 'day');
 }
 
+export function parseBool(v: string | null, def = false) {
+  if (v == null) return def;
+  return v === '1' || v.toLowerCase() === 'true';
+}
+
+export function clamp(n: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, n));
+}
+
+/** Format a numeric minutes-from-UTC offset as an ISO 8601 offset string (e.g. +02:00). */
+export function formatTimezoneOffset(offsetMinutes: number): string {
+  const sign = offsetMinutes >= 0 ? '+' : '-';
+  const abs = Math.abs(offsetMinutes);
+  const hours = String(Math.floor(abs / 60)).padStart(2, '0');
+  const minutes = String(abs % 60).padStart(2, '0');
+  return `${sign}${hours}:${minutes}`;
+}
+
 export const TaskDateKeys = ['completedAt', 'date', 'selectedAt', 'deletedAt', 'updatedAt'] as const;
 
 export function parseDateFields<T extends Record<string, unknown>, K extends keyof T>(obj: T, fields: readonly K[]): T {

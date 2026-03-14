@@ -2,8 +2,6 @@ import { currentInitiativeTable } from '@/shared/lib/drizzle/schema';
 import { toISOString } from '@/shared/lib/api/serialize-helpers';
 import dayjs from 'dayjs';
 
-export { handleApiError } from '@/shared/lib/api/serialize-helpers';
-
 type InitiativeRow = typeof currentInitiativeTable.$inferSelect;
 
 type ApiInitiative = Omit<InitiativeRow, 'date' | 'setAt' | 'changedAt'> & {

@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { eq } from 'drizzle-orm';
 import { listsTable } from '@/shared/lib/drizzle/schema';
-import { authenticateApiKey } from '@/app/api/api-auth';
-import { serializeList, handleApiError } from '../serialize';
+import { withApiAuth } from '@/shared/lib/api/api-route-wrapper';
+import { serializeList } from '../serialize';
 import {
   findUserListById,
   findUserListByName,
@@ -20,9 +20,8 @@ type RouteContext = { params: Promise<{ id: string }> };
 /**
  * GET /api/lists/:id - Get a single list
  */
-export async function GET(req: NextRequest, context: RouteContext) {
-  try {
-    const userId = await authenticateApiKey(req);
+export function GET(req: NextRequest, context: RouteContext) {
+  return withApiAuth(async (r, userId) => {
     const { id } = await context.params;
     const listId = parseInt(id, 10);
 
@@ -37,9 +36,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
     }
 
     return NextResponse.json({ list: serializeList(list) }, { status: 200 });
-  } catch (error) {
-    return handleApiError(error, 'GET /api/lists/:id');
-  }
+  }, 'GET /api/lists/:id')(req);
 }
 
 /**
@@ -47,9 +44,8 @@ export async function GET(req: NextRequest, context: RouteContext) {
  *
  * Body: { name?: string, description?: string, participatesInInitiative?: boolean, archived?: boolean }
  */
-export async function PATCH(req: NextRequest, context: RouteContext) {
-  try {
-    const userId = await authenticateApiKey(req);
+export function PATCH(req: NextRequest, context: RouteContext) {
+  return withApiAuth(async (r, userId) => {
     const { id } = await context.params;
     const listId = parseInt(id, 10);
 
@@ -62,7 +58,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: 'List not found' }, { status: 404 });
     }
 
-    const body = await req.json();
+    const body = await r.json();
 
     // Handle archive toggle
     if ('archived' in body) {
@@ -130,9 +126,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       .where(eq(listsTable.id, listId));
 
     return NextResponse.json({ list: serializeList(updated) }, { status: 200 });
-  } catch (error) {
-    return handleApiError(error, 'PATCH /api/lists/:id');
-  }
+  }, 'PATCH /api/lists/:id')(req);
 }
 
 /**
@@ -141,9 +135,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
  * Query params:
  *   - reassignTo: List ID to reassign tasks/goals to before deletion
  */
-export async function DELETE(req: NextRequest, context: RouteContext) {
-  try {
-    const userId = await authenticateApiKey(req);
+export function DELETE(req: NextRequest, context: RouteContext) {
+  return withApiAuth(async (r, userId) => {
     const { id } = await context.params;
     const listId = parseInt(id, 10);
 
@@ -158,7 +151,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
 
     const { tasksCount, goalsCount } = await countListUsage(userId, listId);
 
-    const { searchParams } = new URL(req.url);
+    const { searchParams } = new URL(r.url);
     const reassignToParam = searchParams.get('reassignTo');
 
     if ((tasksCount > 0 || goalsCount > 0) && !reassignToParam) {
@@ -189,7 +182,5 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
     await deleteUserList(userId, listId);
 
     return NextResponse.json({ message: 'List deleted successfully' }, { status: 200 });
-  } catch (error) {
-    return handleApiError(error, 'DELETE /api/lists/:id');
-  }
+  }, 'DELETE /api/lists/:id')(req);
 }

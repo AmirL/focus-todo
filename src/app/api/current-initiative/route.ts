@@ -53,7 +53,7 @@ async function createInitiativeHandler(
   req: NextRequest,
   session: { user: { id: string } }
 ) {
-  const body = await req.json() as Record<string, unknown>;
+  const body = await req.json() as { listId?: number; date?: string; reason?: string };
   const parsed = parseCreateInitiativeBody(body);
 
   if (parsed.error) {
