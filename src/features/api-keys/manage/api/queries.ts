@@ -8,7 +8,7 @@ export function useApiKeysQuery() {
   return useQuery({
     queryKey: ['api-keys'],
     queryFn: async () => {
-      const res = (await fetchBackend('api-keys/list')) as { keys: ApiKeyItem[] };
+      const res = await fetchBackend<{ keys: ApiKeyItem[] }>('api-keys/list');
       return res.keys;
     },
     staleTime: 30_000,

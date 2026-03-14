@@ -150,7 +150,7 @@ describe('validateUpdateListRequest', () => {
   it('should return invalid when id is missing', () => {
     const result = validateUpdateListRequest({ name: 'Work' });
     expect(result.isValid).toBe(false);
-    expect(result.error).toBe('List ID and name are required');
+    expect(result.error).toBe('List ID must be a valid number');
   });
 
   it('should return invalid when name is missing', () => {
@@ -224,7 +224,7 @@ describe('validateArchiveListRequest', () => {
   it('should return invalid when id is missing', () => {
     const result = validateArchiveListRequest({ archived: true });
     expect(result.isValid).toBe(false);
-    expect(result.error).toBe('List ID is required');
+    expect(result.error).toBe('List ID must be a valid number');
   });
 
   it('should return invalid when archived is not a boolean', () => {
@@ -256,6 +256,6 @@ describe('validateArchiveListRequest', () => {
   it('should return invalid when body is null', () => {
     const result = validateArchiveListRequest(null);
     expect(result.isValid).toBe(false);
-    expect(result.error).toBe('List ID is required');
+    expect(result.error).toBe('Request body must be a non-null object');
   });
 });

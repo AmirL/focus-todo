@@ -18,9 +18,10 @@ mockFrom.mockReturnValue({ where: mockWhere });
 mockValues.mockReturnValue({ $returningId: mock$returningId });
 
 // Mock auth
-vi.mock('@/app/api/api-auth', () => ({
-  getUserIdFromApiKey: vi.fn(),
-}));
+vi.mock('@/app/api/api-auth', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/app/api/api-auth')>();
+  return { ...actual, authenticateApiKey: vi.fn() };
+});
 
 // Mock next/headers
 vi.mock('next/headers', () => ({
@@ -34,10 +35,10 @@ vi.mock('@/shared/lib/db/list-queries', () => ({
 }));
 
 import { GET, POST } from './route';
-import { getUserIdFromApiKey } from '@/app/api/api-auth';
+import { authenticateApiKey, ApiAuthError } from '@/app/api/api-auth';
 import { getUserLists, findUserListByName } from '@/shared/lib/db/list-queries';
 
-const mockedGetUserId = vi.mocked(getUserIdFromApiKey);
+const mockedGetUserId = vi.mocked(authenticateApiKey);
 const mockedGetUserLists = vi.mocked(getUserLists);
 const mockedFindUserListByName = vi.mocked(findUserListByName);
 
@@ -65,7 +66,7 @@ describe('GET /api/lists', () => {
   });
 
   it('returns 401 when no API key', async () => {
-    mockedGetUserId.mockRejectedValue(new Error('API key required'));
+    mockedGetUserId.mockRejectedValue(new ApiAuthError('API key required'));
     const res = await GET(makeRequest('http://localhost:3000/api/lists'));
     expect(res.status).toBe(401);
   });
@@ -107,7 +108,7 @@ describe('POST /api/lists', () => {
   });
 
   it('returns 401 when no API key', async () => {
-    mockedGetUserId.mockRejectedValue(new Error('API key required'));
+    mockedGetUserId.mockRejectedValue(new ApiAuthError('API key required'));
     const res = await POST(
       makeRequest('http://localhost:3000/api/lists', {
         method: 'POST',
@@ -156,7 +157,7 @@ describe('POST /api/lists', () => {
 
   it('returns 409 when duplicate name exists', async () => {
     mockedGetUserId.mockResolvedValue('user-1');
-    mockedFindUserListByName.mockResolvedValue([sampleList]);
+    mockedFindUserListByName.mockResolvedValue(sampleList);
 
     const res = await POST(
       makeRequest('http://localhost:3000/api/lists', {
@@ -171,7 +172,7 @@ describe('POST /api/lists', () => {
 
   it('creates a list and returns 201', async () => {
     mockedGetUserId.mockResolvedValue('user-1');
-    mockedFindUserListByName.mockResolvedValue([]);
+    mockedFindUserListByName.mockResolvedValue(null);
     // maxSortOrder query
     mockWhere.mockResolvedValueOnce([{ maxSortOrder: 1 }]);
     mock$returningId.mockResolvedValue([{ id: 3 }]);

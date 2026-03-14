@@ -6,7 +6,7 @@ export function buildListIdToNameMap(lists: ListModel[]): Map<number, string> {
   return new Map(lists.map((l) => [Number(l.id), l.name]));
 }
 
-export function buildListIdToColorMap(lists: ListModel[]): Map<number, string | null> {
+function buildListIdToColorMap(lists: ListModel[]): Map<number, string | null> {
   return new Map(lists.map((l) => [Number(l.id), l.color ?? null]));
 }
 

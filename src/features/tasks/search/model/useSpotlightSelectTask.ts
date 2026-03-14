@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { TaskModel } from '@/entities/task/model/task';
-import { useEditTaskModalStore } from '@/features/tasks/edit/model/editTaskModalStore';
+import { useEditTaskModalStore } from '@/features/tasks/edit';
 
 export function useSpotlightSelectTask(setOpen: (o: boolean) => void) {
   const openEdit = useEditTaskModalStore((s) => s.openWithTask);

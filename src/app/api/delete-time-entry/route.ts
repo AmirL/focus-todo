@@ -1,20 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { validateUserSession } from '../user-auth';
+import { NextRequest } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { and, eq } from 'drizzle-orm';
 import { timeEntriesTable } from '@/shared/lib/drizzle/schema';
+import { withAuthAndErrorHandling, createErrorResponse, createSuccessResponse } from '@/shared/lib/api/route-wrapper';
 
-// POST - delete a time entry
-export async function POST(req: NextRequest) {
-  const session = await validateUserSession();
+async function deleteTimeEntryHandler(req: NextRequest, session: { user: { id: string } }) {
   const { id } = await req.json();
 
   if (!id) {
-    return NextResponse.json({ error: 'id is required' }, { status: 400 });
+    return createErrorResponse('id is required', 400);
   }
 
   await DB.delete(timeEntriesTable)
     .where(and(eq(timeEntriesTable.id, id), eq(timeEntriesTable.userId, session.user.id)));
 
-  return NextResponse.json({ success: true }, { status: 200 });
+  return createSuccessResponse({ success: true });
 }
+
+export const POST = withAuthAndErrorHandling(deleteTimeEntryHandler, 'delete-time-entry');

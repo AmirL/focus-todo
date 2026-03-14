@@ -1,20 +1,11 @@
 import { Clock, ChevronDown, X } from 'lucide-react';
 import { useState } from 'react';
 import { formatDuration } from '@/shared/lib/format-duration';
+import { DURATION_OPTIONS } from '@/shared/lib/duration-options';
 import { Label } from '@/shared/ui/label';
 import { cn } from '@/shared/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { Button } from '@/shared/ui/button';
-
-const DURATION_OPTIONS = [
-  { value: 15, label: '15 minutes' },
-  { value: 30, label: '30 minutes' },
-  { value: 60, label: '1 hour' },
-  { value: 90, label: '1.5 hours' },
-  { value: 150, label: '2.5 hours' },
-  { value: 240, label: '4 hours' },
-  { value: 480, label: '1 day' },
-] as const;
 
 interface EstimatedDurationSelectorProps {
   value: number | null;
@@ -33,46 +24,25 @@ interface PopoverContentProps {
 }
 
 const DurationPopoverContent = ({ onChange, value, onOpenChange }: PopoverContentProps) => (
-  <PopoverContent 
-    className="w-48 p-0 z-50 relative" 
+  <PopoverContent
+    className="w-48 p-0 z-50 relative"
     align="end"
     side="bottom"
     sideOffset={8}
     avoidCollisions={true}
     sticky="always"
   >
-    <div
-      className="relative z-50"
-      style={{
-        pointerEvents: 'auto',
-        position: 'relative',
-        touchAction: 'manipulation',
-        WebkitTouchCallout: 'none',
-        WebkitUserSelect: 'none',
-        userSelect: 'none',
-      }}
-      onClick={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-      }}
-      onMouseDown={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-      }}
-      onTouchStart={(e) => {
-        e.stopPropagation();
-      }}
-    >
+    <div className="relative z-50">
       <div className="p-2 border-b border-border flex justify-between items-center h-[44px]">
         <span className="text-xs font-medium text-muted-foreground">Estimated Duration</span>
         {value && (
-          <Button 
-            variant="ghost" 
-            size="sm" 
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => {
               onChange(null);
               onOpenChange(false);
-            }} 
+            }}
             className="text-muted-foreground cursor-pointer"
           >
             <X className="h-4 w-4 mr-1" /> Clear
@@ -84,15 +54,7 @@ const DurationPopoverContent = ({ onChange, value, onOpenChange }: PopoverConten
           variant="ghost"
           size="sm"
           className="w-full justify-start text-sm"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onChange(null);
-            onOpenChange(false);
-          }}
-          onTouchEnd={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
+          onClick={() => {
             onChange(null);
             onOpenChange(false);
           }}
@@ -105,15 +67,7 @@ const DurationPopoverContent = ({ onChange, value, onOpenChange }: PopoverConten
             variant="ghost"
             size="sm"
             className="w-full justify-start text-sm"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onChange(option.value);
-              onOpenChange(false);
-            }}
-            onTouchEnd={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
+            onClick={() => {
               onChange(option.value);
               onOpenChange(false);
             }}
@@ -136,10 +90,6 @@ export function EstimatedDurationSelector({
 }: EstimatedDurationSelectorProps) {
   const [popoverOpen, setPopoverOpen] = useState(false);
 
-  const handleOpenChange = (open: boolean) => {
-    setPopoverOpen(open);
-  };
-
   return (
     <div className={className}>
       {showLabel && (
@@ -147,8 +97,8 @@ export function EstimatedDurationSelector({
           {label}
         </Label>
       )}
-      
-      <Popover open={popoverOpen} onOpenChange={handleOpenChange}>
+
+      <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
         <PopoverTrigger 
           id={id}
           className={cn(
@@ -182,16 +132,13 @@ export function EstimatedDurationSelector({
           <ChevronDown size={16} />
         </PopoverTrigger>
 
-        <DurationPopoverContent 
-          onChange={onChange} 
+        <DurationPopoverContent
+          onChange={onChange}
           value={value}
-          onOpenChange={handleOpenChange}
+          onOpenChange={setPopoverOpen}
         />
       </Popover>
     </div>
   );
 }
 
-// Export duration options for reuse in other components
-export { DURATION_OPTIONS };
-export type { EstimatedDurationSelectorProps };

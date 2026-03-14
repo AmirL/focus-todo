@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
+import { AuthError } from '@/shared/lib/api/auth-errors';
 
 const mockUpdate = vi.fn();
 const mockSet = vi.fn();
@@ -14,8 +15,9 @@ vi.mock('@/shared/lib/db', () => ({
 mockUpdate.mockReturnValue({ set: mockSet });
 mockSet.mockReturnValue({ where: mockWhere });
 
-vi.mock('../../user-auth', () => ({
+vi.mock('@/shared/lib/auth/user-auth', () => ({
   validateUserSession: vi.fn(),
+  AuthError,
 }));
 
 vi.mock('next/headers', () => ({
@@ -23,7 +25,7 @@ vi.mock('next/headers', () => ({
 }));
 
 import { POST } from './route';
-import { validateUserSession } from '../../user-auth';
+import { validateUserSession } from '@/shared/lib/auth/user-auth';
 
 const mockedValidate = vi.mocked(validateUserSession);
 

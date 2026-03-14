@@ -20,9 +20,9 @@ describe("Smoke Tests - Critical User Flows", () => {
 
   it("should create and complete a task", () => {
     const taskName = `Smoke test task ${Date.now()}`;
-    cy.get('[data-testid="add-task-button"]').click();
-    cy.get('[data-testid="task-name-input"]').type(taskName);
-    cy.get('[data-testid="save-task-button"]').click();
+    cy.get('[data-cy="add-task-button"]').click();
+    cy.get('[data-cy="task-name-input"]').type(taskName);
+    cy.get('[data-cy="save-task-button"]').click();
     cy.contains(taskName).should("be.visible");
 
     cy.wait("@createTask").then((interception) => {
@@ -30,16 +30,16 @@ describe("Smoke Tests - Critical User Flows", () => {
     });
 
     // Complete the task - use role="checkbox" for Radix checkbox
-    cy.get('[data-testid^="task-"]').contains(taskName).parents('[data-testid^="task-"]').find('[role="checkbox"]').click();
+    cy.get('[data-cy^="task-"]').contains(taskName).parents('[data-cy^="task-"]').find('[role="checkbox"]').click();
     cy.get(".line-through").should("exist");
   });
 
   it("should star a task and view in Selected", () => {
     // Create a task first so there's one to star
     const taskName = `Star test task ${Date.now()}`;
-    cy.get('[data-testid="add-task-button"]').click();
-    cy.get('[data-testid="task-name-input"]').type(taskName);
-    cy.get('[data-testid="save-task-button"]').click();
+    cy.get('[data-cy="add-task-button"]').click();
+    cy.get('[data-cy="task-name-input"]').type(taskName);
+    cy.get('[data-cy="save-task-button"]').click();
     cy.contains(taskName).should("be.visible");
     cy.wait("@createTask").then((interception) => {
       createdTaskIds.push(interception.response!.body.id);
@@ -47,8 +47,8 @@ describe("Smoke Tests - Critical User Flows", () => {
 
     // Hover and click star, wait for update to complete
     cy.intercept("POST", "/api/update-task").as("updateTask");
-    cy.get('[data-testid^="task-"]').first().trigger('mouseover');
-    cy.get('[data-testid^="star-task-"]').first().click({ force: true });
+    cy.get('[data-cy^="task-"]').first().trigger('mouseover');
+    cy.get('[data-cy^="star-task-"]').first().click({ force: true });
     cy.wait("@updateTask");
     // Navigate to Selected and verify task appears there
     cy.get('[data-cy="filter-selected"]').click();
@@ -83,9 +83,9 @@ describe("Smoke Tests - Critical User Flows", () => {
   it("should search for tasks", () => {
     // Create a task first so there's something to find
     const taskName = `Searchable smoke task ${Date.now()}`;
-    cy.get('[data-testid="add-task-button"]').click();
-    cy.get('[data-testid="task-name-input"]').type(taskName);
-    cy.get('[data-testid="save-task-button"]').click();
+    cy.get('[data-cy="add-task-button"]').click();
+    cy.get('[data-cy="task-name-input"]').type(taskName);
+    cy.get('[data-cy="save-task-button"]').click();
     cy.contains(taskName).should("be.visible");
     cy.wait("@createTask").then((interception) => {
       createdTaskIds.push(interception.response!.body.id);

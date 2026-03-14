@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { DB } from "./db";
 import * as schema from "./drizzle/schema";
+import { createDefaultLists } from "./db/list-queries";
 
 function invariant(condition: unknown, message: string): asserts condition {
   if (!condition) {
@@ -80,13 +81,11 @@ export const auth = betterAuth({
       create: {
         after: async (user) => {
           try {
-            // Create default lists for new user
-            const defaultLists = [
-              { name: 'Work', userId: user.id, isDefault: true },
-              { name: 'Personal', userId: user.id, isDefault: true }
-            ];
-            await DB.insert(schema.listsTable).values(defaultLists);
+            await createDefaultLists(user.id);
           } catch (error) {
+            // Intentionally swallowed: default list creation is non-critical.
+            // The user can still use the app and create lists manually.
+            // We log the error for debugging but don't block signup.
             console.error('Failed to create default lists:', error);
           }
         }
@@ -95,4 +94,4 @@ export const auth = betterAuth({
   },
 });
 
-export type Session = typeof auth.$Infer.Session;
+type Session = typeof auth.$Infer.Session;

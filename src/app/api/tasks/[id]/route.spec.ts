@@ -10,7 +10,7 @@ const mockLeftJoin = vi.fn();
 
 vi.mock('@/shared/lib/db', () => ({
   DB: {
-    select: (...args: unknown[]) => ({ from: mockFrom }),
+    select: () => ({ from: mockFrom }),
     update: () => ({ set: mockSet }),
     delete: () => ({ where: mockDeleteWhere }),
   },
@@ -21,9 +21,10 @@ mockLeftJoin.mockReturnValue({ where: mockWhere });
 mockSet.mockReturnValue({ where: vi.fn().mockResolvedValue(undefined) });
 
 // Mock auth
-vi.mock('@/app/api/api-auth', () => ({
-  getUserIdFromApiKey: vi.fn(),
-}));
+vi.mock('@/app/api/api-auth', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/app/api/api-auth')>();
+  return { ...actual, authenticateApiKey: vi.fn() };
+});
 
 // Mock next/headers
 vi.mock('next/headers', () => ({
@@ -31,9 +32,9 @@ vi.mock('next/headers', () => ({
 }));
 
 import { GET, PATCH, DELETE } from './route';
-import { getUserIdFromApiKey } from '@/app/api/api-auth';
+import { authenticateApiKey, ApiAuthError } from '@/app/api/api-auth';
 
-const mockedGetUserId = vi.mocked(getUserIdFromApiKey);
+const mockedGetUserId = vi.mocked(authenticateApiKey);
 
 function makeRequest(url: string, init?: RequestInit) {
   return new NextRequest(new URL(url, 'http://localhost:3000'), init as never);
@@ -72,7 +73,7 @@ describe('GET /api/tasks/:id', () => {
   });
 
   it('returns 401 when no API key', async () => {
-    mockedGetUserId.mockRejectedValue(new Error('API key required'));
+    mockedGetUserId.mockRejectedValue(new ApiAuthError('API key required'));
     const res = await GET(makeRequest('http://localhost:3000/api/tasks/1'), makeContext('1'));
     expect(res.status).toBe(401);
   });
@@ -114,7 +115,7 @@ describe('PATCH /api/tasks/:id', () => {
   });
 
   it('returns 401 when no API key', async () => {
-    mockedGetUserId.mockRejectedValue(new Error('API key required'));
+    mockedGetUserId.mockRejectedValue(new ApiAuthError('API key required'));
     const res = await PATCH(
       makeRequest('http://localhost:3000/api/tasks/1', {
         method: 'PATCH',
@@ -201,7 +202,7 @@ describe('DELETE /api/tasks/:id', () => {
   });
 
   it('returns 401 when no API key', async () => {
-    mockedGetUserId.mockRejectedValue(new Error('API key required'));
+    mockedGetUserId.mockRejectedValue(new ApiAuthError('API key required'));
     const res = await DELETE(makeRequest('http://localhost:3000/api/tasks/1'), makeContext('1'));
     expect(res.status).toBe(401);
   });

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { validateUserSession } from '@/app/api/user-auth';
+import { validateUserSession } from '@/shared/lib/auth/user-auth';
+import { handleApiError } from '@/shared/lib/api/auth-errors';
 
 export interface AuthenticatedSession {
   user: {
@@ -7,14 +8,11 @@ export interface AuthenticatedSession {
   };
 }
 
-export type RouteHandler<T = unknown> = (
+type RouteHandler<T = unknown> = (
   req: NextRequest,
   session: AuthenticatedSession
 ) => Promise<NextResponse<T | { error: string }>>;
 
-/**
- * Wraps API route handlers with common authentication and error handling logic
- */
 export function withAuthAndErrorHandling<T = unknown>(
   handler: RouteHandler<T>,
   routeName: string
@@ -24,25 +22,15 @@ export function withAuthAndErrorHandling<T = unknown>(
       const session = await validateUserSession();
       return await handler(req, session);
     } catch (error) {
-      console.error(`Error in ${routeName}:`, error);
-      return NextResponse.json(
-        { error: error instanceof Error ? error.message : 'Unknown error occurred' },
-        { status: 500 }
-      );
+      return handleApiError(error, routeName);
     }
   };
 }
 
-/**
- * Helper function to create standardized error responses
- */
-export function createErrorResponse(message: string, status: number = 400) {
+export function createErrorResponse(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });
 }
 
-/**
- * Helper function to create standardized success responses
- */
-export function createSuccessResponse<T>(data: T, status: number = 200) {
+export function createSuccessResponse<T>(data: T, status = 200) {
   return NextResponse.json(data, { status });
 }

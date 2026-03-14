@@ -4,7 +4,7 @@ import { DB } from '@/shared/lib/db';
 import { and, eq, asc } from 'drizzle-orm';
 import { goalMilestonesTable, goalsTable } from '@/shared/lib/drizzle/schema';
 
-async function handler(req: NextRequest, session: AuthenticatedSession) {
+async function getGoalMilestonesHandler(req: NextRequest, session: AuthenticatedSession) {
   const { goalId } = await req.json();
 
   const [goal] = await DB.select()
@@ -23,4 +23,4 @@ async function handler(req: NextRequest, session: AuthenticatedSession) {
   return createSuccessResponse({ milestones });
 }
 
-export const POST = withAuthAndErrorHandling(handler, 'get-goal-milestones');
+export const POST = withAuthAndErrorHandling(getGoalMilestonesHandler, 'get-goal-milestones');

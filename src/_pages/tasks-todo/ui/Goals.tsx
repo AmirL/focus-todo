@@ -1,9 +1,9 @@
 import { ContentSection } from './Section';
-import { Goal } from '@/entities/goal/ui/Goal';
+import { Goal } from '@/entities/goal';
 import { useGoalsLoader } from '../api/useGoalsLoader';
 import { EditGoalButton } from '@/features/goals/edit';
 import { AddGoalDialog } from '@/features/goals/add';
-import { DeleteGoalButton } from '@/features/goals/actions/ui/DeleteGoalButton';
+import { DeleteGoalButton } from '@/features/goals/actions';
 
 export function Goals() {
   const { goals, isLoading, error } = useGoalsLoader();

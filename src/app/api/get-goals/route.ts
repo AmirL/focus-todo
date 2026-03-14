@@ -1,23 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { validateUserSession } from '../user-auth';
+import { NextRequest } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { and, eq, isNull } from 'drizzle-orm';
 import { goalsTable } from '@/shared/lib/drizzle/schema';
+import { withAuthAndErrorHandling, createSuccessResponse } from '@/shared/lib/api/route-wrapper';
 
-export async function POST(req: NextRequest) {
-  try {
-    const session = await validateUserSession();
+async function getGoalsHandler(_req: NextRequest, session: { user: { id: string } }) {
+  const goals = await DB.select()
+    .from(goalsTable)
+    .where(and(eq(goalsTable.userId, session.user.id), isNull(goalsTable.deletedAt)));
 
-    const goals = await DB.select()
-      .from(goalsTable)
-      .where(and(eq(goalsTable.userId, session.user.id), isNull(goalsTable.deletedAt)));
-
-    return NextResponse.json({ goals }, { status: 200 });
-  } catch (error) {
-    console.error('Error in get-goals:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unknown error occurred' },
-      { status: 500 }
-    );
-  }
+  return createSuccessResponse({ goals });
 }
+
+export const POST = withAuthAndErrorHandling(getGoalsHandler, 'get-goals');

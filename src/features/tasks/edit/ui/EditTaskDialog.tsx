@@ -9,7 +9,7 @@ import { createInstance } from '@/shared/lib/instance-tools';
 import { hasAnySuggestions } from '@/shared/lib/aiSuggestions';
 import { TaskFormFields } from '@/shared/ui/task/TaskFormFields';
 import { useTaskMetadata } from '@/shared/ui/task/useTaskMetadata';
-import { ReAddButton } from '@/features/tasks/actions/ui/ReAddButton';
+import { ReAddButton } from '@/features/tasks/actions';
 
 export function EditTaskDialog({
   task,
@@ -88,7 +88,7 @@ export function EditTaskDialog({
     updateTaskMutation.mutate(updatedTask);
   };
 
-  const onSubmit = async (e: React.FormEvent) => {
+  const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     const updatedTask = createInstance(TaskModel, {
@@ -145,7 +145,7 @@ export function EditTaskDialog({
                 Clear suggestions
               </Button>
             )}
-            <Button type="submit" data-testid="save-task-changes-button">
+            <Button type="submit" data-cy="save-task-changes-button">
               Save changes
             </Button>
           </DialogFooter>

@@ -2,13 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ListModel, ListPlain } from '@/entities/list';
 import { fetchBackend } from '@/shared/lib/api';
 import toast from 'react-hot-toast';
+import { cloneInstance } from '@/shared/lib/instance-tools';
 
-// Context type for optimistic mutations
 interface OptimisticMutationContext {
   previousLists: ListModel[] | undefined;
 }
 
-// Generic optimistic mutation hook types
 interface OptimisticMutationOptions<TData, TVariables> {
   mutationFn: (variables: TVariables) => Promise<TData>;
   queryKey: readonly unknown[];
@@ -20,7 +19,6 @@ interface OptimisticMutationOptions<TData, TVariables> {
   errorMessage?: string;
 }
 
-// Generic optimistic mutation hook
 function useOptimisticMutation<TData, TVariables>({
   mutationFn,
   queryKey,
@@ -36,20 +34,12 @@ function useOptimisticMutation<TData, TVariables>({
   return useMutation({
     mutationFn,
     onMutate: async (variables): Promise<OptimisticMutationContext> => {
-      // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey });
-
-      // Snapshot the previous value
       const previousLists = queryClient.getQueryData<ListModel[]>(queryKey);
-
-      // Apply optimistic update
       queryClient.setQueryData<ListModel[]>(queryKey, (old) => optimisticUpdate(old, variables));
-
-      // Return context object with the snapshotted value
       return { previousLists };
     },
     onError: (err, variables, context) => {
-      // Roll back to previous state
       if (context?.previousLists) {
         queryClient.setQueryData<ListModel[]>(queryKey, context.previousLists);
       }
@@ -65,15 +55,13 @@ function useOptimisticMutation<TData, TVariables>({
       onSuccess?.(data, variables, context);
     },
     onSettled: (data, error, variables, context) => {
-      // Always refetch after error or success to ensure we have the latest data
       queryClient.invalidateQueries({ queryKey });
       onSettled?.(data, error, variables, context);
     },
   });
 }
 
-// Query Keys
-export const listKeys = {
+const listKeys = {
   all: ['lists'] as const,
   active: ['lists', { includeArchived: false }] as const,
   withArchived: ['lists', { includeArchived: true }] as const,
@@ -81,7 +69,6 @@ export const listKeys = {
   detail: (id: string) => [...listKeys.details(), id] as const,
 };
 
-// Fetch Lists Query
 export function useListsQuery(options?: { includeArchived?: boolean }) {
   const includeArchived = options?.includeArchived ?? false;
   const queryKey = includeArchived ? listKeys.withArchived : listKeys.active;
@@ -90,7 +77,7 @@ export function useListsQuery(options?: { includeArchived?: boolean }) {
     queryKey,
     queryFn: async () => {
       const body = includeArchived ? { includeArchived: true } : undefined;
-      const data = (await fetchBackend('get-lists', body)) as { lists: ListPlain[] };
+      const data = await fetchBackend<{ lists: ListPlain[] }>('get-lists', body);
       return ListModel.fromPlainArray(data.lists);
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -98,16 +85,14 @@ export function useListsQuery(options?: { includeArchived?: boolean }) {
   });
 }
 
-// Create List Mutation
 export function useCreateListMutation() {
   return useOptimisticMutation({
     mutationFn: async ({ name, description, participatesInInitiative, color }: { name: string; description?: string | null; participatesInInitiative: boolean; color?: string | null }) => {
-      const response = (await fetchBackend('create-list', { name, description, participatesInInitiative, color })) as ListPlain;
+      const response = await fetchBackend<ListPlain>('create-list', { name, description, participatesInInitiative, color });
       return ListModel.toInstance(response);
     },
     queryKey: listKeys.all,
     optimisticUpdate: (old, { name, description, participatesInInitiative, color }) => {
-      // Optimistically add the new list to the cache
       const maxSortOrder = old ? Math.max(...old.map((l) => l.sortOrder), -1) : -1;
       const optimisticList = {
         id: 'temp-' + Date.now(),
@@ -131,18 +116,17 @@ export function useCreateListMutation() {
   });
 }
 
-// Update List Mutation
 export function useUpdateListMutation() {
   return useOptimisticMutation({
     mutationFn: async ({ id, name, description, participatesInInitiative, color }: { id: string; name: string; description?: string | null; participatesInInitiative: boolean; color?: string | null }) => {
-      const response = (await fetchBackend('update-list', { id, name, description, participatesInInitiative, color })) as ListPlain;
+      const response = await fetchBackend<ListPlain>('update-list', { id, name, description, participatesInInitiative, color });
       return ListModel.toInstance(response);
     },
     queryKey: listKeys.all,
     optimisticUpdate: (old, { id, name, description, participatesInInitiative, color }) => {
       if (!old) return [];
       return old.map((list) =>
-        list.id === id ? Object.assign(Object.create(Object.getPrototypeOf(list)), list, { name, ...(description !== undefined && { description }), ...(color !== undefined && { color }), participatesInInitiative, updatedAt: new Date() }) : list
+        list.id === id ? cloneInstance(list, { name, ...(description !== undefined && { description }), ...(color !== undefined && { color }), participatesInInitiative, updatedAt: new Date() } as Partial<ListModel>) : list
       );
     },
     successMessage: 'List updated',
@@ -150,18 +134,16 @@ export function useUpdateListMutation() {
   });
 }
 
-// Archive List Mutation
 export function useArchiveListMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({ id, archived }: { id: string; archived: boolean }) => {
-      const response = (await fetchBackend('update-list', { id, archived })) as ListPlain;
+      const response = await fetchBackend<ListPlain>('update-list', { id, archived });
       return ListModel.toInstance(response);
     },
     onSuccess: (_data, { archived }) => {
       toast.success(archived ? 'List archived' : 'List unarchived');
-      // Invalidate all list queries (both active and withArchived)
       queryClient.invalidateQueries({ queryKey: listKeys.all });
     },
     onError: () => {
@@ -170,7 +152,6 @@ export function useArchiveListMutation() {
   });
 }
 
-// Delete List Mutation
 export function useDeleteListMutation() {
   const queryClient = useQueryClient();
 
@@ -187,36 +168,25 @@ export function useDeleteListMutation() {
     successMessage: 'List deleted',
     errorMessage: 'Failed to delete list',
     onSuccess: () => {
-      // Also invalidate tasks and goals queries since they might be affected
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['goals'] });
     },
   });
 }
 
-// Reorder Lists Mutation
 export function useReorderListsMutation() {
   return useOptimisticMutation({
     mutationFn: async (listIds: string[]) => {
-      const response = await fetch('/api/reorder-lists', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ listIds }),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to reorder lists');
-      }
-      return response.json();
+      return fetchBackend('reorder-lists', { listIds });
     },
     queryKey: listKeys.all,
     optimisticUpdate: (old, listIds) => {
       if (!old) return [];
-      // Reorder the lists based on the new order
       const listMap = new Map(old.map((list) => [list.id, list]));
       return listIds
         .map((id) => listMap.get(id))
         .filter((list): list is ListModel => list !== undefined)
-        .map((list, index) => Object.assign(Object.create(Object.getPrototypeOf(list)), list, { sortOrder: index }));
+        .map((list, index) => cloneInstance(list, { sortOrder: index } as Partial<ListModel>));
     },
     errorMessage: 'Failed to reorder lists',
   });

@@ -18,7 +18,7 @@ interface ReorderResponse {
 
 async function reorderTasks(params: ReorderTasksParams): Promise<ReorderResponse> {
   const response = await fetch('/api/reorder-tasks', {
-    method: 'PUT',
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },

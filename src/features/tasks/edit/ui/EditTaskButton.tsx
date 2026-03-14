@@ -10,7 +10,7 @@ export function EditTaskButton({ task }: { task: TaskModel }) {
       variant="ghost"
       size="icon"
       className="h-8 w-8 text-muted-foreground hover:text-primary"
-      data-testid={`edit-task-${task.id}`}
+      data-cy={`edit-task-${task.id}`}
       onClick={() => openEdit(task)}
     >
       <Pencil className="h-4 w-4" />

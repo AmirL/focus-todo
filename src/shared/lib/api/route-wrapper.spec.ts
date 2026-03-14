@@ -6,11 +6,17 @@ import {
   createSuccessResponse,
 } from './route-wrapper';
 
-vi.mock('@/app/api/user-auth', () => ({
-  validateUserSession: vi.fn(),
-}));
+vi.mock('@/shared/lib/auth/user-auth', async () => {
+  const { AuthError } = await import('@/shared/lib/api/auth-errors');
+  return {
+    validateUserSession: vi.fn(),
+    AuthError,
+  };
+});
 
-import { validateUserSession } from '@/app/api/user-auth';
+import { AuthError } from '@/shared/lib/api/auth-errors';
+
+import { validateUserSession } from '@/shared/lib/auth/user-auth';
 
 const mockedValidateUserSession = vi.mocked(validateUserSession);
 
@@ -105,8 +111,22 @@ describe('route-wrapper', () => {
       expect(body).toEqual({ success: true });
     });
 
-    it('should return 500 with error message when validateUserSession throws', async () => {
-      mockedValidateUserSession.mockRejectedValue(new Error('No session found'));
+    it('should return 401 with error message when validateUserSession throws AuthError', async () => {
+      mockedValidateUserSession.mockRejectedValue(new AuthError('No session found'));
+
+      const handler = vi.fn();
+
+      const wrappedHandler = withAuthAndErrorHandling(handler, 'test-route');
+      const response = await wrappedHandler(mockRequest);
+      const body = await response.json();
+
+      expect(handler).not.toHaveBeenCalled();
+      expect(response.status).toBe(401);
+      expect(body).toEqual({ error: 'No session found' });
+    });
+
+    it('should return 500 with error message when validateUserSession throws a generic Error', async () => {
+      mockedValidateUserSession.mockRejectedValue(new Error('Database connection failed'));
 
       const handler = vi.fn();
 
@@ -116,7 +136,7 @@ describe('route-wrapper', () => {
 
       expect(handler).not.toHaveBeenCalled();
       expect(response.status).toBe(500);
-      expect(body).toEqual({ error: 'No session found' });
+      expect(body).toEqual({ error: 'Database connection failed' });
     });
 
     it('should return "Unknown error occurred" for non-Error thrown values', async () => {

@@ -9,7 +9,7 @@ export function StarButton({ task }: { task: TaskModel }) {
   const updateTaskMutation = useUpdateTaskMutation();
   const isSelected = isTaskSelected(task);
 
-  const toggleTodayTask = async (task: TaskModel) => {
+  const toggleTodayTask = (task: TaskModel) => {
     const selectedAt = isSelected ? null : new Date();
     const updatedTask = createInstance(TaskModel, { ...task, selectedAt, updatedAt: new Date() });
     updateTaskMutation.mutate(updatedTask);
@@ -24,7 +24,7 @@ export function StarButton({ task }: { task: TaskModel }) {
         'h-8 w-8',
         isSelected ? 'text-yellow-500 hover:text-yellow-600' : 'text-muted-foreground hover:text-yellow-500'
       )}
-      data-testid={`star-task-${task.id}`}
+      data-cy={`star-task-${task.id}`}
     >
       <Star fill={isSelected ? '#E3B644' : 'none'} className="h-4 w-4" />
     </Button>

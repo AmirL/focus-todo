@@ -68,5 +68,3 @@ export function SpotlightResults({ items, activeIndex, onHoverIndex, onSelect }:
     </ul>
   );
 }
-
-export default SpotlightResults;

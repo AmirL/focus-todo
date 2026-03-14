@@ -31,5 +31,4 @@ export function SpotlightHeader({ inputRef, query, onChange, onKeyDown }: Props)
   );
 }
 
-export default SpotlightHeader;
 

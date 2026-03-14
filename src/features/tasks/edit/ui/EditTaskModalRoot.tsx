@@ -9,4 +9,3 @@ export function EditTaskModalRoot() {
   return <EditTaskDialog open={open} onOpenChange={(o) => (o ? null : close())} task={task} />;
 }
 
-export default EditTaskModalRoot;

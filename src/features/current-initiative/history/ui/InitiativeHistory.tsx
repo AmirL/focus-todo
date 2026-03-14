@@ -65,7 +65,7 @@ export function InitiativeHistory() {
                   return (
                     <tr key={initiative.id} className="border-b last:border-b-0">
                       <td className="py-2 pr-4">
-                        {formatDate(initiative.date)}
+                        {formatHistoryDate(initiative.date)}
                       </td>
                       <td className="py-2 pr-4">
                         {initiative.suggestedListName ?? '-'}
@@ -94,7 +94,7 @@ export function InitiativeHistory() {
   );
 }
 
-function formatDate(dateValue: string | Date): string {
+function formatHistoryDate(dateValue: string | Date): string {
   const date = dayjs(dateValue);
   const today = dayjs();
   const yesterday = today.subtract(1, 'day');

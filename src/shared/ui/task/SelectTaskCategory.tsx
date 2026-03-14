@@ -11,7 +11,9 @@ export function SelectTaskCategory({ selectedListId, setSelectedListId }: Props)
   const { data: lists = [], isLoading } = useListsQuery();
   const defaultAppliedRef = useRef(false);
 
-  // Auto-select first list when no selection exists (e.g. Add Task form).
+  // Intentional: auto-select first list when no selection exists (e.g. Add Task form).
+  // This is a deliberate default initialization performed here rather than in the parent,
+  // because the available lists are loaded asynchronously via useListsQuery.
   // Ref guard prevents re-triggering after the parent resets.
   useEffect(() => {
     if (selectedListId == null && lists.length > 0 && !defaultAppliedRef.current) {

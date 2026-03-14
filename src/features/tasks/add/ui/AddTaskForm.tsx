@@ -13,16 +13,38 @@ import {
 import { createInstance } from '@/shared/lib/instance-tools';
 import { TaskModel } from '@/entities/task/model/task';
 import { useCreateTaskMutation } from '@/shared/api/tasks';
-import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
+import { useEditTaskModalStore } from '@/features/tasks/edit';
+import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter';
 import { TaskFormFields } from '@/shared/ui/task/TaskFormFields';
 import { useTaskMetadata } from '@/shared/ui/task/useTaskMetadata';
+import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 
 export function AddTaskForm() {
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
   const [name, setName] = useState('');
   const [details, setDetails] = useState('');
-  const createTaskMutation = useCreateTaskMutation();
+  const createTaskMutation = useCreateTaskMutation({
+    onSuccess: (createdTask) => {
+      toast.success(
+        (t) => (
+          <span className="flex items-center gap-2">
+            Task created: {createdTask.name}
+            <button
+              onClick={() => {
+                useEditTaskModalStore.getState().openWithTask(createdTask);
+                toast.dismiss(t.id);
+              }}
+              className="ml-2 text-blue-600 underline hover:text-blue-800"
+            >
+              Edit
+            </button>
+          </span>
+        ),
+        { duration: 5000 }
+      );
+    },
+  });
 
   const { metadata, updateMetadata, resetMetadata } = useTaskMetadata();
   const { statusFilter, listId } = useFilterStore();
@@ -70,7 +92,7 @@ export function AddTaskForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAddTaskOpen, statusFilter, listId]);
 
-  const handleAddTaskClick = async () => {
+  const handleAddTaskClick = () => {
     if (!name.trim()) return;
 
     const newTask = createInstance(TaskModel, {
@@ -93,7 +115,7 @@ export function AddTaskForm() {
         <Button
           className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg"
           onClick={() => setIsAddTaskOpen(true)}
-          data-testid="add-task-button"
+          data-cy="add-task-button"
         >
           <Plus className="h-6 w-6" />
         </Button>
@@ -133,7 +155,7 @@ function DialogFooterButtons({ onCancel, onAdd, isAddDisabled }: DialogFooterBut
       <Button variant="outline" onClick={onCancel}>
         Cancel
       </Button>
-      <Button onClick={onAdd} disabled={isAddDisabled} data-testid="save-task-button">
+      <Button onClick={onAdd} disabled={isAddDisabled} data-cy="save-task-button">
         <PlusCircle className="h-4 w-4 mr-2" />
         Add Task
       </Button>

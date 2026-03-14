@@ -9,12 +9,12 @@ function createTaskWithCheckboxes(name: string) {
   cy.intercept("POST", "/api/get-tasks").as("getTasks");
   cy.intercept("POST", "/api/create-task").as("createTask");
 
-  cy.get('[data-testid="add-task-button"]').click();
+  cy.get('[data-cy="add-task-button"]').click();
   cy.get('[role="dialog"]').should("be.visible");
-  cy.get('[data-testid="task-name-input"]').type(name);
+  cy.get('[data-cy="task-name-input"]').type(name);
   cy.get('[role="dialog"]').contains("button", "Edit").click();
   cy.get("#details").type(checkboxMarkdown);
-  cy.get('[data-testid="save-task-button"]').click();
+  cy.get('[data-cy="save-task-button"]').click();
   cy.contains(name, { timeout: 15000 }).should("be.visible");
 
   // Capture created task ID for cleanup
@@ -36,7 +36,7 @@ function expandDescription(name: string) {
   cy.wait(2000);
 
   cy.contains(name)
-    .parents('[data-testid^="task-"]')
+    .parents('[data-cy^="task-"]')
     .first()
     .find('[data-cy="description-indicator"]')
     .click();
@@ -46,7 +46,7 @@ function expandDescription(name: string) {
   cy.wait(1500);
 
   cy.contains(name)
-    .parents('[data-testid^="task-"]')
+    .parents('[data-cy^="task-"]')
     .first()
     .find('[data-cy="description-indicator"]')
     .then(($btn) => {
@@ -55,7 +55,7 @@ function expandDescription(name: string) {
         // eslint-disable-next-line cypress/no-unnecessary-waiting
         cy.wait(1500);
         cy.contains(name)
-          .parents('[data-testid^="task-"]')
+          .parents('[data-cy^="task-"]')
           .first()
           .find('[data-cy="description-indicator"]')
           .then(($btn2) => {
@@ -67,24 +67,24 @@ function expandDescription(name: string) {
     });
 
   cy.contains(name)
-    .parents('[data-testid^="task-"]')
+    .parents('[data-cy^="task-"]')
     .first()
     .find('[data-cy="description-indicator"]')
     .should("have.attr", "aria-expanded", "true");
 
   cy.contains(name)
-    .parents('[data-testid^="task-"]')
+    .parents('[data-cy^="task-"]')
     .first()
-    .find('[data-testid="subtask-checkbox"]')
+    .find('[data-cy="subtask-checkbox"]')
     .should("have.length.at.least", 1);
 }
 
 function getTaskCheckboxes(name: string) {
   return cy
     .contains(name)
-    .parents('[data-testid^="task-"]')
+    .parents('[data-cy^="task-"]')
     .first()
-    .find('[data-testid="subtask-checkbox"]');
+    .find('[data-cy="subtask-checkbox"]');
 }
 
 describe("Subtask Checkboxes", () => {
@@ -92,7 +92,7 @@ describe("Subtask Checkboxes", () => {
     cy.visit("/");
     cy.waitForAppLoad();
     // Wait for the task list to render (ensures session is restored and main view loaded)
-    cy.get('[data-testid="add-task-button"]', { timeout: 15000 }).should("be.visible");
+    cy.get('[data-cy="add-task-button"]', { timeout: 15000 }).should("be.visible");
   });
 
   afterEach(() => {

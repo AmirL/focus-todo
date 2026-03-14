@@ -8,9 +8,7 @@ import { useTimeEntriesQuery, useUpdateTimeEntryMutation, useDeleteTimeEntryMuta
 import { useTasksQuery } from '@/shared/api/tasks';
 import { useListsQuery } from '@/shared/api/lists';
 import { useListNameMap, useListColorMap } from '@/shared/lib/listUtils';
-import { mapTimeEntriesToBlocks } from '@/features/timeline/model/mapTimeEntriesToBlocks';
-import { aggregateTimeByList } from '@/features/timeline/model/aggregateTimeByList';
-import { QuickAddFromGapDialog } from '@/features/timeline/ui/QuickAddFromGapDialog';
+import { mapTimeEntriesToBlocks, aggregateTimeByList, QuickAddFromGapDialog } from '@/features/timeline';
 import { DoughnutChart } from '@/shared/ui/charts';
 
 export function CalendarDayPage() {

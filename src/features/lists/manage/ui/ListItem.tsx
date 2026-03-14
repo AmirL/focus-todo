@@ -77,7 +77,7 @@ export function ListItem({ list, isDragging, dragHandleRef, dragHandleListeners 
           onClick={handleArchiveToggle}
           disabled={isArchiving}
           title={list.isArchived ? 'Unarchive' : 'Archive'}
-          data-testid={`archive-list-${list.id}`}
+          data-cy={`archive-list-${list.id}`}
         >
           {list.isArchived ? <ArchiveRestore className="h-4 w-4" /> : <Archive className="h-4 w-4" />}
         </Button>

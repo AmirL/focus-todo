@@ -1,15 +1,11 @@
-import { NextResponse } from 'next/server';
-import { validateUserSession } from '../user-auth';
+import { NextRequest } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { and, eq, isNull } from 'drizzle-orm';
 import { timeEntriesTable } from '@/shared/lib/drizzle/schema';
-import dayjs from 'dayjs';
+import { stopRunningTimers } from '../timer-helpers';
+import { withAuthAndErrorHandling, createErrorResponse, createSuccessResponse } from '@/shared/lib/api/route-wrapper';
 
-// POST - stop the currently running timer
-export async function POST() {
-  const session = await validateUserSession();
-  const now = dayjs().format('YYYY-MM-DD HH:mm:ss');
-
+async function stopTimerHandler(_req: NextRequest, session: { user: { id: string } }) {
   const [running] = await DB.select()
     .from(timeEntriesTable)
     .where(and(
@@ -18,19 +14,16 @@ export async function POST() {
     ));
 
   if (!running) {
-    return NextResponse.json({ error: 'No running timer' }, { status: 404 });
+    return createErrorResponse('No running timer', 404);
   }
 
-  const startedAt = dayjs(running.startedAt);
-  const duration = Math.round(dayjs(now).diff(startedAt, 'minute', true));
-
-  await DB.update(timeEntriesTable)
-    .set({ endedAt: new Date(now), durationMinutes: Math.max(duration, 1) })
-    .where(eq(timeEntriesTable.id, running.id));
+  await stopRunningTimers(session.user.id);
 
   const [stopped] = await DB.select()
     .from(timeEntriesTable)
     .where(eq(timeEntriesTable.id, running.id));
 
-  return NextResponse.json(stopped, { status: 200 });
+  return createSuccessResponse(stopped);
 }
+
+export const POST = withAuthAndErrorHandling(stopTimerHandler, 'stop-timer');

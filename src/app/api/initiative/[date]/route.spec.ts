@@ -4,7 +4,6 @@ import { NextRequest } from 'next/server';
 // Mock DB
 const mockFrom = vi.fn();
 const mockWhere = vi.fn();
-const mockUpdate = vi.fn();
 const mockSet = vi.fn();
 const mockUpdateWhere = vi.fn();
 
@@ -19,19 +18,20 @@ mockFrom.mockReturnValue({ where: mockWhere });
 mockSet.mockReturnValue({ where: mockUpdateWhere });
 
 // Mock api-auth
-vi.mock('@/app/api/api-auth', () => ({
-  getUserIdFromApiKey: vi.fn(),
-}));
+vi.mock('@/app/api/api-auth', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/app/api/api-auth')>();
+  return { ...actual, authenticateApiKey: vi.fn() };
+});
 
 // Mock next/headers
 vi.mock('next/headers', () => ({
   headers: vi.fn(() => new Map()),
 }));
 
-import { getUserIdFromApiKey } from '@/app/api/api-auth';
+import { authenticateApiKey, ApiAuthError } from '@/app/api/api-auth';
 import { GET, PATCH } from './route';
 
-const mockedGetUserId = vi.mocked(getUserIdFromApiKey);
+const mockedGetUserId = vi.mocked(authenticateApiKey);
 
 function makeRequest(url: string, options?: { method?: string; body?: string }): NextRequest {
   return new NextRequest(new URL(url, 'http://localhost:3000'), options);
@@ -87,7 +87,7 @@ describe('GET /api/initiative/:date', () => {
   });
 
   it('should return 401 when API key is missing', async () => {
-    mockedGetUserId.mockRejectedValue(new Error('API key required'));
+    mockedGetUserId.mockRejectedValue(new ApiAuthError('API key required'));
 
     const req = makeRequest('http://localhost:3000/api/initiative/2026-03-08');
     const res = await GET(req, makeContext('2026-03-08'));
@@ -186,7 +186,7 @@ describe('PATCH /api/initiative/:date', () => {
   });
 
   it('should return 401 when API key is missing', async () => {
-    mockedGetUserId.mockRejectedValue(new Error('API key required'));
+    mockedGetUserId.mockRejectedValue(new ApiAuthError('API key required'));
 
     const req = makeRequest('http://localhost:3000/api/initiative/2026-03-08', {
       method: 'PATCH',
@@ -220,7 +220,7 @@ describe('PATCH /api/initiative/:date', () => {
     const body = await res.json();
 
     expect(res.status).toBe(400);
-    expect(body.error).toBe('listId is required');
+    expect(body.error).toBe('listId must be a valid number');
   });
 
   it('should return 404 when list does not belong to user', async () => {

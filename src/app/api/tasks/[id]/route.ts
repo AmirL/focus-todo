@@ -2,19 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { and, eq, isNull } from 'drizzle-orm';
 import { tasksTable, listsTable } from '@/shared/lib/drizzle/schema';
-import { getUserIdFromApiKey } from '@/app/api/api-auth';
 import { parseDateFields, TaskDateKeys } from '@/shared/lib/utils';
 import dayjs from 'dayjs';
-import { serializeTaskWithDescription, handleApiError } from '../serialize';
+import { withApiAuth } from '@/shared/lib/api/api-route-wrapper';
+import { serializeTaskWithDescription } from '../serialize';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 /**
  * GET /api/tasks/:id - Get a single task by ID
  */
-export async function GET(req: NextRequest, context: RouteContext) {
-  try {
-    const userId = await getUserIdFromApiKey(req);
+export function GET(req: NextRequest, context: RouteContext) {
+  return withApiAuth(async (_r, userId) => {
     const { id } = await context.params;
     const taskId = parseInt(id, 10);
 
@@ -41,9 +40,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
     }
 
     return NextResponse.json({ task: serializeTaskWithDescription(row.task, row.listDescription) }, { status: 200 });
-  } catch (error) {
-    return handleApiError(error, 'GET /api/tasks/:id');
-  }
+  }, 'GET /api/tasks/:id')(req);
 }
 
 /**
@@ -52,9 +49,8 @@ export async function GET(req: NextRequest, context: RouteContext) {
  * Body: Partial task fields to update
  * Returns: Updated task
  */
-export async function PATCH(req: NextRequest, context: RouteContext) {
-  try {
-    const userId = await getUserIdFromApiKey(req);
+export function PATCH(req: NextRequest, context: RouteContext) {
+  return withApiAuth(async (r, userId) => {
     const { id } = await context.params;
     const taskId = parseInt(id, 10);
 
@@ -77,19 +73,26 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: 'Task not found' }, { status: 404 });
     }
 
-    const body = await req.json();
+    const body = await r.json();
 
-    // Remove fields that should not be updated via API
-    const { id: _id, userId: _userId, createdAt: _createdAt, ...updateFields } = body;
+    const ALLOWED_FIELDS = [
+      'name', 'details', 'date', 'estimatedDuration', 'completedAt',
+      'listId', 'isBlocker', 'selectedAt', 'deletedAt', 'sortOrder',
+      'aiSuggestions', 'goalId',
+    ] as const;
 
-    // Parse date fields
-    const processedFields = parseDateFields(
-      { ...updateFields, updatedAt: new Date() },
-      TaskDateKeys
-    );
+    const updateFields: Record<string, unknown> = {};
+    for (const field of ALLOWED_FIELDS) {
+      if (body[field] !== undefined) {
+        updateFields[field] = body[field];
+      }
+    }
+    updateFields.updatedAt = new Date();
+
+    const fieldsWithParsedDates = parseDateFields(updateFields, TaskDateKeys);
 
     await DB.update(tasksTable)
-      .set(processedFields)
+      .set(fieldsWithParsedDates as Partial<typeof tasksTable.$inferInsert>)
       .where(and(eq(tasksTable.id, taskId), eq(tasksTable.userId, userId)));
 
     const [updatedRow] = await DB.select({
@@ -101,9 +104,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       .where(and(eq(tasksTable.id, taskId), eq(tasksTable.userId, userId)));
 
     return NextResponse.json({ task: serializeTaskWithDescription(updatedRow.task, updatedRow.listDescription) }, { status: 200 });
-  } catch (error) {
-    return handleApiError(error, 'PATCH /api/tasks/:id');
-  }
+  }, 'PATCH /api/tasks/:id')(req);
 }
 
 /**
@@ -114,9 +115,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
  *
  * Returns: Success message
  */
-export async function DELETE(req: NextRequest, context: RouteContext) {
-  try {
-    const userId = await getUserIdFromApiKey(req);
+export function DELETE(req: NextRequest, context: RouteContext) {
+  return withApiAuth(async (r, userId) => {
     const { id } = await context.params;
     const taskId = parseInt(id, 10);
 
@@ -138,7 +138,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: 'Task not found' }, { status: 404 });
     }
 
-    const { searchParams } = new URL(req.url);
+    const { searchParams } = new URL(r.url);
     const permanent = searchParams.get('permanent') === 'true';
 
     if (permanent) {
@@ -155,7 +155,5 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
 
       return NextResponse.json({ message: 'Task deleted' }, { status: 200 });
     }
-  } catch (error) {
-    return handleApiError(error, 'DELETE /api/tasks/:id');
-  }
+  }, 'DELETE /api/tasks/:id')(req);
 }

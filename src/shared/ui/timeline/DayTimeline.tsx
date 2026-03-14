@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { cn } from '@/shared/lib/utils';
 import { getColorClasses } from '@/shared/lib/colors';
+import { formatDuration } from '@/shared/lib/format-duration';
 import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from 'lucide-react';
 import type { TimelineBlock, TimelineGap } from './TimelineBar';
 
@@ -24,18 +25,6 @@ interface DayTimelineProps {
   onGapClick?: (gap: TimelineGap) => void;
   onAddEntry?: (startTime: string, endTime: string) => void;
   className?: string;
-}
-
-function getListColors(listColor: string | null | undefined) {
-  return getColorClasses(listColor);
-}
-
-function formatDuration(minutes: number | null): string {
-  if (minutes === null || minutes <= 0) return '';
-  if (minutes < 60) return `${minutes}m`;
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return m === 0 ? `${h}h` : `${h}h ${m}m`;
 }
 
 function formatDateHeader(date: Date): string {
@@ -97,6 +86,15 @@ interface BlockPosition {
   column?: number;
   /** Total columns in the cluster. */
   totalColumns?: number;
+}
+
+function inSameCluster(a: BlockPosition, b: BlockPosition): boolean {
+  return (
+    a.column !== undefined &&
+    b.column !== undefined &&
+    a.totalColumns === b.totalColumns &&
+    a.topPx === b.topPx
+  );
 }
 
 interface GapPosition {
@@ -174,12 +172,7 @@ function computeVerticalLayout(blocks: TimelineBlock[], startHour: number): {
     const next = blockPositions[idx + 1];
 
     // Skip entries within the same cluster (they're side-by-side, not stacked)
-    if (
-      curr.column !== undefined &&
-      next.column !== undefined &&
-      curr.totalColumns === next.totalColumns &&
-      curr.topPx === next.topPx
-    ) {
+    if (inSameCluster(curr, next)) {
       continue;
     }
 
@@ -195,12 +188,7 @@ function computeVerticalLayout(blocks: TimelineBlock[], startHour: number): {
     // Skip gaps within a cluster (entries placed side-by-side, not stacked)
     const curr = blockPositions[idx];
     const next = blockPositions[idx + 1];
-    if (
-      curr.column !== undefined &&
-      next.column !== undefined &&
-      curr.totalColumns === next.totalColumns &&
-      curr.topPx === next.topPx
-    ) {
+    if (inSameCluster(curr, next)) {
       continue;
     }
 
@@ -308,7 +296,7 @@ function TimeBlock({
 }) {
   const { block, topPx, heightPx } = position;
   const isRunning = block.endedAt === null;
-  const colors = getListColors(block.listColor);
+  const colors = getColorClasses(block.listColor);
   const durationStr = isRunning
     ? formatDuration(block.durationMinutes) || 'running'
     : formatDuration(block.durationMinutes);
@@ -553,4 +541,3 @@ export function DayTimeline({
   );
 }
 
-export type { DayTimelineProps };

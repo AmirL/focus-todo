@@ -4,12 +4,10 @@ import { Button } from '@/shared/ui/button';
 import { CheckSquare2, Menu, LogOut, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useFilterStore } from '@/features/tasks/filter/model/filterStore';
-import { buildHomeHref } from '@/features/tasks/filter/model/filterUrl';
+import { useFilterStore, buildHomeHref, TaskFilters } from '@/features/tasks/filter';
 import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider, useSidebar } from '@/shared/ui/sidebar';
 import { Separator } from '@/shared/ui/separator';
 import { useSession, signOut } from '@/shared/lib/auth-client';
-import { TaskFilters } from '@/features/tasks/filter/ui/TaskFilters';
 import { BalanceIndicator } from '@/features/current-initiative/balance';
 
 function MobileMenuButton() {

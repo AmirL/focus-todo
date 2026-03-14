@@ -1,6 +1,19 @@
-import { drizzle } from 'drizzle-orm/mysql2';
+import { drizzle, type MySql2Database } from 'drizzle-orm/mysql2';
 
-// Fallback to an empty connection string during static builds
-// so that importing this module doesn't throw when DATABASE_URL
-// is undefined. The actual value should be provided at runtime.
-export const DB = drizzle(process.env.DATABASE_URL ?? '');
+let _db: MySql2Database | null = null;
+
+/** Lazily initialized database connection. Defers connection until first use
+ *  to avoid import-time side effects during static builds and testing. */
+export function getDB(): MySql2Database {
+  if (!_db) {
+    _db = drizzle(process.env.DATABASE_URL ?? '');
+  }
+  return _db;
+}
+
+/** @deprecated Use getDB() for lazy initialization. Kept for backward compatibility. */
+export const DB = new Proxy({} as MySql2Database, {
+  get(_, prop) {
+    return (getDB() as unknown as Record<string | symbol, unknown>)[prop];
+  },
+});

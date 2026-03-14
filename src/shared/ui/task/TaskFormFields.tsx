@@ -45,7 +45,7 @@ export function TaskFormFields({
           onChange={(e) => onNameChange(e.target.value)}
           className="mt-1"
           autoFocus
-          data-testid="task-name-input"
+          data-cy="task-name-input"
         />
         {nameSuggestion && onAcceptSuggestion && onRejectSuggestion && (
           <AiSuggestionBanner

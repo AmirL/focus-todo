@@ -1,16 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { validateUserSession } from '../user-auth';
+import { NextRequest } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { eq } from 'drizzle-orm';
 import { tasksTable } from '@/shared/lib/drizzle/schema';
 import { parseDateFields, TaskDateKeys } from '@/shared/lib/utils';
+import { withAuthAndErrorHandling, createSuccessResponse, createErrorResponse } from '@/shared/lib/api/route-wrapper';
+import { serializeTask } from '@/app/api/tasks/serialize';
 
-export async function POST(req: NextRequest) {
-  const session = await validateUserSession();
-
+async function createTaskHandler(req: NextRequest, session: { user: { id: string } }) {
   const { task } = await req.json();
 
-  const processedTask = parseDateFields({
+  if (!task?.name || typeof task.name !== 'string' || task.name.trim() === '') {
+    return createErrorResponse('Task name is required');
+  }
+
+  if (!task?.listId || typeof task.listId !== 'number') {
+    return createErrorResponse('Task listId is required (number)');
+  }
+
+  const taskWithParsedDates = parseDateFields({
     ...task,
     __list_deprecated: '',
     createdAt: undefined,
@@ -18,8 +25,10 @@ export async function POST(req: NextRequest) {
     userId: session.user.id
   }, TaskDateKeys);
 
-  const [{ id }] = await DB.insert(tasksTable).values(processedTask).$returningId();
+  const [{ id }] = await DB.insert(tasksTable).values(taskWithParsedDates).$returningId();
   const [createdTask] = await DB.select().from(tasksTable).where(eq(tasksTable.id, id));
 
-  return NextResponse.json(createdTask, { status: 200 });
+  return createSuccessResponse(serializeTask(createdTask));
 }
+
+export const POST = withAuthAndErrorHandling(createTaskHandler, 'create-task');

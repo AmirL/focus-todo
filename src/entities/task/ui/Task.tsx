@@ -3,13 +3,13 @@ import { isTaskSelected, TaskModel, isTaskDeleted } from '@/entities/task/model/
 import { Checkbox } from '@/shared/ui/checkbox';
 import { cn } from '@/shared/lib/utils';
 import { useToggleTaskCompleted } from '../model/toggleCompleted';
-import { EstimatedTimeButton } from '@/features/tasks/actions/ui/EstimatedTimeButton';
+import { EstimatedTimeButton } from '@/features/tasks/actions';
 import { CollapsibleActions } from '@/shared/ui/collapsible-actions';
 import { TaskBadges } from './TaskBadges';
 import { TaskDetails, DescriptionIndicator } from './TaskDetails';
 import { TaskName } from './TaskName';
 import { useTempSelectStore } from '@/features/tasks/temp-select';
-import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
+import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter';
 import { useUpdateTaskMutation } from '@/shared/api/tasks';
 import { toggleMarkdownCheckbox } from '@/shared/lib/toggleMarkdownCheckbox';
 import { createInstance } from '@/shared/lib/instance-tools';
@@ -38,7 +38,7 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
     updateTaskMutation.mutate(updatedTask);
   };
 
-  const onCheckboxClick = async () => {
+  const onCheckboxClick = () => {
     if (deleted) return;
     toggleTaskCompleted.mutate(task);
   };
@@ -58,7 +58,7 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
       target.closest('button') ||
       target.closest('a') ||
       target.closest('input') ||
-      target.closest('[data-testid="task-details"]')
+      target.closest('[data-cy="task-details"]')
     ) {
       return;
     }
@@ -80,7 +80,7 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
         !deleted && 'cursor-pointer',
         isTempSelectedTask && 'bg-blue-50 hover:bg-blue-100'
       )}
-      data-testid={`task-${task.id}`}
+      data-cy={`task-${task.id}`}
     >
       <div className="px-2 sm:px-4 py-3">
         <div className="flex items-center space-x-2 sm:space-x-3">

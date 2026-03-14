@@ -17,9 +17,10 @@ mockFrom.mockReturnValue({ where: mockWhere });
 mockSet.mockReturnValue({ where: vi.fn().mockResolvedValue(undefined) });
 
 // Mock auth
-vi.mock('@/app/api/api-auth', () => ({
-  getUserIdFromApiKey: vi.fn(),
-}));
+vi.mock('@/app/api/api-auth', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/app/api/api-auth')>();
+  return { ...actual, authenticateApiKey: vi.fn() };
+});
 
 // Mock next/headers
 vi.mock('next/headers', () => ({
@@ -38,7 +39,7 @@ vi.mock('@/shared/lib/db/list-queries', () => ({
 }));
 
 import { GET, PATCH, DELETE } from './route';
-import { getUserIdFromApiKey } from '@/app/api/api-auth';
+import { authenticateApiKey, ApiAuthError } from '@/app/api/api-auth';
 import {
   findUserListById,
   findUserListByName,
@@ -48,7 +49,7 @@ import {
   setListArchivedStatus,
 } from '@/shared/lib/db/list-queries';
 
-const mockedGetUserId = vi.mocked(getUserIdFromApiKey);
+const mockedGetUserId = vi.mocked(authenticateApiKey);
 const mockedFindById = vi.mocked(findUserListById);
 const mockedFindByName = vi.mocked(findUserListByName);
 const mockedCountUsage = vi.mocked(countListUsage);
@@ -84,7 +85,7 @@ describe('GET /api/lists/:id', () => {
   });
 
   it('returns 401 when no API key', async () => {
-    mockedGetUserId.mockRejectedValue(new Error('API key required'));
+    mockedGetUserId.mockRejectedValue(new ApiAuthError('API key required'));
     const res = await GET(makeRequest('http://localhost:3000/api/lists/1'), makeContext('1'));
     expect(res.status).toBe(401);
   });
@@ -125,7 +126,7 @@ describe('PATCH /api/lists/:id', () => {
   });
 
   it('returns 401 when no API key', async () => {
-    mockedGetUserId.mockRejectedValue(new Error('API key required'));
+    mockedGetUserId.mockRejectedValue(new ApiAuthError('API key required'));
     const res = await PATCH(
       makeRequest('http://localhost:3000/api/lists/1', {
         method: 'PATCH',
@@ -225,7 +226,7 @@ describe('PATCH /api/lists/:id', () => {
   it('returns 409 when duplicate name exists', async () => {
     mockedGetUserId.mockResolvedValue('user-1');
     mockedFindById.mockResolvedValue(sampleList);
-    mockedFindByName.mockResolvedValue([{ ...sampleList, id: 2, name: 'Other' }]);
+    mockedFindByName.mockResolvedValue({ ...sampleList, id: 2, name: 'Other' });
 
     const res = await PATCH(
       makeRequest('http://localhost:3000/api/lists/1', {
@@ -240,7 +241,7 @@ describe('PATCH /api/lists/:id', () => {
   it('allows same name for same list (no-op rename)', async () => {
     mockedGetUserId.mockResolvedValue('user-1');
     mockedFindById.mockResolvedValue(sampleList);
-    mockedFindByName.mockResolvedValue([sampleList]); // same ID
+    mockedFindByName.mockResolvedValue(sampleList); // same ID
     mockWhere.mockResolvedValue([sampleList]);
 
     const res = await PATCH(
@@ -308,7 +309,7 @@ describe('DELETE /api/lists/:id', () => {
   });
 
   it('returns 401 when no API key', async () => {
-    mockedGetUserId.mockRejectedValue(new Error('API key required'));
+    mockedGetUserId.mockRejectedValue(new ApiAuthError('API key required'));
     const res = await DELETE(makeRequest('http://localhost:3000/api/lists/1'), makeContext('1'));
     expect(res.status).toBe(401);
   });

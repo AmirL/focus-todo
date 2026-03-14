@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server';
 import { tasksTable } from '@/shared/lib/drizzle/schema';
+import { toISOString } from '@/shared/lib/api/serialize-helpers';
 
-export type TaskRow = typeof tasksTable.$inferSelect;
+type TaskRow = typeof tasksTable.$inferSelect;
 
-export type ApiTask = Omit<
+type ApiTask = Omit<
   TaskRow,
   'date' | 'completedAt' | 'deletedAt' | 'selectedAt' | 'updatedAt' | 'createdAt' | '__list_deprecated'
 > & {
@@ -15,14 +15,7 @@ export type ApiTask = Omit<
   createdAt: string | null;
 };
 
-export type ApiTaskWithDescription = ApiTask & { listDescription: string | null };
-
-export function toISOString(d: Date | string | null | undefined): string | null {
-  if (!d) return null;
-  if (d instanceof Date) return d.toISOString();
-  const parsed = new Date(d);
-  return isNaN(parsed.getTime()) ? null : parsed.toISOString();
-}
+type ApiTaskWithDescription = ApiTask & { listDescription: string | null };
 
 export function serializeTask(t: TaskRow): ApiTask {
   const { __list_deprecated: _, ...rest } = t;
@@ -42,15 +35,4 @@ export function serializeTaskWithDescription(t: TaskRow, listDescription?: strin
     ...serializeTask(t),
     listDescription: listDescription ?? null,
   };
-}
-
-export function handleApiError(error: unknown, operation: string) {
-  const msg = error instanceof Error ? error.message : 'Unknown error occurred';
-  const lower = msg.toLowerCase();
-  const isAuth = lower.includes('api key required') || lower.includes('invalid or revoked api key');
-  const status = isAuth ? 401 : 500;
-  if (!isAuth) {
-    console.error(`Error in ${operation}:`, error);
-  }
-  return NextResponse.json({ error: msg }, { status });
 }

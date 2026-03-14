@@ -3,7 +3,7 @@ import type { ListModel } from '@/entities/list';
 import { useListsQuery } from '@/shared/api/lists';
 import { useListNameMap } from '@/shared/lib/listUtils';
 
-export type TaskGroup = {
+type TaskGroup = {
   id: number;
   name: string;
   tasks: TaskModel[];

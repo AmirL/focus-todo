@@ -1,6 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
 import {
   TaskModel,
   isTaskInFuture,
@@ -15,8 +13,6 @@ import {
 } from './task';
 import type { TaskPlain } from './task';
 import { createInstance } from '@/shared/lib/instance-tools';
-
-dayjs.extend(utc);
 
 function makeTaskPlain(overrides: Partial<TaskPlain> = {}): TaskPlain {
   return {

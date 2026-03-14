@@ -1,17 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { validateUserSession } from '../user-auth';
+import { NextRequest } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { and, eq } from 'drizzle-orm';
 import { timeEntriesTable } from '@/shared/lib/drizzle/schema';
 import dayjs from 'dayjs';
+import { withAuthAndErrorHandling, createErrorResponse, createSuccessResponse } from '@/shared/lib/api/route-wrapper';
 
-// POST - update a time entry (edit start/end times)
-export async function POST(req: NextRequest) {
-  const session = await validateUserSession();
+async function updateTimeEntryHandler(req: NextRequest, session: { user: { id: string } }) {
   const { id, startedAt, endedAt } = await req.json();
 
   if (!id) {
-    return NextResponse.json({ error: 'id is required' }, { status: 400 });
+    return createErrorResponse('id is required', 400);
   }
 
   const [existing] = await DB.select()
@@ -19,7 +17,7 @@ export async function POST(req: NextRequest) {
     .where(and(eq(timeEntriesTable.id, id), eq(timeEntriesTable.userId, session.user.id)));
 
   if (!existing) {
-    return NextResponse.json({ error: 'Time entry not found' }, { status: 404 });
+    return createErrorResponse('Time entry not found', 404);
   }
 
   const updateData: Record<string, unknown> = {};
@@ -46,5 +44,7 @@ export async function POST(req: NextRequest) {
     .from(timeEntriesTable)
     .where(eq(timeEntriesTable.id, id));
 
-  return NextResponse.json(updated, { status: 200 });
+  return createSuccessResponse(updated);
 }
+
+export const POST = withAuthAndErrorHandling(updateTimeEntryHandler, 'update-time-entry');

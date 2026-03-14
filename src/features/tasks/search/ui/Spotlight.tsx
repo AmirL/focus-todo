@@ -68,5 +68,3 @@ export function Spotlight({ buttonClassName }: SpotlightProps) {
     </Dialog>
   );
 }
-
-export default Spotlight;

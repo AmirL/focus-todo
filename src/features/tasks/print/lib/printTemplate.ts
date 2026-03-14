@@ -1,5 +1,5 @@
 import { TaskModel } from '@/entities/task/model/task';
-import { GroupedTasks, formatDate, formatDuration } from './printUtils';
+import { GroupedTasks, formatPrintDate, formatDuration } from './printUtils';
 import { PRINT_STYLES } from './printStyles';
 
 function renderTask(task: TaskModel): string {
@@ -36,17 +36,13 @@ function renderTaskSection(listType: string, tasks: TaskModel[]): string {
 function renderNewTaskLines(): string {
   return Array.from(
     { length: 6 },
-    (_, i) => `
+    () => `
     <div class="new-task-line">
       <input type="checkbox" class="new-task-checkbox" />
       <div class="new-task-line-border"></div>
     </div>
   `
   ).join('');
-}
-
-function renderNoteLines(): string {
-  return Array.from({ length: 4 }, () => '<div class="note-line"></div>').join('');
 }
 
 export function generatePrintHTML(
@@ -63,13 +59,13 @@ export function generatePrintHTML(
     <!DOCTYPE html>
     <html>
       <head>
-        <title>Daily Tasks - ${formatDate(firstTaskDate)}</title>
+        <title>Daily Tasks - ${formatPrintDate(firstTaskDate)}</title>
         <style>${PRINT_STYLES}</style>
       </head>
       <body>
         <div class="header">
           <h1>Daily Tasks</h1>
-          <div class="date-info">${formatDate(firstTaskDate)} • Total: ${formatDuration(totalDuration)}</div>
+          <div class="date-info">${formatPrintDate(firstTaskDate)} • Total: ${formatDuration(totalDuration)}</div>
         </div>
 
         ${taskSections}

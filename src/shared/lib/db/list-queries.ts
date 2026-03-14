@@ -61,19 +61,19 @@ export async function findUserListById(userId: string, listId: number) {
 /**
  * Finds a list by name that belongs to the user
  */
-export async function findUserListByName(userId: string, listName: string) {
-  const lists = await DB.select()
+export async function findUserListByName(userId: string, listName: string): Promise<typeof listsTable.$inferSelect | null> {
+  const [list] = await DB.select()
     .from(listsTable)
     .where(userListByNameFilter(userId, listName));
-  
-  return lists;
+
+  return list || null;
 }
 
 /**
  * Gets lists for a user, ordered by sortOrder then createdAt.
  * By default excludes archived lists.
  */
-export async function getUserLists(userId: string, includeArchived: boolean = false) {
+export function getUserLists(userId: string, includeArchived: boolean = false) {
   const conditions = [eq(listsTable.userId, userId)];
 
   if (!includeArchived) {
@@ -99,15 +99,15 @@ export async function countListUsage(userId: string, listId: number) {
     .where(userGoalsByListFilter(userId, listId));
 
   return {
-    tasksCount: tasksCountResult?.count || 0,
-    goalsCount: goalsCountResult?.count || 0
+    tasksCount: Number(tasksCountResult?.count) || 0,
+    goalsCount: Number(goalsCountResult?.count) || 0
   };
 }
 
 /**
  * Creates default lists for a new user
  */
-export async function createDefaultLists(userId: string) {
+export function createDefaultLists(userId: string) {
   const defaultLists = [
     { name: 'Work', userId, isDefault: true, sortOrder: 0, color: 'blue' },
     { name: 'Personal', userId, isDefault: true, sortOrder: 1, color: 'violet' }
@@ -136,7 +136,7 @@ export async function reassignItemsToList(
 /**
  * Deletes a user's list
  */
-export async function deleteUserList(userId: string, listId: number) {
+export function deleteUserList(userId: string, listId: number) {
   return DB.delete(listsTable)
     .where(userListFilter(userId, listId));
 }
@@ -144,7 +144,7 @@ export async function deleteUserList(userId: string, listId: number) {
 /**
  * Sets the archived status of a list
  */
-export async function setListArchivedStatus(userId: string, listId: number, archived: boolean) {
+export function setListArchivedStatus(userId: string, listId: number, archived: boolean) {
   return DB.update(listsTable)
     .set({
       archivedAt: archived ? new Date() : null,

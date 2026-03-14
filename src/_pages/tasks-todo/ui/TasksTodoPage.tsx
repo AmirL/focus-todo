@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { TodoList } from './TodoList';
 import { Card, CardContent } from '@/shared/ui/card';
-import { useFilterStore } from '@/features/tasks/filter/model/filterStore';
+import { useFilterStore } from '@/features/tasks/filter';
 
 export function TasksTodoPage() {
   const { initializeFromURL } = useFilterStore();

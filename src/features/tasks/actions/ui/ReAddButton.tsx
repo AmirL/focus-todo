@@ -25,7 +25,7 @@ export function ReAddButton({ task }: { task: TaskModel }) {
             variant="ghost"
             size="icon"
             className="h-8 w-8 text-muted-foreground hover:text-primary"
-            data-testid={`readd-task-${task.id}`}
+            data-cy={`readd-task-${task.id}`}
           >
             <RotateCw className="h-4 w-4" />
           </Button>

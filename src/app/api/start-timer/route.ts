@@ -1,38 +1,22 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { validateUserSession } from '../user-auth';
+import { NextRequest } from 'next/server';
 import { DB } from '@/shared/lib/db';
-import { and, eq, isNull } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { timeEntriesTable } from '@/shared/lib/drizzle/schema';
 import dayjs from 'dayjs';
+import { stopRunningTimers } from '../timer-helpers';
+import { withAuthAndErrorHandling, createErrorResponse, createSuccessResponse } from '@/shared/lib/api/route-wrapper';
 
-// POST - start a timer (creates a new open time entry, auto-stops any running one)
-export async function POST(req: NextRequest) {
-  const session = await validateUserSession();
+async function startTimerHandler(req: NextRequest, session: { user: { id: string } }) {
   const { taskId } = await req.json();
 
   if (!taskId) {
-    return NextResponse.json({ error: 'taskId is required' }, { status: 400 });
+    return createErrorResponse('taskId is required', 400);
   }
 
   const now = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
-  // Auto-stop any running timer for this user
-  const runningEntries = await DB.select()
-    .from(timeEntriesTable)
-    .where(and(
-      eq(timeEntriesTable.userId, session.user.id),
-      isNull(timeEntriesTable.endedAt)
-    ));
+  await stopRunningTimers(session.user.id);
 
-  for (const entry of runningEntries) {
-    const startedAt = dayjs(entry.startedAt);
-    const duration = Math.round(dayjs(now).diff(startedAt, 'minute', true));
-    await DB.update(timeEntriesTable)
-      .set({ endedAt: new Date(now), durationMinutes: Math.max(duration, 1) })
-      .where(eq(timeEntriesTable.id, entry.id));
-  }
-
-  // Create a new open entry
   const [{ id }] = await DB.insert(timeEntriesTable).values({
     taskId: Number(taskId),
     userId: session.user.id,
@@ -43,5 +27,7 @@ export async function POST(req: NextRequest) {
     .from(timeEntriesTable)
     .where(eq(timeEntriesTable.id, id));
 
-  return NextResponse.json(created, { status: 200 });
+  return createSuccessResponse(created);
 }
+
+export const POST = withAuthAndErrorHandling(startTimerHandler, 'start-timer');

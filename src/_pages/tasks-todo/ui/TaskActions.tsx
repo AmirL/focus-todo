@@ -1,13 +1,13 @@
 import { RefreshCcw, Copy, ClipboardCheck, ClipboardX } from 'lucide-react';
-import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter/model/filterStore';
+import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter';
 import { useTasksQuery, useUpdateTaskMutation } from '@/shared/api/tasks';
 import { Button } from '@/shared/ui/button';
 import { TaskModel, isTaskDeleted } from '@/entities/task/model/task';
-import { useApplyFilters } from '@/features/tasks/filter/model/filterTasks';
+import { useApplyFilters } from '@/features/tasks/filter';
 import { useSortedTasks } from '../model/sortTasks';
 import toast from 'react-hot-toast';
 import { createInstance } from '@/shared/lib/instance-tools';
-import { PrintButton } from '@/features/tasks/print/ui/PrintButton';
+import { PrintButton } from '@/features/tasks/print';
 
 export function TaskActions() {
   const { statusFilter } = useFilterStore();
@@ -67,7 +67,7 @@ function ResetSelectedButton() {
   const { data: allTasks = [] } = useTasksQuery();
   const updateTaskMutation = useUpdateTaskMutation();
 
-  const resetAllSelected = async () => {
+  const resetAllSelected = () => {
     const selectedTasks = allTasks.filter((task) => task.selectedAt && !task.completedAt);
 
     for (const task of selectedTasks) {

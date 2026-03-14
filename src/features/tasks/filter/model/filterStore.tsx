@@ -1,7 +1,7 @@
 'use client';
 
 import { create } from 'zustand';
-import { getSearchParam, updateSearchParams, validateEnumValue } from '@/shared/lib/url-utils';
+import { getSearchParams, updateSearchParams, validateEnumValue } from '@/shared/lib/url-utils';
 
 export enum StatusFilterEnum {
   SELECTED = 'selected',
@@ -21,8 +21,9 @@ type FilterState = {
 
 // Helper function to get initial state from URL
 function getInitialStateFromURL(): { statusFilter: StatusFilterEnum; listId: string } {
-  const filterParam = getSearchParam('filter');
-  const listIdParam = getSearchParam('listId') || '';
+  const params = getSearchParams();
+  const filterParam = params.get('filter');
+  const listIdParam = params.get('listId') || '';
 
   const statusFilter = validateEnumValue(filterParam, StatusFilterEnum, StatusFilterEnum.BACKLOG);
 

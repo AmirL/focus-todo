@@ -1,10 +1,7 @@
 import { isFutureDate } from '@/shared/lib/utils';
 import { instanceToPlain, plainToInstance, Transform } from 'class-transformer';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-dayjs.extend(utc);
+import dayjs from '@/shared/lib/dayjs';
 
-export type { AiSuggestionField, AiSuggestions } from '@/shared/types/aiSuggestions';
 import type { AiSuggestions } from '@/shared/types/aiSuggestions';
 
 export type TaskPlain = {
@@ -96,19 +93,19 @@ export function isTaskCompletedAgo(task: TaskModel) {
 }
 
 export function isTaskSelected(task: TaskModel) {
-  return !!task.selectedAt; // && dayjs(task.selectedAt).isSame(dayjs(), 'day');
+  return !!task.selectedAt;
 }
 
-export function isTaskToday(task: TaskModel) {
-  return task.date && dayjs(task.date).isSame(dayjs(), 'day');
+export function isTaskToday(task: TaskModel): boolean {
+  return !!task.date && dayjs(task.date).isSame(dayjs(), 'day');
 }
 
-export function isTaskTomorrow(task: TaskModel) {
-  return task.date && dayjs(task.date).isSame(dayjs().add(1, 'day'), 'day');
+export function isTaskTomorrow(task: TaskModel): boolean {
+  return !!task.date && dayjs(task.date).isSame(dayjs().add(1, 'day'), 'day');
 }
 
-export function isTaskOverdue(task: TaskModel) {
-  return task.date && dayjs(task.date).isBefore(dayjs(), 'day') && !task.completedAt;
+export function isTaskOverdue(task: TaskModel): boolean {
+  return !!task.date && dayjs(task.date).isBefore(dayjs(), 'day') && !task.completedAt;
 }
 
 function transformDateToUTCString({ value }: { value: Date | null }) {

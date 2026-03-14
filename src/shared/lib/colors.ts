@@ -65,7 +65,7 @@ export function validateListColor(value: unknown): { isValid: boolean; error?: s
  * Tailwind class sets for each list color.
  * Used by timeline components, list items, and color pickers.
  */
-export interface ColorClasses {
+interface ColorClasses {
   bg: string;
   border: string;
   text: string;

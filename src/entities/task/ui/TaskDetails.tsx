@@ -29,7 +29,7 @@ export function TaskDetails({ details, expanded, onCollapse, onCheckboxToggle }:
       onClick={onCollapse}
       onKeyDown={handleKeyDown}
       className="mt-1 overflow-hidden"
-      data-testid="task-details"
+      data-cy="task-details"
       role="button"
       tabIndex={0}
       aria-expanded={true}
@@ -46,7 +46,7 @@ export function TaskDetails({ details, expanded, onCollapse, onCheckboxToggle }:
               rel="noopener noreferrer"
               className="text-blue-600 hover:text-blue-800 underline"
               onClick={(e) => e.stopPropagation()}
-              data-testid="auto-link"
+              data-cy="auto-link"
               {...props}
             >
               {children}
@@ -66,7 +66,7 @@ export function TaskDetails({ details, expanded, onCollapse, onCheckboxToggle }:
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}
                 className="cursor-pointer accent-primary h-4 w-4 mr-1"
-                data-testid="subtask-checkbox"
+                data-cy="subtask-checkbox"
               />
             );
           },
@@ -135,8 +135,8 @@ export function DescriptionIndicator({ details, expanded, onClick }: Description
 }
 
 function getCheckboxIndexFromEvent(e: React.ChangeEvent<HTMLInputElement>): number {
-  const container = e.target.closest('[data-testid="task-details"]');
+  const container = e.target.closest('[data-cy="task-details"]');
   if (!container) return -1;
-  const allCheckboxes = container.querySelectorAll('[data-testid="subtask-checkbox"]');
+  const allCheckboxes = container.querySelectorAll('[data-cy="subtask-checkbox"]');
   return Array.from(allCheckboxes).indexOf(e.target);
 }

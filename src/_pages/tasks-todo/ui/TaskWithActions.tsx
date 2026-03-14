@@ -1,18 +1,12 @@
 import { Task } from '@/entities/task/ui/Task';
-import { EditTaskButton } from '@/features/tasks/edit/ui/EditTaskButton';
-import { DeleteButton } from '@/features/tasks/actions/ui/DeleteButton';
-import { ReAddButton } from '@/features/tasks/actions/ui/ReAddButton';
-import { SnoozeButton } from '@/features/tasks/actions/ui/SnoozeButton';
-import { StarButton } from '@/features/tasks/actions/ui/StarButton';
-import { BlockerButton } from '@/features/tasks/actions/ui/BlockerButton';
-import { useReorderStore } from '@/features/tasks/reorder';
+import { EditTaskButton } from '@/features/tasks/edit';
+import { DeleteButton, ReAddButton, SnoozeButton, StarButton, BlockerButton } from '@/features/tasks/actions';
 import type { TaskModel } from '@/entities/task/model/task';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 
 export function TaskWithActions({ task }: { task: TaskModel }) {
-  const { isDragging } = useReorderStore();
   const {
     attributes,
     listeners,

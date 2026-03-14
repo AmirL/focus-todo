@@ -1,9 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
 import { isFutureDate, isToday, isOverdue, parseDateFields, TaskDateKeys } from './utils';
-
-dayjs.extend(utc);
 
 describe('isFutureDate', () => {
   beforeEach(() => {
