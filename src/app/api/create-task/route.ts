@@ -4,6 +4,7 @@ import { eq } from 'drizzle-orm';
 import { tasksTable } from '@/shared/lib/drizzle/schema';
 import { parseDateFields, TaskDateKeys } from '@/shared/lib/utils';
 import { withAuthAndErrorHandling, createSuccessResponse, createErrorResponse } from '@/shared/lib/api/route-wrapper';
+import { serializeTask } from '@/app/api/tasks/serialize';
 
 async function createTaskHandler(req: NextRequest, session: { user: { id: string } }) {
   const { task } = await req.json();
@@ -27,7 +28,7 @@ async function createTaskHandler(req: NextRequest, session: { user: { id: string
   const [{ id }] = await DB.insert(tasksTable).values(taskWithParsedDates).$returningId();
   const [createdTask] = await DB.select().from(tasksTable).where(eq(tasksTable.id, id));
 
-  return createSuccessResponse(createdTask);
+  return createSuccessResponse(serializeTask(createdTask));
 }
 
 export const POST = withAuthAndErrorHandling(createTaskHandler, 'create-task');
