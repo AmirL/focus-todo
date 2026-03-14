@@ -11,6 +11,11 @@ import {
 
 type RouteContext = { params: Promise<{ date: string }> };
 
+interface ChangeInitiativeBody {
+  listId: number;
+  reason?: string;
+}
+
 /**
  * GET /api/initiative/:date - Get initiative for a specific date
  */
@@ -46,11 +51,16 @@ export function PATCH(req: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: 'Invalid date format. Use YYYY-MM-DD' }, { status: 400 });
     }
 
-    const body = await r.json();
+    const rawBody = await r.json() as ChangeInitiativeBody;
 
-    if (!body.listId) {
-      return NextResponse.json({ error: 'listId is required' }, { status: 400 });
+    if (!rawBody.listId || typeof rawBody.listId !== 'number' || !Number.isFinite(rawBody.listId)) {
+      return NextResponse.json({ error: 'listId must be a valid number' }, { status: 400 });
     }
+
+    const body: ChangeInitiativeBody = {
+      listId: rawBody.listId,
+      reason: typeof rawBody.reason === 'string' ? rawBody.reason : undefined,
+    };
 
     // Verify list belongs to user
     const list = await verifyListOwnership(body.listId, userId);

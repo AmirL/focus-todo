@@ -30,13 +30,19 @@ async function getHandler(_req: NextRequest, userId: string) {
   );
 }
 
+interface CreateInitiativeBody {
+  listId?: number;
+  date?: string;
+  reason?: string;
+}
+
 /**
  * POST /api/initiative - Set focus for a date
  *
  * Body: { listId: number, date?: string (YYYY-MM-DD), reason?: string }
  */
 async function postHandler(req: NextRequest, userId: string) {
-  const body = await req.json() as { listId?: number; date?: string; reason?: string };
+  const body = await req.json() as CreateInitiativeBody;
   const parsed = parseCreateInitiativeBody(body);
 
   if (parsed.error) {

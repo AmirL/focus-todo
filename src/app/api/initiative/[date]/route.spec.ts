@@ -220,7 +220,7 @@ describe('PATCH /api/initiative/:date', () => {
     const body = await res.json();
 
     expect(res.status).toBe(400);
-    expect(body.error).toBe('listId is required');
+    expect(body.error).toBe('listId must be a valid number');
   });
 
   it('should return 404 when list does not belong to user', async () => {
