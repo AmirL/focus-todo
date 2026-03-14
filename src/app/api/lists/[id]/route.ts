@@ -21,7 +21,7 @@ type RouteContext = { params: Promise<{ id: string }> };
  * GET /api/lists/:id - Get a single list
  */
 export function GET(req: NextRequest, context: RouteContext) {
-  return withApiAuth(async (r, userId) => {
+  return withApiAuth(async (_r, userId) => {
     const { id } = await context.params;
     const listId = parseInt(id, 10);
 

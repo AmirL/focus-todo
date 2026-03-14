@@ -16,7 +16,7 @@ export class ApiAuthError extends AuthError {
   }
 }
 
-export function isAuthError(error: unknown): boolean {
+function isAuthError(error: unknown): boolean {
   return error instanceof AuthError;
 }
 

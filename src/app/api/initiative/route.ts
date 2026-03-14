@@ -10,7 +10,7 @@ import {
 /**
  * GET /api/initiative - Get today's and tomorrow's initiative with balance data
  */
-async function getHandler(req: NextRequest, userId: string) {
+async function getHandler(_req: NextRequest, userId: string) {
   const { todayInitiative, tomorrowInitiative, suggestedList, balance, participatingLists } =
     await fetchTodayTomorrowInitiative(userId);
 

@@ -15,7 +15,7 @@ type RouteContext = { params: Promise<{ date: string }> };
  * GET /api/initiative/:date - Get initiative for a specific date
  */
 export function GET(req: NextRequest, context: RouteContext) {
-  return withApiAuth(async (r, userId) => {
+  return withApiAuth(async (_r, userId) => {
     const { date } = await context.params;
 
     if (!isValidDate(date)) {

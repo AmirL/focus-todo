@@ -12,7 +12,7 @@ type RouteContext = { params: Promise<{ id: string }> };
  * GET /api/goals/:id - Get a single goal by ID
  */
 export function GET(req: NextRequest, context: RouteContext) {
-  return withApiAuth(async (r, userId) => {
+  return withApiAuth(async (_r, userId) => {
     const { id } = await context.params;
     const goalId = parseInt(id, 10);
 

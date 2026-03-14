@@ -2,8 +2,6 @@ import { auth } from '@/shared/lib/auth';
 import { headers } from 'next/headers';
 import { AuthError } from '@/shared/lib/api/auth-errors';
 
-export { AuthError } from '@/shared/lib/api/auth-errors';
-
 export async function validateUserSession() {
   const headerValues = headers();
 
