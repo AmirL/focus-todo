@@ -10,10 +10,8 @@ import type { TimelineBlock, TimelineGap } from './TimelineBar';
 const DEFAULT_START_HOUR = 8;
 const DEFAULT_END_HOUR = 23;
 const HOUR_HEIGHT_PX = 64;
-/** Entries shorter than this are grouped side-by-side in columns */
-const SHORT_ENTRY_THRESHOLD_MIN = 30;
-/** Maximum gap (minutes) between short entries to still group them */
-const CLUSTER_GAP_THRESHOLD_MIN = 15;
+/** Maximum side-by-side columns before entries reuse columns with overlap */
+const MAX_COLUMNS = 4;
 
 interface DayTimelineProps {
   date: Date;
@@ -82,19 +80,14 @@ interface BlockPosition {
   heightPx: number;
   startMin: number;
   endMin: number;
-  /** Column index within a short-entry cluster (0-based). undefined = full width. */
+  /** Column index within an overlap group (0-based). undefined = full width. */
   column?: number;
-  /** Total columns in the cluster. */
+  /** Total columns in the overlap group. */
   totalColumns?: number;
-}
-
-function inSameCluster(a: BlockPosition, b: BlockPosition): boolean {
-  return (
-    a.column !== undefined &&
-    b.column !== undefined &&
-    a.totalColumns === b.totalColumns &&
-    a.topPx === b.topPx
-  );
+  /** Group ID for overlapping blocks placed side-by-side. */
+  groupId?: number;
+  /** Z-index for stacking order within column (higher = on top). */
+  zIndex?: number;
 }
 
 interface GapPosition {
@@ -127,100 +120,123 @@ function computeVerticalLayout(blocks: TimelineBlock[], startHour: number): {
     endMin,
   }));
 
-  // Group consecutive short entries into side-by-side clusters
-  let i = 0;
-  while (i < blockPositions.length) {
-    const duration = blockPositions[i].endMin - blockPositions[i].startMin;
-    if (duration < SHORT_ENTRY_THRESHOLD_MIN) {
-      // Start a potential cluster
-      let j = i + 1;
-      while (j < blockPositions.length) {
-        const nextDuration = blockPositions[j].endMin - blockPositions[j].startMin;
-        if (nextDuration >= SHORT_ENTRY_THRESHOLD_MIN) break;
-        const gap = blockPositions[j].startMin - blockPositions[j - 1].endMin;
-        if (gap > CLUSTER_GAP_THRESHOLD_MIN) break;
-        j++;
+  // Greedy column assignment: when blocks overlap (due to min-height inflation),
+  // place them side-by-side in columns instead of pushing them down.
+  // This keeps all blocks at their correct time positions.
+  let groupId = 0;
+  let groupStart = 0;
+
+  while (groupStart < blockPositions.length) {
+    // Expand the group to include all transitively overlapping blocks
+    let groupEnd = groupStart;
+    let maxBottom = blockPositions[groupStart].topPx + blockPositions[groupStart].heightPx;
+
+    while (groupEnd + 1 < blockPositions.length && blockPositions[groupEnd + 1].topPx < maxBottom) {
+      groupEnd++;
+      maxBottom = Math.max(maxBottom, blockPositions[groupEnd].topPx + blockPositions[groupEnd].heightPx);
+    }
+
+    if (groupEnd > groupStart) {
+      // Multiple overlapping blocks: assign columns using greedy interval coloring
+      const columns: { bottomPx: number }[] = [];
+
+      for (let k = groupStart; k <= groupEnd; k++) {
+        const entry = blockPositions[k];
+        let placed = false;
+
+        for (let c = 0; c < columns.length; c++) {
+          if (columns[c].bottomPx <= entry.topPx) {
+            entry.column = c;
+            columns[c].bottomPx = entry.topPx + entry.heightPx;
+            placed = true;
+            break;
+          }
+        }
+
+        if (!placed) {
+          if (columns.length < MAX_COLUMNS) {
+            entry.column = columns.length;
+            columns.push({ bottomPx: entry.topPx + entry.heightPx });
+          } else {
+            // Max columns reached: reuse the column with least overlap
+            let bestCol = 0;
+            let leastBottom = columns[0].bottomPx;
+            for (let c = 1; c < columns.length; c++) {
+              if (columns[c].bottomPx < leastBottom) {
+                leastBottom = columns[c].bottomPx;
+                bestCol = c;
+              }
+            }
+            entry.column = bestCol;
+            columns[bestCol].bottomPx = entry.topPx + entry.heightPx;
+          }
+        }
+
+        entry.groupId = groupId;
+        entry.zIndex = k - groupStart + 1;
       }
 
-      if (j - i >= 2) {
-        // Cluster of 2+ short entries: place side-by-side
-        const clusterTop = blockPositions[i].topPx;
-        const lastPos = blockPositions[j - 1];
-        const clusterBottom = lastPos.topPx + lastPos.heightPx;
-        const clusterHeight = Math.max(clusterBottom - clusterTop, 48);
-        const numColumns = j - i;
+      const totalCols = columns.length;
+      for (let k = groupStart; k <= groupEnd; k++) {
+        blockPositions[k].totalColumns = totalCols;
+      }
 
-        for (let k = i; k < j; k++) {
-          blockPositions[k].column = k - i;
-          blockPositions[k].totalColumns = numColumns;
-          blockPositions[k].topPx = clusterTop;
-          blockPositions[k].heightPx = clusterHeight;
+      groupId++;
+      groupStart = groupEnd + 1;
+    } else {
+      groupStart++;
+    }
+  }
+
+  // Compute gaps between entries/groups (skip gaps within the same overlap group)
+  const gapPositions: GapPosition[] = [];
+  let idx = 0;
+
+  while (idx < blockPositions.length) {
+    // Collect the time span of the current entry or group
+    let spanEndMin = blockPositions[idx].endMin;
+    let spanMaxBottom = blockPositions[idx].topPx + blockPositions[idx].heightPx;
+
+    if (blockPositions[idx].groupId !== undefined) {
+      const gid = blockPositions[idx].groupId;
+      while (idx + 1 < blockPositions.length && blockPositions[idx + 1].groupId === gid) {
+        idx++;
+        spanEndMin = Math.max(spanEndMin, blockPositions[idx].endMin);
+        spanMaxBottom = Math.max(spanMaxBottom, blockPositions[idx].topPx + blockPositions[idx].heightPx);
+      }
+    }
+
+    // Check for a gap to the next entry/group
+    if (idx + 1 < blockPositions.length) {
+      const nextStart = blockPositions[idx + 1].startMin;
+      if (nextStart - spanEndMin > 1) {
+        const gapDuration = nextStart - spanEndMin;
+        const baseDate = new Date(sorted[0].block.startedAt);
+        const gapStartDate = new Date(baseDate);
+        gapStartDate.setHours(startHour + Math.floor(spanEndMin / 60), spanEndMin % 60, 0, 0);
+        const gapEndDate = new Date(baseDate);
+        gapEndDate.setHours(startHour + Math.floor(nextStart / 60), nextStart % 60, 0, 0);
+
+        const timeBasedGapTop = minutesToTop(spanEndMin);
+        const gapTop = Math.max(timeBasedGapTop, spanMaxBottom);
+        const nextBlockTop = blockPositions[idx + 1].topPx;
+        const gapHeight = Math.max(nextBlockTop - gapTop, 0);
+
+        if (gapHeight > 0) {
+          gapPositions.push({
+            gap: {
+              startedAt: gapStartDate.toISOString(),
+              endedAt: gapEndDate.toISOString(),
+              durationMinutes: gapDuration,
+            },
+            topPx: gapTop,
+            heightPx: gapHeight,
+          });
         }
       }
-      i = j;
-    } else {
-      i++;
-    }
-  }
-
-  // Overlap-prevention pass: push blocks down when previous block's rendered
-  // bottom extends past the next block's time-based top position.
-  // This handles cases like a 13-minute entry (min-height 24px) visually
-  // overlapping a subsequent 1-hour entry that starts at its time-based position.
-  for (let idx = 0; idx < blockPositions.length - 1; idx++) {
-    const curr = blockPositions[idx];
-    const next = blockPositions[idx + 1];
-
-    // Skip entries within the same cluster (they're side-by-side, not stacked)
-    if (inSameCluster(curr, next)) {
-      continue;
     }
 
-    const currBottom = curr.topPx + curr.heightPx;
-    if (currBottom > next.topPx) {
-      next.topPx = currBottom;
-    }
-  }
-
-  // Compute gaps (skip gaps between entries in the same cluster)
-  const gapPositions: GapPosition[] = [];
-  for (let idx = 0; idx < blockPositions.length - 1; idx++) {
-    // Skip gaps within a cluster (entries placed side-by-side, not stacked)
-    const curr = blockPositions[idx];
-    const next = blockPositions[idx + 1];
-    if (inSameCluster(curr, next)) {
-      continue;
-    }
-
-    const currentEnd = sorted[idx].endMin;
-    const nextStart = sorted[idx + 1].startMin;
-    if (nextStart - currentEnd > 1) {
-      const gapDuration = nextStart - currentEnd;
-      const baseDate = new Date(sorted[idx].block.startedAt);
-      const gapStartDate = new Date(baseDate);
-      gapStartDate.setHours(startHour + Math.floor(currentEnd / 60), currentEnd % 60, 0, 0);
-      const gapEndDate = new Date(baseDate);
-      gapEndDate.setHours(startHour + Math.floor(nextStart / 60), nextStart % 60, 0, 0);
-
-      // Use the rendered bottom of the previous block to avoid overlap
-      const prevBlockBottom = curr.topPx + curr.heightPx;
-      const timeBasedGapTop = minutesToTop(currentEnd);
-      const gapTop = Math.max(timeBasedGapTop, prevBlockBottom);
-      const nextBlockTop = next.topPx;
-      const gapHeight = Math.max(nextBlockTop - gapTop, 0);
-
-      if (gapHeight > 0) {
-        gapPositions.push({
-          gap: {
-            startedAt: gapStartDate.toISOString(),
-            endedAt: gapEndDate.toISOString(),
-            durationMinutes: gapDuration,
-          },
-          topPx: gapTop,
-          heightPx: gapHeight,
-        });
-      }
-    }
+    idx++;
   }
 
   return { blockPositions, gapPositions };
@@ -335,7 +351,7 @@ function TimeBlock({
         colors.hover,
         isRunning && 'animate-pulse'
       )}
-      style={{ top: `${topPx}px`, height: `${heightPx}px`, ...columnStyle }}
+      style={{ top: `${topPx}px`, height: `${heightPx}px`, zIndex: position.zIndex, ...columnStyle }}
       title={isShort ? tooltipText : undefined}
       onClick={onStartEdit}
     >
