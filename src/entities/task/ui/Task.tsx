@@ -89,7 +89,7 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
               {dragHandle}
             </div>
           )}
-          {!deleted && !task.completedAt && (
+          {!deleted && (
             <TaskStartTimerButton taskId={Number(task.id)} />
           )}
           <Checkbox
