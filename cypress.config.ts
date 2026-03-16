@@ -57,7 +57,7 @@ export default defineConfig({
             );
             return finalPassed && hadFailure;
           })
-          .map((test) => test.title.join(" > "));
+          .map((test) => test.title.join(" "));
 
         if (flakyTests.length > 0) {
           let existing: string[] = [];
