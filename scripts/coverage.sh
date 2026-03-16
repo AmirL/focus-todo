@@ -1,12 +1,39 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Local coverage script: runs vitest coverage, optionally Cypress coverage,
-# merges available reports, and prints a summary.
+# Local coverage script: runs vitest coverage, starts an instrumented dev server,
+# runs Cypress E2E tests with coverage, merges all reports, and prints a summary.
+#
+# Usage:
+#   pnpm run coverage              # unit + e2e (starts instrumented server automatically)
+#   pnpm run coverage --unit-only  # unit tests only, no dev server needed
+#
+# The script automatically starts a Next.js dev server with CYPRESS_COVERAGE=true
+# so the code is instrumented via babel-plugin-istanbul. The server is shut down
+# when the script exits.
 
 COVERAGE_DIR="coverage"
 MERGE_DIR="$COVERAGE_DIR/to-merge"
 MERGED_DIR="$COVERAGE_DIR/merged"
+DEV_SERVER_PID=""
+UNIT_ONLY=false
+E2E_RAN=false
+
+# Parse arguments
+for arg in "$@"; do
+  case "$arg" in
+    --unit-only) UNIT_ONLY=true ;;
+  esac
+done
+
+cleanup() {
+  if [ -n "$DEV_SERVER_PID" ]; then
+    echo "==> Stopping dev server (PID $DEV_SERVER_PID)..."
+    kill "$DEV_SERVER_PID" 2>/dev/null || true
+    wait "$DEV_SERVER_PID" 2>/dev/null || true
+  fi
+}
+trap cleanup EXIT
 
 # Clean previous run
 rm -rf "$MERGE_DIR" "$MERGED_DIR"
@@ -16,18 +43,46 @@ mkdir -p "$MERGE_DIR" "$MERGED_DIR"
 echo "==> Running unit tests with coverage..."
 pnpm vitest run --coverage || true
 
-# 2. Optionally run Cypress if a dev server is already running
-DEV_SERVER_UP=false
-if curl -s -o /dev/null -w '' http://localhost:3000 2>/dev/null; then
-  DEV_SERVER_UP=true
-fi
+# 2. Start instrumented dev server and run Cypress E2E tests
+if [ "$UNIT_ONLY" = false ]; then
+  # Check if a dev server is already running on port 3000
+  EXTERNAL_SERVER=false
+  if curl -s -o /dev/null -w '' http://localhost:3000 2>/dev/null; then
+    EXTERNAL_SERVER=true
+    echo "==> Dev server already running on localhost:3000."
+    echo "    WARNING: For E2E coverage, the server must have been started with:"
+    echo "      CYPRESS_COVERAGE=true pnpm dev"
+    echo "    If not, coverage data will be incomplete. Stop the server and re-run this script"
+    echo "    to let it start an instrumented server automatically."
+  fi
 
-if [ "$DEV_SERVER_UP" = true ]; then
-  echo "==> Dev server detected on localhost:3000, running Cypress with coverage..."
-  CYPRESS_COVERAGE=true pnpm cypress run || true
-else
-  echo "==> No dev server on localhost:3000, skipping Cypress coverage."
-  echo "    Start the dev server (pnpm dev) to include E2E coverage."
+  if [ "$EXTERNAL_SERVER" = false ]; then
+    echo "==> Starting instrumented dev server (CYPRESS_COVERAGE=true)..."
+    CYPRESS_COVERAGE=true pnpm dev &
+    DEV_SERVER_PID=$!
+
+    # Wait for the server to be ready (up to 60 seconds)
+    echo "==> Waiting for dev server to start..."
+    RETRIES=0
+    MAX_RETRIES=60
+    while ! curl -s -o /dev/null -w '' http://localhost:3000 2>/dev/null; do
+      RETRIES=$((RETRIES + 1))
+      if [ "$RETRIES" -ge "$MAX_RETRIES" ]; then
+        echo "ERROR: Dev server did not start within ${MAX_RETRIES}s. Skipping E2E coverage."
+        kill "$DEV_SERVER_PID" 2>/dev/null || true
+        DEV_SERVER_PID=""
+        break
+      fi
+      sleep 1
+    done
+  fi
+
+  # Run Cypress with coverage if server is up
+  if curl -s -o /dev/null -w '' http://localhost:3000 2>/dev/null; then
+    echo "==> Running Cypress E2E tests with coverage..."
+    CYPRESS_COVERAGE=true pnpm cypress run || true
+    E2E_RAN=true
+  fi
 fi
 
 # 3. Collect available coverage JSON files
@@ -61,7 +116,7 @@ pnpm exec nyc report \
 # 5. Print summary
 if [ -f "$MERGED_DIR/coverage-summary.json" ]; then
   LABEL="unit only"
-  if [ "$DEV_SERVER_UP" = true ]; then
+  if [ "$E2E_RAN" = true ]; then
     LABEL="unit + e2e"
   fi
   echo ""
@@ -74,4 +129,6 @@ if [ -f "$MERGED_DIR/coverage-summary.json" ]; then
       console.log('  ' + key + ': ' + pct + '%');
     }
   "
+  echo ""
+  echo "HTML report: $MERGED_DIR/lcov-report/index.html"
 fi

@@ -11,6 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **TypeScript check**: `pnpm tsc --noEmit` (type checking without emitting files)
 - **Database migrations**: `pnpm run db:generate` and `pnpm run db:migrate`
 - **Architecture analysis**: `pnpm run fsd` (Feature-Sliced Design linting)
+- **Code coverage**: `pnpm run coverage` (unit + e2e combined). See [`docs/CODE_COVERAGE.md`](./docs/CODE_COVERAGE.md) for details.
 
 ### Port Configuration
 
