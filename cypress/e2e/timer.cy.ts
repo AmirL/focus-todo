@@ -217,4 +217,45 @@ describe("Timer", () => {
       );
     });
   });
+
+  it("should show start timer button on completed tasks", () => {
+    cy.intercept("POST", "/api/update-task").as("updateTask");
+    const taskName = `Done timer test ${Date.now()}`;
+
+    // Inline task creation (avoid createTaskAndGetId's visibility assertion
+    // which fails when Goals section pushes tasks below the fold)
+    cy.get('[data-cy="add-task-button"]').click();
+    cy.get('[data-cy="task-name-input"]').type(taskName);
+    cy.get('[data-cy="save-task-button"]').click();
+
+    cy.wait("@createTask").then((interception) => {
+      const taskId = interception.response!.body.id as number;
+      createdTaskIds.push(taskId);
+
+      // Wait for React Query to refetch tasks list after creation
+      cy.wait(2000);
+      cy.get(`[data-cy="task-${taskId}"]`, { timeout: 15000 }).should("exist");
+
+      // Mark the task as done
+      cy.get(`[data-cy="task-${taskId}"]`)
+        .find('[role="checkbox"]')
+        .click({ force: true });
+      cy.wait("@updateTask");
+
+      // The start timer button should still exist on the completed task
+      cy.get(`[data-cy="task-${taskId}"]`)
+        .find('[data-cy="start-timer-button"]')
+        .should("exist");
+
+      // Start a timer on the completed task to prove it works
+      cy.get(`[data-cy="task-${taskId}"]`)
+        .find('[data-cy="start-timer-button"]')
+        .click({ force: true });
+      cy.wait("@startTimer");
+
+      // Timer bar should appear, proving the timer works on completed tasks
+      cy.get('[data-cy="timer-bar"]', { timeout: 10000 }).should("be.visible");
+      cy.get('[data-cy="timer-bar"]').should("contain.text", taskName);
+    });
+  });
 });
