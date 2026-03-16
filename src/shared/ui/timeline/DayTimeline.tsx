@@ -10,10 +10,8 @@ import type { TimelineBlock, TimelineGap } from './TimelineBar';
 const DEFAULT_START_HOUR = 8;
 const DEFAULT_END_HOUR = 23;
 const HOUR_HEIGHT_PX = 64;
-/** Entries shorter than this are grouped side-by-side in columns */
-const SHORT_ENTRY_THRESHOLD_MIN = 30;
-/** Maximum gap (minutes) between short entries to still group them */
-const CLUSTER_GAP_THRESHOLD_MIN = 15;
+/** Maximum number of side-by-side columns for overlapping entries */
+const MAX_COLUMNS = 4;
 
 interface DayTimelineProps {
   date: Date;
@@ -88,19 +86,101 @@ interface BlockPosition {
   totalColumns?: number;
 }
 
-function inSameCluster(a: BlockPosition, b: BlockPosition): boolean {
-  return (
-    a.column !== undefined &&
-    b.column !== undefined &&
-    a.totalColumns === b.totalColumns &&
-    a.topPx === b.topPx
-  );
-}
-
 interface GapPosition {
   gap: TimelineGap;
   topPx: number;
   heightPx: number;
+}
+
+/**
+ * Checks if two blocks visually overlap based on their rendered positions.
+ * Uses rendered height (with min-height) rather than time-based height,
+ * so short entries expanded by min-height are correctly detected as overlapping.
+ */
+function blocksVisuallyOverlap(a: BlockPosition, b: BlockPosition): boolean {
+  const aBottom = a.topPx + a.heightPx;
+  const bBottom = b.topPx + b.heightPx;
+  return a.topPx < bBottom && b.topPx < aBottom;
+}
+
+/**
+ * Assigns columns to overlapping entries using a greedy algorithm (like Google Calendar).
+ * Instead of pushing overlapping entries down (which cascades and displaces them),
+ * overlapping entries are placed side-by-side in columns at their correct time positions.
+ */
+function assignOverlapColumns(positions: BlockPosition[]): void {
+  if (positions.length === 0) return;
+
+  // Find connected overlap groups
+  const visited = new Set<number>();
+  const groups: number[][] = [];
+
+  for (let i = 0; i < positions.length; i++) {
+    if (visited.has(i)) continue;
+
+    // BFS to find all entries connected by visual overlap
+    const group: number[] = [];
+    const queue = [i];
+    visited.add(i);
+
+    while (queue.length > 0) {
+      const curr = queue.shift()!;
+      group.push(curr);
+
+      for (let j = 0; j < positions.length; j++) {
+        if (visited.has(j)) continue;
+        if (blocksVisuallyOverlap(positions[curr], positions[j])) {
+          visited.add(j);
+          queue.push(j);
+        }
+      }
+    }
+
+    if (group.length >= 2) {
+      groups.push(group);
+    }
+  }
+
+  // For each overlap group, assign columns greedily
+  for (const group of groups) {
+    // Sort group members by start time
+    group.sort((a, b) => positions[a].startMin - positions[b].startMin);
+
+    // columns[c] = rendered bottom (topPx + heightPx) of the last entry in column c
+    const columns: number[] = [];
+
+    for (const idx of group) {
+      const pos = positions[idx];
+
+      // Find first column where this entry doesn't visually overlap
+      let placed = false;
+      for (let c = 0; c < columns.length && c < MAX_COLUMNS; c++) {
+        if (pos.topPx >= columns[c]) {
+          // Fits in this column
+          pos.column = c;
+          columns[c] = pos.topPx + pos.heightPx;
+          placed = true;
+          break;
+        }
+      }
+
+      if (!placed) {
+        // New column needed
+        pos.column = columns.length;
+        columns.push(pos.topPx + pos.heightPx);
+      }
+    }
+
+    // Set totalColumns for all entries in the group
+    const totalCols = Math.min(columns.length, MAX_COLUMNS);
+    for (const idx of group) {
+      positions[idx].totalColumns = totalCols;
+      // Clamp column index if we exceeded MAX_COLUMNS
+      if (positions[idx].column! >= totalCols) {
+        positions[idx].column = totalCols - 1;
+      }
+    }
+  }
 }
 
 function computeVerticalLayout(blocks: TimelineBlock[], startHour: number): {
@@ -127,68 +207,18 @@ function computeVerticalLayout(blocks: TimelineBlock[], startHour: number): {
     endMin,
   }));
 
-  // Group consecutive short entries into side-by-side clusters
-  let i = 0;
-  while (i < blockPositions.length) {
-    const duration = blockPositions[i].endMin - blockPositions[i].startMin;
-    if (duration < SHORT_ENTRY_THRESHOLD_MIN) {
-      // Start a potential cluster
-      let j = i + 1;
-      while (j < blockPositions.length) {
-        const nextDuration = blockPositions[j].endMin - blockPositions[j].startMin;
-        if (nextDuration >= SHORT_ENTRY_THRESHOLD_MIN) break;
-        const gap = blockPositions[j].startMin - blockPositions[j - 1].endMin;
-        if (gap > CLUSTER_GAP_THRESHOLD_MIN) break;
-        j++;
-      }
+  // Assign columns for overlapping entries (side-by-side, like Google Calendar)
+  assignOverlapColumns(blockPositions);
 
-      if (j - i >= 2) {
-        // Cluster of 2+ short entries: place side-by-side
-        const clusterTop = blockPositions[i].topPx;
-        const lastPos = blockPositions[j - 1];
-        const clusterBottom = lastPos.topPx + lastPos.heightPx;
-        const clusterHeight = Math.max(clusterBottom - clusterTop, 48);
-        const numColumns = j - i;
-
-        for (let k = i; k < j; k++) {
-          blockPositions[k].column = k - i;
-          blockPositions[k].totalColumns = numColumns;
-          blockPositions[k].topPx = clusterTop;
-          blockPositions[k].heightPx = clusterHeight;
-        }
-      }
-      i = j;
-    } else {
-      i++;
-    }
-  }
-
-  // Overlap-prevention pass: push blocks down when previous block's rendered
-  // bottom extends past the next block's time-based top position.
-  // This handles cases like a 13-minute entry (min-height 24px) visually
-  // overlapping a subsequent 1-hour entry that starts at its time-based position.
-  for (let idx = 0; idx < blockPositions.length - 1; idx++) {
-    const curr = blockPositions[idx];
-    const next = blockPositions[idx + 1];
-
-    // Skip entries within the same cluster (they're side-by-side, not stacked)
-    if (inSameCluster(curr, next)) {
-      continue;
-    }
-
-    const currBottom = curr.topPx + curr.heightPx;
-    if (currBottom > next.topPx) {
-      next.topPx = currBottom;
-    }
-  }
-
-  // Compute gaps (skip gaps between entries in the same cluster)
+  // Compute gaps between non-overlapping consecutive entries
+  // For entries in columns, use the last entry in the overlap group as the "end"
   const gapPositions: GapPosition[] = [];
   for (let idx = 0; idx < blockPositions.length - 1; idx++) {
-    // Skip gaps within a cluster (entries placed side-by-side, not stacked)
     const curr = blockPositions[idx];
     const next = blockPositions[idx + 1];
-    if (inSameCluster(curr, next)) {
+
+    // Skip gap computation within overlap groups (entries are side-by-side)
+    if (curr.column !== undefined && next.column !== undefined && blocksVisuallyOverlap(curr, next)) {
       continue;
     }
 
@@ -202,12 +232,9 @@ function computeVerticalLayout(blocks: TimelineBlock[], startHour: number): {
       const gapEndDate = new Date(baseDate);
       gapEndDate.setHours(startHour + Math.floor(nextStart / 60), nextStart % 60, 0, 0);
 
-      // Use the rendered bottom of the previous block to avoid overlap
-      const prevBlockBottom = curr.topPx + curr.heightPx;
-      const timeBasedGapTop = minutesToTop(currentEnd);
-      const gapTop = Math.max(timeBasedGapTop, prevBlockBottom);
-      const nextBlockTop = next.topPx;
-      const gapHeight = Math.max(nextBlockTop - gapTop, 0);
+      const gapTop = minutesToTop(currentEnd);
+      const gapBottom = minutesToTop(nextStart);
+      const gapHeight = Math.max(gapBottom - gapTop, 0);
 
       if (gapHeight > 0) {
         gapPositions.push({
