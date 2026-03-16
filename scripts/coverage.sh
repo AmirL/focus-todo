@@ -8,6 +8,9 @@ set -euo pipefail
 #   pnpm run coverage              # unit + e2e (starts instrumented server automatically)
 #   pnpm run coverage --unit-only  # unit tests only, no dev server needed
 #
+# Environment variables:
+#   COVERAGE_PORT  - port for the instrumented dev server (default: 3200)
+#
 # The script automatically starts a Next.js dev server with CYPRESS_COVERAGE=true
 # so the code is instrumented via babel-plugin-istanbul. The server is shut down
 # when the script exits.
@@ -18,6 +21,7 @@ MERGED_DIR="$COVERAGE_DIR/merged"
 DEV_SERVER_PID=""
 UNIT_ONLY=false
 E2E_RAN=false
+PORT="${COVERAGE_PORT:-3200}"
 
 # Parse arguments
 for arg in "$@"; do
@@ -25,6 +29,36 @@ for arg in "$@"; do
     --unit-only) UNIT_ONLY=true ;;
   esac
 done
+
+# Check E2E prerequisites (Cypress needs test credentials)
+if [ "$UNIT_ONLY" = false ]; then
+  MISSING_VARS=false
+
+  # Cypress reads CYPRESS_* env vars automatically (stripping the prefix).
+  # They can also be set in cypress.env.json.
+  if [ -z "${CYPRESS_TEST_EMAIL:-}" ] && [ ! -f "cypress.env.json" ]; then
+    MISSING_VARS=true
+  fi
+  if [ -z "${CYPRESS_TEST_PASSWORD:-}" ] && [ ! -f "cypress.env.json" ]; then
+    MISSING_VARS=true
+  fi
+
+  if [ "$MISSING_VARS" = true ]; then
+    echo ""
+    echo "WARNING: E2E test credentials not found."
+    echo "  E2E coverage requires CYPRESS_TEST_EMAIL and CYPRESS_TEST_PASSWORD."
+    echo ""
+    echo "  Option 1: Create cypress.env.json (see cypress.env.json.example)"
+    echo "  Option 2: Export env vars:"
+    echo "    export CYPRESS_TEST_EMAIL=test@example.com"
+    echo "    export CYPRESS_TEST_PASSWORD=password123"
+    echo "    export CYPRESS_API_TEST_KEY=<your-api-key>  # optional, for test cleanup"
+    echo ""
+    echo "  Falling back to --unit-only mode."
+    echo ""
+    UNIT_ONLY=true
+  fi
+fi
 
 cleanup() {
   if [ -n "$DEV_SERVER_PID" ]; then
@@ -45,27 +79,31 @@ pnpm vitest run --coverage || true
 
 # 2. Start instrumented dev server and run Cypress E2E tests
 if [ "$UNIT_ONLY" = false ]; then
-  # Check if a dev server is already running on port 3000
-  EXTERNAL_SERVER=false
-  if curl -s -o /dev/null -w '' http://localhost:3000 2>/dev/null; then
-    EXTERNAL_SERVER=true
-    echo "==> Dev server already running on localhost:3000."
-    echo "    WARNING: For E2E coverage, the server must have been started with:"
-    echo "      CYPRESS_COVERAGE=true pnpm dev"
-    echo "    If not, coverage data will be incomplete. Stop the server and re-run this script"
-    echo "    to let it start an instrumented server automatically."
-  fi
+  # Check if any dev server is running (coverage needs exclusive DB access to avoid
+  # "Too many connections" errors from running two Next.js servers simultaneously)
+  for CHECK_PORT in 3000 3001 3002 "${PORT}"; do
+    if curl -s -o /dev/null -w '' "http://localhost:${CHECK_PORT}" 2>/dev/null; then
+      echo "ERROR: A server is already running on port ${CHECK_PORT}."
+      echo "  The coverage script starts its own instrumented dev server and needs exclusive"
+      echo "  database access. Running two servers causes 'Too many connections' errors."
+      echo ""
+      echo "  Please stop all dev servers before running coverage."
+      echo "  Skipping E2E coverage (unit coverage still collected)."
+      UNIT_ONLY=true
+      break
+    fi
+  done
 
-  if [ "$EXTERNAL_SERVER" = false ]; then
-    echo "==> Starting instrumented dev server (CYPRESS_COVERAGE=true)..."
-    CYPRESS_COVERAGE=true pnpm dev &
+  if [ "$UNIT_ONLY" = false ]; then
+    echo "==> Starting instrumented dev server on port ${PORT} (CYPRESS_COVERAGE=true)..."
+    CYPRESS_COVERAGE=true pnpm dev --port "$PORT" &
     DEV_SERVER_PID=$!
 
-    # Wait for the server to be ready (up to 60 seconds)
+    # Wait for the server to be ready (up to 120 seconds)
     echo "==> Waiting for dev server to start..."
     RETRIES=0
-    MAX_RETRIES=60
-    while ! curl -s -o /dev/null -w '' http://localhost:3000 2>/dev/null; do
+    MAX_RETRIES=120
+    while ! curl -s -o /dev/null -w '' "http://localhost:${PORT}" 2>/dev/null; do
       RETRIES=$((RETRIES + 1))
       if [ "$RETRIES" -ge "$MAX_RETRIES" ]; then
         echo "ERROR: Dev server did not start within ${MAX_RETRIES}s. Skipping E2E coverage."
@@ -75,13 +113,13 @@ if [ "$UNIT_ONLY" = false ]; then
       fi
       sleep 1
     done
-  fi
 
-  # Run Cypress with coverage if server is up
-  if curl -s -o /dev/null -w '' http://localhost:3000 2>/dev/null; then
-    echo "==> Running Cypress E2E tests with coverage..."
-    CYPRESS_COVERAGE=true pnpm cypress run || true
-    E2E_RAN=true
+    # Run Cypress with coverage if server is up
+    if curl -s -o /dev/null -w '' "http://localhost:${PORT}" 2>/dev/null; then
+      echo "==> Running Cypress E2E tests with coverage against http://localhost:${PORT}..."
+      CYPRESS_COVERAGE=true CYPRESS_BASE_URL="http://localhost:${PORT}" pnpm cypress run || true
+      E2E_RAN=true
+    fi
   fi
 fi
 

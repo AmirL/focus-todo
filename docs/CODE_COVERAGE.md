@@ -2,6 +2,28 @@
 
 This project supports combined code coverage from unit tests (Vitest) and E2E tests (Cypress).
 
+## Prerequisites
+
+E2E coverage requires Cypress test credentials. Set them up once:
+
+```bash
+# Copy the example and fill in your values
+cp cypress.env.json.example cypress.env.json
+```
+
+The file is gitignored. Required fields:
+- `TEST_EMAIL` / `TEST_PASSWORD`: login credentials for the test user (dev mode: `test@example.com` / `password123`)
+- `API_TEST_KEY` (optional): API key for test data cleanup between runs
+
+Alternatively, export environment variables with the `CYPRESS_` prefix:
+
+```bash
+export CYPRESS_TEST_EMAIL=test@example.com
+export CYPRESS_TEST_PASSWORD=password123
+```
+
+If credentials are missing, the script falls back to unit-only mode automatically.
+
 ## Quick Start
 
 ```bash
@@ -12,7 +34,9 @@ pnpm run coverage
 pnpm run coverage --unit-only
 ```
 
-The script handles everything automatically: runs unit tests, starts an instrumented dev server, runs Cypress E2E tests with coverage collection, merges the reports, and prints a summary.
+The script handles everything automatically: runs unit tests, starts an instrumented dev server on port 3200 (to avoid conflicts with a running dev server), runs Cypress E2E tests with coverage collection, merges the reports, and prints a summary.
+
+You can override the port with `COVERAGE_PORT=4000 pnpm run coverage`.
 
 ## How It Works
 
@@ -45,11 +69,11 @@ NYC merges all available coverage JSON files into a single report:
 If you prefer to run the dev server yourself (e.g., for debugging):
 
 ```bash
-# Terminal 1: start instrumented dev server
-CYPRESS_COVERAGE=true pnpm dev
+# Terminal 1: start instrumented dev server on a free port
+CYPRESS_COVERAGE=true pnpm dev --port 3200
 
-# Terminal 2: run Cypress with coverage
-CYPRESS_COVERAGE=true pnpm cypress run
+# Terminal 2: run Cypress with coverage against that port
+CYPRESS_COVERAGE=true CYPRESS_BASE_URL=http://localhost:3200 pnpm cypress run
 ```
 
 Then run the merge step manually:
