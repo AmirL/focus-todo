@@ -22,11 +22,8 @@ function walkSuites(suites) {
     for (const test of suite.tests || []) {
       const title = test.fullTitle || test.title;
       const passed = test.pass === true;
-      const attempts = test.attempts || [];
-      const hadFailedAttempts = attempts.some((a) => a.pass === false || a.error);
-      const flaky = passed && hadFailedAttempts;
 
-      tests.set(title, { passed, flaky });
+      tests.set(title, { passed, flaky: false });
     }
     walkSuites(suite.suites);
   }
@@ -60,6 +57,39 @@ for (const file of reportFiles) {
     walkSuites(suites);
   } catch (e) {
     console.error(`Error parsing ${file}: ${e.message}`);
+  }
+}
+
+// Mark tests as flaky using Cypress after:spec retry data.
+// Mochawesome doesn't record retry attempts, so the Cypress config writes
+// flaky-from-retries.json with test titles that passed after failed attempts.
+function findFlakyRetryFiles(dir) {
+  const files = [];
+  if (!fs.existsSync(dir)) return files;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...findFlakyRetryFiles(fullPath));
+    } else if (entry.name === 'flaky-from-retries.json') {
+      files.push(fullPath);
+    }
+  }
+  return files;
+}
+
+for (const file of findFlakyRetryFiles(resultsDir)) {
+  try {
+    const flakyTitles = JSON.parse(fs.readFileSync(file, 'utf8'));
+    for (const title of flakyTitles) {
+      // Find matching test by partial title match (after:spec joins with " > ")
+      for (const [testTitle, testData] of tests) {
+        if (testTitle === title || testTitle.includes(title) || title.includes(testTitle)) {
+          testData.flaky = true;
+        }
+      }
+    }
+  } catch (e) {
+    console.error(`Error reading flaky retries from ${file}: ${e.message}`);
   }
 }
 
