@@ -390,7 +390,93 @@ export const ShortEntries: Story = {
   },
 };
 
-/** Four consecutive short entries placed side-by-side in columns */
+/** Reproduces the exact bug from task #54: 8 consecutive short entries in ~1.5h */
+export const ManyConsecutiveShortEntries: Story = {
+  args: {
+    date: today,
+    blocks: [
+      {
+        id: '1',
+        taskName: 'Daily Recurring',
+        startedAt: todayAt(13, 1),
+        endedAt: todayAt(13, 22),
+        listName: 'Daily Recurring',
+        listColor: 'green',
+        durationMinutes: 21,
+      },
+      {
+        id: '2',
+        taskName: 'Life Maintenance',
+        startedAt: todayAt(13, 22),
+        endedAt: todayAt(13, 23),
+        listName: 'Life Maintenance',
+        listColor: 'amber',
+        durationMinutes: 1,
+      },
+      {
+        id: '3',
+        taskName: 'Personal',
+        startedAt: todayAt(13, 23),
+        endedAt: todayAt(13, 43),
+        listName: 'Personal',
+        listColor: 'blue',
+        durationMinutes: 20,
+      },
+      {
+        id: '4',
+        taskName: 'Life Maintenance',
+        startedAt: todayAt(13, 43),
+        endedAt: todayAt(13, 45),
+        listName: 'Life Maintenance',
+        listColor: 'amber',
+        durationMinutes: 2,
+      },
+      {
+        id: '5',
+        taskName: 'Daily Recurring',
+        startedAt: todayAt(13, 45),
+        endedAt: todayAt(13, 58),
+        listName: 'Daily Recurring',
+        listColor: 'green',
+        durationMinutes: 13,
+      },
+      {
+        id: '6',
+        taskName: 'Life Maintenance',
+        startedAt: todayAt(13, 58),
+        endedAt: todayAt(14, 14),
+        listName: 'Life Maintenance',
+        listColor: 'amber',
+        durationMinutes: 16,
+      },
+      {
+        id: '7',
+        taskName: 'Personal',
+        startedAt: todayAt(14, 14),
+        endedAt: todayAt(14, 23),
+        listName: 'Personal',
+        listColor: 'blue',
+        durationMinutes: 9,
+      },
+      {
+        id: '8',
+        taskName: 'Daily Recurring',
+        startedAt: todayAt(14, 23),
+        endedAt: todayAt(14, 44),
+        listName: 'Daily Recurring',
+        listColor: 'green',
+        durationMinutes: 21,
+      },
+    ] as TimelineBlock[],
+    onPrevDay: () => console.log('Previous day'),
+    onNextDay: () => console.log('Next day'),
+    onGapClick: (gap) => console.log('Gap clicked:', gap),
+    onBlockDelete: (block) => console.log('Delete:', block.taskName),
+    onBlockEdit: (block, start, end) => console.log('Edit:', block.taskName, start, end),
+  },
+};
+
+/** Consecutive short entries at their correct time positions */
 export const ShortEntriesSideBySide: Story = {
   args: {
     date: today,
