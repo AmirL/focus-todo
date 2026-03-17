@@ -34,6 +34,8 @@ describe("List Description", () => {
       .click();
     cy.get('[data-cy="list-form-dialog"]').should("be.visible");
 
+    // Wait for form to fully load (submit button becomes enabled once list name is populated)
+    cy.get('[data-cy="list-form-submit"]').should("not.be.disabled");
     cy.get('[data-cy="list-description"]').clear().type(testDescription);
     cy.get('[data-cy="list-form-submit"]').click();
 
