@@ -77,7 +77,7 @@ jobs:
       - name: Merge mochawesome reports
         if: always()
         run: |
-          npx mochawesome-merge cypress/results/*.json -o cypress/results/merged-report.json 2>/dev/null || echo "No mochawesome reports to merge"
+          npx mochawesome-merge cypress/results/mochawesome*.json -o cypress/results/merged-report.json 2>/dev/null || echo "No mochawesome reports to merge"
 
       - name: Upload Cypress artifacts
         if: always()
