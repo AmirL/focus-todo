@@ -153,8 +153,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Find the PR number for this deployment
-          PR_NUMBER=$(gh pr list --search "${{ github.event.deployment_status.deployment.sha }}" --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
+          # Find the PR number for this deployment using the branch name (ref)
+          DEPLOY_REF="${{ github.event.deployment_status.deployment.ref }}"
+          echo "Looking for PR with head branch: $DEPLOY_REF"
+          PR_NUMBER=$(gh pr list --head "$DEPLOY_REF" --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
 
           if [ -z "$PR_NUMBER" ]; then
             echo "Could not find PR for this deployment, skipping label"
