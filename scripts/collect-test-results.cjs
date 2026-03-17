@@ -77,9 +77,13 @@ function findFlakyRetryFiles(dir) {
   return files;
 }
 
-for (const file of findFlakyRetryFiles(resultsDir)) {
+const flakyRetryFiles = findFlakyRetryFiles(resultsDir);
+console.error(`Found ${flakyRetryFiles.length} flaky-from-retries.json file(s): ${JSON.stringify(flakyRetryFiles)}`);
+
+for (const file of flakyRetryFiles) {
   try {
     const flakyTitles = JSON.parse(fs.readFileSync(file, 'utf8'));
+    console.error(`Flaky titles from ${file}: ${JSON.stringify(flakyTitles)}`);
     for (const title of flakyTitles) {
       // Find matching test by partial title match (after:spec joins with " > ")
       for (const [testTitle, testData] of tests) {

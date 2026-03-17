@@ -130,11 +130,18 @@ jobs:
             echo "No previous flaky history found, starting fresh"
           fi
 
+      - name: List downloaded artifacts
+        run: |
+          echo "=== Files in all-results ==="
+          find all-results -name "*.json" -type f | sort
+          echo "=== Looking for flaky-from-retries.json ==="
+          find all-results -name "flaky-from-retries.json" -type f
+
       - name: Collect current test results
         run: |
           node scripts/collect-test-results.cjs all-results > current-results.json
           echo "Current results:"
-          cat current-results.json | head -c 500
+          cat current-results.json | head -c 2000
 
       - name: Analyze flaky tests and generate summary
         run: |
