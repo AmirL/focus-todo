@@ -110,7 +110,13 @@ describe("Task Actions", () => {
   describe("Drag Reorder", () => {
     it("should show drag handles on task hover", () => {
       cy.get(`[data-cy="task-${taskId}"]`).trigger("mouseover");
-      cy.get('[aria-label="Drag to reorder task"]').should("exist");
+      cy.get(`[data-cy="drag-handle-${taskId}"]`).should("exist");
+    });
+
+    it("should have drag handle with correct cursor style", () => {
+      cy.get(`[data-cy="task-${taskId}"]`).trigger("mouseover");
+      cy.get(`[data-cy="drag-handle-${taskId}"]`)
+        .should("have.css", "cursor", "grab");
     });
   });
 
@@ -129,6 +135,44 @@ describe("Task Actions", () => {
       cy.wait("@updateTask").then((interception) => {
         expect(interception.request.body.task.listId).to.be.a("number");
       });
+    });
+  });
+
+  describe("Bulk Selection", () => {
+    it("should temporarily select a task in the Selected filter", () => {
+      // First star the task so it appears in the Selected filter
+      cy.get(`[data-cy="task-${taskId}"]`).trigger("mouseover");
+      taskEl("star-task-").click({ force: true });
+      cy.wait("@updateTask");
+
+      // Navigate to Selected filter
+      cy.get('[data-cy="filter-selected"]').click();
+      cy.get(`[data-cy="task-${taskId}"]`, { timeout: 10000 }).should("exist");
+
+      // Click the task row (not a button) to temporarily select it
+      cy.get(`[data-cy="task-${taskId}"]`).find('.font-medium').first().click();
+
+      // Verify the task shows selection highlight (bg-blue-50)
+      cy.get(`[data-cy="task-${taskId}"]`).should("have.class", "bg-blue-50");
+    });
+
+    it("should deselect a temporarily selected task by clicking again", () => {
+      // Star the task
+      cy.get(`[data-cy="task-${taskId}"]`).trigger("mouseover");
+      taskEl("star-task-").click({ force: true });
+      cy.wait("@updateTask");
+
+      // Go to Selected filter
+      cy.get('[data-cy="filter-selected"]').click();
+      cy.get(`[data-cy="task-${taskId}"]`, { timeout: 10000 }).should("exist");
+
+      // Click to select
+      cy.get(`[data-cy="task-${taskId}"]`).find('.font-medium').first().click();
+      cy.get(`[data-cy="task-${taskId}"]`).should("have.class", "bg-blue-50");
+
+      // Click again to deselect
+      cy.get(`[data-cy="task-${taskId}"]`).find('.font-medium').first().click();
+      cy.get(`[data-cy="task-${taskId}"]`).should("not.have.class", "bg-blue-50");
     });
   });
 

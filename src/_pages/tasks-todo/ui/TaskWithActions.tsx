@@ -33,6 +33,7 @@ export function TaskWithActions({ task }: { task: TaskModel }) {
             className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground"
             {...listeners}
             aria-label="Drag to reorder task"
+            data-cy={`drag-handle-${task.id}`}
           >
             <GripVertical size={16} />
           </button>

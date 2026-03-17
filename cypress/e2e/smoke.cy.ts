@@ -31,7 +31,7 @@ describe("Smoke Tests - Critical User Flows", () => {
 
     // Complete the task - use role="checkbox" for Radix checkbox
     cy.get('[data-cy^="task-"]').contains(taskName).parents('[data-cy^="task-"]').find('[role="checkbox"]').click();
-    cy.get(".line-through").should("exist");
+    cy.get('[data-cy^="task-"]').contains(taskName).parents('[data-cy^="task-"]').should("have.attr", "data-state", "completed");
   });
 
   it("should star a task and view in Selected", () => {

@@ -50,14 +50,43 @@ describe("Initiative", () => {
       cy.contains("Last 30 days of daily focus selections").should("exist");
       // Should show either the history table or empty state
       cy.get("body").then(($body) => {
-        if ($body.find("table th").length > 0) {
-          cy.contains("th", "Date").should("exist");
-          cy.contains("th", "Suggested").should("exist");
-          cy.contains("th", "Chosen").should("exist");
+        if ($body.find('[data-cy="initiative-history-table"]').length > 0) {
+          cy.get('[data-cy="initiative-history-table"]').within(() => {
+            cy.contains("th", "Date").should("exist");
+            cy.contains("th", "Suggested").should("exist");
+            cy.contains("th", "Chosen").should("exist");
+            cy.contains("th", "Reason").should("exist");
+            // Verify at least one row of data exists
+            cy.get("tbody tr").should("have.length.greaterThan", 0);
+          });
         } else {
           cy.contains("No focus history yet").should("exist");
         }
       });
+    });
+
+    it("should show history entries after setting today's focus", () => {
+      // First set today's focus to generate history
+      cy.intercept("POST", "/api/current-initiative").as("setInitiative");
+      cy.intercept("PATCH", "/api/current-initiative/*").as("changeInitiative");
+
+      cy.get('[data-cy="filter-today"]').click();
+      cy.get('[data-cy="today-focus-banner"]', { timeout: 10000 }).should("be.visible");
+      cy.get('[data-cy="today-focus-dropdown"]').click();
+      cy.get('[data-cy^="today-focus-option-"]').first().click();
+      cy.get("body").then(($body) => {
+        if ($body.find('[data-cy="today-focus-save"]').length > 0) {
+          cy.get('[data-cy="today-focus-save"]').click();
+        }
+      });
+
+      // Now navigate to settings and verify history exists
+      cy.visit("/settings");
+      cy.contains("Settings", { timeout: 10000 }).should("be.visible");
+      cy.contains("Focus History").scrollIntoView({ duration: 500 }).should("be.visible");
+      // After setting focus, there should be at least one entry
+      cy.get('[data-cy="initiative-history-table"]', { timeout: 10000 }).should("exist");
+      cy.get('[data-cy="initiative-history-table"] tbody tr').should("have.length.greaterThan", 0);
     });
   });
 

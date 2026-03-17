@@ -56,7 +56,7 @@ describe("Task Management", () => {
     it("should mark a task as complete", () => {
       // Radix checkbox uses role="checkbox"
       cy.get('[data-cy^="task-"]').first().find('[role="checkbox"]').click();
-      cy.get(".line-through").should("exist");
+      cy.get('[data-cy^="task-"]').first().should("have.attr", "data-state", "completed");
     });
 
     it("should star/select a task", () => {
@@ -74,7 +74,7 @@ describe("Task Management", () => {
 
     it("should delete a task", () => {
       cy.get('[data-cy^="delete-task-"]').first().click();
-      cy.get(".line-through").should("exist");
+      cy.get('[data-cy^="task-"]').first().should("have.attr", "data-state", "deleted");
     });
 
     it("should snooze a task to a different date", () => {
@@ -102,7 +102,7 @@ describe("Task Management", () => {
       // Wait for calendar popover to appear (Radix Popover renders in portal)
       cy.get('[role="grid"]', { timeout: 15000 }).should('be.visible');
       // Select the last non-outside day in the current month
-      cy.get('[role="grid"] button').not('.day-outside').not('[disabled]').last().click({ force: true });
+      cy.get('[role="grid"] button').not('[disabled]').not('[aria-disabled="true"]').last().click({ force: true });
       cy.wait("@updateTask");
     });
 
