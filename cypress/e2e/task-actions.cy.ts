@@ -93,7 +93,35 @@ describe("Task Actions", () => {
   describe("Delete Task", () => {
     it("should soft-delete a task", () => {
       cy.get('[data-cy^="delete-task-"]').first().click();
-      cy.get(".line-through").should("exist");
+      cy.wait("@updateTask").then((interception) => {
+        expect(interception.request.body.task.deletedAt).to.not.be.null;
+      });
+      // Verify the task shows deleted state after re-render
+      cy.get('[data-state="deleted"]', { timeout: 10000 }).should("exist");
+    });
+  });
+
+  describe("Drag Reorder", () => {
+    it("should show drag handles on task hover", () => {
+      cy.get('[data-cy^="task-"]').first().trigger("mouseover");
+      cy.get('[aria-label="Drag to reorder task"]').should("exist");
+    });
+  });
+
+  describe("Move Between Lists", () => {
+    it("should move a task to a different list via edit form", () => {
+      // Open edit dialog
+      cy.get('[data-cy^="edit-task-"]').first().click({ force: true });
+      cy.get('[role="dialog"]', { timeout: 10000 }).should("be.visible");
+
+      // Get current category, then switch to a different one
+      cy.get('[data-cy="category-selector"]').click();
+      cy.get('[role="option"]').last().click();
+
+      cy.get('[data-cy="save-task-changes-button"]').click();
+      cy.wait("@updateTask").then((interception) => {
+        expect(interception.request.body.task.listId).to.be.a("number");
+      });
     });
   });
 
@@ -118,7 +146,7 @@ describe("Task Actions", () => {
       });
 
       cy.get('[role="grid"]', { timeout: 15000 }).should("be.visible");
-      cy.get('[role="grid"] button').not(".day-outside").not("[disabled]").last().click({ force: true });
+      cy.get('[role="grid"] button').not("[disabled]").not('[aria-disabled="true"]').last().click({ force: true });
       cy.wait("@updateTask");
     });
   });

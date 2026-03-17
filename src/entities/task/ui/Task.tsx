@@ -81,6 +81,7 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
         isTempSelectedTask && 'bg-blue-50 hover:bg-blue-100'
       )}
       data-cy={`task-${task.id}`}
+      data-state={deleted ? 'deleted' : task.completedAt ? 'completed' : 'active'}
     >
       <div className="px-2 sm:px-4 py-3">
         <div className="flex items-center space-x-2 sm:space-x-3">

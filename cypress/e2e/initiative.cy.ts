@@ -40,6 +40,27 @@ describe("Initiative", () => {
     });
   });
 
+  describe("Initiative History", () => {
+    it("should display the focus history table on settings page", () => {
+      cy.visit("/settings");
+      // Wait for settings page to fully load
+      cy.contains("Settings", { timeout: 10000 }).should("be.visible");
+      // Scroll to Focus History card (below Manage Lists)
+      cy.contains("Focus History").scrollIntoView({ duration: 500 }).should("be.visible");
+      cy.contains("Last 30 days of daily focus selections").should("exist");
+      // Should show either the history table or empty state
+      cy.get("body").then(($body) => {
+        if ($body.find("table th").length > 0) {
+          cy.contains("th", "Date").should("exist");
+          cy.contains("th", "Suggested").should("exist");
+          cy.contains("th", "Chosen").should("exist");
+        } else {
+          cy.contains("No focus history yet").should("exist");
+        }
+      });
+    });
+  });
+
   describe("Tomorrow's Focus Picker", () => {
     it("should display the initiative picker on the Tomorrow filter", () => {
       cy.get('[data-cy="filter-tomorrow"]').click();
