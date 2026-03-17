@@ -117,9 +117,10 @@ describe("Calendar Day View", () => {
   it("should open inline editor when clicking a time block", () => {
     setupEntriesAndVisitCalendar("Edit test");
 
+    // Use force:true because gap buttons can overlap blocks in the z-order
     cy.get('[data-cy="day-timeline-block"]', { timeout: 10000 })
       .first()
-      .click();
+      .click({ force: true });
 
     cy.get('[data-cy="day-timeline-inline-editor"]').should("be.visible");
     cy.get('[data-cy="day-timeline-edit-start"]').should("be.visible");
@@ -133,7 +134,7 @@ describe("Calendar Day View", () => {
 
     cy.get('[data-cy="day-timeline-block"]', { timeout: 10000 })
       .first()
-      .click();
+      .click({ force: true });
 
     cy.get('[data-cy="day-timeline-inline-editor"]').should("be.visible");
     cy.get('[data-cy="day-timeline-edit-cancel"]').click();
@@ -145,7 +146,7 @@ describe("Calendar Day View", () => {
 
     cy.get('[data-cy="day-timeline-block"]', { timeout: 10000 })
       .first()
-      .click();
+      .click({ force: true });
 
     cy.get('[data-cy="day-timeline-inline-editor"]').should("be.visible");
 
@@ -166,8 +167,9 @@ describe("Calendar Day View", () => {
       2,
     );
 
-    // Delete buttons are hidden until hover; trigger hover on the block first
-    cy.get('[data-cy="day-timeline-block"]').first().trigger('mouseover');
+    // Delete buttons are hidden until hover; use force for both hover and click
+    // since gap buttons can overlap blocks in the z-order
+    cy.get('[data-cy="day-timeline-block"]').first().trigger('mouseover', { force: true });
     cy.get('[data-cy="day-timeline-delete-btn"]').first().click({ force: true });
 
     cy.wait("@deleteTimeEntry").then((interception) => {

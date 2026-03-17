@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { ColorPicker } from '@/shared/ui/color-picker';
 import { useCreateList } from '../api/useCreateList';
 import { useUpdateList } from '../api/useUpdateList';
-import { useListsQuery } from '@/shared/api/lists';
+import { ListModel } from '@/entities/list';
 import { useState, useEffect } from 'react';
 import type { ListColor } from '@/shared/lib/colors';
 
@@ -18,7 +18,7 @@ interface ListFormDialogProps {
   onOpenChange: (open: boolean) => void;
   onCancel: () => void;
   mode: 'create' | 'edit';
-  listId?: string | null;
+  list?: ListModel | null;
 }
 
 export function ListFormDialog({
@@ -26,18 +26,16 @@ export function ListFormDialog({
   onOpenChange,
   onCancel,
   mode,
-  listId
+  list
 }: ListFormDialogProps) {
   const { createList, isCreating } = useCreateList();
   const { updateList, isUpdating } = useUpdateList();
-  const { data: lists = [] } = useListsQuery();
 
   const [value, setValue] = useState('');
   const [description, setDescription] = useState('');
   const [participatesInInitiative, setParticipatesInInitiative] = useState(true);
   const [color, setColor] = useState<ListColor | null>(null);
 
-  const list = listId ? lists.find(l => l.id === listId) : null;
   const isLoading = mode === 'create' ? isCreating : isUpdating;
 
   // Set initial values when dialog opens
@@ -66,8 +64,8 @@ export function ListFormDialog({
 
     if (mode === 'create') {
       success = await createList(value, participatesInInitiative, description || null, color);
-    } else if (mode === 'edit' && listId) {
-      success = await updateList(listId, value, participatesInInitiative, description || null, color);
+    } else if (mode === 'edit' && list) {
+      success = await updateList(list.id, value, participatesInInitiative, description || null, color);
     }
 
     if (success) {

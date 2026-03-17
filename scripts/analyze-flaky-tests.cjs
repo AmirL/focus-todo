@@ -88,12 +88,6 @@ for (const [title, s] of stats) {
 // Sort by failure rate descending
 unreliable.sort((a, b) => b.failureRate - a.failureRate);
 
-// Also output a machine-readable list of flaky test names for the labeling step
-const flakyTestNames = unreliable.filter((t) => t.failureRate > 0).map((t) => t.title);
-if (flakyTestNames.length > 0) {
-  fs.writeFileSync('/tmp/flaky-test-names.json', JSON.stringify(flakyTestNames));
-}
-
 if (unreliable.length === 0) {
   lines.push('All tests are stable across recorded history.');
 } else {
@@ -110,7 +104,7 @@ if (unreliable.length === 0) {
   }
 }
 
-// Also show current run summary
+// Current run summary
 lines.push('');
 lines.push('### Current Run');
 const currentTests = Object.entries(current.tests || {});
@@ -120,6 +114,21 @@ const currentFlaky = currentTests.filter(([, r]) => r.flaky).length;
 lines.push(
   `- Total: ${currentTests.length}, Passed: ${currentPassed}, Failed: ${currentFailed}, Flaky (retried): ${currentFlaky}`,
 );
+
+// Output machine-readable list based on CURRENT RUN only (not historical aggregate).
+// The label should reflect whether THIS run had flaky tests (passed after Cypress retries).
+// Hard failures are NOT included — the label means "tests are green but were flaky."
+const currentRunFlaky = currentTests
+  .filter(([, r]) => r.flaky)
+  .map(([title]) => title);
+if (currentRunFlaky.length > 0) {
+  fs.writeFileSync('/tmp/flaky-test-names.json', JSON.stringify(currentRunFlaky));
+} else {
+  // Ensure no stale file from a previous step triggers labeling
+  if (fs.existsSync('/tmp/flaky-test-names.json')) {
+    fs.unlinkSync('/tmp/flaky-test-names.json');
+  }
+}
 
 console.log(lines.join('\n'));
 

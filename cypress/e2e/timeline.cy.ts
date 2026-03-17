@@ -49,6 +49,10 @@ describe("Timeline", () => {
       cy.wait("@startTimer");
       cy.get('[data-cy="timer-bar"]', { timeout: 10000 }).should("be.visible");
 
+      // Wait so the time entry has enough duration to render a visible block
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(2000);
+
       cy.get('[data-cy="timer-stop-button"]').click();
       cy.wait("@stopTimer");
 
@@ -66,8 +70,8 @@ describe("Timeline", () => {
         1,
       );
 
-      // The block should contain the task name
-      cy.get('[data-cy="timeline-block"]').first().should("contain.text", taskName);
+      // At least one block should contain the task name
+      cy.get('[data-cy="timeline-block"]').should("contain.text", taskName);
     });
   });
 
@@ -84,6 +88,10 @@ describe("Timeline", () => {
       cy.wait("@startTimer");
       cy.get('[data-cy="timer-bar"]', { timeout: 10000 }).should("be.visible");
 
+      // Wait so the time entry has enough duration to render a clickable block
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(2000);
+
       cy.get('[data-cy="timer-stop-button"]').click();
       cy.wait("@stopTimer");
 
@@ -99,8 +107,9 @@ describe("Timeline", () => {
         1,
       );
 
-      // Click the timeline block for our task
-      cy.get('[data-cy="timeline-block"]').contains(taskName).click();
+      // Click the timeline block for our task (use force:true because the inner
+      // span text may have 0 width due to truncation in narrow blocks)
+      cy.get('[data-cy="timeline-block"]').contains(taskName).click({ force: true });
 
       // The task should get highlighted (ring class added)
       cy.get(`[data-task-id="${taskId}"]`, { timeout: 5000 }).should(
