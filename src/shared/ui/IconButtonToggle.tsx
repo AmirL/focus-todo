@@ -24,6 +24,7 @@ export function IconButtonToggle({
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
+            type="button"
             variant="ghost"
             size="icon"
             onClick={() => onCheckedChange(!isChecked)}

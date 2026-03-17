@@ -2,6 +2,7 @@
 
 describe("Task Edit Form", () => {
   let createdTaskIds: number[] = [];
+  let taskId: number;
   let taskName: string;
 
   beforeEach(() => {
@@ -16,7 +17,8 @@ describe("Task Edit Form", () => {
     cy.get('[data-cy="task-name-input"]').type(taskName);
     cy.get('[data-cy="save-task-button"]').click();
     cy.wait("@createTask").then((interception) => {
-      createdTaskIds.push(interception.response!.body.id);
+      taskId = interception.response!.body.id;
+      createdTaskIds.push(taskId);
     });
     cy.contains(taskName, { timeout: 15000 }).should("be.visible");
   });
@@ -28,8 +30,8 @@ describe("Task Edit Form", () => {
 
   function openEditDialog() {
     // Hover over task row to reveal action buttons (hidden behind group-hover)
-    cy.get('[data-cy^="task-"]').first().trigger("mouseover");
-    cy.get('[data-cy^="edit-task-"]', { timeout: 10000 }).first().click({ force: true });
+    cy.get(`[data-cy="task-${taskId}"]`).trigger("mouseover");
+    cy.get(`[data-cy="task-${taskId}"]`).find('[data-cy^="edit-task-"]').click({ force: true });
     cy.get('[role="dialog"]', { timeout: 10000 }).should("be.visible");
     cy.get('[data-cy="save-task-changes-button"]', { timeout: 5000 }).should("exist");
   }
