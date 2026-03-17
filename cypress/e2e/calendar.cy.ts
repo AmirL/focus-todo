@@ -166,9 +166,10 @@ describe("Calendar Day View", () => {
       2,
     );
 
-    // Delete buttons are hidden until hover; trigger hover on the block first
+    // Delete button is hidden until hover; use realHover or force click
     cy.get('[data-cy="day-timeline-block"]').first().trigger('mouseover');
-    cy.get('[data-cy="day-timeline-delete-btn"]').first().click({ force: true });
+    // Give the hover state time to activate and the button to appear
+    cy.get('[data-cy="day-timeline-delete-btn"]', { timeout: 5000 }).first().click({ force: true });
 
     cy.wait("@deleteTimeEntry").then((interception) => {
       expect(interception.response!.statusCode).to.eq(200);

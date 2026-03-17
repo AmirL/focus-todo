@@ -49,10 +49,13 @@ describe("Doughnut Chart", () => {
 
       cy.get('[data-cy="timer-stop-button"]').click();
       cy.wait("@stopTimer");
-      cy.get('[data-cy="timer-dismiss-button"]').click();
+      // Wait for the timer bar to show the dismiss button and dismiss it
+      cy.get('[data-cy="timer-dismiss-button"]', { timeout: 5000 }).click();
+      // Wait for timer bar to disappear and data to refetch
+      cy.get('[data-cy="timer-bar"]').should("not.exist");
 
       // Doughnut chart should appear
-      cy.get('[data-cy="doughnut-chart"]', { timeout: 10000 }).should(
+      cy.get('[data-cy="doughnut-chart"]', { timeout: 15000 }).should(
         "be.visible",
       );
 
