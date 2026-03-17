@@ -79,17 +79,15 @@ describe("Task Management", () => {
 
     it("should snooze a task to a different date", () => {
       cy.intercept("POST", "/api/update-task").as("updateTask");
-      // Hover to reveal action buttons, then click snooze to open calendar popover
+      // Hover to reveal action buttons, then click snooze to open calendar popover.
+      // Radix Popover uses pointer events internally. Using trigger('pointerdown') +
+      // trigger('click') to reliably open the popover in headless CI environments
+      // where cy.click({ force: true }) alone can fail to trigger the Radix state change.
       cy.get('[data-cy^="task-"]').first().trigger('mouseover');
-      // Use retry-click pattern: keep clicking until the popover opens.
-      // In CI, the first click can sometimes not trigger the Radix Popover state change.
-      cy.get('[data-cy^="snooze-task-"]').first().click({ force: true });
-      cy.get('body').then(($body) => {
-        if ($body.find('[role="grid"]').length === 0) {
-          // Retry click if popover didn't open
-          cy.get('[data-cy^="snooze-task-"]').first().click({ force: true });
-        }
-      });
+      cy.get('[data-cy^="snooze-task-"]').first()
+        .trigger('pointerdown', { force: true })
+        .trigger('pointerup', { force: true })
+        .trigger('click', { force: true });
       // Wait for calendar popover to appear (Radix Popover renders in portal)
       cy.get('[role="grid"]', { timeout: 15000 }).should('be.visible');
       // Select the last non-outside day in the current month
