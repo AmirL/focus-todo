@@ -94,7 +94,7 @@ Full RESTful API for programmatic access to tasks, goals, lists, and initiative.
 - Database changes require running migrations via `pnpm run db:generate` and `pnpm run db:migrate`
 - **Database migrations**: `pnpm run db:migrate` requires `DATABASE_URL` env var. It is not auto-loaded from `.env.local`. Run with: `DATABASE_URL='...' npx drizzle-kit migrate`
 - **Shared database**: Dev and prod use the same database. Be careful with migrations and data changes.
-- **Test user login**: In dev mode, the login page has a "Login as Test User" button (`test@example.com` / `password123`). Use this for `playwright-cli` testing. Note: the button may need to be clicked twice and the redirect can take a few seconds. If the page doesn't redirect after clicking, wait 3-5 seconds and try again or navigate to `/` manually.
+- **Test user login**: In dev mode, the login page has a "Login as Test User" button. It reads credentials from `NEXT_PUBLIC_TEST_EMAIL` and `NEXT_PUBLIC_TEST_PASSWORD` env vars in `.env.local`. Use this for `playwright-cli` testing. Note: the button may need to be clicked twice and the redirect can take a few seconds. If the page doesn't redirect after clicking, wait 3-5 seconds and try again or navigate to `/` manually.
 - Always run `pnpm tsc --noEmit` before committing to ensure TypeScript compliance
 - The steiger config has specific FSD rules disabled - follow existing patterns rather than strict FSD compliance
 

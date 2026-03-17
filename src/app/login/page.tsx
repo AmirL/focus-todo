@@ -56,14 +56,21 @@ function useAuthentication() {
   };
 
   const authenticateTestUser = async () => {
+    const testEmail = process.env.NEXT_PUBLIC_TEST_EMAIL;
+    const testPassword = process.env.NEXT_PUBLIC_TEST_PASSWORD;
+
+    if (!testEmail || !testPassword) {
+      setError('Test credentials not configured. Set NEXT_PUBLIC_TEST_EMAIL and NEXT_PUBLIC_TEST_PASSWORD in .env.local');
+      return;
+    }
+
     setIsLoading(true);
     setError('');
 
     try {
-      // First try to sign in with existing user
       const signInResult = await signIn.email({
-        email: 'test@example.com',
-        password: 'password123',
+        email: testEmail,
+        password: testPassword,
       });
 
       if (signInResult?.error) {
@@ -72,11 +79,10 @@ function useAuthentication() {
 
       redirectAfterLogin();
     } catch (signInError) {
-      // If sign in fails, try to create the user
       try {
         const signUpResult = await signUp.email({
-          email: 'test@example.com',
-          password: 'password123',
+          email: testEmail,
+          password: testPassword,
           name: 'Test User',
         });
 
