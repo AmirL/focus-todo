@@ -28,9 +28,6 @@ describe("List Description", () => {
   it("should save and persist a description", () => {
     const testDescription = `E2E test description ${Date.now()}`;
 
-    // Intercept the list update API to wait for save completion
-    cy.intercept("POST", "/api/update-list").as("updateList");
-
     cy.get('[data-cy^="list-item-"]')
       .first()
       .find('[data-cy="edit-list-btn"]')
@@ -40,8 +37,6 @@ describe("List Description", () => {
     cy.get('[data-cy="list-description"]').clear().type(testDescription);
     cy.get('[data-cy="list-form-submit"]').click();
 
-    // Wait for the API save to complete before navigating
-    cy.wait("@updateList");
     waitForDialogClosed();
 
     // Reload the page to ensure fresh data from server

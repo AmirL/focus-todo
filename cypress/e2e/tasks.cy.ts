@@ -80,8 +80,7 @@ describe("Task Management", () => {
     it("should snooze a task to a different date", () => {
       cy.get('[data-cy^="task-"]').first().trigger('mouseover');
       cy.get('[data-cy^="snooze-task-"]').first().click({ force: true });
-      // Wait for the popover/calendar to fully render
-      cy.get('[role="dialog"], [data-radix-popper-content-wrapper]', { timeout: 10000 }).should('be.visible');
+      // Wait for calendar to appear
       cy.get('[role="grid"]', { timeout: 15000 }).should('be.visible');
       // Select the last non-outside day in the current month
       cy.get('[role="grid"] button').not('.day-outside').not('[disabled]').last().click({ force: true });

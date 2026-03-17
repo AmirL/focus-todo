@@ -29,32 +29,42 @@ function createTaskWithCheckboxes(name: string) {
 function expandDescription(name: string) {
   // Click the description indicator, then verify checkboxes appear.
   // A background React Query refetch can remount the component and reset the
-  // expanded state after the click. Use Cypress retry to handle this.
+  // expanded state after the click. If that happens, we retry.
 
   // Wait for any in-flight refetch to settle before expanding
-  cy.intercept("POST", "/api/get-tasks").as("refetchSettled");
-  // Trigger any pending refetch and wait for it, or timeout after 3s
-  cy.wait("@refetchSettled", { timeout: 5000 }).then(() => {}, () => {});
+  // eslint-disable-next-line cypress/no-unnecessary-waiting
+  cy.wait(2000);
 
-  // Use a recursive retry: click the indicator and check if expanded.
-  // If a React Query refetch collapses it, Cypress will retry the assertion
-  // and we'll click again.
-  function clickUntilExpanded(attempts = 0) {
-    if (attempts > 3) return; // safety limit
-    cy.contains(name)
-      .parents('[data-cy^="task-"]')
-      .first()
-      .find('[data-cy="description-indicator"]')
-      .then(($btn) => {
-        if ($btn.attr("aria-expanded") !== "true") {
-          cy.wrap($btn).click();
-          // eslint-disable-next-line cypress/no-unnecessary-waiting
-          cy.wait(500);
-          clickUntilExpanded(attempts + 1);
-        }
-      });
-  }
-  clickUntilExpanded();
+  cy.contains(name)
+    .parents('[data-cy^="task-"]')
+    .first()
+    .find('[data-cy="description-indicator"]')
+    .click();
+
+  // A refetch may collapse it again — wait and re-check up to 2 times
+  // eslint-disable-next-line cypress/no-unnecessary-waiting
+  cy.wait(1500);
+
+  cy.contains(name)
+    .parents('[data-cy^="task-"]')
+    .first()
+    .find('[data-cy="description-indicator"]')
+    .then(($btn) => {
+      if ($btn.attr("aria-expanded") !== "true") {
+        cy.wrap($btn).click();
+        // eslint-disable-next-line cypress/no-unnecessary-waiting
+        cy.wait(1500);
+        cy.contains(name)
+          .parents('[data-cy^="task-"]')
+          .first()
+          .find('[data-cy="description-indicator"]')
+          .then(($btn2) => {
+            if ($btn2.attr("aria-expanded") !== "true") {
+              cy.wrap($btn2).click();
+            }
+          });
+      }
+    });
 
   cy.contains(name)
     .parents('[data-cy^="task-"]')
