@@ -168,7 +168,7 @@ jobs:
 
           if [ -f /tmp/flaky-test-names.json ]; then
             FLAKY_COUNT=$(node --input-type=commonjs -e "console.log(JSON.parse(require('fs').readFileSync('/tmp/flaky-test-names.json','utf8')).length)")
-            echo "Current run had $FLAKY_COUNT flaky/failed test(s)"
+            echo "Current run had $FLAKY_COUNT test(s) that passed only after Cypress retries"
             gh pr edit "$PR_NUMBER" --add-label "flaky-tests" 2>/dev/null || \
               (gh label create "flaky-tests" --color "FBCA04" --description "PR has flaky E2E tests" 2>/dev/null; \
                gh pr edit "$PR_NUMBER" --add-label "flaky-tests")

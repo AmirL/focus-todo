@@ -116,9 +116,10 @@ lines.push(
 );
 
 // Output machine-readable list based on CURRENT RUN only (not historical aggregate).
-// The label should reflect whether THIS run had flaky or failed tests.
+// The label should reflect whether THIS run had flaky tests (passed after Cypress retries).
+// Hard failures are NOT included — the label means "tests are green but were flaky."
 const currentRunFlaky = currentTests
-  .filter(([, r]) => r.flaky || !r.passed)
+  .filter(([, r]) => r.flaky)
   .map(([title]) => title);
 if (currentRunFlaky.length > 0) {
   fs.writeFileSync('/tmp/flaky-test-names.json', JSON.stringify(currentRunFlaky));
