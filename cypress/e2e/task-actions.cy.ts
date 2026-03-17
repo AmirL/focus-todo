@@ -108,15 +108,30 @@ describe("Task Actions", () => {
   });
 
   describe("Drag Reorder", () => {
-    it("should show drag handles on task hover", () => {
-      cy.get(`[data-cy="task-${taskId}"]`).trigger("mouseover");
-      cy.get(`[data-cy="drag-handle-${taskId}"]`).should("exist");
-    });
-
-    it("should have drag handle with correct cursor style", () => {
+    it("should show accessible drag handle with grab cursor on hover", () => {
       cy.get(`[data-cy="task-${taskId}"]`).trigger("mouseover");
       cy.get(`[data-cy="drag-handle-${taskId}"]`)
-        .should("have.css", "cursor", "grab");
+        .should("exist")
+        .and("have.css", "cursor", "grab")
+        .and("have.attr", "aria-label", "Drag to reorder task");
+    });
+
+    // Note: @dnd-kit uses PointerSensor with activation constraints that
+    // require real browser pointer events. Cypress synthetic events do not
+    // reliably trigger @dnd-kit's drag lifecycle. Real drag reordering is
+    // tested manually. This test verifies the drag infrastructure is wired up.
+    it("should have drag handle wired to sortable listeners", () => {
+      cy.get(`[data-cy="task-${taskId}"]`).trigger("mouseover");
+      // Verify the drag handle exists and is interactive (not disabled)
+      // Note: handle has opacity-0 with group-hover:opacity-100, Cypress
+      // doesn't trigger CSS :hover, so we check existence and attributes
+      cy.get(`[data-cy="drag-handle-${taskId}"]`)
+        .should("exist")
+        .and("not.be.disabled");
+      // Verify the parent wrapper has the dnd-kit data attributes
+      cy.get(`[data-cy="task-${taskId}"]`).parent('[data-task-id]')
+        .should("have.attr", "data-task-id", String(taskId))
+        .and("have.attr", "role", "button");
     });
   });
 
@@ -149,11 +164,11 @@ describe("Task Actions", () => {
       cy.get('[data-cy="filter-selected"]').click();
       cy.get(`[data-cy="task-${taskId}"]`, { timeout: 10000 }).should("exist");
 
-      // Click the task row (not a button) to temporarily select it
-      cy.get(`[data-cy="task-${taskId}"]`).find('.font-medium').first().click();
+      // Click the task row to temporarily select it (use first() in case task appears in multiple sections)
+      cy.get(`[data-cy="task-${taskId}"]`).first().click();
 
-      // Verify the task shows selection highlight (bg-blue-50)
-      cy.get(`[data-cy="task-${taskId}"]`).should("have.class", "bg-blue-50");
+      // Verify the task shows temp-selected state
+      cy.get(`[data-cy="task-${taskId}"]`).first().should("have.attr", "data-state", "temp-selected");
     });
 
     it("should deselect a temporarily selected task by clicking again", () => {
@@ -166,13 +181,13 @@ describe("Task Actions", () => {
       cy.get('[data-cy="filter-selected"]').click();
       cy.get(`[data-cy="task-${taskId}"]`, { timeout: 10000 }).should("exist");
 
-      // Click to select
-      cy.get(`[data-cy="task-${taskId}"]`).find('.font-medium').first().click();
-      cy.get(`[data-cy="task-${taskId}"]`).should("have.class", "bg-blue-50");
+      // Click to select (use first() in case task appears in multiple sections)
+      cy.get(`[data-cy="task-${taskId}"]`).first().click();
+      cy.get(`[data-cy="task-${taskId}"]`).first().should("have.attr", "data-state", "temp-selected");
 
       // Click again to deselect
-      cy.get(`[data-cy="task-${taskId}"]`).find('.font-medium').first().click();
-      cy.get(`[data-cy="task-${taskId}"]`).should("not.have.class", "bg-blue-50");
+      cy.get(`[data-cy="task-${taskId}"]`).first().click();
+      cy.get(`[data-cy="task-${taskId}"]`).first().should("have.attr", "data-state", "active");
     });
   });
 
