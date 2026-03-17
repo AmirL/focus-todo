@@ -77,7 +77,7 @@ jobs:
       - name: Merge mochawesome reports
         if: always()
         run: |
-          npx mochawesome-merge cypress/results/*.json -o cypress/results/merged-report.json 2>/dev/null || echo "No mochawesome reports to merge"
+          npx mochawesome-merge cypress/results/mochawesome*.json -o cypress/results/merged-report.json 2>/dev/null || echo "No mochawesome reports to merge"
 
       - name: Upload Cypress artifacts
         if: always()
@@ -130,11 +130,18 @@ jobs:
             echo "No previous flaky history found, starting fresh"
           fi
 
+      - name: List downloaded artifacts
+        run: |
+          echo "=== Files in all-results ==="
+          find all-results -name "*.json" -type f | sort
+          echo "=== Looking for flaky-from-retries.json ==="
+          find all-results -name "flaky-from-retries.json" -type f
+
       - name: Collect current test results
         run: |
           node scripts/collect-test-results.cjs all-results > current-results.json
           echo "Current results:"
-          cat current-results.json | head -c 500
+          cat current-results.json | head -c 2000
 
       - name: Analyze flaky tests and generate summary
         run: |
@@ -149,26 +156,31 @@ jobs:
           overwrite: true
           retention-days: 90
 
-      - name: Label PR if flaky tests detected
+      - name: Label PR based on current run flaky tests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ ! -f /tmp/flaky-test-names.json ]; then
-            echo "No flaky tests detected"
+          # Find the PR number for this deployment's commit SHA.
+          # Vercel deployment_status events don't populate deployment.ref or deployment.sha,
+          # so we use github.sha (which holds the correct commit) and query the GitHub API
+          # for associated pull requests.
+          COMMIT_SHA="${{ github.sha }}"
+          echo "Looking for PR associated with commit: $COMMIT_SHA"
+          PR_NUMBER=$(gh api "repos/${{ github.repository }}/commits/$COMMIT_SHA/pulls" --jq '.[0].number' 2>/dev/null || echo "")
+
+          if [ -z "$PR_NUMBER" ]; then
+            echo "Could not find PR for this deployment, skipping label"
             exit 0
           fi
 
-          FLAKY_COUNT=$(node --input-type=commonjs -e "console.log(JSON.parse(require('fs').readFileSync('/tmp/flaky-test-names.json','utf8')).length)")
-          echo "Found $FLAKY_COUNT unreliable test(s) in history"
-
-          # Find the PR number for this deployment
-          PR_NUMBER=$(gh pr list --search "${{ github.event.deployment_status.deployment.sha }}" --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
-
-          if [ -n "$PR_NUMBER" ]; then
+          if [ -f /tmp/flaky-test-names.json ]; then
+            FLAKY_COUNT=$(node --input-type=commonjs -e "console.log(JSON.parse(require('fs').readFileSync('/tmp/flaky-test-names.json','utf8')).length)")
+            echo "Current run had $FLAKY_COUNT test(s) that passed only after Cypress retries"
             gh pr edit "$PR_NUMBER" --add-label "flaky-tests" 2>/dev/null || \
               (gh label create "flaky-tests" --color "FBCA04" --description "PR has flaky E2E tests" 2>/dev/null; \
                gh pr edit "$PR_NUMBER" --add-label "flaky-tests")
             echo "Added 'flaky-tests' label to PR #$PR_NUMBER"
           else
-            echo "Could not find PR for this deployment, skipping label"
+            echo "Current run is clean, removing flaky-tests label if present"
+            gh pr edit "$PR_NUMBER" --remove-label "flaky-tests" 2>/dev/null || true
           fi

@@ -225,10 +225,10 @@ describe("Timer", () => {
     // Inline task creation (avoid createTaskAndGetId's visibility assertion
     // which fails when Goals section pushes tasks below the fold)
     cy.get('[data-cy="add-task-button"]').click();
-    cy.get('[data-cy="task-name-input"]').type(taskName);
-    cy.get('[data-cy="save-task-button"]').click();
+    cy.get('[data-cy="task-name-input"]').should("be.visible").type(taskName);
+    cy.get('[data-cy="save-task-button"]').should("be.visible").click();
 
-    cy.wait("@createTask").then((interception) => {
+    cy.wait("@createTask", { timeout: 15000 }).then((interception) => {
       const taskId = interception.response!.body.id as number;
       createdTaskIds.push(taskId);
 

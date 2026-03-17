@@ -117,7 +117,7 @@ export function ListItem({ list, isDragging, dragHandleRef, dragHandleListeners 
         onOpenChange={setEditDialogOpen}
         onCancel={() => setEditDialogOpen(false)}
         mode="edit"
-        listId={list.id}
+        list={list}
       />
     </div>
   );

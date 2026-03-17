@@ -34,8 +34,12 @@ describe("List Description", () => {
       .click();
     cy.get('[data-cy="list-form-dialog"]').should("be.visible");
 
+    // Wait for form to fully load: the list name input gets populated from React
+    // Query data, which enables the submit button. Without this, the button stays
+    // disabled because the name field is empty.
+    cy.get('#list-name', { timeout: 15000 }).should('not.have.value', '');
     cy.get('[data-cy="list-description"]').clear().type(testDescription);
-    cy.get('[data-cy="list-form-submit"]').click();
+    cy.get('[data-cy="list-form-submit"]').should("not.be.disabled").click();
 
     waitForDialogClosed();
 
