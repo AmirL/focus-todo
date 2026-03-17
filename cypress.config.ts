@@ -36,12 +36,10 @@ export default defineConfig({
       json: true,
     },
     setupNodeEvents(on, config) {
-      cypressSplit(on, config);
       if (coverageEnabled) {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         require("@cypress/code-coverage/task")(on, config);
       }
-
       // Track flaky tests (passed after retry) for CI labeling.
       // Mochawesome doesn't record retry attempts, so we use after:spec
       // which has access to the full Cypress test results including attempts.
@@ -72,6 +70,7 @@ export default defineConfig({
         }
       });
 
+      cypressSplit(on, config);
       return config;
     },
   },

@@ -1,12 +1,72 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Local coverage script: runs vitest coverage, optionally Cypress coverage,
-# merges available reports, and prints a summary.
+# Local coverage script: runs vitest coverage, starts an instrumented dev server,
+# runs Cypress E2E tests with coverage, merges all reports, and prints a summary.
+#
+# Usage:
+#   pnpm run coverage              # unit + e2e (starts instrumented server automatically)
+#   pnpm run coverage --unit-only  # unit tests only, no dev server needed
+#
+# Environment variables:
+#   COVERAGE_PORT  - port for the instrumented dev server (default: 3200)
+#
+# The script automatically starts a Next.js dev server with CYPRESS_COVERAGE=true
+# so the code is instrumented via babel-plugin-istanbul. The server is shut down
+# when the script exits.
 
 COVERAGE_DIR="coverage"
 MERGE_DIR="$COVERAGE_DIR/to-merge"
 MERGED_DIR="$COVERAGE_DIR/merged"
+DEV_SERVER_PID=""
+UNIT_ONLY=false
+E2E_RAN=false
+PORT="${COVERAGE_PORT:-3200}"
+
+# Parse arguments
+for arg in "$@"; do
+  case "$arg" in
+    --unit-only) UNIT_ONLY=true ;;
+  esac
+done
+
+# Check E2E prerequisites (Cypress needs test credentials)
+if [ "$UNIT_ONLY" = false ]; then
+  MISSING_VARS=false
+
+  # Cypress reads CYPRESS_* env vars automatically (stripping the prefix).
+  # They can also be set in cypress.env.json.
+  if [ -z "${CYPRESS_TEST_EMAIL:-}" ] && [ ! -f "cypress.env.json" ]; then
+    MISSING_VARS=true
+  fi
+  if [ -z "${CYPRESS_TEST_PASSWORD:-}" ] && [ ! -f "cypress.env.json" ]; then
+    MISSING_VARS=true
+  fi
+
+  if [ "$MISSING_VARS" = true ]; then
+    echo ""
+    echo "WARNING: E2E test credentials not found."
+    echo "  E2E coverage requires CYPRESS_TEST_EMAIL and CYPRESS_TEST_PASSWORD."
+    echo ""
+    echo "  Option 1: Create cypress.env.json (see cypress.env.json.example)"
+    echo "  Option 2: Export env vars (use values from .env.local):"
+    echo "    export CYPRESS_TEST_EMAIL=\$NEXT_PUBLIC_TEST_EMAIL"
+    echo "    export CYPRESS_TEST_PASSWORD=\$NEXT_PUBLIC_TEST_PASSWORD"
+    echo ""
+    echo "  Falling back to --unit-only mode."
+    echo ""
+    UNIT_ONLY=true
+  fi
+fi
+
+cleanup() {
+  if [ -n "$DEV_SERVER_PID" ]; then
+    echo "==> Stopping dev server (PID $DEV_SERVER_PID)..."
+    kill "$DEV_SERVER_PID" 2>/dev/null || true
+    wait "$DEV_SERVER_PID" 2>/dev/null || true
+  fi
+}
+trap cleanup EXIT
 
 # Clean previous run
 rm -rf "$MERGE_DIR" "$MERGED_DIR"
@@ -16,18 +76,50 @@ mkdir -p "$MERGE_DIR" "$MERGED_DIR"
 echo "==> Running unit tests with coverage..."
 pnpm vitest run --coverage || true
 
-# 2. Optionally run Cypress if a dev server is already running
-DEV_SERVER_UP=false
-if curl -s -o /dev/null -w '' http://localhost:3000 2>/dev/null; then
-  DEV_SERVER_UP=true
-fi
+# 2. Start instrumented dev server and run Cypress E2E tests
+if [ "$UNIT_ONLY" = false ]; then
+  # Check if any dev server is running (coverage needs exclusive DB access to avoid
+  # "Too many connections" errors from running two Next.js servers simultaneously)
+  for CHECK_PORT in 3000 3001 3002 "${PORT}"; do
+    if curl -s -o /dev/null -w '' "http://localhost:${CHECK_PORT}" 2>/dev/null; then
+      echo "ERROR: A server is already running on port ${CHECK_PORT}."
+      echo "  The coverage script starts its own instrumented dev server and needs exclusive"
+      echo "  database access. Running two servers causes 'Too many connections' errors."
+      echo ""
+      echo "  Please stop all dev servers before running coverage."
+      echo "  Skipping E2E coverage (unit coverage still collected)."
+      UNIT_ONLY=true
+      break
+    fi
+  done
 
-if [ "$DEV_SERVER_UP" = true ]; then
-  echo "==> Dev server detected on localhost:3000, running Cypress with coverage..."
-  CYPRESS_COVERAGE=true pnpm cypress run || true
-else
-  echo "==> No dev server on localhost:3000, skipping Cypress coverage."
-  echo "    Start the dev server (pnpm dev) to include E2E coverage."
+  if [ "$UNIT_ONLY" = false ]; then
+    echo "==> Starting instrumented dev server on port ${PORT} (CYPRESS_COVERAGE=true)..."
+    CYPRESS_COVERAGE=true pnpm dev --port "$PORT" &
+    DEV_SERVER_PID=$!
+
+    # Wait for the server to be ready (up to 120 seconds)
+    echo "==> Waiting for dev server to start..."
+    RETRIES=0
+    MAX_RETRIES=120
+    while ! curl -s -o /dev/null -w '' "http://localhost:${PORT}" 2>/dev/null; do
+      RETRIES=$((RETRIES + 1))
+      if [ "$RETRIES" -ge "$MAX_RETRIES" ]; then
+        echo "ERROR: Dev server did not start within ${MAX_RETRIES}s. Skipping E2E coverage."
+        kill "$DEV_SERVER_PID" 2>/dev/null || true
+        DEV_SERVER_PID=""
+        break
+      fi
+      sleep 1
+    done
+
+    # Run Cypress with coverage if server is up
+    if curl -s -o /dev/null -w '' "http://localhost:${PORT}" 2>/dev/null; then
+      echo "==> Running Cypress E2E tests with coverage against http://localhost:${PORT}..."
+      CYPRESS_COVERAGE=true CYPRESS_BASE_URL="http://localhost:${PORT}" pnpm cypress run || true
+      E2E_RAN=true
+    fi
+  fi
 fi
 
 # 3. Collect available coverage JSON files
@@ -61,7 +153,7 @@ pnpm exec nyc report \
 # 5. Print summary
 if [ -f "$MERGED_DIR/coverage-summary.json" ]; then
   LABEL="unit only"
-  if [ "$DEV_SERVER_UP" = true ]; then
+  if [ "$E2E_RAN" = true ]; then
     LABEL="unit + e2e"
   fi
   echo ""
@@ -74,4 +166,6 @@ if [ -f "$MERGED_DIR/coverage-summary.json" ]; then
       console.log('  ' + key + ': ' + pct + '%');
     }
   "
+  echo ""
+  echo "HTML report: $MERGED_DIR/lcov-report/index.html"
 fi
