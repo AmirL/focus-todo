@@ -99,8 +99,9 @@ export function EstimatedDurationSelector({
       )}
 
       <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-        <PopoverTrigger 
+        <PopoverTrigger
           id={id}
+          data-cy="duration-selector"
           className={cn(
             'inline-flex items-center justify-between cursor-pointer bg-white border border-slate-200 transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1',
             showLabel 

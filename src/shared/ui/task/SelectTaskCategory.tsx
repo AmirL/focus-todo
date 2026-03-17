@@ -27,7 +27,7 @@ export function SelectTaskCategory({ selectedListId, setSelectedListId }: Props)
 
   return (
     <Select value={selectedListId != null ? String(selectedListId) : ''} onValueChange={(v) => setSelectedListId(Number(v))} disabled={isLoading}>
-      <SelectTrigger id="task-list" className="w-[140px] h-8">
+      <SelectTrigger id="task-list" className="w-[140px] h-8" data-cy="category-selector">
         <SelectValue placeholder={isLoading ? "Loading..." : "Select a list"} />
       </SelectTrigger>
       <SelectContent>

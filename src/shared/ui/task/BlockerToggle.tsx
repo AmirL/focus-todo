@@ -14,6 +14,7 @@ export function BlockerToggle({ metadata, onMetadataChange }: BlockerToggleProps
       tooltipContent="Blocker"
       isChecked={metadata.isBlocker}
       onCheckedChange={(blocker) => onMetadataChange({ isBlocker: blocker })}
+      data-cy="blocker-toggle"
       className={
         metadata.isBlocker ? 'text-blue-600 hover:text-blue-700 p-2 sm:p-1' : 'text-muted-foreground hover:text-blue-600 p-2 sm:p-1'
       }

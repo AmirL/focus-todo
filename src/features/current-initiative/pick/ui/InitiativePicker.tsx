@@ -117,7 +117,7 @@ export function InitiativePicker() {
   const isSaving = setInitiativeMutation.isPending || changeInitiativeMutation.isPending;
 
   return (
-    <div className="px-2 sm:px-4 mb-6">
+    <div className="px-2 sm:px-4 mb-6" data-cy="tomorrow-focus-picker">
       <div className="flex items-center gap-3">
         <span className="text-sm text-muted-foreground shrink-0">Tomorrow&apos;s focus:</span>
 
@@ -126,6 +126,7 @@ export function InitiativePicker() {
           <button
             type="button"
             onClick={() => setIsExpanded(!isExpanded)}
+            data-cy="tomorrow-focus-dropdown"
             className={cn(
               'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
               'bg-secondary/50 hover:bg-secondary',
@@ -157,6 +158,7 @@ export function InitiativePicker() {
                     key={list.id}
                     type="button"
                     onClick={() => handleSelect(list.id)}
+                    data-cy={`tomorrow-focus-option-${list.id}`}
                     className={cn(
                       'w-full flex items-center gap-3 px-3 py-2 text-left transition-colors',
                       'hover:bg-accent',
@@ -193,6 +195,7 @@ export function InitiativePicker() {
             type="button"
             onClick={handleSave}
             disabled={isSaving}
+            data-cy="tomorrow-focus-save"
             className={cn(
               'px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
               'bg-primary text-primary-foreground hover:bg-primary/90',
