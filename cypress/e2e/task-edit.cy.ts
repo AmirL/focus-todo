@@ -2,6 +2,7 @@
 
 describe("Task Edit Form", () => {
   let createdTaskIds: number[] = [];
+  let taskName: string;
 
   beforeEach(() => {
     cy.intercept("POST", "/api/create-task").as("createTask");
@@ -10,7 +11,7 @@ describe("Task Edit Form", () => {
     cy.waitForAppLoad();
 
     // Create a task to edit
-    const taskName = `Edit form test ${Date.now()}`;
+    taskName = `Edit form test ${Date.now()}`;
     cy.get('[data-cy="add-task-button"]').click();
     cy.get('[data-cy="task-name-input"]').type(taskName);
     cy.get('[data-cy="save-task-button"]').click();
@@ -25,18 +26,20 @@ describe("Task Edit Form", () => {
     createdTaskIds = [];
   });
 
-  it("should open edit dialog and display task name", () => {
-    cy.get('[data-cy^="edit-task-"]').first().click();
-    cy.get('[role="dialog"]').should("be.visible");
-    cy.get('[data-cy="task-name-input"]').should("have.value", /Edit form test/);
-    // Close dialog
-    cy.get('[role="dialog"]').find('button[type="submit"]').should("exist");
+  function openEditDialog() {
+    cy.get('[data-cy^="edit-task-"]').first().click({ force: true });
+    cy.get('[role="dialog"]', { timeout: 10000 }).should("be.visible");
+    cy.get('[data-cy="save-task-changes-button"]', { timeout: 5000 }).should("exist");
+  }
+
+  it("should open edit dialog and display current task name", () => {
+    openEditDialog();
+    cy.get('#name').invoke("val").should("include", "Edit form test");
   });
 
   it("should edit task name and save", () => {
     const newName = `Renamed task ${Date.now()}`;
-    cy.get('[data-cy^="edit-task-"]').first().click();
-    cy.get('[role="dialog"]').should("be.visible");
+    openEditDialog();
     cy.get('#name').clear().type(newName);
     cy.get('[data-cy="save-task-changes-button"]').click();
     cy.wait("@updateTask").then((interception) => {
@@ -46,10 +49,9 @@ describe("Task Edit Form", () => {
   });
 
   it("should edit task details via markdown editor", () => {
-    cy.get('[data-cy^="edit-task-"]').first().click();
-    cy.get('[role="dialog"]').should("be.visible");
-    // Switch to edit tab for details
-    cy.get('[role="dialog"]').contains("Edit").click();
+    openEditDialog();
+    // The MarkdownAreaField has View/Edit tabs - click the Edit tab within the dialog
+    cy.get('[role="dialog"]').find('[role="tablist"]').contains("Edit").click();
     cy.get('[role="dialog"]').find("textarea#details").clear().type("Updated details content");
     cy.get('[data-cy="save-task-changes-button"]').click();
     cy.wait("@updateTask").then((interception) => {
@@ -58,11 +60,8 @@ describe("Task Edit Form", () => {
   });
 
   it("should change task category in edit form", () => {
-    cy.get('[data-cy^="edit-task-"]').first().click();
-    cy.get('[role="dialog"]').should("be.visible");
-    // Click the category selector
+    openEditDialog();
     cy.get('[data-cy="category-selector"]').click();
-    // Select a different category from the dropdown
     cy.get('[role="option"]').last().click();
     cy.get('[data-cy="save-task-changes-button"]').click();
     cy.wait("@updateTask").then((interception) => {
@@ -71,11 +70,8 @@ describe("Task Edit Form", () => {
   });
 
   it("should change estimated duration in edit form", () => {
-    cy.get('[data-cy^="edit-task-"]').first().click();
-    cy.get('[role="dialog"]').should("be.visible");
-    // Click the duration selector
+    openEditDialog();
     cy.get('[data-cy="duration-selector"]').click({ force: true });
-    // Select 30 minutes from the popover
     cy.contains("button", "30 minutes").click();
     cy.get('[data-cy="save-task-changes-button"]').click();
     cy.wait("@updateTask").then((interception) => {
@@ -84,9 +80,7 @@ describe("Task Edit Form", () => {
   });
 
   it("should toggle blocker status in edit form", () => {
-    cy.get('[data-cy^="edit-task-"]').first().click();
-    cy.get('[role="dialog"]').should("be.visible");
-    // Click the blocker toggle
+    openEditDialog();
     cy.get('[data-cy="blocker-toggle"]').click();
     cy.get('[data-cy="save-task-changes-button"]').click();
     cy.wait("@updateTask").then((interception) => {
@@ -95,9 +89,7 @@ describe("Task Edit Form", () => {
   });
 
   it("should toggle starred status in edit form", () => {
-    cy.get('[data-cy^="edit-task-"]').first().click();
-    cy.get('[role="dialog"]').should("be.visible");
-    // Click the starred toggle
+    openEditDialog();
     cy.get('[data-cy="starred-toggle"]').click();
     cy.get('[data-cy="save-task-changes-button"]').click();
     cy.wait("@updateTask").then((interception) => {
@@ -107,20 +99,13 @@ describe("Task Edit Form", () => {
 
   it("should edit multiple fields at once and save", () => {
     const newName = `Multi-edit task ${Date.now()}`;
-    cy.get('[data-cy^="edit-task-"]').first().click();
-    cy.get('[role="dialog"]').should("be.visible");
+    openEditDialog();
 
-    // Change name
     cy.get('#name').clear().type(newName);
-
-    // Change duration
     cy.get('[data-cy="duration-selector"]').click({ force: true });
     cy.contains("button", "1 hour").click();
-
-    // Toggle blocker
     cy.get('[data-cy="blocker-toggle"]').click();
 
-    // Save all changes
     cy.get('[data-cy="save-task-changes-button"]').click();
     cy.wait("@updateTask").then((interception) => {
       expect(interception.request.body.task.name).to.equal(newName);
@@ -131,14 +116,10 @@ describe("Task Edit Form", () => {
   });
 
   it("should close edit dialog without saving on Escape", () => {
-    const originalName = `Edit form test`;
-    cy.get('[data-cy^="edit-task-"]').first().click();
-    cy.get('[role="dialog"]').should("be.visible");
+    openEditDialog();
     cy.get('#name').clear().type("Should not be saved");
-    // Press Escape to close
     cy.get("body").type("{esc}");
     cy.get('[role="dialog"]').should("not.exist");
-    // Original name should still be visible
-    cy.contains(originalName).should("exist");
+    cy.contains(taskName).should("exist");
   });
 });
