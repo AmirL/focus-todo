@@ -27,6 +27,8 @@ describe("Task Edit Form", () => {
   });
 
   function openEditDialog() {
+    // Wait for task row to be fully interactive before clicking edit
+    cy.get('[data-cy^="edit-task-"]', { timeout: 10000 }).first().should("be.visible");
     cy.get('[data-cy^="edit-task-"]').first().click({ force: true });
     cy.get('[role="dialog"]', { timeout: 10000 }).should("be.visible");
     cy.get('[data-cy="save-task-changes-button"]', { timeout: 5000 }).should("exist");
