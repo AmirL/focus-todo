@@ -153,10 +153,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Find the PR number for this deployment using the branch name (ref)
-          DEPLOY_REF="${{ github.event.deployment_status.deployment.ref }}"
-          echo "Looking for PR with head branch: $DEPLOY_REF"
-          PR_NUMBER=$(gh pr list --head "$DEPLOY_REF" --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
+          # Find the PR number for this deployment's commit SHA.
+          # Vercel deployment_status events don't populate deployment.ref or deployment.sha,
+          # so we use github.sha (which holds the correct commit) and query the GitHub API
+          # for associated pull requests.
+          COMMIT_SHA="${{ github.sha }}"
+          echo "Looking for PR associated with commit: $COMMIT_SHA"
+          PR_NUMBER=$(gh api "repos/${{ github.repository }}/commits/$COMMIT_SHA/pulls" --jq '.[0].number' 2>/dev/null || echo "")
 
           if [ -z "$PR_NUMBER" ]; then
             echo "Could not find PR for this deployment, skipping label"
