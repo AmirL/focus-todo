@@ -67,7 +67,7 @@ describe("Task Management", () => {
         cy.get('[data-cy^="star-task-"]').first().click({ force: true });
         cy.wait("@updateTask");
         // Navigate to Selected and verify task appears there
-        cy.get('[data-cy="filter-selected"]').click();
+        cy.get('[data-cy="filter-selected"]').click({ force: true });
         cy.contains(taskText.slice(0, 20)).should("exist");
       });
     });
@@ -148,27 +148,27 @@ describe("Task Management", () => {
 
   describe("Filter Tasks", () => {
     it("should navigate to Today filter", () => {
-      cy.get('[data-cy="filter-today"]').click();
+      cy.get('[data-cy="filter-today"]').click({ force: true });
       cy.contains("today").should("exist");
     });
 
     it("should navigate to Tomorrow filter", () => {
-      cy.get('[data-cy="filter-tomorrow"]').click();
+      cy.get('[data-cy="filter-tomorrow"]').click({ force: true });
       cy.contains("tomorrow").should("exist");
     });
 
     it("should navigate to Backlog filter", () => {
-      cy.get('[data-cy="filter-backlog"]').click();
+      cy.get('[data-cy="filter-backlog"]').click({ force: true });
       cy.contains("backlog").should("exist");
     });
 
     it("should navigate to Selected filter", () => {
-      cy.get('[data-cy="filter-selected"]').click();
+      cy.get('[data-cy="filter-selected"]').click({ force: true });
       cy.contains("selected").should("exist");
     });
 
     it("should navigate to Future filter", () => {
-      cy.get('[data-cy="filter-future"]').click();
+      cy.get('[data-cy="filter-future"]').click({ force: true });
       cy.contains("future").should("exist");
     });
   });

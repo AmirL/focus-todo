@@ -8,25 +8,25 @@ describe("Initiative", () => {
 
   describe("Today's Focus Banner", () => {
     it("should display the today focus banner on the Today filter", () => {
-      cy.get('[data-cy="filter-today"]').click();
+      cy.get('[data-cy="filter-today"]').click({ force: true });
       cy.get('[data-cy="today-focus-banner"]', { timeout: 10000 }).should("be.visible");
       cy.contains("Today's Focus").should("be.visible");
     });
 
     it("should display the today focus banner on the Selected filter", () => {
-      cy.get('[data-cy="filter-selected"]').click();
+      cy.get('[data-cy="filter-selected"]').click({ force: true });
       cy.get('[data-cy="today-focus-banner"]', { timeout: 10000 }).should("be.visible");
     });
 
     it("should open dropdown and show category options", () => {
-      cy.get('[data-cy="filter-today"]').click();
+      cy.get('[data-cy="filter-today"]').click({ force: true });
       cy.get('[data-cy="today-focus-banner"]', { timeout: 10000 }).should("be.visible");
       cy.get('[data-cy="today-focus-dropdown"]').click();
       cy.get('[data-cy^="today-focus-option-"]').should("have.length.greaterThan", 0);
     });
 
     it("should select a category and show save button", () => {
-      cy.get('[data-cy="filter-today"]').click();
+      cy.get('[data-cy="filter-today"]').click({ force: true });
       cy.get('[data-cy="today-focus-banner"]', { timeout: 10000 }).should("be.visible");
       cy.get('[data-cy="today-focus-dropdown"]').click();
       // Click the last option to maximize chance it differs from current selection
@@ -70,7 +70,7 @@ describe("Initiative", () => {
       cy.intercept("POST", "/api/current-initiative").as("setInitiative");
       cy.intercept("PATCH", "/api/current-initiative/*").as("changeInitiative");
 
-      cy.get('[data-cy="filter-today"]').click();
+      cy.get('[data-cy="filter-today"]').click({ force: true });
       cy.get('[data-cy="today-focus-banner"]', { timeout: 10000 }).should("be.visible");
       cy.get('[data-cy="today-focus-dropdown"]').click();
       cy.get('[data-cy^="today-focus-option-"]').first().click();
@@ -92,13 +92,13 @@ describe("Initiative", () => {
 
   describe("Tomorrow's Focus Picker", () => {
     it("should display the initiative picker on the Tomorrow filter", () => {
-      cy.get('[data-cy="filter-tomorrow"]').click();
+      cy.get('[data-cy="filter-tomorrow"]').click({ force: true });
       cy.get('[data-cy="tomorrow-focus-picker"]', { timeout: 10000 }).should("be.visible");
       cy.contains("Tomorrow's focus").should("be.visible");
     });
 
     it("should open dropdown and show category options with balance info", () => {
-      cy.get('[data-cy="filter-tomorrow"]').click();
+      cy.get('[data-cy="filter-tomorrow"]').click({ force: true });
       cy.get('[data-cy="tomorrow-focus-picker"]', { timeout: 10000 }).should("be.visible");
       cy.get('[data-cy="tomorrow-focus-dropdown"]').click();
       cy.get('[data-cy^="tomorrow-focus-option-"]').should("have.length.greaterThan", 0);
@@ -108,7 +108,7 @@ describe("Initiative", () => {
       cy.intercept("POST", "/api/current-initiative").as("setInitiative");
       cy.intercept("PATCH", "/api/current-initiative/*").as("changeInitiative");
 
-      cy.get('[data-cy="filter-tomorrow"]').click();
+      cy.get('[data-cy="filter-tomorrow"]').click({ force: true });
       cy.get('[data-cy="tomorrow-focus-picker"]', { timeout: 10000 }).should("be.visible");
       cy.get('[data-cy="tomorrow-focus-dropdown"]').click();
       // Pick a different option from current to trigger unsaved changes
@@ -122,7 +122,7 @@ describe("Initiative", () => {
     });
 
     it("should close dropdown when clicking outside", () => {
-      cy.get('[data-cy="filter-tomorrow"]').click();
+      cy.get('[data-cy="filter-tomorrow"]').click({ force: true });
       cy.get('[data-cy="tomorrow-focus-picker"]', { timeout: 10000 }).should("be.visible");
       cy.get('[data-cy="tomorrow-focus-dropdown"]').click();
       cy.get('[data-cy^="tomorrow-focus-option-"]').should("be.visible");

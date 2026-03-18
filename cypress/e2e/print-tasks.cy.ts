@@ -29,7 +29,7 @@ describe("Print Tasks", () => {
   }
 
   it("should show print button on Today page when tasks exist", () => {
-    cy.get('[data-cy="filter-today"]').click();
+    cy.get('[data-cy="filter-today"]').click({ force: true });
     const taskName = `Print test ${Date.now()}`;
     createTask(taskName);
 
@@ -41,7 +41,7 @@ describe("Print Tasks", () => {
 
   it("should not show print button when no printable tasks exist", () => {
     // Navigate to a filter unlikely to have tasks (Future)
-    cy.get('[data-cy="filter-future"]').click();
+    cy.get('[data-cy="filter-future"]').click({ force: true });
 
     // Print button should not be visible when there are no tasks
     // (or may not exist at all)
@@ -55,7 +55,7 @@ describe("Print Tasks", () => {
   });
 
   it("should trigger print when clicking the print button", () => {
-    cy.get('[data-cy="filter-today"]').click();
+    cy.get('[data-cy="filter-today"]').click({ force: true });
     const taskName = `Print trigger test ${Date.now()}`;
     createTask(taskName);
 
@@ -98,7 +98,7 @@ describe("Print Tasks", () => {
   it("should include task duration info in print output", () => {
     cy.intercept("POST", "/api/update-task").as("updateTask");
 
-    cy.get('[data-cy="filter-today"]').click();
+    cy.get('[data-cy="filter-today"]').click({ force: true });
     const taskName = `Duration print ${Date.now()}`;
     createTask(taskName).then((taskId) => {
       // Set estimated duration

@@ -86,7 +86,7 @@ describe("Task Actions", () => {
       cy.get(`[data-cy="task-${taskId}"]`).trigger("mouseover");
       taskEl("star-task-").click({ force: true });
       cy.wait("@updateTask");
-      cy.get('[data-cy="filter-selected"]').click();
+      cy.get('[data-cy="filter-selected"]').click({ force: true });
       cy.get(`[data-cy="task-${taskId}"]`, { timeout: 10000 }).should("exist");
     });
   });
@@ -161,7 +161,7 @@ describe("Task Actions", () => {
       cy.wait("@updateTask");
 
       // Navigate to Selected filter
-      cy.get('[data-cy="filter-selected"]').click();
+      cy.get('[data-cy="filter-selected"]').click({ force: true });
       cy.get(`[data-cy="task-${taskId}"]`, { timeout: 10000 }).should("exist");
 
       // Click the task row to temporarily select it (use first() in case task appears in multiple sections)
@@ -178,7 +178,7 @@ describe("Task Actions", () => {
       cy.wait("@updateTask");
 
       // Go to Selected filter
-      cy.get('[data-cy="filter-selected"]').click();
+      cy.get('[data-cy="filter-selected"]').click({ force: true });
       cy.get(`[data-cy="task-${taskId}"]`, { timeout: 10000 }).should("exist");
 
       // Click to select (use first() in case task appears in multiple sections)

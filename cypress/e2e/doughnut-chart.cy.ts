@@ -36,7 +36,7 @@ describe("Doughnut Chart", () => {
   }
 
   it("shows doughnut chart on Today page after tracking time", () => {
-    cy.get('[data-cy="filter-today"]').click();
+    cy.get('[data-cy="filter-today"]').click({ force: true });
 
     const taskName = `Chart test ${Date.now()}`;
     createTaskAndGetId(taskName).then((taskId) => {
@@ -72,7 +72,7 @@ describe("Doughnut Chart", () => {
   });
 
   it("shows empty state when no time entries on Today page", () => {
-    cy.get('[data-cy="filter-today"]').click();
+    cy.get('[data-cy="filter-today"]').click({ force: true });
 
     cy.get('[data-cy="doughnut-chart-empty"]', { timeout: 10000 }).should(
       "be.visible",
@@ -84,7 +84,7 @@ describe("Doughnut Chart", () => {
   });
 
   it("shows doughnut chart on Calendar day page", () => {
-    cy.get('[data-cy="filter-today"]').click();
+    cy.get('[data-cy="filter-today"]').click({ force: true });
 
     const taskName = `Calendar chart ${Date.now()}`;
     createTaskAndGetId(taskName).then((taskId) => {

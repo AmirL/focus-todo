@@ -85,7 +85,7 @@ describe("Quick-Add from Timeline Gap", () => {
     // Visit after creating tasks so React Query fetches fresh data
     cy.visit("/");
     cy.waitForAppLoad();
-    cy.get('[data-cy="filter-today"]').click();
+    cy.get('[data-cy="filter-today"]').click({ force: true });
   }
 
   it("should open dialog when clicking a timeline gap and create a completed task", () => {

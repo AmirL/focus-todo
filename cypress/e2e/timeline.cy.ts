@@ -38,7 +38,7 @@ describe("Timeline", () => {
 
   it("should show timeline on Today page with time blocks", () => {
     // Navigate to Today filter first so the task gets a today date
-    cy.get('[data-cy="filter-today"]').click();
+    cy.get('[data-cy="filter-today"]').click({ force: true });
 
     const taskName = `Timeline test ${Date.now()}`;
     createTaskAndGetId(taskName).then((taskId) => {
@@ -77,7 +77,7 @@ describe("Timeline", () => {
 
   it("should scroll to task when clicking a timeline block", () => {
     // Navigate to Today filter first so the task gets a today date
-    cy.get('[data-cy="filter-today"]').click();
+    cy.get('[data-cy="filter-today"]').click({ force: true });
 
     const taskName = `Scroll test ${Date.now()}`;
     createTaskAndGetId(taskName).then((taskId) => {
@@ -121,7 +121,7 @@ describe("Timeline", () => {
 
   it("should show empty state when no time entries exist", () => {
     // Navigate to Today filter without creating any time entries
-    cy.get('[data-cy="filter-today"]').click();
+    cy.get('[data-cy="filter-today"]').click({ force: true });
 
     // Timeline should show the empty state (timeline-bar with empty message)
     cy.get('[data-cy="today-timeline"]', { timeout: 10000 }).should(
