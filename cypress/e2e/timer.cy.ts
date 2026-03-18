@@ -109,19 +109,21 @@ describe("Timer", () => {
       cy.get('[data-cy="timer-start-input"]').should("be.visible");
       cy.get('[data-cy="timer-end-input"]').should("be.visible");
 
-      // Edit start time to 1 hour earlier and verify the API call succeeds
-      cy.get('[data-cy="timer-start-input"]').then(($input) => {
+      // Edit end time to 1 hour later and verify the API call succeeds.
+      // We edit end time (not start time) to avoid midnight rollover issues
+      // where subtracting 1 hour from hour 0 wraps to hour 23 on the same day.
+      cy.get('[data-cy="timer-end-input"]').then(($input) => {
         const currentValue = $input.val() as string;
         const [h, m] = currentValue.split(":").map(Number);
-        const newHour = String(h > 0 ? h - 1 : 23).padStart(2, "0");
+        const newHour = String((h + 1) % 24).padStart(2, "0");
         const newTime = `${newHour}:${String(m).padStart(2, "0")}`;
 
-        cy.get('[data-cy="timer-start-input"]').clear().type(newTime).blur();
+        cy.get('[data-cy="timer-end-input"]').clear().type(newTime).blur();
         cy.wait("@updateEntry").then((interception) => {
           expect(interception.response!.statusCode).to.equal(200);
         });
 
-        // Duration should update (should show ~60m or 1h 0m since we moved start 1 hour earlier)
+        // Duration should update (should show ~60m or 1h since we moved end 1 hour later)
         cy.get('[data-cy="timer-duration"]').should("contain.text", "1h");
       });
     });
@@ -141,14 +143,14 @@ describe("Timer", () => {
       cy.get('[data-cy="timer-stop-button"]').click();
       cy.wait("@stopTimer");
 
-      // Edit start time and blur to trigger save
-      cy.get('[data-cy="timer-start-input"]').then(($input) => {
+      // Edit end time and blur to trigger save (using end time to avoid midnight rollover)
+      cy.get('[data-cy="timer-end-input"]').then(($input) => {
         const currentValue = $input.val() as string;
         const [h, m] = currentValue.split(":").map(Number);
-        const newHour = String(h > 0 ? h - 1 : 23).padStart(2, "0");
+        const newHour = String((h + 1) % 24).padStart(2, "0");
         const newTime = `${newHour}:${String(m).padStart(2, "0")}`;
 
-        cy.get('[data-cy="timer-start-input"]').clear().type(newTime).blur();
+        cy.get('[data-cy="timer-end-input"]').clear().type(newTime).blur();
         cy.wait("@updateEntry");
 
         // Save confirmation should appear

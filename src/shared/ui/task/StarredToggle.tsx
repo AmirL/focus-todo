@@ -14,6 +14,7 @@ export function StarredToggle({ metadata, onMetadataChange }: StarredToggleProps
       tooltipContent="Selected"
       isChecked={metadata.isStarred}
       onCheckedChange={(starred) => onMetadataChange({ isStarred: starred })}
+      data-cy="starred-toggle"
       className={
         metadata.isStarred
           ? 'text-yellow-500 hover:text-yellow-600 p-2 sm:p-1'

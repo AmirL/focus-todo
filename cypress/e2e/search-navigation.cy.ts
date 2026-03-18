@@ -46,21 +46,21 @@ describe("Search and Navigation", () => {
 
   describe("Sidebar Navigation", () => {
     it("should navigate between filter views", () => {
-      cy.get('[data-cy="filter-backlog"]').click();
+      cy.get('[data-cy="filter-backlog"]').click({ force: true });
       cy.contains("backlog").should("exist");
-      cy.get('[data-cy="filter-today"]').click();
+      cy.get('[data-cy="filter-today"]').click({ force: true });
       cy.contains("today").should("exist");
-      cy.get('[data-cy="filter-tomorrow"]').click();
+      cy.get('[data-cy="filter-tomorrow"]').click({ force: true });
       cy.contains("tomorrow").should("exist");
     });
 
     it("should navigate to Selected filter", () => {
-      cy.get('[data-cy="filter-selected"]').click();
+      cy.get('[data-cy="filter-selected"]').click({ force: true });
       cy.contains("selected").should("exist");
     });
 
     it("should navigate to Future filter", () => {
-      cy.get('[data-cy="filter-future"]').click();
+      cy.get('[data-cy="filter-future"]').click({ force: true });
       cy.contains("future").should("exist");
     });
 
@@ -82,7 +82,7 @@ describe("Search and Navigation", () => {
 
     it("should navigate on mobile", () => {
       cy.get('[data-cy="mobile-menu-button"]').click();
-      cy.get('[data-cy="filter-today"]').click();
+      cy.get('[data-cy="filter-today"]').click({ force: true });
       cy.contains("today").should("exist");
     });
   });

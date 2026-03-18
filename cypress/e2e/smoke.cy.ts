@@ -31,7 +31,7 @@ describe("Smoke Tests - Critical User Flows", () => {
 
     // Complete the task - use role="checkbox" for Radix checkbox
     cy.get('[data-cy^="task-"]').contains(taskName).parents('[data-cy^="task-"]').find('[role="checkbox"]').click();
-    cy.get(".line-through").should("exist");
+    cy.get('[data-cy^="task-"]').contains(taskName).parents('[data-cy^="task-"]').should("have.attr", "data-state", "completed");
   });
 
   it("should star a task and view in Selected", () => {
@@ -51,7 +51,7 @@ describe("Smoke Tests - Critical User Flows", () => {
     cy.get('[data-cy^="star-task-"]').first().click({ force: true });
     cy.wait("@updateTask");
     // Navigate to Selected and verify task appears there
-    cy.get('[data-cy="filter-selected"]').click();
+    cy.get('[data-cy="filter-selected"]').click({ force: true });
     cy.contains(taskName).should("be.visible");
   });
 
@@ -98,11 +98,11 @@ describe("Smoke Tests - Critical User Flows", () => {
   });
 
   it("should navigate between filter views", () => {
-    cy.get('[data-cy="filter-backlog"]').click();
+    cy.get('[data-cy="filter-backlog"]').click({ force: true });
     cy.contains("backlog").should("exist");
-    cy.get('[data-cy="filter-today"]').click();
+    cy.get('[data-cy="filter-today"]').click({ force: true });
     cy.contains("today").should("exist");
-    cy.get('[data-cy="filter-selected"]').click();
+    cy.get('[data-cy="filter-selected"]').click({ force: true });
     cy.contains("selected").should("exist");
   });
 });

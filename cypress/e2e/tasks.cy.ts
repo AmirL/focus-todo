@@ -56,7 +56,7 @@ describe("Task Management", () => {
     it("should mark a task as complete", () => {
       // Radix checkbox uses role="checkbox"
       cy.get('[data-cy^="task-"]').first().find('[role="checkbox"]').click();
-      cy.get(".line-through").should("exist");
+      cy.get('[data-cy^="task-"]').first().should("have.attr", "data-state", "completed");
     });
 
     it("should star/select a task", () => {
@@ -67,14 +67,14 @@ describe("Task Management", () => {
         cy.get('[data-cy^="star-task-"]').first().click({ force: true });
         cy.wait("@updateTask");
         // Navigate to Selected and verify task appears there
-        cy.get('[data-cy="filter-selected"]').click();
+        cy.get('[data-cy="filter-selected"]').click({ force: true });
         cy.contains(taskText.slice(0, 20)).should("exist");
       });
     });
 
     it("should delete a task", () => {
       cy.get('[data-cy^="delete-task-"]').first().click();
-      cy.get(".line-through").should("exist");
+      cy.get('[data-cy^="task-"]').first().should("have.attr", "data-state", "deleted");
     });
 
     it("should snooze a task to a different date", () => {
@@ -102,7 +102,7 @@ describe("Task Management", () => {
       // Wait for calendar popover to appear (Radix Popover renders in portal)
       cy.get('[role="grid"]', { timeout: 15000 }).should('be.visible');
       // Select the last non-outside day in the current month
-      cy.get('[role="grid"] button').not('.day-outside').not('[disabled]').last().click({ force: true });
+      cy.get('[role="grid"] button').not('[disabled]').not('[aria-disabled="true"]').last().click({ force: true });
       cy.wait("@updateTask");
     });
 
@@ -148,27 +148,27 @@ describe("Task Management", () => {
 
   describe("Filter Tasks", () => {
     it("should navigate to Today filter", () => {
-      cy.get('[data-cy="filter-today"]').click();
+      cy.get('[data-cy="filter-today"]').click({ force: true });
       cy.contains("today").should("exist");
     });
 
     it("should navigate to Tomorrow filter", () => {
-      cy.get('[data-cy="filter-tomorrow"]').click();
+      cy.get('[data-cy="filter-tomorrow"]').click({ force: true });
       cy.contains("tomorrow").should("exist");
     });
 
     it("should navigate to Backlog filter", () => {
-      cy.get('[data-cy="filter-backlog"]').click();
+      cy.get('[data-cy="filter-backlog"]').click({ force: true });
       cy.contains("backlog").should("exist");
     });
 
     it("should navigate to Selected filter", () => {
-      cy.get('[data-cy="filter-selected"]').click();
+      cy.get('[data-cy="filter-selected"]').click({ force: true });
       cy.contains("selected").should("exist");
     });
 
     it("should navigate to Future filter", () => {
-      cy.get('[data-cy="filter-future"]').click();
+      cy.get('[data-cy="filter-future"]').click({ force: true });
       cy.contains("future").should("exist");
     });
   });

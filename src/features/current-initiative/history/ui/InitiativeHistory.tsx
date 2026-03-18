@@ -48,7 +48,7 @@ export function InitiativeHistory() {
           <div className="text-muted-foreground text-sm">No focus history yet</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm" data-cy="initiative-history-table">
               <thead>
                 <tr className="border-b">
                   <th className="text-left py-2 pr-4 font-medium">Date</th>

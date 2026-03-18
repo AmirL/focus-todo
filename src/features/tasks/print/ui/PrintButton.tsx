@@ -50,7 +50,7 @@ export function PrintButton({ tasks }: PrintButtonProps) {
   if (printableTasks.length === 0) return null;
 
   return (
-    <Button variant="outline" size="sm" className="gap-2 text-xs sm:text-sm" onClick={handlePrint}>
+    <Button data-cy="print-tasks-btn" variant="outline" size="sm" className="gap-2 text-xs sm:text-sm" onClick={handlePrint}>
       <Printer className="h-4 w-4" />
       <span className="hidden xs:inline sm:inline">Print</span> Tasks
     </Button>

@@ -8,6 +8,7 @@ interface IconButtonToggleProps {
   isChecked: boolean;
   onCheckedChange: (checked: boolean) => void;
   className?: string;
+  'data-cy'?: string;
 }
 
 export function IconButtonToggle({
@@ -16,15 +17,18 @@ export function IconButtonToggle({
   isChecked,
   onCheckedChange,
   className,
+  'data-cy': dataCy,
 }: IconButtonToggleProps) {
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
+            type="button"
             variant="ghost"
             size="icon"
             onClick={() => onCheckedChange(!isChecked)}
+            data-cy={dataCy}
             className={cn(
               'h-8 w-8', // Smaller size
               className

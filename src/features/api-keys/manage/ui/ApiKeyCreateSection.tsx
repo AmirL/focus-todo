@@ -31,28 +31,29 @@ export function ApiKeyCreateSection({ onGenerate, isGenerating, created }: Props
           <Label htmlFor="api-key-name">Label (optional)</Label>
           <Input
             id="api-key-name"
+            data-cy="api-key-name-input"
             placeholder="e.g. Raycast, Zapier, CLI script"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
         </div>
-        <Button onClick={() => onGenerate(name || undefined)} disabled={isGenerating}>
+        <Button data-cy="generate-api-key-btn" onClick={() => onGenerate(name || undefined)} disabled={isGenerating}>
           <Plus className="h-4 w-4 mr-2" />
           Generate
         </Button>
       </div>
 
       {created && (
-        <div className="rounded-md border p-3 bg-muted/30">
+        <div data-cy="created-api-key-box" className="rounded-md border p-3 bg-muted/30">
           <div className="flex items-start justify-between gap-2">
             <div>
               <div className="text-sm font-medium">New API Key</div>
               <div className="text-xs text-muted-foreground">
                 Copy and store it securely. You won’t see it again.
               </div>
-              <div className="mt-2 font-mono break-all text-sm">{created.key}</div>
+              <div data-cy="created-api-key-value" className="mt-2 font-mono break-all text-sm">{created.key}</div>
             </div>
-            <Button variant="secondary" size="sm" onClick={copyCreatedKey}>
+            <Button data-cy="copy-api-key-btn" variant="secondary" size="sm" onClick={copyCreatedKey}>
               <Copy className="h-4 w-4 mr-2" />
               Copy
             </Button>
