@@ -36,6 +36,14 @@ export default defineConfig({
       json: true,
     },
     setupNodeEvents(on, config) {
+      // Allow cy.task('log', message) to print to terminal (cy.log only shows in browser)
+      on("task", {
+        log(message: string) {
+          console.log(message);
+          return null;
+        },
+      });
+
       if (coverageEnabled) {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         require("@cypress/code-coverage/task")(on, config);

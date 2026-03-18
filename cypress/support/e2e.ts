@@ -47,7 +47,9 @@ before(() => {
   const authHeaders = { "X-API-Key": apiKey };
   const cutoff = new Date(Date.now() - TWO_HOURS_MS).toISOString();
 
-  // Clean up stale tasks (older than 2 hours)
+  // Clean up stale tasks (older than 2 hours).
+  // Parallel safety: only deletes tasks older than 2 hours, so active test data
+  // from concurrent CI runs (which is minutes old) is never touched.
   cy.request({
     method: "GET",
     url: "/api/tasks?includeDeleted=true&limit=500",
@@ -56,19 +58,28 @@ before(() => {
   }).then((response) => {
     if (response.status !== 200) return;
     const tasks = response.body.tasks || [];
-    tasks.forEach((task: { id: number; createdAt: string }) => {
-      if (task.createdAt && task.createdAt < cutoff) {
-        cy.request({
-          method: "DELETE",
-          url: `/api/tasks/${task.id}?permanent=true`,
-          headers: authHeaders,
-          failOnStatusCode: false,
-        });
-      }
+    const staleTasks = tasks.filter(
+      (task: { createdAt: string }) => task.createdAt && task.createdAt < cutoff,
+    );
+    if (staleTasks.length > 0) {
+      cy.task("log", `[cleanup] Deleting ${staleTasks.length} stale tasks (of ${tasks.length} total)`);
+    }
+    staleTasks.forEach((task: { id: number }) => {
+      cy.request({
+        method: "DELETE",
+        url: `/api/tasks/${task.id}?permanent=true`,
+        headers: authHeaders,
+        failOnStatusCode: false,
+      });
     });
   });
 
-  // Clean up all goals (test account should be empty between runs)
+  // Clean up all goals (test account should be empty between runs).
+  // Parallel safety: each test creates goals in its own beforeEach/it block and
+  // the before() hook runs once at the start before any tests execute.
+  // If two CI runs overlap, both delete all goals at startup, which is harmless
+  // (DELETE on already-deleted goals returns 404, caught by failOnStatusCode: false).
+  // Tests then create fresh goals as needed.
   cy.request({
     method: "GET",
     url: "/api/goals?includeDeleted=true",
@@ -77,6 +88,9 @@ before(() => {
   }).then((response) => {
     if (response.status !== 200) return;
     const goals = response.body.goals || [];
+    if (goals.length > 0) {
+      cy.task("log", `[cleanup] Deleting ${goals.length} goals`);
+    }
     goals.forEach((goal: { id: number }) => {
       cy.request({
         method: "DELETE",
@@ -87,7 +101,10 @@ before(() => {
     });
   });
 
-  // Clean up non-default lists older than 2 hours
+  // Clean up non-default lists older than 2 hours.
+  // Parallel safety: same 2-hour threshold as tasks. Lists created by an active
+  // concurrent run are minutes old and won't be deleted. Items from deleted lists
+  // are reassigned to the default list so no data is lost.
   cy.request({
     method: "GET",
     url: "/api/lists?includeArchived=true",
@@ -99,15 +116,20 @@ before(() => {
     const defaultList = lists.find((l: { isDefault: boolean }) => l.isDefault);
     if (!defaultList) return;
 
-    lists.forEach((list: { id: number; isDefault: boolean; createdAt: string }) => {
-      if (!list.isDefault && list.createdAt && list.createdAt < cutoff) {
-        cy.request({
-          method: "DELETE",
-          url: `/api/lists/${list.id}?reassignTo=${defaultList.id}`,
-          headers: authHeaders,
-          failOnStatusCode: false,
-        });
-      }
+    const staleLists = lists.filter(
+      (list: { isDefault: boolean; createdAt: string }) =>
+        !list.isDefault && list.createdAt && list.createdAt < cutoff,
+    );
+    if (staleLists.length > 0) {
+      cy.task("log", `[cleanup] Deleting ${staleLists.length} stale lists (of ${lists.length} total)`);
+    }
+    staleLists.forEach((list: { id: number }) => {
+      cy.request({
+        method: "DELETE",
+        url: `/api/lists/${list.id}?reassignTo=${defaultList.id}`,
+        headers: authHeaders,
+        failOnStatusCode: false,
+      });
     });
   });
 });
