@@ -36,9 +36,8 @@ beforeEach(() => {
   cy.login();
 });
 
-// Clean up stale test tasks (older than 2 hours) at the start of each test run.
+// Clean up stale test data at the start of each test run.
 // This is a safety net for tests that fail mid-execution or don't clean up properly.
-// Goals don't have a list API with API key auth, so goal cleanup relies on per-test afterEach hooks.
 const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
 
 before(() => {
@@ -48,6 +47,7 @@ before(() => {
   const authHeaders = { "X-API-Key": apiKey };
   const cutoff = new Date(Date.now() - TWO_HOURS_MS).toISOString();
 
+  // Clean up stale tasks (older than 2 hours)
   cy.request({
     method: "GET",
     url: "/api/tasks?includeDeleted=true&limit=500",
@@ -61,6 +61,49 @@ before(() => {
         cy.request({
           method: "DELETE",
           url: `/api/tasks/${task.id}?permanent=true`,
+          headers: authHeaders,
+          failOnStatusCode: false,
+        });
+      }
+    });
+  });
+
+  // Clean up all goals (test account should be empty between runs)
+  cy.request({
+    method: "GET",
+    url: "/api/goals?includeDeleted=true",
+    headers: authHeaders,
+    failOnStatusCode: false,
+  }).then((response) => {
+    if (response.status !== 200) return;
+    const goals = response.body.goals || [];
+    goals.forEach((goal: { id: number }) => {
+      cy.request({
+        method: "DELETE",
+        url: `/api/goals/${goal.id}?permanent=true`,
+        headers: authHeaders,
+        failOnStatusCode: false,
+      });
+    });
+  });
+
+  // Clean up non-default lists older than 2 hours
+  cy.request({
+    method: "GET",
+    url: "/api/lists?includeArchived=true",
+    headers: authHeaders,
+    failOnStatusCode: false,
+  }).then((response) => {
+    if (response.status !== 200) return;
+    const lists = response.body.lists || [];
+    const defaultList = lists.find((l: { isDefault: boolean }) => l.isDefault);
+    if (!defaultList) return;
+
+    lists.forEach((list: { id: number; isDefault: boolean; createdAt: string }) => {
+      if (!list.isDefault && list.createdAt && list.createdAt < cutoff) {
+        cy.request({
+          method: "DELETE",
+          url: `/api/lists/${list.id}?reassignTo=${defaultList.id}`,
           headers: authHeaders,
           failOnStatusCode: false,
         });
