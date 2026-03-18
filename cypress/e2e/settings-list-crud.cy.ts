@@ -193,7 +193,7 @@ describe("Settings List Management", () => {
       // Click delete button (trash icon on the new list)
       cy.get('[data-cy^="list-item-"]').contains(listName)
         .closest('[data-cy^="list-item-"]')
-        .find("button.text-red-600")
+        .find('[data-cy="delete-list-btn"]')
         .click();
 
       // Confirmation dialog should appear
@@ -210,7 +210,7 @@ describe("Settings List Management", () => {
       // Find the list item with "Default" badge and verify no trash button
       cy.contains("Default")
         .closest('[data-cy^="list-item-"]')
-        .find("button.text-red-600")
+        .find('[data-cy="delete-list-btn"]')
         .should("not.exist");
     });
   });

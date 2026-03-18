@@ -85,7 +85,7 @@ export function ListItem({ list, isDragging, dragHandleRef, dragHandleListeners 
         {!list.isDefault && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">
+              <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700" data-cy="delete-list-btn">
                 <Trash2 className="h-4 w-4" />
               </Button>
             </AlertDialogTrigger>
