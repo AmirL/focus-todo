@@ -141,6 +141,13 @@
       "when": 1741700000000,
       "tag": "0019_add_list_color",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1742300000000,
+      "tag": "0020_add_goal_created_at",
+      "breakpoints": true
     }
   ]
 }

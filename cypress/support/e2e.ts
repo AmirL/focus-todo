@@ -74,12 +74,9 @@ before(() => {
     });
   });
 
-  // Clean up all goals (test account should be empty between runs).
-  // Parallel safety: each test creates goals in its own beforeEach/it block and
-  // the before() hook runs once at the start before any tests execute.
-  // If two CI runs overlap, both delete all goals at startup, which is harmless
-  // (DELETE on already-deleted goals returns 404, caught by failOnStatusCode: false).
-  // Tests then create fresh goals as needed.
+  // Clean up stale goals (older than 2 hours).
+  // Parallel safety: same 2-hour threshold as tasks and lists. Goals created by
+  // an active concurrent run are minutes old and won't be deleted.
   cy.request({
     method: "GET",
     url: "/api/goals?includeDeleted=true",
@@ -88,10 +85,13 @@ before(() => {
   }).then((response) => {
     if (response.status !== 200) return;
     const goals = response.body.goals || [];
-    if (goals.length > 0) {
-      cy.task("log", `[cleanup] Deleting ${goals.length} goals`);
+    const staleGoals = goals.filter(
+      (goal: { createdAt: string }) => goal.createdAt && goal.createdAt < cutoff,
+    );
+    if (staleGoals.length > 0) {
+      cy.task("log", `[cleanup] Deleting ${staleGoals.length} stale goals (of ${goals.length} total)`);
     }
-    goals.forEach((goal: { id: number }) => {
+    staleGoals.forEach((goal: { id: number }) => {
       cy.request({
         method: "DELETE",
         url: `/api/goals/${goal.id}?permanent=true`,
