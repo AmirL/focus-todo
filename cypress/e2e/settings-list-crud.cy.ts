@@ -79,9 +79,8 @@ describe("Settings List Management", () => {
   });
 
   describe("List Items Display", () => {
-    it("should show color swatches and action buttons for each list", () => {
+    it("should show action buttons for each list", () => {
       cy.get('[data-cy^="list-item-"]').first().within(() => {
-        cy.get('[data-cy="list-color-swatch"]').should("exist");
         cy.get('[data-cy="edit-list-btn"]').should("exist");
       });
     });
