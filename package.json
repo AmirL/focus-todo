@@ -19,6 +19,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "coverage": "bash scripts/coverage.sh",
+    "coverage:map": "node scripts/generate-coverage-map.cjs",
     "quality": ".venv/bin/desloppify scan --path src",
     "quality:next": ".venv/bin/desloppify next",
     "quality:status": ".venv/bin/desloppify status",
