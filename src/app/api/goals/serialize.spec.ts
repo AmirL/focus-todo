@@ -11,6 +11,7 @@ describe('serializeGoal', () => {
       listId: 2,
       userId: 'user-1',
       deletedAt: new Date('2026-01-15T10:00:00Z'),
+      createdAt: new Date('2026-01-01T00:00:00Z'),
       __list_deprecated: 'old',
     };
 
@@ -24,6 +25,7 @@ describe('serializeGoal', () => {
       listId: 2,
       userId: 'user-1',
       deletedAt: '2026-01-15T10:00:00.000Z',
+      createdAt: '2026-01-01T00:00:00.000Z',
     });
     expect(result).not.toHaveProperty('__list_deprecated');
   });
@@ -37,6 +39,7 @@ describe('serializeGoal', () => {
       listId: 1,
       userId: 'user-1',
       deletedAt: null,
+      createdAt: new Date('2026-01-01T00:00:00Z'),
       __list_deprecated: '',
     };
 
@@ -53,6 +56,7 @@ describe('serializeGoal', () => {
       listId: 1,
       userId: 'user-1',
       deletedAt: '2026-02-01T00:00:00Z' as unknown as Date,
+      createdAt: new Date('2026-01-01T00:00:00Z'),
       __list_deprecated: null,
     };
 
@@ -71,6 +75,7 @@ describe('serializeGoalWithList', () => {
       listId: 2,
       userId: 'user-1',
       deletedAt: null,
+      createdAt: new Date('2026-01-01T00:00:00Z'),
       __list_deprecated: '',
     };
 
@@ -90,6 +95,7 @@ describe('serializeGoalWithList', () => {
       listId: 1,
       userId: 'user-1',
       deletedAt: null,
+      createdAt: new Date('2026-01-01T00:00:00Z'),
       __list_deprecated: '',
     };
 

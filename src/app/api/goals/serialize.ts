@@ -3,8 +3,9 @@ import { toISOString } from '@/shared/lib/api/serialize-helpers';
 
 type GoalRow = typeof goalsTable.$inferSelect;
 
-type ApiGoal = Omit<GoalRow, '__list_deprecated' | 'deletedAt'> & {
+type ApiGoal = Omit<GoalRow, '__list_deprecated' | 'deletedAt' | 'createdAt'> & {
   deletedAt: string | null;
+  createdAt: string;
 };
 
 type ApiGoalWithList = ApiGoal & { listName: string | null };
@@ -14,6 +15,7 @@ export function serializeGoal(g: GoalRow): ApiGoal {
   return {
     ...rest,
     deletedAt: toISOString(g.deletedAt),
+    createdAt: toISOString(g.createdAt) ?? new Date().toISOString(),
   };
 }
 

@@ -34,6 +34,9 @@ export const goalsTable = mysqlTable('goals', {
   listId: int('list_id').notNull().references(() => listsTable.id, { onDelete: 'restrict' }),
   userId: varchar('user_id', { length: 36 }).notNull().references(() => user.id, { onDelete: 'cascade' }),
   deletedAt: datetime('deleted_at'),
+  createdAt: datetime('created_at')
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
 });
 
 export const listsTable = mysqlTable('lists', {
