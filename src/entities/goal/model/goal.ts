@@ -18,6 +18,7 @@ export class GoalModel {
   progress!: number;
   listId!: number;
   deletedAt!: string;
+  createdAt!: string;
 
   static toInstance(data: GoalPlain): GoalModel {
     return plainToInstance(GoalModel, data);
