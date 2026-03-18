@@ -220,6 +220,42 @@ describe("Timer", () => {
     });
   });
 
+  it("should auto-stop previous timer when starting timer on a different task", () => {
+    const taskNameA = `Timer A ${Date.now()}`;
+    const taskNameB = `Timer B ${Date.now()}`;
+
+    createTaskAndGetId(taskNameA).then((taskIdA) => {
+      createTaskAndGetId(taskNameB).then((taskIdB) => {
+        // Start timer on task A
+        cy.get(`[data-cy="task-${taskIdA}"]`)
+          .find('[data-cy="start-timer-button"]')
+          .click();
+        cy.wait("@startTimer");
+        cy.get('[data-cy="timer-bar"]', { timeout: 10000 }).should(
+          "be.visible",
+        );
+        cy.get('[data-cy="timer-bar"]').should("contain.text", taskNameA);
+
+        // Start timer on task B (should auto-stop A)
+        cy.get(`[data-cy="task-${taskIdB}"]`)
+          .find('[data-cy="start-timer-button"]')
+          .click();
+        cy.wait("@startTimer");
+
+        // Timer bar should now show task B
+        cy.get('[data-cy="timer-bar"]', { timeout: 10000 }).should(
+          "contain.text",
+          taskNameB,
+        );
+
+        // Task A should show time-spent badge (was stopped)
+        cy.get(`[data-cy="task-${taskIdA}"]`)
+          .find('[data-cy="time-spent-badge"]', { timeout: 10000 })
+          .should("exist");
+      });
+    });
+  });
+
   it("should show start timer button on completed tasks", () => {
     cy.intercept("POST", "/api/update-task").as("updateTask");
     const taskName = `Done timer test ${Date.now()}`;

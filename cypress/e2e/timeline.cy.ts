@@ -119,6 +119,59 @@ describe("Timeline", () => {
     });
   });
 
+  it("should show multiple timeline blocks for multiple tasks with time entries", () => {
+    // Navigate to Today filter first
+    cy.get('[data-cy="filter-today"]').click({ force: true });
+
+    const taskNameA = `Multi-block A ${Date.now()}`;
+    const taskNameB = `Multi-block B ${Date.now()}`;
+
+    createTaskAndGetId(taskNameA).then((taskIdA) => {
+      createTaskAndGetId(taskNameB).then((taskIdB) => {
+        // Create time entry for task A
+        cy.get(`[data-cy="task-${taskIdA}"]`)
+          .find('[data-cy="start-timer-button"]')
+          .click();
+        cy.wait("@startTimer");
+        cy.get('[data-cy="timer-bar"]', { timeout: 10000 }).should(
+          "be.visible",
+        );
+        // eslint-disable-next-line cypress/no-unnecessary-waiting
+        cy.wait(2000);
+        cy.get('[data-cy="timer-stop-button"]').click();
+        cy.wait("@stopTimer");
+        cy.get('[data-cy="timer-dismiss-button"]').click();
+
+        // Create time entry for task B
+        cy.get(`[data-cy="task-${taskIdB}"]`)
+          .find('[data-cy="start-timer-button"]')
+          .click();
+        cy.wait("@startTimer");
+        cy.get('[data-cy="timer-bar"]', { timeout: 10000 }).should(
+          "be.visible",
+        );
+        // eslint-disable-next-line cypress/no-unnecessary-waiting
+        cy.wait(2000);
+        cy.get('[data-cy="timer-stop-button"]').click();
+        cy.wait("@stopTimer");
+        cy.get('[data-cy="timer-dismiss-button"]').click();
+
+        // Timeline should show at least 2 blocks
+        cy.get('[data-cy="today-timeline"]', { timeout: 10000 }).should(
+          "be.visible",
+        );
+        cy.get('[data-cy="timeline-block"]', { timeout: 10000 }).should(
+          "have.length.at.least",
+          2,
+        );
+
+        // Both task names should appear in the timeline
+        cy.get('[data-cy="timeline-block"]').should("contain.text", taskNameA);
+        cy.get('[data-cy="timeline-block"]').should("contain.text", taskNameB);
+      });
+    });
+  });
+
   it("should show empty state when no time entries exist", () => {
     // Navigate to Today filter without creating any time entries
     cy.get('[data-cy="filter-today"]').click({ force: true });

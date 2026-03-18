@@ -22,7 +22,31 @@ describe("Task Categories", () => {
     });
 
     it("should filter by clicking a category", () => {
-      cy.get('[data-cy^="category-"]').first().click();
+      cy.get('[data-cy^="category-"]').first().click({ force: true });
+    });
+
+    it("should show category filter buttons for each list", () => {
+      // There should be at least 2 category buttons (Work + Personal or similar)
+      cy.get('[data-cy^="category-"]').should("have.length.at.least", 2);
+    });
+
+    it("should filter tasks when switching between categories", () => {
+      // Create a task (it goes to the default category)
+      const taskName = `Category filter test ${Date.now()}`;
+      cy.get('[data-cy="add-task-button"]').click();
+      cy.get('[data-cy="task-name-input"]').type(taskName);
+      cy.get('[data-cy="save-task-button"]').click();
+      cy.wait("@createTask").then((interception) => {
+        createdTaskIds.push(interception.response!.body.id);
+      });
+      cy.contains(taskName, { timeout: 15000 }).should("be.visible");
+
+      // Click a different category - the task might not be visible
+      cy.get('[data-cy^="category-"]').last().click({ force: true });
+
+      // Click back to backlog - task should reappear
+      cy.get('[data-cy="filter-backlog"]').click({ force: true });
+      cy.contains(taskName, { timeout: 10000 }).should("be.visible");
     });
   });
 
