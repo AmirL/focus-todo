@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">89.47% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>17/19</span>
+                <span class='fraction'>19/19</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>7/14</span>
+                <span class='fraction'>14/14</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">92.85% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>13/14</span>
+                <span class='fraction'>14/14</span>
             </div>
         
             
@@ -111,7 +111,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">61x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -119,39 +119,39 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">61x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">39x</span>
-<span class="cline-any cline-yes">39x</span>
-<span class="cline-any cline-yes">39x</span>
-<span class="cline-any cline-yes">39x</span>
-<span class="cline-any cline-yes">39x</span>
-<span class="cline-any cline-yes">39x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">61x</span>
+<span class="cline-any cline-yes">61x</span>
+<span class="cline-any cline-yes">61x</span>
+<span class="cline-any cline-yes">61x</span>
+<span class="cline-any cline-yes">61x</span>
+<span class="cline-any cline-yes">59x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">61x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">39x</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">61x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">61x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-yes">60x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { NextRequest } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { and, eq } from 'drizzle-orm';
 import { goalsTable } from '@/shared/lib/drizzle/schema';
 import { withAuthAndErrorHandling, createErrorResponse, createSuccessResponse } from '@/shared/lib/api/route-wrapper';
 &nbsp;
-async function <span class="fstat-no" title="function not covered" >updateGoalHandler(r</span>eq: NextRequest, session: { user: { id: string } }) {
+async function updateGoalHandler(req: NextRequest, session: { user: { id: string } }) {
   const { id, goal } = await req.json();
 &nbsp;
   const goalData: {
@@ -162,11 +162,11 @@ async function <span class="fstat-no" title="function not covered" >updateGoalHa
     deletedAt?: Date | null;
   } = {};
 &nbsp;
-  <span class="missing-if-branch" title="else path not taken" >E</span>if (goal.title !== undefined) goalData.title = goal.title;
-  <span class="missing-if-branch" title="else path not taken" >E</span>if (goal.description !== undefined) goalData.description = goal.description;
-  <span class="missing-if-branch" title="else path not taken" >E</span>if (goal.progress !== undefined) goalData.progress = goal.progress;
-  <span class="missing-if-branch" title="else path not taken" >E</span>if (goal.listId !== undefined) goalData.listId = goal.listId;
-  <span class="missing-if-branch" title="else path not taken" >E</span>if (goal.deletedAt !== undefined) {
+  if (goal.title !== undefined) goalData.title = goal.title;
+  if (goal.description !== undefined) goalData.description = goal.description;
+  if (goal.progress !== undefined) goalData.progress = goal.progress;
+  if (goal.listId !== undefined) goalData.listId = goal.listId;
+  if (goal.deletedAt !== undefined) {
     goalData.deletedAt = goal.deletedAt ? new Date(goal.deletedAt) : null;
   }
 &nbsp;
@@ -179,13 +179,13 @@ async function <span class="fstat-no" title="function not covered" >updateGoalHa
     .where(and(eq(goalsTable.id, id), eq(goalsTable.userId, session.user.id)));
 &nbsp;
   if (!updatedGoal) {
-<span class="cstat-no" title="statement not covered" >    return createErrorResponse('Goal not found', 404);</span>
+    return createErrorResponse('Goal not found', 404);
   }
 &nbsp;
   return createSuccessResponse(updatedGoal);
 }
 &nbsp;
-export const POST = <span class="cstat-no" title="statement not covered" >withAuthAndErrorHandling(updateGoalHandler, 'update-goal');</span>
+export const POST = withAuthAndErrorHandling(updateGoalHandler, 'update-goal');
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -193,7 +193,7 @@ export const POST = <span class="cstat-no" title="statement not covered" >withAu
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-17T07:29:53.678Z
+                at 2026-03-18T01:27:50.795Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/17</span>
+                <span class='fraction'>17/17</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/13</span>
+                <span class='fraction'>13/13</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>1/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/17</span>
+                <span class='fraction'>17/17</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -124,48 +124,48 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { NextRequest } from 'next/server';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">import { NextRequest } from 'next/server';
 import { withAuthAndErrorHandling, createErrorResponse, createSuccessResponse } from '@/shared/lib/api/route-wrapper';
 import {
   findUserListById,
@@ -174,56 +174,56 @@ import {
   deleteUserList
 } from '@/shared/lib/db/list-queries';
 &nbsp;
-async function <span class="fstat-no" title="function not covered" >deleteListHandler(r</span>eq: NextRequest, session: { user: { id: string } }) {
-  const { id, reassignToListId } = <span class="cstat-no" title="statement not covered" >await req.json();</span>
+async function deleteListHandler(req: NextRequest, session: { user: { id: string } }) {
+  const { id, reassignToListId } = await req.json();
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (!id) {</span>
-<span class="cstat-no" title="statement not covered" >    return createErrorResponse('List ID is required', 400);</span>
+  if (!id) {
+    return createErrorResponse('List ID is required', 400);
   }
 &nbsp;
   // Check if the list exists and belongs to the user
-  const existingList = <span class="cstat-no" title="statement not covered" >await findUserListById(session.user.id, id);</span>
+  const existingList = await findUserListById(session.user.id, id);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (!existingList) {</span>
-<span class="cstat-no" title="statement not covered" >    return createErrorResponse('List not found', 404);</span>
+  if (!existingList) {
+    return createErrorResponse('List not found', 404);
   }
 &nbsp;
   // Check if there are tasks or goals using this list
-  const { tasksCount, goalsCount } = <span class="cstat-no" title="statement not covered" >await countListUsage(session.user.id, existingList.id);</span>
+  const { tasksCount, goalsCount } = await countListUsage(session.user.id, existingList.id);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if ((tasksCount &gt; 0 || goalsCount &gt; 0) &amp;&amp; !reassignToListId) {</span>
-<span class="cstat-no" title="statement not covered" >    return createErrorResponse(</span>
+  if ((tasksCount &gt; 0 || goalsCount &gt; 0) &amp;&amp; !reassignToListId) {
+    return createErrorResponse(
       'Cannot delete list with existing tasks or goals. Please specify a list to reassign them to.',
       400
     );
   }
 &nbsp;
   // If reassignment is needed, verify the target list exists
-<span class="cstat-no" title="statement not covered" >  if (reassignToListId) {</span>
-    const targetList = <span class="cstat-no" title="statement not covered" >await findUserListById(session.user.id, reassignToListId);</span>
+  if (reassignToListId) {
+    const targetList = await findUserListById(session.user.id, reassignToListId);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!targetList) {</span>
-<span class="cstat-no" title="statement not covered" >      return createErrorResponse('Target list for reassignment not found', 404);</span>
+    if (!targetList) {
+      return createErrorResponse('Target list for reassignment not found', 404);
     }
 &nbsp;
     // Reassign tasks and goals to the new list
-<span class="cstat-no" title="statement not covered" >    await reassignItemsToList(session.user.id, existingList.id, targetList.id);</span>
+    await reassignItemsToList(session.user.id, existingList.id, targetList.id);
   }
 &nbsp;
   // Delete the list
-<span class="cstat-no" title="statement not covered" >  await deleteUserList(session.user.id, id);</span>
+  await deleteUserList(session.user.id, id);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return createSuccessResponse({ message: 'List deleted successfully' }, 200);</span>
+  return createSuccessResponse({ message: 'List deleted successfully' }, 200);
 }
 &nbsp;
-export const POST = <span class="cstat-no" title="statement not covered" >withAuthAndErrorHandling(deleteListHandler, 'delete-list');</span></pre></td></tr></table></pre>
+export const POST = withAuthAndErrorHandling(deleteListHandler, 'delete-list');</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-17T07:29:53.678Z
+                at 2026-03-18T01:27:50.795Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

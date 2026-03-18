@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">48.38% </span>
+                <span class="strong">48.48% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>15/31</span>
+                <span class='fraction'>16/33</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">40% </span>
+                <span class="strong">36.36% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>4/10</span>
+                <span class='fraction'>4/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">56.52% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>11/22</span>
+                <span class='fraction'>13/23</span>
             </div>
         
             
@@ -108,38 +108,36 @@
 <a name='L43'></a><a href='#L43'>43</a>
 <a name='L44'></a><a href='#L44'>44</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2013x</span>
+<span class="cline-any cline-yes">2013x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2013x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2440x</span>
-<span class="cline-any cline-yes">2440x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2440x</span>
-<span class="cline-any cline-yes">2152x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2152x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">36x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2152x</span>
-<span class="cline-any cline-yes">18x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-yes">2134x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-yes">18x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">2013x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1777x</span>
+<span class="cline-any cline-yes">1777x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1793x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1761x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -147,49 +145,51 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export async function <span class="fstat-no" title="function not covered" >fetchBackend&lt;T = unknown&gt;(</span>
-  endpoint: string,
-  body: object | undefined = <span class="branch-0 cbranch-no" title="branch not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >undefined,</span></span>
-  method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE' = <span class="branch-0 cbranch-no" title="branch not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >'POST'</span></span>
+  endpoint: string<span class="branch-0 cbranch-no" title="branch not covered" >,</span>
+<span class="cstat-no" title="statement not covered" >  body: object | undefined = <span class="branch-0 cbranch-no" title="branch not covered" >undefined,</span></span>
+  method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE' = <span class="branch-0 cbranch-no" title="branch not covered" >'POST'</span>
 ): Promise&lt;T&gt; {
-  const options: RequestInit = <span class="cstat-no" title="statement not covered" >{</span>
+  const options: RequestInit = {
     method,
     headers: {
       'Content-Type': 'application/json',
     },
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
-  };
+<span class="cstat-no" title="statement not covered" >  };</span>
 &nbsp;
-  const response = <span class="cstat-no" title="statement not covered" >await fetch(`/api/${endpoint}`, options);</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>const response = await fetch(`/api/${endpoint}`, options);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (!response.ok) {</span>
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (!response.ok) {
     const errorMessage = await response.text();
 &nbsp;
     console.error(`API Error [${response.status}] on ${endpoint}:`, errorMessage);
 &nbsp;
     redirectToLoginIfAuthError(response.status, errorMessage);
 &nbsp;
-    throw new Error(`HTTP error! status: ${response.status}, message: ${errorMessage}`);
-  }
+<span class="cstat-no" title="statement not covered" >    throw new Error(`HTTP error! status: ${response.status}, message: ${errorMessage}`);</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return response.json() as Promise&lt;T&gt;;</span>
-}
+  return response.json() as Promise&lt;T&gt;;
+<span class="fstat-no" title="function not covered" >}</span>
 &nbsp;
-function <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >redirectToLoginIfAuthError(s</span></span>tatus: number, errorMessage: string) {
-  const isAuthError = <span class="cstat-no" title="statement not covered" >status === 401 || (status === 500 &amp;&amp; errorMessage.includes('No session found'));</span>
-<span class="cstat-no" title="statement not covered" >  if (isAuthError) <span class="branch-2 cbranch-no" title="branch not covered" >{</span></span>
-    // Don't redirect if already on login page to avoid infinite loop
-    if (<span class="branch-0 cbranch-no" title="branch not covered" >typeof window !== 'undefined' &amp;&amp; !</span>window.location.pathname.includes('/login')) {
-<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>// Import toast dynamically to avoid issues</span>
-<span class="cstat-no" title="statement not covered" >      import('react-hot-toast').then(<span class="fstat-no" title="function not covered" >({</span> default: toast }) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >        toast.error(<span class="fstat-no" title="function not covered" >'Session expired. Redirecting to login...');</span></span></span>
+function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >redirectToLoginIfAuthError(s</span>tatus: number, errorMessage: string) {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>const isAuthError = status === 401 || (status === 500 &amp;&amp; <span class="branch-2 cbranch-no" title="branch not covered" >errorMessage.includes('No session found'));</span></span>
+  if (isAuthError) {
+<span class="branch-0 cbranch-no" title="branch not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>// Don't redirect if already on login page to avoid infinite loop</span>
+<span class="cstat-no" title="statement not covered" >    if (typeof window !== 'undefined' &amp;&amp; !window.location.pathname.includes('/login')) {</span>
+<span class="cstat-no" title="statement not covered" >      // Import toast dynamically to avoid issues</span>
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >      import('react-hot-toast').then(<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >({</span></span></span> default: toast }<span class="cstat-no" title="statement not covered" >) =&gt; {</span></span>
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >        toast.error('Session expired. Redirecting to login...');</span></span>
 <span class="cstat-no" title="statement not covered" >      });</span>
-<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >      setTimeout(() =&gt; {</span></span>
+<span class="cstat-no" title="statement not covered" >      setTimeout(<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >() =&gt; {</span></span></span>
 <span class="cstat-no" title="statement not covered" >        window.location.href = '/login';</span>
-<span class="cstat-no" title="statement not covered" >      }, <span class="fstat-no" title="function not covered" >1000);</span></span>
-<span class="cstat-no" title="statement not covered" >    }</span>
+      }, 1000);
+    }
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -199,7 +199,7 @@ function <span class="fstat-no" title="function not covered" ><span class="fstat
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-17T07:29:53.678Z
+                at 2026-03-18T01:27:50.795Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

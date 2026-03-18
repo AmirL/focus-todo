@@ -23,23 +23,23 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">77.77% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>7/9</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>1/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -100,27 +100,27 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">84x</span>
+<span class="cline-any cline-yes">143x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">84x</span>
-<span class="cline-any cline-yes">56x</span>
+<span class="cline-any cline-yes">145x</span>
+<span class="cline-any cline-yes">92x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-yes">53x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">28x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-yes">53x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">56x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">53x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { NextRequest } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { and, eq, isNull } from 'drizzle-orm';
@@ -128,15 +128,15 @@ import { timeEntriesTable } from '@/shared/lib/drizzle/schema';
 import { stopRunningTimers } from '../timer-helpers';
 import { withAuthAndErrorHandling, createErrorResponse, createSuccessResponse } from '@/shared/lib/api/route-wrapper';
 &nbsp;
-async function <span class="fstat-no" title="function not covered" >stopTimerHandler(_</span>req: NextRequest, session: { user: { id: string } }) {
-  const [running] = <span class="cstat-no" title="statement not covered" >await DB.select()</span>
+async function stopTimerHandler(_req: NextRequest, session: { user: { id: string } }) {
+  const [running] = await DB.select()
     .from(timeEntriesTable)
     .where(and(
       eq(timeEntriesTable.userId, session.user.id),
       isNull(timeEntriesTable.endedAt)
     ));
 &nbsp;
-  <span class="missing-if-branch" title="else path not taken" >E</span>if (!running) {
+  if (!running) {
     return createErrorResponse('No running timer', 404);
   }
 &nbsp;
@@ -149,7 +149,7 @@ async function <span class="fstat-no" title="function not covered" >stopTimerHan
   return createSuccessResponse(stopped);
 }
 &nbsp;
-export const POST = <span class="cstat-no" title="statement not covered" >withAuthAndErrorHandling(stopTimerHandler, 'stop-timer');</span>
+export const POST = withAuthAndErrorHandling(stopTimerHandler, 'stop-timer');
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -157,7 +157,7 @@ export const POST = <span class="cstat-no" title="statement not covered" >withAu
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-17T07:29:53.678Z
+                at 2026-03-18T01:27:50.795Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

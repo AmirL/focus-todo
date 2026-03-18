@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">31.25% </span>
+                <span class="strong">93.75% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>5/16</span>
+                <span class='fraction'>15/16</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">25% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>2/8</span>
+                <span class='fraction'>8/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">25% </span>
+                <span class="strong">75% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/4</span>
+                <span class='fraction'>3/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">38.46% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>5/13</span>
+                <span class='fraction'>13/13</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -175,19 +175,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">509x</span>
+<span class="cline-any cline-yes">1290x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">500x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1289x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">500x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1289x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -196,29 +194,31 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">190x</span>
-<span class="cline-any cline-yes">190x</span>
+<span class="cline-any cline-yes">263x</span>
+<span class="cline-any cline-yes">263x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { NextRequest } from 'next/server';
 import {
   withAuthAndErrorHandling,
@@ -248,7 +248,7 @@ interface InitiativeResponse {
  * GET /api/current-initiative
  * Returns today's and tomorrow's initiative, plus balance data and suggestion
  */
-async function <span class="fstat-no" title="function not covered" >getInitiativeHandler(</span>
+async function getInitiativeHandler(
   _req: NextRequest,
   session: { user: { id: string } }
 ) {
@@ -256,8 +256,8 @@ async function <span class="fstat-no" title="function not covered" >getInitiativ
     await fetchTodayTomorrowInitiative(session.user.id);
 &nbsp;
   const response: InitiativeResponse = {
-    today: todayInitiative ? <span class="branch-0 cbranch-no" title="branch not covered" >serializeInitiative(todayInitiative) : n</span>ull,
-    tomorrow: tomorrowInitiative ? <span class="branch-0 cbranch-no" title="branch not covered" >serializeInitiative(tomorrowInitiative) : n</span>ull,
+    today: todayInitiative ? serializeInitiative(todayInitiative) : null,
+    tomorrow: tomorrowInitiative ? serializeInitiative(tomorrowInitiative) : null,
     suggestedList,
     balance,
     participatingLists,
@@ -270,33 +270,33 @@ async function <span class="fstat-no" title="function not covered" >getInitiativ
  * POST /api/current-initiative
  * Set tomorrow's focus. Creates a new initiative record for tomorrow.
  */
-async function <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >createInitiativeHandler(</span></span>
+async function <span class="fstat-no" title="function not covered" >createInitiativeHandler(</span>
   req: NextRequest,
   session: { user: { id: string } }
 ) {
-  const body = <span class="cstat-no" title="statement not covered" >await req.json() as { listId?: number; date?: string; reason?: string };</span>
-  const parsed = <span class="cstat-no" title="statement not covered" >parseCreateInitiativeBody(body);</span>
+  const body = await req.json() as { listId?: number; date?: string; reason?: string };
+  const parsed = parseCreateInitiativeBody(body);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (parsed.error) {</span>
-<span class="cstat-no" title="statement not covered" >    return createErrorResponse(parsed.error, 400);</span>
+  if (parsed.error) {
+    return createErrorResponse(parsed.error, 400);
   }
 &nbsp;
-  const result = <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >await createInitiative(</span></span>
+  const result = <span class="cstat-no" title="statement not covered" >await createInitiative(</span>
     session.user.id,
     parsed.listId!,
     parsed.date,
     parsed.reason,
   );
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if ('error' in result) {</span>
-<span class="cstat-no" title="statement not covered" >    return createErrorResponse(result.error, result.status);</span>
+  if ('error' in result) {
+    return createErrorResponse(result.error, result.status);
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return createSuccessResponse({ initiative: result.initiative }, 201);</span>
+  return createSuccessResponse({ initiative: result.initiative }, 201);
 }
 &nbsp;
-export const GET = <span class="cstat-no" title="statement not covered" >withAuthAndErrorHandling(getInitiativeHandler, 'GET /api/current-initiative');</span>
-export const POST = <span class="cstat-no" title="statement not covered" >withAuthAndErrorHandling(createInitiativeHandler, 'POST /api/current-initiative');</span>
+export const GET = withAuthAndErrorHandling(getInitiativeHandler, 'GET /api/current-initiative');
+export const POST = withAuthAndErrorHandling(createInitiativeHandler, 'POST /api/current-initiative');
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -304,7 +304,7 @@ export const POST = <span class="cstat-no" title="statement not covered" >withAu
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-17T07:29:53.678Z
+                at 2026-03-18T01:27:50.795Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

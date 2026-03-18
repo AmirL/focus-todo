@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/14</span>
+                <span class='fraction'>14/14</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">83.33% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>10/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>1/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/14</span>
+                <span class='fraction'>14/14</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -123,34 +123,32 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -158,14 +156,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { NextRequest } from 'next/server';
+<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">import { NextRequest } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { eq, sql } from 'drizzle-orm';
 import { listsTable } from '@/shared/lib/drizzle/schema';
@@ -173,57 +173,57 @@ import { withAuthAndErrorHandling, createErrorResponse, createSuccessResponse } 
 import { validateCreateListRequest } from '@/shared/lib/validation/list-validation';
 import { findUserListByName } from '@/shared/lib/db/list-queries';
 &nbsp;
-async function <span class="fstat-no" title="function not covered" >createListHandler(r</span>eq: NextRequest, session: { user: { id: string } }) {
-  const requestBody = <span class="cstat-no" title="statement not covered" >await req.json();</span>
-  const validation = <span class="cstat-no" title="statement not covered" >validateCreateListRequest(requestBody);</span>
+async function createListHandler(req: NextRequest, session: { user: { id: string } }) {
+  const requestBody = await req.json();
+  const validation = validateCreateListRequest(requestBody);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (!validation.isValid) {</span>
-<span class="cstat-no" title="statement not covered" >    return createErrorResponse(validation.error!, 400);</span>
+  if (!validation.isValid) {
+    return createErrorResponse(validation.error!, 400);
   }
 &nbsp;
-  const { name, description, participatesInInitiative, color } = <span class="cstat-no" title="statement not covered" >validation;</span>
+  const { name, description, participatesInInitiative, color } = validation;
 &nbsp;
   // Check if list with same name already exists for this user
-  const existingList = <span class="cstat-no" title="statement not covered" >await findUserListByName(session.user.id, name!);</span>
+  const existingList = await findUserListByName(session.user.id, name!);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (existingList) {</span>
-<span class="cstat-no" title="statement not covered" >    return createErrorResponse('A list with this name already exists', 409);</span>
+  if (existingList) {
+    return createErrorResponse('A list with this name already exists', 409);
   }
 &nbsp;
   // Get the max sortOrder for this user's lists
-  const [maxSortOrderResult] = <span class="cstat-no" title="statement not covered" >await DB.select({</span>
+  const [maxSortOrderResult] = await DB.select({
     maxSortOrder: sql&lt;number&gt;`COALESCE(MAX(${listsTable.sortOrder}), -1)`
   })
     .from(listsTable)
     .where(eq(listsTable.userId, session.user.id));
 &nbsp;
-  const <span class="cstat-no" title="statement not covered" >nextSortOrder = (maxSortOrderResult?.maxSortOrder ?? -1) + 1;</span>
+  const nextSortOrder = (maxSortOrderResult?.maxSortOrder ?? <span class="branch-1 cbranch-no" title="branch not covered" >-1) + 1</span>;
 &nbsp;
-  const [{ id }] = <span class="cstat-no" title="statement not covered" >await DB.insert(listsTable).values({</span>
+  const [{ id }] = await DB.insert(listsTable).values({
     name: name!,
     description: description ?? null,
     color: color ?? null,
     userId: session.user.id,
     isDefault: false,
-    participatesInInitiative: participatesInInitiative ?? true,
+    participatesInInitiative: participatesInInitiative ?? <span class="branch-1 cbranch-no" title="branch not covered" >true,</span>
     sortOrder: nextSortOrder
   }).$returningId();
 &nbsp;
-  const [createdList] = <span class="cstat-no" title="statement not covered" >await DB.select()</span>
+  const [createdList] = await DB.select()
     .from(listsTable)
     .where(eq(listsTable.id, id));
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return createSuccessResponse(createdList, 201);</span>
+  return createSuccessResponse(createdList, 201);
 }
 &nbsp;
-export const POST = <span class="cstat-no" title="statement not covered" >withAuthAndErrorHandling(createListHandler, 'create-list');</span></pre></td></tr></table></pre>
+export const POST = withAuthAndErrorHandling(createListHandler, 'create-list');</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-17T07:29:53.678Z
+                at 2026-03-18T01:27:50.795Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

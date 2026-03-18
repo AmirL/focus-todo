@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.33% </span>
+                <span class="strong">83.33% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>4/12</span>
+                <span class='fraction'>10/12</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">14.28% </span>
+                <span class="strong">42.85% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>2/14</span>
+                <span class='fraction'>6/14</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.33% </span>
+                <span class="strong">83.33% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>4/12</span>
+                <span class='fraction'>10/12</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -106,28 +106,28 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">156x</span>
-<span class="cline-any cline-yes">156x</span>
+<span class="cline-any cline-yes">354x</span>
+<span class="cline-any cline-yes">354x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">354x</span>
+<span class="cline-any cline-yes">354x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">156x</span>
-<span class="cline-any cline-yes">156x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -143,12 +143,12 @@ import type { CreatedKey } from '../model/types';
 export function <span class="fstat-no" title="function not covered" >useCreateApiKeyMutation() {</span>
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >async (n</span></span>ame: string | undefined) =&gt; {
-<span class="cstat-no" title="statement not covered" >      return await fetchBackend&lt;CreatedKey&gt;('api-keys/create', { name });</span>
+    mutationFn: <span class="fstat-no" title="function not covered" >async (n</span>ame: string | undefined) =&gt; {
+      return await fetchBackend&lt;CreatedKey&gt;('api-keys/create', { name });
     },
-    onSuccess: <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
-<span class="cstat-no" title="statement not covered" >      toast.success('API key created');</span>
-<span class="cstat-no" title="statement not covered" >      qc.invalidateQueries({ queryKey: ['api-keys'] });</span>
+    onSuccess: <span class="fstat-no" title="function not covered" >() =&gt; {</span>
+      toast.success('API key created');
+      qc.invalidateQueries({ queryKey: ['api-keys'] });
     },
     onError: <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >t</span>oast.error('Failed to create API key'),</span>
   });
@@ -157,12 +157,12 @@ export function <span class="fstat-no" title="function not covered" >useCreateAp
 export function <span class="fstat-no" title="function not covered" >useRevokeApiKeyMutation() {</span>
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >async (i</span></span>d: number) =&gt; {
-<span class="cstat-no" title="statement not covered" >      await fetchBackend('api-keys/revoke', { id });</span>
+    mutationFn: <span class="fstat-no" title="function not covered" >async (i</span>d: number) =&gt; {
+      await fetchBackend('api-keys/revoke', { id });
     },
-    onSuccess: <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
-<span class="cstat-no" title="statement not covered" >      toast.success('API key revoked');</span>
-<span class="cstat-no" title="statement not covered" >      qc.invalidateQueries({ queryKey: ['api-keys'] });</span>
+    onSuccess: <span class="fstat-no" title="function not covered" >() =&gt; {</span>
+      toast.success('API key revoked');
+      qc.invalidateQueries({ queryKey: ['api-keys'] });
     },
     onError: <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >t</span>oast.error('Failed to revoke API key'),</span>
   });
@@ -175,7 +175,7 @@ export function <span class="fstat-no" title="function not covered" >useRevokeAp
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-17T07:29:53.678Z
+                at 2026-03-18T01:27:50.795Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

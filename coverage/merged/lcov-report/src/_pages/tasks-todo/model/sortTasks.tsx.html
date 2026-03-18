@@ -30,16 +30,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50.9% </span>
+                <span class="strong">61.81% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>28/55</span>
+                <span class='fraction'>34/55</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">57.69% </span>
+                <span class="strong">73.07% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>15/26</span>
+                <span class='fraction'>19/26</span>
             </div>
         
             
@@ -119,49 +119,49 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-yes">2624x</span>
-<span class="cline-any cline-yes">1052x</span>
+<span class="cline-any cline-yes">7501x</span>
+<span class="cline-any cline-yes">3052x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-yes">1004x</span>
+<span class="cline-any cline-yes">2944x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1004x</span>
+<span class="cline-any cline-yes">2944x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1016x</span>
+<span class="cline-any cline-yes">2984x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">38x</span>
+<span class="cline-any cline-yes">124x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">954x</span>
+<span class="cline-any cline-yes">2780x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">18x</span>
-<span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">45x</span>
-<span class="cline-any cline-yes">38x</span>
-<span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-yes">38x</span>
-<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-yes">46x</span>
+<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">131x</span>
+<span class="cline-any cline-yes">124x</span>
+<span class="cline-any cline-yes">110x</span>
+<span class="cline-any cline-yes">124x</span>
+<span class="cline-any cline-yes">107x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">115042x</span>
+<span class="cline-any cline-yes">28838x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-yes">56x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { TaskModel } from '@/entities/task/model/task';
 import { StatusFilterEnum, useFilterStore } from '@/features/tasks/filter';
@@ -187,7 +187,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
 &nbsp;
 <span class="cstat-no" title="statement not covered" >// Primary sort by date, secondary sort by manual order (sortOrder)</span>
 export function sortTasksByDateWithManualOrder(tasks: TaskModel[]) {
-  return [...tasks].sort(<span class="fstat-no" title="function not covered" >(a</span>, <span class="fstat-no" title="function not covered" >b) =&gt; {</span>
+  return [...tasks].sort((a, <span class="fstat-no" title="function not covered" >b) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    const dateDiff = unixTime(a.date) - unixTime(b.date);</span>
     if (dateDiff !== 0) return dateDiff;
 <span class="fstat-no" title="function not covered" >    // Secondary sort by manual order within same date</span>
@@ -197,11 +197,11 @@ export function sortTasksByDateWithManualOrder(tasks: TaskModel[]) {
 &nbsp;
 <span class="cstat-no" title="statement not covered" >// Primary sort by blocker status, secondary sort by manual order</span>
 export function sortBlockerTasksBottomWithManualOrder(tasks: TaskModel[]) {
-  return [...tasks].sort(<span class="fstat-no" title="function not covered" >(a</span>, <span class="fstat-no" title="function not covered" >b) =&gt; {</span>
+  return [...tasks].sort((a, b) =&gt; {
     const blockerDiff = Number(a.isBlocker) - Number(b.isBlocker);
     if (blockerDiff !== 0) return blockerDiff;
     // Secondary sort by manual order within same blocker status
-    return (a.sortOrder || <span class="branch-1 cbranch-no" title="branch not covered" ><span class="branch-1 cbranch-no" title="branch not covered" >0) - (b</span></span>.sortOrder || <span class="branch-1 cbranch-no" title="branch not covered" >0);</span>
+    return (a.sortOrder || 0) - (b.sortOrder || <span class="branch-1 cbranch-no" title="branch not covered" >0);</span>
 <span class="fstat-no" title="function not covered" >  });</span>
 <span class="cstat-no" title="statement not covered" >}</span>
 &nbsp;
@@ -210,7 +210,7 @@ export function sortByManualOrder(tasks: TaskModel[]) {
   return [...tasks].sort((a, b) =&gt; (a.sortOrder || 0) - (b.sortOrder || 0));
 }
 &nbsp;
-function <span class="fstat-no" title="function not covered" >unixTime(d</span>ate: Date | null | undefined) {
+function unixTime(date: Date | null | undefined) {
   return date ? dayjs(date).unix() : 0;
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -220,7 +220,7 @@ function <span class="fstat-no" title="function not covered" >unixTime(d</span>a
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-17T07:29:53.678Z
+                at 2026-03-18T01:27:50.795Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

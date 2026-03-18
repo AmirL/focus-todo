@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">62.5% </span>
+                <span class="strong">68.42% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>15/24</span>
+                <span class='fraction'>13/19</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">75% </span>
+                <span class="strong">71.42% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>15/20</span>
+                <span class='fraction'>15/21</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">84.61% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>11/13</span>
+                <span class='fraction'>6/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">70.58% </span>
+                <span class="strong">81.25% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>12/17</span>
+                <span class='fraction'>13/16</span>
             </div>
         
             
@@ -101,7 +101,6 @@
 <a name='L36'></a><a href='#L36'>36</a>
 <a name='L37'></a><a href='#L37'>37</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">64x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -115,25 +114,26 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2944x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1004x</span>
+<span class="cline-any cline-yes">2944x</span>
+<span class="cline-any cline-yes">52824x</span>
+<span class="cline-any cline-yes">52824x</span>
+<span class="cline-any cline-yes">30976x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-yes">1004x</span>
-<span class="cline-any cline-yes">285494x</span>
-<span class="cline-any cline-yes">29x</span>
-<span class="cline-any cline-yes">64x</span>
-<span class="cline-any cline-yes">55x</span>
+<span class="cline-any cline-yes">52853x</span>
+<span class="cline-any cline-yes">52824x</span>
+<span class="cline-any cline-yes">40113x</span>
+<span class="cline-any cline-yes">52824x</span>
+<span class="cline-any cline-yes">664x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">68x</span>
+<span class="cline-any cline-yes">2171x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">9515x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">169817x</span>
-<span class="cline-any cline-yes">125000x</span>
-<span class="cline-any cline-yes">169812x</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">390x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import {
   TaskModel,
@@ -147,17 +147,17 @@
   isTaskOverdue,
 } from '@/entities/task/model/task';
 // Update relative import to point to the store in the same feature directory
-import { useFilterStore, StatusFilterEnum } from './filterStore';
+import { <span class="fstat-no" title="function not covered" >useFilterStore, StatusFilterEnum </span>} from './filterStore';
 &nbsp;
-export function <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >useApplyFilters(t</span></span>asks: TaskModel[]) {
-  const { statusFilter, listId } = <span class="cstat-no" title="statement not covered" >useFilterStore();</span>
+export function <span class="fstat-no" title="function not covered" >useApplyFilters(t</span>asks: TaskModel[]<span class="cstat-no" title="statement not covered" >) {</span>
+  const { statusFilter, listId } = useFilterStore();
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return tasks</span>
-    .filter((task) =&gt; <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >!isTaskDeletedAgo(task) &amp;&amp; !isTaskCompletedAgo(task))</span></span>
-    .filter((task) =&gt; <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >applyStatusFilter(task, statusFilter))</span></span>
-    .filter((task) =&gt; <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >listId === '' || String(task.listId) === listId)</span>;</span>
-}
-export function applyStatusFilter(task: TaskModel, filter: StatusFilterEnum) {
+  return <span class="fstat-no" title="function not covered" >tasks</span>
+    .filter(<span class="fstat-no" title="function not covered" >(t</span>ask) =&gt; <span class="cstat-no" title="statement not covered" >!isTaskDeletedAgo(task) &amp;&amp; !isTaskCompletedAgo(task))</span>
+    .filter(<span class="fstat-no" title="function not covered" >(t</span>ask) =&gt; <span class="cstat-no" title="statement not covered" >applyStatusFilter(task, statusFilter))</span>
+    .filter(<span class="fstat-no" title="function not covered" >(t</span>ask) =&gt; <span class="cstat-no" title="statement not covered" >listId === '' || <span class="branch-1 cbranch-no" title="branch not covered" >String(task.listId) === listId)</span></span>;
+<span class="cstat-no" title="statement not covered" >}</span>
+export <span class="cstat-no" title="statement not covered" >function applyStatusFilter(task: TaskModel, filter: StatusFilterEnum) {</span>
   switch (filter) {
     case StatusFilterEnum.BACKLOG:
       return isTaskInBacklog(task);
@@ -168,8 +168,8 @@ export function applyStatusFilter(task: TaskModel, filter: StatusFilterEnum) {
     case StatusFilterEnum.TODAY:
       return isTaskToday(task) || isTaskOverdue(task);
     case StatusFilterEnum.TOMORROW:
-<span class="branch-1 cbranch-no" title="branch not covered" >      return isTaskTomorrow(task);</span>
-<span class="cstat-no" title="statement not covered" >  }</span>
+      return isTaskTomorrow(task);
+  }
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -178,7 +178,7 @@ export function applyStatusFilter(task: TaskModel, filter: StatusFilterEnum) {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-17T07:29:53.678Z
+                at 2026-03-18T01:27:50.795Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

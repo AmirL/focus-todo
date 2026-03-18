@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">54.54% </span>
+                <span class="strong">72.72% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>6/11</span>
+                <span class='fraction'>8/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">38.98% </span>
+                <span class="strong">52.54% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>23/59</span>
+                <span class='fraction'>31/59</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">70% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>5/10</span>
+                <span class='fraction'>7/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">62.5% </span>
+                <span class="strong">75% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>5/8</span>
+                <span class='fraction'>6/8</span>
             </div>
         
             
@@ -250,7 +250,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">52x</span>
+<span class="cline-any cline-yes">178x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -288,8 +288,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">28x</span>
-<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-yes">178x</span>
+<span class="cline-any cline-yes">178x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -305,9 +305,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">28x</span>
-<span class="cline-any cline-yes">28x</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">178x</span>
+<span class="cline-any cline-yes">178x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -469,8 +469,8 @@ export function <span class="fstat-no" title="function not covered" >TimerBar({<
           &lt;Input
             type="time"
             value={endTime ?? ''}
-            onChange={<span class="fstat-no" title="function not covered" >(e</span>) =&gt; <span class="cstat-no" title="statement not covered" >onEndTimeChange?.(e.target.value)}</span>
-            onBlur={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >o</span>nEndTimeBlur?.()}</span>
+            onChange={(e) =&gt; onEndTimeChange?.(e.target.value)}
+            onBlur={() =&gt; onEndTimeBlur?.()}
             className="w-[90px] h-7 text-xs font-mono px-1.5"
             data-cy="timer-end-input"
           /&gt;
@@ -490,14 +490,14 @@ export function <span class="fstat-no" title="function not covered" >TimerBar({<
       &lt;div className="flex items-center justify-between px-4 pt-1 pb-3"&gt;
         &lt;div className="w-16" data-cy="timer-save-status"&gt;
           {saveStatus === 'saving' &amp;&amp; (
-<span class="branch-1 cbranch-no" title="branch not covered" >            &lt;<span class="branch-1 cbranch-no" title="branch not covered" >span c</span>lassName={cn('text-xs', isRunning ? 'text-primary-foreground/70' : 'text-muted-foreground')}&gt;</span>
+<span class="branch-1 cbranch-no" title="branch not covered" >            &lt;span className={cn('text-xs', isRunning ? <span class="branch-0 cbranch-no" title="branch not covered" >'text-primary-foreground/70' : '</span>text-muted-foreground')}&gt;</span>
               Saving...
             &lt;/span&gt;
           )}
           {saveStatus === 'saved' &amp;&amp; (
-<span class="branch-1 cbranch-no" title="branch not covered" >            &lt;<span class="branch-1 cbranch-no" title="branch not covered" >span c</span>lassName={cn(</span>
+<span class="branch-1 cbranch-no" title="branch not covered" >            &lt;span className={cn(</span>
               'inline-flex items-center gap-0.5 text-xs animate-in fade-in duration-200',
-              isRunning ? 'text-primary-foreground' : 'text-green-600'
+              isRunning ? <span class="branch-0 cbranch-no" title="branch not covered" >'text-primary-foreground' : '</span>text-green-600'
             )}&gt;
               &lt;Check size={12} /&gt;
               Saved
@@ -559,7 +559,7 @@ export function <span class="fstat-no" title="function not covered" >TimerBar({<
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-17T07:29:53.678Z
+                at 2026-03-18T01:27:50.795Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

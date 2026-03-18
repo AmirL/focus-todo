@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">55% </span>
+                <span class="strong">45% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>22/40</span>
+                <span class='fraction'>18/40</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">44.44% </span>
+                <span class="strong">25.92% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>12/27</span>
+                <span class='fraction'>7/27</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">66.66% </span>
+                <span class="strong">54.16% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>16/24</span>
+                <span class='fraction'>13/24</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -149,24 +149,24 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-yes">3502x</span>
-<span class="cline-any cline-yes">3502x</span>
-<span class="cline-any cline-yes">3502x</span>
-<span class="cline-any cline-yes">3502x</span>
-<span class="cline-any cline-yes">3502x</span>
-<span class="cline-any cline-yes">3502x</span>
+<span class="cline-any cline-yes">146x</span>
+<span class="cline-any cline-yes">146x</span>
+<span class="cline-any cline-yes">146x</span>
+<span class="cline-any cline-yes">146x</span>
+<span class="cline-any cline-yes">146x</span>
+<span class="cline-any cline-yes">146x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">60x</span>
-<span class="cline-any cline-yes">60x</span>
+<span class="cline-any cline-yes">113x</span>
+<span class="cline-any cline-yes">56x</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-yes">60x</span>
+<span class="cline-any cline-yes">56x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3502x</span>
-<span class="cline-any cline-yes">3136x</span>
+<span class="cline-any cline-yes">146x</span>
+<span class="cline-any cline-yes">146x</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-yes">3136x</span>
-<span class="cline-any cline-yes">3136x</span>
+<span class="cline-any cline-yes">146x</span>
+<span class="cline-any cline-yes">146x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -178,10 +178,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">366x</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-yes">366x</span>
-<span class="cline-any cline-yes">366x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -220,7 +220,7 @@ type Props = {
 &nbsp;
 function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >formatSubline(t</span></span>ask: TaskModel, listNameMap: Map&lt;number, string&gt;) {
 <span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>const parts: string[] = <span class="cstat-no" title="statement not covered" >[]<span class="cstat-no" title="statement not covered" >;</span></span></span>
-  <span class="missing-if-branch" title="else path not taken" >E</span>if (task.<span class="cstat-no" title="statement not covered" >completedAt) parts.push('Completed');</span>
+  if (task.<span class="cstat-no" title="statement not covered" >completedAt) <span class="cstat-no" title="statement not covered" >parts.push('Completed');</span></span>
   <span class="missing-if-branch" title="else path not taken" >E</span>if (task.date) parts.push(dayjs(task.date).format('YYYY-MM-DD'));
 <span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>const <span class="cstat-no" title="statement not covered" >listName = listNameMap.get(task.listId);</span></span>
 <span class="cstat-no" title="statement not covered" >  if (listName) <span class="cstat-no" title="statement not covered" >parts.push(`List: ${listName}`);</span></span>
@@ -233,7 +233,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
     &lt;ul className="divide-y" data-cy="search-results"&gt;
       {items.map(<span class="fstat-no" title="function not covered" >(i</span>tem, idx) =&gt; {
         <span class="missing-if-branch" title="else path not taken" >E</span>if (item.type === 'active') {
-          const task = <span class="cstat-no" title="statement not covered" >item.task;</span>
+          const task = <span class="cstat-no" title="statement not covered" >item.task<span class="branch-1 cbranch-no" title="branch not covered" >;</span></span>
 <span class="cstat-no" title="statement not covered" >          return (</span>
             &lt;li key={`active-${task.id}`}&gt;
               &lt;button
@@ -243,16 +243,16 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
               &gt;
                 &lt;div className="font-medium leading-tight"&gt;{task.name}&lt;/div&gt;
                 &lt;div className="text-xs text-muted-foreground mt-1"&gt;{formatSubline(task, listNameMap)}&lt;/div&gt;
-                {task.details ? &lt;div className="line-clamp-2 text-xs text-muted-foreground mt-1"&gt;{task.details}&lt;/div&gt; : null}
+                {task.details ? <span class="branch-0 cbranch-no" title="branch not covered" >&lt;div className="line-clamp-2 text-xs text-muted-foreground mt-1"&gt;{task.details}&lt;/div&gt; : null}</span>
               &lt;/button&gt;
             &lt;/li&gt;
           );
         }
-        const { name, count, newestTask } = item;
+        const { name, count, newestTask } = <span class="cstat-no" title="statement not covered" >item;</span>
 <span class="cstat-no" title="statement not covered" >        return (</span>
-          &lt;li key={`completed-${name}`}&gt;
-            &lt;button
-              className={`w-full text-left px-4 py-3 focus:outline-none ${idx === activeIndex ? <span class="branch-0 cbranch-no" title="branch not covered" >'bg-accent' : '</span>hover:bg-accent'}`}
+<span class="cstat-no" title="statement not covered" >          &lt;li key={`</span>completed-${name}`}&gt;
+<span class="cstat-no" title="statement not covered" >            &lt;button</span>
+              className={`w-full text-left px-4 py-3 focus:outline-none ${idx === activeIndex ? 'bg-accent' : 'hover:bg-accent'}`}
               onMouseEnter={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >o</span>nHoverIndex(idx)}</span>
               onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >o</span>nSelect(newestTask)}</span>
             &gt;
@@ -264,7 +264,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
               &lt;/div&gt;
               &lt;div className="text-xs text-muted-foreground mt-1"&gt;{formatSubline(newestTask, listNameMap)}&lt;/div&gt;
               {newestTask.details ? (
-<span class="branch-0 cbranch-no" title="branch not covered" >                &lt;div className="line-clamp-2 text-xs text-muted-foreground mt-1"&gt;{newestTask.details}&lt;/div&gt;</span>
+                &lt;div className="line-clamp-2 text-xs text-muted-foreground mt-1"&gt;{newestTask.details}&lt;/div&gt;
               ) : null}
             &lt;/button&gt;
           &lt;/li&gt;
@@ -280,7 +280,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-17T07:29:53.678Z
+                at 2026-03-18T01:27:50.795Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>
