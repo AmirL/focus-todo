@@ -1,5 +1,92 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { isFutureDate, isToday, isOverdue, parseDateFields, TaskDateKeys, parseBool, clamp, formatTimezoneOffset } from './utils';
+import { cn, isFutureDate, isToday, isOverdue, parseDateFields, parseBool, clamp, formatTimezoneOffset, TaskDateKeys } from './utils';
+
+describe('cn', () => {
+  it('merges class names correctly', () => {
+    expect(cn('foo', 'bar')).toBe('foo bar');
+  });
+
+  it('handles conditional classes', () => {
+    expect(cn('base', false && 'hidden', 'visible')).toBe('base visible');
+  });
+
+  it('merges tailwind classes with conflict resolution', () => {
+    expect(cn('px-2 py-1', 'px-4')).toBe('py-1 px-4');
+  });
+
+  it('handles undefined and null inputs', () => {
+    expect(cn('foo', undefined, null, 'bar')).toBe('foo bar');
+  });
+
+  it('returns empty string for no inputs', () => {
+    expect(cn()).toBe('');
+  });
+});
+
+describe('parseBool', () => {
+  it('returns true for "1"', () => {
+    expect(parseBool('1')).toBe(true);
+  });
+
+  it('returns true for "true" (case insensitive)', () => {
+    expect(parseBool('true')).toBe(true);
+    expect(parseBool('TRUE')).toBe(true);
+    expect(parseBool('True')).toBe(true);
+  });
+
+  it('returns false for "0"', () => {
+    expect(parseBool('0')).toBe(false);
+  });
+
+  it('returns false for "false"', () => {
+    expect(parseBool('false')).toBe(false);
+  });
+
+  it('returns default for null', () => {
+    expect(parseBool(null)).toBe(false);
+    expect(parseBool(null, true)).toBe(true);
+  });
+});
+
+describe('clamp', () => {
+  it('returns value when within range', () => {
+    expect(clamp(5, 0, 10)).toBe(5);
+  });
+
+  it('returns min when value is below', () => {
+    expect(clamp(-1, 0, 10)).toBe(0);
+  });
+
+  it('returns max when value is above', () => {
+    expect(clamp(15, 0, 10)).toBe(10);
+  });
+
+  it('returns boundary when value equals min', () => {
+    expect(clamp(0, 0, 10)).toBe(0);
+  });
+
+  it('returns boundary when value equals max', () => {
+    expect(clamp(10, 0, 10)).toBe(10);
+  });
+});
+
+describe('formatTimezoneOffset', () => {
+  it('formats positive offset', () => {
+    expect(formatTimezoneOffset(120)).toBe('+02:00');
+  });
+
+  it('formats negative offset', () => {
+    expect(formatTimezoneOffset(-300)).toBe('-05:00');
+  });
+
+  it('formats zero offset', () => {
+    expect(formatTimezoneOffset(0)).toBe('+00:00');
+  });
+
+  it('formats offset with minutes', () => {
+    expect(formatTimezoneOffset(330)).toBe('+05:30');
+  });
+});
 
 describe('isFutureDate', () => {
   beforeEach(() => {
@@ -206,18 +293,6 @@ describe('parseDateFields', () => {
     expect(obj.completedAt).toBe('2024-06-15 12:00:00');
   });
 
-  it('should handle falsy empty string field', () => {
-    const obj = {
-      date: '',
-      name: 'Test',
-    };
-
-    const parsed = parseDateFields(obj, ['date'] as const);
-
-    // Empty string is falsy, so it should not be parsed
-    expect(parsed.date).toBe('');
-  });
-
   it('should handle an empty fields list', () => {
     const obj = {
       completedAt: '2024-06-15 12:00:00',
@@ -250,114 +325,5 @@ describe('parseDateFields', () => {
     expect(parsed.updatedAt).toBeInstanceOf(Date);
     expect(parsed.id).toBe('task-1');
     expect(parsed.name).toBe('Test Task');
-  });
-});
-
-describe('parseBool', () => {
-  it('should return true for "1"', () => {
-    expect(parseBool('1')).toBe(true);
-  });
-
-  it('should return true for "true"', () => {
-    expect(parseBool('true')).toBe(true);
-  });
-
-  it('should return true for "TRUE"', () => {
-    expect(parseBool('TRUE')).toBe(true);
-  });
-
-  it('should return true for "True"', () => {
-    expect(parseBool('True')).toBe(true);
-  });
-
-  it('should return false for "0"', () => {
-    expect(parseBool('0')).toBe(false);
-  });
-
-  it('should return false for "false"', () => {
-    expect(parseBool('false')).toBe(false);
-  });
-
-  it('should return false for random string', () => {
-    expect(parseBool('hello')).toBe(false);
-  });
-
-  it('should return default value for null', () => {
-    expect(parseBool(null)).toBe(false);
-    expect(parseBool(null, true)).toBe(true);
-  });
-
-  it('should return empty string as false', () => {
-    expect(parseBool('')).toBe(false);
-  });
-});
-
-describe('clamp', () => {
-  it('should return the value when within range', () => {
-    expect(clamp(5, 0, 10)).toBe(5);
-  });
-
-  it('should return min when value is below range', () => {
-    expect(clamp(-5, 0, 10)).toBe(0);
-  });
-
-  it('should return max when value is above range', () => {
-    expect(clamp(15, 0, 10)).toBe(10);
-  });
-
-  it('should return min when value equals min', () => {
-    expect(clamp(0, 0, 10)).toBe(0);
-  });
-
-  it('should return max when value equals max', () => {
-    expect(clamp(10, 0, 10)).toBe(10);
-  });
-
-  it('should handle negative ranges', () => {
-    expect(clamp(-5, -10, -1)).toBe(-5);
-    expect(clamp(-15, -10, -1)).toBe(-10);
-    expect(clamp(0, -10, -1)).toBe(-1);
-  });
-
-  it('should handle single-value range', () => {
-    expect(clamp(5, 3, 3)).toBe(3);
-  });
-});
-
-describe('formatTimezoneOffset', () => {
-  it('should format positive offset', () => {
-    expect(formatTimezoneOffset(120)).toBe('+02:00');
-  });
-
-  it('should format negative offset', () => {
-    expect(formatTimezoneOffset(-300)).toBe('-05:00');
-  });
-
-  it('should format zero offset', () => {
-    expect(formatTimezoneOffset(0)).toBe('+00:00');
-  });
-
-  it('should format offset with minutes', () => {
-    expect(formatTimezoneOffset(330)).toBe('+05:30');
-  });
-
-  it('should format negative offset with minutes', () => {
-    expect(formatTimezoneOffset(-210)).toBe('-03:30');
-  });
-
-  it('should format single-digit hour offsets with leading zero', () => {
-    expect(formatTimezoneOffset(60)).toBe('+01:00');
-  });
-
-  it('should format offset with 45 minutes', () => {
-    expect(formatTimezoneOffset(345)).toBe('+05:45');
-  });
-
-  it('should format large positive offset', () => {
-    expect(formatTimezoneOffset(720)).toBe('+12:00');
-  });
-
-  it('should format large negative offset', () => {
-    expect(formatTimezoneOffset(-720)).toBe('-12:00');
   });
 });

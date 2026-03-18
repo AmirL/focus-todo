@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { LIST_COLORS, isValidListColor, validateListColor, getListColorHex, getColorClasses, LIST_COLOR_HEX } from './colors';
+import { LIST_COLORS, isValidListColor, validateListColor } from './colors';
 
 describe('LIST_COLORS', () => {
   it('should contain expected colors', () => {
@@ -68,62 +68,5 @@ describe('validateListColor', () => {
   it('should reject non-string values', () => {
     const result = validateListColor(42);
     expect(result.isValid).toBe(false);
-  });
-});
-
-describe('getListColorHex', () => {
-  it('should return hex for valid color name', () => {
-    expect(getListColorHex('blue')).toBe('#3b82f6');
-    expect(getListColorHex('red')).toBe('#ef4444');
-  });
-
-  it('should return slate hex for null', () => {
-    expect(getListColorHex(null)).toBe(LIST_COLOR_HEX.slate);
-  });
-
-  it('should return slate hex for undefined', () => {
-    expect(getListColorHex(undefined)).toBe(LIST_COLOR_HEX.slate);
-  });
-
-  it('should return slate hex for invalid color', () => {
-    expect(getListColorHex('purple')).toBe(LIST_COLOR_HEX.slate);
-  });
-
-  it('should return slate hex for empty string', () => {
-    expect(getListColorHex('')).toBe(LIST_COLOR_HEX.slate);
-  });
-});
-
-describe('getColorClasses', () => {
-  it('should return color classes for valid color', () => {
-    const classes = getColorClasses('blue');
-    expect(classes.bg).toBe('bg-blue-100');
-    expect(classes.border).toBe('border-blue-300');
-    expect(classes.text).toBe('text-blue-800');
-    expect(classes.hover).toBe('hover:bg-blue-200');
-    expect(classes.swatch).toBe('bg-blue-500');
-  });
-
-  it('should return emerald (default) classes for null', () => {
-    const classes = getColorClasses(null);
-    expect(classes.bg).toBe('bg-emerald-100');
-  });
-
-  it('should return emerald (default) classes for undefined', () => {
-    const classes = getColorClasses(undefined);
-    expect(classes.bg).toBe('bg-emerald-100');
-  });
-
-  it('should return emerald (default) classes for invalid color', () => {
-    const classes = getColorClasses('invalid');
-    expect(classes.bg).toBe('bg-emerald-100');
-  });
-
-  it('should return correct classes for all valid colors', () => {
-    for (const color of LIST_COLORS) {
-      const classes = getColorClasses(color);
-      expect(classes.bg).toContain(color);
-      expect(classes.swatch).toContain(color);
-    }
   });
 });

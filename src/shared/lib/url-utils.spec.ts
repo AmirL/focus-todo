@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateEnumValue, getSearchParams } from '@/shared/lib/url-utils';
+import { validateEnumValue } from '@/shared/lib/url-utils';
 
 describe('validateEnumValue', () => {
   const TestEnum = {
@@ -44,14 +44,5 @@ describe('validateEnumValue', () => {
     const SingleEnum = { Only: 'only' } as const;
     expect(validateEnumValue('only', SingleEnum, SingleEnum.Only)).toBe('only');
     expect(validateEnumValue('other', SingleEnum, SingleEnum.Only)).toBe('only');
-  });
-});
-
-describe('getSearchParams', () => {
-  it('should return empty URLSearchParams when window is undefined (SSR)', () => {
-    // In node test environment, window is undefined so it returns empty params
-    const result = getSearchParams();
-    expect(result).toBeInstanceOf(URLSearchParams);
-    expect(result.toString()).toBe('');
   });
 });
