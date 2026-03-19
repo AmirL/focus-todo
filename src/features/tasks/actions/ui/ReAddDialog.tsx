@@ -4,8 +4,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { TaskFormFields } from '@/shared/ui/task/TaskFormFields';
 import { useTaskMetadata } from '@/shared/ui/task/useTaskMetadata';
 import { Button } from '@/shared/ui/button';
-import { createInstance } from '@/shared/lib/instance-tools';
 import { useCreateTaskMutation, useUpdateTaskMutation } from '@/shared/api/tasks';
+import { buildCompletedOriginalTask, buildReAddedTask } from '../lib/reAddUtils';
 
 export function ReAddDialog({
   task,
@@ -43,12 +43,7 @@ export function ReAddDialog({
   const hasMarkedCompletedRef = useRef(false);
   useEffect(() => {
     if (open && !hasMarkedCompletedRef.current) {
-      const updatedTask = createInstance(TaskModel, {
-        ...task,
-        completedAt: new Date(),
-        updatedAt: new Date(),
-      });
-      updateTaskMutation.mutate(updatedTask);
+      updateTaskMutation.mutate(buildCompletedOriginalTask(task));
       hasMarkedCompletedRef.current = true;
     } else if (!open) {
       hasMarkedCompletedRef.current = false;
@@ -56,16 +51,7 @@ export function ReAddDialog({
   }, [open, task, updateTaskMutation]);
 
   const handleReAdd = () => {
-    const newTask = createInstance(TaskModel, {
-      name,
-      details: details.trim(),
-      listId: metadata.selectedListId!,
-      selectedAt: metadata.isStarred ? new Date() : null,
-      isBlocker: metadata.isBlocker,
-      date: metadata.selectedDate,
-      estimatedDuration: metadata.selectedDuration ?? null,
-    });
-    createTaskMutation.mutate(newTask);
+    createTaskMutation.mutate(buildReAddedTask(name, details, metadata));
     onOpenChange(false);
   };
 

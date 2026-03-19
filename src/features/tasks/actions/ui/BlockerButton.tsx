@@ -2,14 +2,13 @@ import { TaskModel } from '@/entities/task/model/task';
 import { Button } from '@/shared/ui/button';
 import { Users } from 'lucide-react';
 import { useUpdateTaskMutation } from '@/shared/api/tasks';
-import { createInstance } from '@/shared/lib/instance-tools';
+import { buildToggledBlockerTask } from '../lib/taskActionUtils';
 
 export function BlockerButton({ task }: { task: TaskModel }) {
   const updateTaskMutation = useUpdateTaskMutation();
 
   const handleToggleBlocker = () => {
-    const updatedTask = createInstance(TaskModel, { ...task, isBlocker: !task.isBlocker, updatedAt: new Date() });
-    updateTaskMutation.mutate(updatedTask);
+    updateTaskMutation.mutate(buildToggledBlockerTask(task));
   };
 
   return (

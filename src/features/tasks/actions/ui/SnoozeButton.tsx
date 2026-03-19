@@ -5,15 +5,14 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { Calendar } from '@/shared/ui/calendar';
 import { useState } from 'react';
 import { useUpdateTaskMutation } from '@/shared/api/tasks';
-import { createInstance } from '@/shared/lib/instance-tools';
+import { buildSnoozedTask } from '../lib/taskActionUtils';
 
 export function SnoozeButton({ task }: { task: TaskModel }) {
   const [popoverOpen, setPopoverOpen] = useState(false);
   const updateTaskMutation = useUpdateTaskMutation();
 
   const onDateSelect = (date: Date | null) => {
-    const updatedTask = createInstance(TaskModel, { ...task, date, updatedAt: new Date() });
-    updateTaskMutation.mutate(updatedTask);
+    updateTaskMutation.mutate(buildSnoozedTask(task, date));
     setPopoverOpen(false);
   };
 

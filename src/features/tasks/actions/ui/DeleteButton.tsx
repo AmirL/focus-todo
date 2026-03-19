@@ -2,16 +2,14 @@ import { TaskModel, isTaskDeleted } from '@/entities/task/model/task';
 import { Button } from '@/shared/ui/button';
 import { Trash2, Undo2 } from 'lucide-react';
 import { useUpdateTaskMutation } from '@/shared/api/tasks';
-import { createInstance } from '@/shared/lib/instance-tools';
+import { buildToggledDeleteTask } from '../lib/taskActionUtils';
 
 export function DeleteButton({ task }: { task: TaskModel }) {
   const updateTaskMutation = useUpdateTaskMutation();
   const isDeleted = isTaskDeleted(task);
 
   const handleDelete = () => {
-    const deletedAt = isDeleted ? null : new Date();
-    const updatedTask = createInstance(TaskModel, { ...task, deletedAt, updatedAt: new Date() });
-    updateTaskMutation.mutate(updatedTask);
+    updateTaskMutation.mutate(buildToggledDeleteTask(task));
   };
 
   return (
