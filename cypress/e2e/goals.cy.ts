@@ -173,6 +173,64 @@ describe("Goal Management", () => {
     });
   });
 
+  describe("Goal-Task Association", () => {
+    let createdTaskIds: number[] = [];
+
+    beforeEach(() => {
+      cy.intercept("POST", "/api/create-task").as("createTask");
+      cy.intercept("POST", "/api/update-task").as("updateTask");
+    });
+
+    afterEach(() => {
+      cy.apiCleanupTasks(createdTaskIds);
+      createdTaskIds = [];
+    });
+
+    it("should assign a goal to a task via edit dialog", () => {
+      // Create a goal first
+      const goalTitle = `Assign goal ${Date.now()}`;
+      cy.get('[data-cy="add-goal-button"]').click();
+      cy.get('[data-cy="goal-title-input"]').type(goalTitle);
+      cy.get('[data-cy="create-goal-button"]').click();
+      cy.wait("@createGoal").then((interception) => {
+        createdGoalIds.push(interception.response!.body.id);
+      });
+      cy.contains(goalTitle, { timeout: 15000 }).should("be.visible");
+
+      // Create a task
+      const taskName = `Task for goal ${Date.now()}`;
+      cy.get('[data-cy="add-task-button"]').click();
+      cy.get('[data-cy="task-name-input"]').type(taskName);
+      cy.get('[data-cy="save-task-button"]').click();
+      cy.wait("@createTask").then((interception) => {
+        const taskId = interception.response!.body.id as number;
+        createdTaskIds.push(taskId);
+
+        // Wait for task to appear
+        cy.get(`[data-cy="task-${taskId}"]`, { timeout: 15000 }).should(
+          "exist",
+        );
+
+        // Open edit dialog
+        cy.get(`[data-cy="task-${taskId}"]`).trigger("mouseover");
+        cy.get(`[data-cy="task-${taskId}"]`)
+          .find('[data-cy^="edit-task-"]')
+          .click({ force: true });
+        cy.get('[role="dialog"]', { timeout: 10000 }).should("be.visible");
+
+        // Select the goal in the goal selector
+        cy.get('[data-cy="goal-selector"]').click();
+        cy.get('[role="option"]').contains(goalTitle).click();
+
+        // Save
+        cy.get('[data-cy="save-task-changes-button"]').click();
+        cy.wait("@updateTask").then((updateInterception) => {
+          expect(updateInterception.request.body.task.goalId).to.be.a("number");
+        });
+      });
+    });
+  });
+
   describe("Goal Display", () => {
     beforeEach(() => {
       const goalTitle = `Display test goal ${Date.now()}`;

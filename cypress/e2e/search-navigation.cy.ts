@@ -77,7 +77,7 @@ describe("Search and Navigation", () => {
 
     it("should toggle mobile menu", () => {
       cy.get('[data-cy="mobile-menu-button"]').click();
-      cy.contains("Backlog").should("be.visible");
+      cy.get('[data-cy="filter-backlog"]', { timeout: 10000 }).should("be.visible");
     });
 
     it("should navigate on mobile", () => {
