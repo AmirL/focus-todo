@@ -170,7 +170,24 @@ if [ -f "$MERGED_DIR/coverage-summary.json" ]; then
   echo "HTML report: $MERGED_DIR/lcov-report/index.html"
 fi
 
-# 6. Archive coverage report for git (individual files are gitignored)
+# 6. Clean up non-merged coverage reports to avoid confusion
+# (AI agents may read these instead of the merged data and report lower coverage)
+echo "==> Cleaning up individual coverage reports..."
+rm -rf "$COVERAGE_DIR/unit" "$COVERAGE_DIR/bdd" "$MERGE_DIR" "$COVERAGE_DIR/.nyc_output"
+rm -f "$COVERAGE_DIR/coverage-final.json" "$COVERAGE_DIR/coverage-summary.json"
+rm -f "$COVERAGE_DIR/lcov.info"
+# Remove Istanbul HTML report files from coverage root (not from merged/)
+rm -f "$COVERAGE_DIR/index.html" "$COVERAGE_DIR/base.css" "$COVERAGE_DIR/prettify.css" \
+      "$COVERAGE_DIR/prettify.js" "$COVERAGE_DIR/sorter.js" "$COVERAGE_DIR/sort-arrow-sprite.png" \
+      "$COVERAGE_DIR/favicon.png" "$COVERAGE_DIR/block-navigation.js"
+rm -rf "$COVERAGE_DIR/lcov-report"
+# Remove per-directory Istanbul HTML reports
+for dir in "$COVERAGE_DIR"/_pages "$COVERAGE_DIR"/app "$COVERAGE_DIR"/entities \
+           "$COVERAGE_DIR"/features "$COVERAGE_DIR"/hooks "$COVERAGE_DIR"/shared; do
+  rm -rf "$dir"
+done
+
+# 7. Archive coverage report for git (individual files are gitignored)
 ARCHIVE="$COVERAGE_DIR/coverage-report.tar.gz"
 if [ -d "$MERGED_DIR" ]; then
   tar -czf "$ARCHIVE" -C "$MERGED_DIR" .
