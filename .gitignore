@@ -8,7 +8,7 @@
 
 # testing
 /coverage/*
-!/coverage/merged
+!/coverage/coverage-report.tar.gz
 /.nyc_output
 
 # next.js

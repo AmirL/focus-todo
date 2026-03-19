@@ -169,3 +169,10 @@ if [ -f "$MERGED_DIR/coverage-summary.json" ]; then
   echo ""
   echo "HTML report: $MERGED_DIR/lcov-report/index.html"
 fi
+
+# 6. Archive coverage report for git (individual files are gitignored)
+ARCHIVE="$COVERAGE_DIR/coverage-report.tar.gz"
+if [ -d "$MERGED_DIR" ]; then
+  tar -czf "$ARCHIVE" -C "$MERGED_DIR" .
+  echo "Archive: $ARCHIVE"
+fi
