@@ -12,7 +12,7 @@ export default defineConfig({
     exclude: [...defaultExclude, '.claude/**'],
     coverage: {
       provider: 'istanbul',
-      reporter: ['json', 'text-summary'],
+      reporter: ['json', 'lcov', 'text-summary'],
       reportsDirectory: './coverage/unit',
       include: ['src/**/*.ts', 'src/**/*.tsx'],
       exclude: ['**/*.spec.ts', '**/*.test.ts', 'cypress/**'],
