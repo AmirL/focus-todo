@@ -5,11 +5,18 @@ import type { AiSuggestions } from '@/shared/types/aiSuggestions';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
 import { useUpdateTaskMutation } from '@/shared/api/tasks';
-import { createInstance } from '@/shared/lib/instance-tools';
 import { hasAnySuggestions } from '@/shared/lib/aiSuggestions';
 import { TaskFormFields } from '@/shared/ui/task/TaskFormFields';
 import { useTaskMetadata } from '@/shared/ui/task/useTaskMetadata';
 import { ReAddButton } from '@/features/tasks/actions';
+import {
+  buildUpdatedTask,
+  buildTaskWithClearedSuggestions,
+  applySuggestion,
+  rejectSuggestion,
+  buildEditMetadataDefaults,
+  getEditFormDefaults,
+} from '../lib/editTaskUtils';
 
 export function EditTaskDialog({
   task,
@@ -23,17 +30,13 @@ export function EditTaskDialog({
   const updateTaskMutation = useUpdateTaskMutation();
 
   // Initialize state with task values
-  const [name, setName] = useState(task.name);
-  const [details, setDetails] = useState(task.details ?? '');
-  const [aiSuggestions, setAiSuggestions] = useState<AiSuggestions | null>(task.aiSuggestions ?? null);
-  const { metadata, updateMetadata, resetMetadata } = useTaskMetadata({
-    selectedDuration: task.estimatedDuration ?? null,
-    selectedListId: task.listId,
-    isStarred: !!task.selectedAt,
-    isBlocker: task.isBlocker,
-    selectedDate: task.date ?? null,
-    selectedGoalId: task.goalId ?? null,
-  });
+  const formDefaults = getEditFormDefaults(task);
+  const [name, setName] = useState(formDefaults.name);
+  const [details, setDetails] = useState(formDefaults.details);
+  const [aiSuggestions, setAiSuggestions] = useState<AiSuggestions | null>(formDefaults.aiSuggestions);
+  const { metadata, updateMetadata, resetMetadata } = useTaskMetadata(
+    buildEditMetadataDefaults(task),
+  );
 
   // Reset form values when task changes or dialog opens in controlled mode
   useEffect(() => {
@@ -45,66 +48,29 @@ export function EditTaskDialog({
   }, [task.id, open]);
 
   const handleAcceptSuggestion = (fieldName: string) => {
-    if (!aiSuggestions?.[fieldName]) return;
-    const suggestion = aiSuggestions[fieldName].suggestion;
-
-    if (fieldName === 'name') {
-      setName(suggestion);
-    } else if (fieldName === 'details') {
-      setDetails(suggestion);
-    } else if (fieldName === 'estimatedDuration') {
-      const parsed = parseInt(suggestion, 10);
-      if (!isNaN(parsed)) {
-        updateMetadata({ selectedDuration: parsed });
-      }
+    const result = applySuggestion(aiSuggestions, fieldName);
+    if (result.appliedValue !== null) {
+      if (fieldName === 'name') setName(result.appliedValue);
+      else if (fieldName === 'details') setDetails(result.appliedValue);
     }
-
-    setAiSuggestions((prev) =>
-      prev ? { ...prev, [fieldName]: { ...prev[fieldName], userReaction: 'accepted' as const } } : null
-    );
+    if (result.appliedDuration !== null) {
+      updateMetadata({ selectedDuration: result.appliedDuration });
+    }
+    setAiSuggestions(result.updatedSuggestions);
   };
 
   const handleRejectSuggestion = (fieldName: string) => {
-    setAiSuggestions((prev) =>
-      prev ? { ...prev, [fieldName]: { ...prev[fieldName], userReaction: 'rejected' as const } } : null
-    );
+    setAiSuggestions(rejectSuggestion(aiSuggestions, fieldName));
   };
 
   const handleClearSuggestions = () => {
     setAiSuggestions(null);
-    const updatedTask = createInstance(TaskModel, {
-      ...task,
-      name,
-      details,
-      estimatedDuration: metadata.selectedDuration,
-      listId: metadata.selectedListId!,
-      selectedAt: metadata.isStarred ? task.selectedAt || new Date() : null,
-      isBlocker: metadata.isBlocker,
-      date: metadata.selectedDate,
-      goalId: metadata.selectedGoalId,
-      aiSuggestions: null,
-      updatedAt: new Date(),
-    });
-    updateTaskMutation.mutate(updatedTask);
+    updateTaskMutation.mutate(buildTaskWithClearedSuggestions(task, { name, details, metadata }));
   };
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    const updatedTask = createInstance(TaskModel, {
-      ...task,
-      name,
-      details,
-      estimatedDuration: metadata.selectedDuration,
-      listId: metadata.selectedListId!,
-      selectedAt: metadata.isStarred ? task.selectedAt || new Date() : null,
-      isBlocker: metadata.isBlocker,
-      date: metadata.selectedDate,
-      goalId: metadata.selectedGoalId,
-      aiSuggestions,
-      updatedAt: new Date(),
-    });
-    updateTaskMutation.mutate(updatedTask);
+    updateTaskMutation.mutate(buildUpdatedTask(task, { name, details, metadata, aiSuggestions }));
     onOpenChange(false);
   };
 

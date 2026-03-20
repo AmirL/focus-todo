@@ -16,32 +16,18 @@ import { PlusCircle } from 'lucide-react';
 import { SelectTaskCategory } from '@/shared/ui/task/SelectTaskCategory';
 import { useCreateCompletedTaskMutation } from '@/shared/api/tasks';
 import type { TimelineGap } from '@/shared/ui/timeline';
+import {
+  formatTimeInput,
+  formatGapDuration,
+  computeGapDuration,
+  isValidGapSubmission,
+  buildGapTaskPayload,
+} from '../lib/gapDialogUtils';
 
 interface QuickAddFromGapDialogProps {
   gap: TimelineGap | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-}
-
-function formatTimeInput(isoString: string): string {
-  const date = new Date(isoString);
-  const hours = date.getHours().toString().padStart(2, '0');
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-  return `${hours}:${minutes}`;
-}
-
-function formatDuration(minutes: number): string {
-  if (minutes < 60) return `${minutes}m`;
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return m === 0 ? `${h}h` : `${h}h ${m}m`;
-}
-
-function parseTimeToDate(timeStr: string, referenceDate: Date): Date {
-  const [hours, minutes] = timeStr.split(':').map(Number);
-  const result = new Date(referenceDate);
-  result.setHours(hours, minutes, 0, 0);
-  return result;
 }
 
 export function QuickAddFromGapDialog({ gap, open, onOpenChange }: QuickAddFromGapDialogProps) {
@@ -64,32 +50,17 @@ export function QuickAddFromGapDialog({ gap, open, onOpenChange }: QuickAddFromG
   }, [open, gap]);
 
   const handleSubmit = () => {
-    if (!name.trim() || !selectedListId || !gap) return;
+    if (!gap || !isValidGapSubmission(name, selectedListId, startTime, endTime, new Date(gap.startedAt))) return;
 
-    const referenceDate = new Date(gap.startedAt);
-    const startDate = parseTimeToDate(startTime, referenceDate);
-    const endDate = parseTimeToDate(endTime, referenceDate);
-
-    if (endDate <= startDate) return;
-
-    createCompletedTask.mutate({
-      task: { name: name.trim(), listId: selectedListId },
-      startedAt: startDate.toISOString(),
-      endedAt: endDate.toISOString(),
-    });
-
+    const payload = buildGapTaskPayload(name, selectedListId!, startTime, endTime, new Date(gap.startedAt));
+    createCompletedTask.mutate(payload);
     onOpenChange(false);
   };
 
   // Compute duration from current time inputs
-  const computedDuration = (() => {
-    if (!startTime || !endTime || !gap) return null;
-    const ref = new Date(gap.startedAt);
-    const start = parseTimeToDate(startTime, ref);
-    const end = parseTimeToDate(endTime, ref);
-    const mins = Math.round((end.getTime() - start.getTime()) / (1000 * 60));
-    return mins > 0 ? mins : null;
-  })();
+  const computedDuration = gap
+    ? computeGapDuration(startTime, endTime, new Date(gap.startedAt))
+    : null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -141,7 +112,7 @@ export function QuickAddFromGapDialog({ gap, open, onOpenChange }: QuickAddFromG
             {computedDuration && (
               <div className="flex items-end pb-1">
                 <span className="text-sm text-muted-foreground whitespace-nowrap">
-                  {formatDuration(computedDuration)}
+                  {formatGapDuration(computedDuration)}
                 </span>
               </div>
             )}

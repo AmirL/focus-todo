@@ -2,7 +2,7 @@
 
 import { useInitiativeHistoryQuery } from '@/shared/api/current-initiative';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
-import dayjs from 'dayjs';
+import { formatHistoryDate } from '../lib/historyUtils';
 
 export function InitiativeHistory() {
   const { data, isLoading, error } = useInitiativeHistoryQuery(30);
@@ -94,16 +94,3 @@ export function InitiativeHistory() {
   );
 }
 
-function formatHistoryDate(dateValue: string | Date): string {
-  const date = dayjs(dateValue);
-  const today = dayjs();
-  const yesterday = today.subtract(1, 'day');
-
-  if (date.isSame(today, 'day')) {
-    return 'Today';
-  }
-  if (date.isSame(yesterday, 'day')) {
-    return 'Yesterday';
-  }
-  return date.format('MMM D');
-}
