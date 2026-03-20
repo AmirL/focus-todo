@@ -27,3 +27,30 @@ export function buildReAddedTask(
     estimatedDuration: metadata.selectedDuration ?? null,
   });
 }
+
+/** Build initial metadata defaults from a task for re-add form */
+export function buildReAddMetadataDefaults(
+  task: TaskModel,
+  initialDate: Date | null,
+): Partial<TaskMetadata> {
+  return {
+    selectedDuration: task.estimatedDuration ?? null,
+    selectedListId: task.listId,
+    isStarred: !!task.selectedAt,
+    isBlocker: !!task.isBlocker,
+    selectedDate: initialDate ?? task.date ?? null,
+  };
+}
+
+/** Get initial form values from a task for re-add */
+export function getReAddFormDefaults(task: TaskModel): { name: string; details: string } {
+  return {
+    name: task.name,
+    details: task.details ?? '',
+  };
+}
+
+/** Check if re-add form can be submitted */
+export function canSubmitReAdd(name: string): boolean {
+  return name.trim().length > 0;
+}

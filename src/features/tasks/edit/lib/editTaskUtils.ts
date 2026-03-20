@@ -77,3 +77,28 @@ export function rejectSuggestion(
     [fieldName]: { ...aiSuggestions[fieldName], userReaction: 'rejected' as const },
   };
 }
+
+/** Build initial metadata defaults from a task for edit form */
+export function buildEditMetadataDefaults(task: TaskModel): Partial<TaskMetadata> {
+  return {
+    selectedDuration: task.estimatedDuration ?? null,
+    selectedListId: task.listId,
+    isStarred: !!task.selectedAt,
+    isBlocker: task.isBlocker,
+    selectedDate: task.date ?? null,
+    selectedGoalId: task.goalId ?? null,
+  };
+}
+
+/** Get initial form values from a task for edit */
+export function getEditFormDefaults(task: TaskModel): {
+  name: string;
+  details: string;
+  aiSuggestions: AiSuggestions | null;
+} {
+  return {
+    name: task.name,
+    details: task.details ?? '',
+    aiSuggestions: task.aiSuggestions ?? null,
+  };
+}

@@ -2,7 +2,13 @@ import { describe, it, expect } from 'vitest';
 import { TaskModel } from '@/entities/task/model/task';
 import { createInstance } from '@/shared/lib/instance-tools';
 import type { TaskMetadata } from '@/shared/ui/task/useTaskMetadata';
-import { buildCompletedOriginalTask, buildReAddedTask } from './reAddUtils';
+import {
+  buildCompletedOriginalTask,
+  buildReAddedTask,
+  buildReAddMetadataDefaults,
+  getReAddFormDefaults,
+  canSubmitReAdd,
+} from './reAddUtils';
 
 function createTestTask(overrides: Partial<TaskModel> = {}): TaskModel {
   return createInstance(TaskModel, {
@@ -125,5 +131,88 @@ describe('buildReAddedTask', () => {
     const metadata = createMetadata();
     const result = buildReAddedTask('Task', '', metadata);
     expect(result).toBeInstanceOf(TaskModel);
+  });
+});
+
+describe('buildReAddMetadataDefaults', () => {
+  it('builds metadata defaults from task', () => {
+    const task = createTestTask({
+      estimatedDuration: 45,
+      listId: 2,
+      selectedAt: new Date('2026-01-15'),
+      isBlocker: true,
+      date: new Date('2026-02-01'),
+    });
+    const result = buildReAddMetadataDefaults(task, null);
+    expect(result.selectedDuration).toBe(45);
+    expect(result.selectedListId).toBe(2);
+    expect(result.isStarred).toBe(true);
+    expect(result.isBlocker).toBe(true);
+    expect(result.selectedDate).toEqual(new Date('2026-02-01'));
+  });
+
+  it('uses initialDate when provided', () => {
+    const task = createTestTask({ date: new Date('2026-01-01') });
+    const initialDate = new Date('2026-03-15');
+    const result = buildReAddMetadataDefaults(task, initialDate);
+    expect(result.selectedDate).toEqual(initialDate);
+  });
+
+  it('falls back to task.date when initialDate is null', () => {
+    const taskDate = new Date('2026-01-01');
+    const task = createTestTask({ date: taskDate });
+    const result = buildReAddMetadataDefaults(task, null);
+    expect(result.selectedDate).toEqual(taskDate);
+  });
+
+  it('returns null date when both initialDate and task.date are null', () => {
+    const task = createTestTask({ date: null });
+    const result = buildReAddMetadataDefaults(task, null);
+    expect(result.selectedDate).toBeNull();
+  });
+
+  it('sets isStarred false when selectedAt is null', () => {
+    const task = createTestTask({ selectedAt: null });
+    const result = buildReAddMetadataDefaults(task, null);
+    expect(result.isStarred).toBe(false);
+  });
+
+  it('handles null estimatedDuration', () => {
+    const task = createTestTask({ estimatedDuration: null });
+    const result = buildReAddMetadataDefaults(task, null);
+    expect(result.selectedDuration).toBeNull();
+  });
+});
+
+describe('getReAddFormDefaults', () => {
+  it('returns name and details from task', () => {
+    const task = createTestTask({ name: 'My task', details: 'Some details' });
+    const result = getReAddFormDefaults(task);
+    expect(result.name).toBe('My task');
+    expect(result.details).toBe('Some details');
+  });
+
+  it('returns empty string for undefined details', () => {
+    const task = createTestTask({ details: undefined });
+    const result = getReAddFormDefaults(task);
+    expect(result.details).toBe('');
+  });
+});
+
+describe('canSubmitReAdd', () => {
+  it('returns true for non-empty name', () => {
+    expect(canSubmitReAdd('Task name')).toBe(true);
+  });
+
+  it('returns false for empty name', () => {
+    expect(canSubmitReAdd('')).toBe(false);
+  });
+
+  it('returns false for whitespace-only name', () => {
+    expect(canSubmitReAdd('   ')).toBe(false);
+  });
+
+  it('returns true for name with leading/trailing whitespace', () => {
+    expect(canSubmitReAdd('  Task  ')).toBe(true);
   });
 });

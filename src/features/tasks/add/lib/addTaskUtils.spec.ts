@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildNewTask, getStatusDefaults, isValidTaskName } from './addTaskUtils';
+import { buildNewTask, getStatusDefaults, isValidTaskName, buildAddTaskMetadataOverrides } from './addTaskUtils';
 import type { TaskMetadata } from '@/shared/ui/task/useTaskMetadata';
 import dayjs from 'dayjs';
 
@@ -103,5 +103,47 @@ describe('isValidTaskName', () => {
 
   it('returns false for whitespace-only string', () => {
     expect(isValidTaskName('   ')).toBe(false);
+  });
+});
+
+describe('buildAddTaskMetadataOverrides', () => {
+  it('returns today date for today filter', () => {
+    const result = buildAddTaskMetadataOverrides('today', null);
+    expect(result.selectedDate).toBeInstanceOf(Date);
+    expect(result.selectedListId).toBeUndefined();
+  });
+
+  it('returns tomorrow date for tomorrow filter', () => {
+    const result = buildAddTaskMetadataOverrides('tomorrow', null);
+    expect(result.selectedDate).toBeInstanceOf(Date);
+    const tomorrow = dayjs().add(1, 'day');
+    expect(dayjs(result.selectedDate).isSame(tomorrow, 'day')).toBe(true);
+  });
+
+  it('sets isStarred for selected filter', () => {
+    const result = buildAddTaskMetadataOverrides('selected', null);
+    expect(result.isStarred).toBe(true);
+  });
+
+  it('returns empty for all filter', () => {
+    const result = buildAddTaskMetadataOverrides('all', null);
+    expect(result.selectedDate).toBeUndefined();
+    expect(result.isStarred).toBeUndefined();
+  });
+
+  it('adds listId when provided', () => {
+    const result = buildAddTaskMetadataOverrides('all', '5');
+    expect(result.selectedListId).toBe(5);
+  });
+
+  it('combines status filter and listId', () => {
+    const result = buildAddTaskMetadataOverrides('today', '3');
+    expect(result.selectedDate).toBeInstanceOf(Date);
+    expect(result.selectedListId).toBe(3);
+  });
+
+  it('does not add listId when null', () => {
+    const result = buildAddTaskMetadataOverrides('all', null);
+    expect(result.selectedListId).toBeUndefined();
   });
 });

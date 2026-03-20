@@ -8,6 +8,8 @@ import {
   buildTaskWithClearedSuggestions,
   applySuggestion,
   rejectSuggestion,
+  buildEditMetadataDefaults,
+  getEditFormDefaults,
 } from './editTaskUtils';
 
 function createTestTask(overrides: Partial<TaskModel> = {}): TaskModel {
@@ -290,5 +292,80 @@ describe('rejectSuggestion', () => {
     });
     const result = rejectSuggestion(suggestions, 'name');
     expect(result!.name.suggestion).toBe('Better name');
+  });
+});
+
+describe('buildEditMetadataDefaults', () => {
+  it('builds metadata from task with all fields', () => {
+    const task = createTestTask({
+      estimatedDuration: 30,
+      listId: 2,
+      selectedAt: new Date('2026-01-15'),
+      isBlocker: true,
+      date: new Date('2026-02-01'),
+      goalId: 5,
+    });
+    const result = buildEditMetadataDefaults(task);
+    expect(result.selectedDuration).toBe(30);
+    expect(result.selectedListId).toBe(2);
+    expect(result.isStarred).toBe(true);
+    expect(result.isBlocker).toBe(true);
+    expect(result.selectedDate).toEqual(new Date('2026-02-01'));
+    expect(result.selectedGoalId).toBe(5);
+  });
+
+  it('handles null optional fields', () => {
+    const task = createTestTask({
+      estimatedDuration: null,
+      selectedAt: null,
+      date: null,
+      goalId: null,
+    });
+    const result = buildEditMetadataDefaults(task);
+    expect(result.selectedDuration).toBeNull();
+    expect(result.isStarred).toBe(false);
+    expect(result.selectedDate).toBeNull();
+    expect(result.selectedGoalId).toBeNull();
+  });
+
+  it('handles undefined goalId', () => {
+    const task = createTestTask({ goalId: undefined });
+    const result = buildEditMetadataDefaults(task);
+    expect(result.selectedGoalId).toBeNull();
+  });
+});
+
+describe('getEditFormDefaults', () => {
+  it('returns name, details, and aiSuggestions from task', () => {
+    const suggestions = createSuggestions({
+      name: { suggestion: 'Better name', userReaction: null },
+    });
+    const task = createTestTask({
+      name: 'My task',
+      details: 'Some details',
+      aiSuggestions: suggestions,
+    });
+    const result = getEditFormDefaults(task);
+    expect(result.name).toBe('My task');
+    expect(result.details).toBe('Some details');
+    expect(result.aiSuggestions).toEqual(suggestions);
+  });
+
+  it('returns empty string for undefined details', () => {
+    const task = createTestTask({ details: undefined });
+    const result = getEditFormDefaults(task);
+    expect(result.details).toBe('');
+  });
+
+  it('returns null for null aiSuggestions', () => {
+    const task = createTestTask({ aiSuggestions: null });
+    const result = getEditFormDefaults(task);
+    expect(result.aiSuggestions).toBeNull();
+  });
+
+  it('returns null for undefined aiSuggestions', () => {
+    const task = createTestTask({ aiSuggestions: undefined });
+    const result = getEditFormDefaults(task);
+    expect(result.aiSuggestions).toBeNull();
   });
 });

@@ -19,3 +19,23 @@ export function formatKeyIdentifier(key: ApiKeyItem): string {
 export function getKeyDisplayName(key: ApiKeyItem): string {
   return key.name ?? 'Unnamed key';
 }
+
+/** Sort keys by creation date, newest first */
+export function sortKeysByDate(keys: ApiKeyItem[]): ApiKeyItem[] {
+  return [...keys].sort((a, b) => {
+    const dateA = new Date(a.createdAt).getTime();
+    const dateB = new Date(b.createdAt).getTime();
+    return dateB - dateA;
+  });
+}
+
+/** Format key creation date for display */
+export function formatKeyDate(dateStr: string | Date): string {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+/** Check if a key has been used */
+export function hasKeyBeenUsed(key: ApiKeyItem): boolean {
+  return key.lastUsedAt !== null;
+}

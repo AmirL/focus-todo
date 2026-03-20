@@ -42,3 +42,15 @@ export function getStatusDefaults(statusFilter: StatusFilter): Partial<TaskMetad
 export function isValidTaskName(name: string): boolean {
   return name.trim().length > 0;
 }
+
+/** Build metadata overrides for add task dialog based on filters */
+export function buildAddTaskMetadataOverrides(
+  statusFilter: StatusFilter,
+  listId: string | null,
+): Partial<TaskMetadata> {
+  const defaults = getStatusDefaults(statusFilter);
+  if (listId) {
+    defaults.selectedListId = Number(listId);
+  }
+  return defaults;
+}

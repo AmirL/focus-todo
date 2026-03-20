@@ -9,7 +9,14 @@ import { hasAnySuggestions } from '@/shared/lib/aiSuggestions';
 import { TaskFormFields } from '@/shared/ui/task/TaskFormFields';
 import { useTaskMetadata } from '@/shared/ui/task/useTaskMetadata';
 import { ReAddButton } from '@/features/tasks/actions';
-import { buildUpdatedTask, buildTaskWithClearedSuggestions, applySuggestion, rejectSuggestion } from '../lib/editTaskUtils';
+import {
+  buildUpdatedTask,
+  buildTaskWithClearedSuggestions,
+  applySuggestion,
+  rejectSuggestion,
+  buildEditMetadataDefaults,
+  getEditFormDefaults,
+} from '../lib/editTaskUtils';
 
 export function EditTaskDialog({
   task,
@@ -23,17 +30,13 @@ export function EditTaskDialog({
   const updateTaskMutation = useUpdateTaskMutation();
 
   // Initialize state with task values
-  const [name, setName] = useState(task.name);
-  const [details, setDetails] = useState(task.details ?? '');
-  const [aiSuggestions, setAiSuggestions] = useState<AiSuggestions | null>(task.aiSuggestions ?? null);
-  const { metadata, updateMetadata, resetMetadata } = useTaskMetadata({
-    selectedDuration: task.estimatedDuration ?? null,
-    selectedListId: task.listId,
-    isStarred: !!task.selectedAt,
-    isBlocker: task.isBlocker,
-    selectedDate: task.date ?? null,
-    selectedGoalId: task.goalId ?? null,
-  });
+  const formDefaults = getEditFormDefaults(task);
+  const [name, setName] = useState(formDefaults.name);
+  const [details, setDetails] = useState(formDefaults.details);
+  const [aiSuggestions, setAiSuggestions] = useState<AiSuggestions | null>(formDefaults.aiSuggestions);
+  const { metadata, updateMetadata, resetMetadata } = useTaskMetadata(
+    buildEditMetadataDefaults(task),
+  );
 
   // Reset form values when task changes or dialog opens in controlled mode
   useEffect(() => {

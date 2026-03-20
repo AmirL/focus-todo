@@ -5,7 +5,13 @@ import { TaskFormFields } from '@/shared/ui/task/TaskFormFields';
 import { useTaskMetadata } from '@/shared/ui/task/useTaskMetadata';
 import { Button } from '@/shared/ui/button';
 import { useCreateTaskMutation, useUpdateTaskMutation } from '@/shared/api/tasks';
-import { buildCompletedOriginalTask, buildReAddedTask } from '../lib/reAddUtils';
+import {
+  buildCompletedOriginalTask,
+  buildReAddedTask,
+  buildReAddMetadataDefaults,
+  getReAddFormDefaults,
+  canSubmitReAdd,
+} from '../lib/reAddUtils';
 
 export function ReAddDialog({
   task,
@@ -18,18 +24,15 @@ export function ReAddDialog({
   onOpenChange: (open: boolean) => void;
   initialDate: Date | null;
 }) {
-  const [name, setName] = useState(task.name);
-  const [details, setDetails] = useState(task.details ?? '');
+  const formDefaults = getReAddFormDefaults(task);
+  const [name, setName] = useState(formDefaults.name);
+  const [details, setDetails] = useState(formDefaults.details);
   const createTaskMutation = useCreateTaskMutation();
   const updateTaskMutation = useUpdateTaskMutation();
 
-  const { metadata, updateMetadata, resetMetadata } = useTaskMetadata({
-    selectedDuration: task.estimatedDuration ?? null,
-    selectedListId: task.listId,
-    isStarred: !!task.selectedAt,
-    isBlocker: !!task.isBlocker,
-    selectedDate: initialDate ?? task.date ?? null,
-  });
+  const { metadata, updateMetadata, resetMetadata } = useTaskMetadata(
+    buildReAddMetadataDefaults(task, initialDate),
+  );
 
   useEffect(() => {
     if (open) {
@@ -78,7 +81,7 @@ export function ReAddDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleReAdd} disabled={!name.trim()}>
+          <Button onClick={handleReAdd} disabled={!canSubmitReAdd(name)}>
             Re-add
           </Button>
         </DialogFooter>
