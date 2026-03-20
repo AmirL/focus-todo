@@ -1,0 +1,111 @@
+name: Code Coverage
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Cache Cypress binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-binary-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            cypress-binary-${{ runner.os }}-
+
+      - name: Install Cypress binary
+        run: npx cypress install
+
+      - name: Run unit tests with coverage
+        run: pnpm vitest run --coverage
+
+      - name: Run Cypress with coverage
+        continue-on-error: true
+        uses: cypress-io/github-action@v6
+        with:
+          install: false
+          start: pnpm dev
+          wait-on: 'http://localhost:3000'
+          wait-on-timeout: 120
+        env:
+          CYPRESS_COVERAGE: 'true'
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          API_KEY_SECRET: ${{ secrets.API_KEY_SECRET }}
+          CYPRESS_TEST_EMAIL: ${{ vars.TEST_EMAIL }}
+          CYPRESS_TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+          CYPRESS_API_TEST_KEY: ${{ secrets.API_TEST_KEY }}
+
+      - name: Merge coverage reports
+        if: always()
+        run: |
+          mkdir -p coverage/merged
+
+          COVERAGE_FILES=""
+          if [ -f coverage/unit/coverage-final.json ]; then
+            COVERAGE_FILES="$COVERAGE_FILES coverage/unit/coverage-final.json"
+            echo "Found unit test coverage"
+          fi
+          if [ -f coverage/coverage-final.json ]; then
+            COVERAGE_FILES="$COVERAGE_FILES coverage/coverage-final.json"
+            echo "Found e2e test coverage"
+          fi
+
+          if [ -z "$COVERAGE_FILES" ]; then
+            echo "No coverage files found"
+            exit 0
+          fi
+
+          mkdir -p coverage/to-merge
+          INDEX=0
+          for f in $COVERAGE_FILES; do
+            cp "$f" "coverage/to-merge/coverage-${INDEX}.json"
+            INDEX=$((INDEX + 1))
+          done
+
+          pnpm exec nyc merge coverage/to-merge coverage/merged/coverage-final.json
+          pnpm exec nyc report \
+            --temp-dir coverage/merged \
+            --reporter=text-summary \
+            --reporter=json-summary \
+            --reporter=lcov \
+            --report-dir coverage/merged
+
+      - name: Upload coverage to OtterWise
+        if: always()
+        run: bash <(curl -s https://raw.githubusercontent.com/getOtterWise/bash-uploader/main/uploader.sh)
+        env:
+          OTTERWISE_TOKEN: ${{ secrets.OTTERWISE_TOKEN }}
+
+      - name: Upload coverage artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report-${{ github.run_id }}
+          path: coverage/
+          retention-days: 14
+          if-no-files-found: warn
