@@ -43,7 +43,6 @@ public/sw.js
 public/workbox-*.js
 
 # Cypress
-cypress.env.json
 cypress/videos
 cypress/screenshots
 cypress/downloads
