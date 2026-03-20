@@ -146,4 +146,115 @@ describe('DayTimeline', () => {
     // Default range is 08:00 to 23:00
     expect(screen.getByText('08:00')).toBeInTheDocument();
   });
+
+  it('handles overlapping blocks with column layout', () => {
+    // Two blocks that overlap in time should be placed side by side
+    const blocks = [
+      makeBlock({ id: 'b1', taskName: 'Task A', startedAt: '2026-03-20T09:00:00', endedAt: '2026-03-20T10:30:00', durationMinutes: 90 }),
+      makeBlock({ id: 'b2', taskName: 'Task B', startedAt: '2026-03-20T09:15:00', endedAt: '2026-03-20T10:00:00', durationMinutes: 45 }),
+    ];
+    render(<DayTimeline date={baseDate} blocks={blocks} />);
+    const dayBlocks = document.querySelectorAll('[data-cy="day-timeline-block"]');
+    expect(dayBlocks.length).toBe(2);
+    // Overlapping blocks should have inline column styles set
+    const block1Style = (dayBlocks[0] as HTMLElement).style;
+    const block2Style = (dayBlocks[1] as HTMLElement).style;
+    // At least one should have a left style from column positioning
+    expect(block1Style.left || block2Style.left).toBeTruthy();
+  });
+
+  it('handles blocks extending beyond default hour range', () => {
+    // Block that starts before 8am and ends after 11pm
+    const blocks = [
+      makeBlock({ id: 'b1', startedAt: '2026-03-20T06:30:00', endedAt: '2026-03-20T07:30:00', durationMinutes: 60 }),
+    ];
+    render(<DayTimeline date={baseDate} blocks={blocks} />);
+    // Hour range should expand to include 6am
+    expect(screen.getByText('06:00')).toBeInTheDocument();
+  });
+
+  it('handles running block (endedAt is null)', () => {
+    const blocks = [
+      makeBlock({ id: 'b1', endedAt: null, durationMinutes: null }),
+    ];
+    render(<DayTimeline date={baseDate} blocks={blocks} />);
+    const dayBlocks = document.querySelectorAll('[data-cy="day-timeline-block"]');
+    expect(dayBlocks.length).toBe(1);
+    // Running block should have animate-pulse
+    expect((dayBlocks[0] as HTMLElement).className).toContain('animate-pulse');
+  });
+
+  it('saves edits via inline editor', () => {
+    const onBlockEdit = vi.fn();
+    const blocks = [makeBlock()];
+    render(<DayTimeline date={baseDate} blocks={blocks} onBlockEdit={onBlockEdit} />);
+    // Click block to open editor
+    fireEvent.click(document.querySelector('[data-cy="day-timeline-block"]')!);
+    expect(document.querySelector('[data-cy="day-timeline-inline-editor"]')).toBeInTheDocument();
+    // Click save
+    fireEvent.click(document.querySelector('[data-cy="day-timeline-edit-save"]')!);
+    expect(onBlockEdit).toHaveBeenCalledOnce();
+  });
+
+  it('cancels inline editor', () => {
+    const blocks = [makeBlock()];
+    render(<DayTimeline date={baseDate} blocks={blocks} onBlockEdit={() => {}} />);
+    fireEvent.click(document.querySelector('[data-cy="day-timeline-block"]')!);
+    expect(document.querySelector('[data-cy="day-timeline-inline-editor"]')).toBeInTheDocument();
+    fireEvent.click(document.querySelector('[data-cy="day-timeline-edit-cancel"]')!);
+    expect(document.querySelector('[data-cy="day-timeline-inline-editor"]')).not.toBeInTheDocument();
+  });
+
+  it('calls onGapClick when gap is clicked', () => {
+    const onGapClick = vi.fn();
+    const blocks = [
+      makeBlock({ id: 'b1', startedAt: '2026-03-20T09:00:00', endedAt: '2026-03-20T10:00:00', durationMinutes: 60 }),
+      makeBlock({ id: 'b2', startedAt: '2026-03-20T11:00:00', endedAt: '2026-03-20T12:00:00', durationMinutes: 60 }),
+    ];
+    render(<DayTimeline date={baseDate} blocks={blocks} onGapClick={onGapClick} />);
+    const gaps = document.querySelectorAll('[data-cy="day-timeline-gap"]');
+    expect(gaps.length).toBe(1);
+    fireEvent.click(gaps[0]);
+    expect(onGapClick).toHaveBeenCalledWith(expect.objectContaining({
+      durationMinutes: expect.any(Number),
+    }));
+  });
+
+  it('handles three overlapping blocks in columns', () => {
+    const blocks = [
+      makeBlock({ id: 'b1', taskName: 'A', startedAt: '2026-03-20T09:00:00', endedAt: '2026-03-20T10:30:00', durationMinutes: 90 }),
+      makeBlock({ id: 'b2', taskName: 'B', startedAt: '2026-03-20T09:10:00', endedAt: '2026-03-20T10:00:00', durationMinutes: 50 }),
+      makeBlock({ id: 'b3', taskName: 'C', startedAt: '2026-03-20T09:20:00', endedAt: '2026-03-20T09:50:00', durationMinutes: 30 }),
+    ];
+    render(<DayTimeline date={baseDate} blocks={blocks} />);
+    const dayBlocks = document.querySelectorAll('[data-cy="day-timeline-block"]');
+    expect(dayBlocks.length).toBe(3);
+  });
+
+  it('handles block ending on a non-hour boundary (minutes > 0)', () => {
+    const blocks = [
+      makeBlock({ id: 'b1', startedAt: '2026-03-20T22:00:00', endedAt: '2026-03-20T23:30:00', durationMinutes: 90 }),
+    ];
+    render(<DayTimeline date={baseDate} blocks={blocks} />);
+    // endHour should round up to 24 since minutes > 0
+    const dayBlocks = document.querySelectorAll('[data-cy="day-timeline-block"]');
+    expect(dayBlocks.length).toBe(1);
+  });
+
+  it('edits time in inline editor inputs', () => {
+    const onBlockEdit = vi.fn();
+    const blocks = [makeBlock()];
+    render(<DayTimeline date={baseDate} blocks={blocks} onBlockEdit={onBlockEdit} />);
+    fireEvent.click(document.querySelector('[data-cy="day-timeline-block"]')!);
+
+    const startInput = document.querySelector('[data-cy="day-timeline-edit-start"]') as HTMLInputElement;
+    const endInput = document.querySelector('[data-cy="day-timeline-edit-end"]') as HTMLInputElement;
+    expect(startInput).toBeInTheDocument();
+    expect(endInput).toBeInTheDocument();
+
+    fireEvent.change(startInput, { target: { value: '08:00' } });
+    fireEvent.change(endInput, { target: { value: '11:00' } });
+    fireEvent.click(document.querySelector('[data-cy="day-timeline-edit-save"]')!);
+    expect(onBlockEdit).toHaveBeenCalledWith(expect.objectContaining({ id: 'block-1' }), '08:00', '11:00');
+  });
 });
