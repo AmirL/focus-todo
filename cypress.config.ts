@@ -1,7 +1,11 @@
 import { defineConfig } from "cypress";
 import cypressSplit from "cypress-split";
+import * as dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
+
+// Load .env.local so Cypress can access test credentials without a separate cypress.env.json
+dotenv.config({ path: ".env.local" });
 
 const coverageEnabled = process.env.CYPRESS_COVERAGE === "true";
 
@@ -20,6 +24,9 @@ export default defineConfig({
     },
     screenshotOnRunFailure: true,
     env: {
+      TEST_EMAIL: process.env.NEXT_PUBLIC_TEST_EMAIL,
+      TEST_PASSWORD: process.env.NEXT_PUBLIC_TEST_PASSWORD,
+      API_TEST_KEY: process.env.CYPRESS_API_TEST_KEY,
       ...(coverageEnabled && {
         codeCoverage: {
           url: "/api/coverage-data",
