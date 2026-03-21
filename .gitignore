@@ -67,3 +67,7 @@ storybook-static
 
 # Claude skills (local only)
 .claude/skills/
+
+# Capacitor iOS
+ios/App/App.xcodeproj/xcuserdata/
+ios/App/App.xcodeproj/project.xcworkspace/xcuserdata/
