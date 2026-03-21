@@ -108,9 +108,13 @@ export function ActiveTimerBar() {
     return dayjs(base).hour(h).minute(m).second(0);
   };
   const startMoment = localStartTime ? getLocalDayjs(activeEntry.startedAt, localStartTime) : dayjs(activeEntry.startedAt);
-  const endMoment = activeEntry.endedAt
+  let endMoment = activeEntry.endedAt
     ? (localEndTime ? getLocalDayjs(activeEntry.endedAt, localEndTime) : dayjs(activeEntry.endedAt))
     : now;
+  // If end is before start (e.g., user edited end time across midnight), advance end by one day
+  if (activeEntry.endedAt && endMoment.isBefore(startMoment)) {
+    endMoment = endMoment.add(1, 'day');
+  }
   const diffMinutes = Math.max(0, endMoment.diff(startMoment, 'minute'));
   const hours = Math.floor(diffMinutes / 60);
   const mins = diffMinutes % 60;
