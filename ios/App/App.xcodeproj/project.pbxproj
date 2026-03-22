@@ -11,23 +11,72 @@
 		4D22ABE92AF431CB00220026 /* CapApp-SPM in Frameworks */ = {isa = PBXBuildFile; productRef = 4D22ABE82AF431CB00220026 /* CapApp-SPM */; };
 		50379B232058CBB4000EE86E /* capacitor.config.json in Resources */ = {isa = PBXBuildFile; fileRef = 50379B222058CBB4000EE86E /* capacitor.config.json */; };
 		504EC3081FED79650016851F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504EC3071FED79650016851F /* AppDelegate.swift */; };
+		95LP00012DB3000100LP0001 /* LiveActivityPreviewScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95LP00022DB3000100LP0002 /* LiveActivityPreviewScreen.swift */; };
 		504EC30D1FED79650016851F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30B1FED79650016851F /* Main.storyboard */; };
 		504EC30F1FED79650016851F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30E1FED79650016851F /* Assets.xcassets */; };
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
+		95LA00012DB1000100LA0001 /* DoableActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95LA00022DB1000100LA0002 /* DoableActivityAttributes.swift */; };
+		95LA00032DB1000100LA0003 /* DoableLiveActivityBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95LA00042DB1000100LA0004 /* DoableLiveActivityBundle.swift */; };
+		95LA00052DB1000100LA0005 /* DoableLiveActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95LA00062DB1000100LA0006 /* DoableLiveActivityWidget.swift */; };
+		95LA00072DB1000100LA0007 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 95LA00082DB1000100LA0008 /* Assets.xcassets */; };
+		95LA00092DB1000100LA0009 /* DoableLiveActivity.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 95LA000A2DB1000100LA000A /* DoableLiveActivity.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		95LT00012DB2000100LT0001 /* DoableLiveActivityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95LT00022DB2000100LT0002 /* DoableLiveActivityTests.swift */; };
+		95LT00032DB2000100LT0003 /* DoableActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95LA00022DB1000100LA0002 /* DoableActivityAttributes.swift */; };
+		95LT00042DB2000100LT0004 /* DoableLiveActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95LA00062DB1000100LA0006 /* DoableLiveActivityWidget.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		95LA000B2DB1000100LA000B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 95LA00102DB1000100LA0010;
+			remoteInfo = DoableLiveActivity;
+		};
+		95LT00052DB2000100LT0005 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 95LA00102DB1000100LA0010;
+			remoteInfo = DoableLiveActivity;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		95LA000C2DB1000100LA000C /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				95LA00092DB1000100LA0009 /* DoableLiveActivity.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		2FAD9762203C412B000D30F8 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = config.xml; sourceTree = "<group>"; };
 		50379B222058CBB4000EE86E /* capacitor.config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = capacitor.config.json; sourceTree = "<group>"; };
 		504EC3041FED79650016851F /* App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = App.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		504EC3071FED79650016851F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		95LP00022DB3000100LP0002 /* LiveActivityPreviewScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityPreviewScreen.swift; sourceTree = "<group>"; };
 		504EC30C1FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		504EC30E1FED79650016851F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		504EC3111FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
 		958DCC722DB07C7200EA8C5F /* debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = debug.xcconfig; path = ../debug.xcconfig; sourceTree = SOURCE_ROOT; };
+		95LA00022DB1000100LA0002 /* DoableActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoableActivityAttributes.swift; sourceTree = "<group>"; };
+		95LA00042DB1000100LA0004 /* DoableLiveActivityBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoableLiveActivityBundle.swift; sourceTree = "<group>"; };
+		95LA00062DB1000100LA0006 /* DoableLiveActivityWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoableLiveActivityWidget.swift; sourceTree = "<group>"; };
+		95LA00082DB1000100LA0008 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		95LA000A2DB1000100LA000A /* DoableLiveActivity.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DoableLiveActivity.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		95LA000D2DB1000100LA000D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		95LT00022DB2000100LT0002 /* DoableLiveActivityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoableLiveActivityTests.swift; sourceTree = "<group>"; };
+		95LT00062DB2000100LT0006 /* DoableLiveActivityTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DoableLiveActivityTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -39,6 +88,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		95LA000E2DB1000100LA000E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		95LT00072DB2000100LT0007 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -47,6 +110,8 @@
 			children = (
 				958DCC722DB07C7200EA8C5F /* debug.xcconfig */,
 				504EC3061FED79650016851F /* App */,
+				95LA000F2DB1000100LA000F /* DoableLiveActivity */,
+				95LT00082DB2000100LT0008 /* DoableLiveActivityTests */,
 				504EC3051FED79650016851F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -55,8 +120,30 @@
 			isa = PBXGroup;
 			children = (
 				504EC3041FED79650016851F /* App.app */,
+				95LA000A2DB1000100LA000A /* DoableLiveActivity.appex */,
+				95LT00062DB2000100LT0006 /* DoableLiveActivityTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		95LA000F2DB1000100LA000F /* DoableLiveActivity */ = {
+			isa = PBXGroup;
+			children = (
+				95LA00022DB1000100LA0002 /* DoableActivityAttributes.swift */,
+				95LA00042DB1000100LA0004 /* DoableLiveActivityBundle.swift */,
+				95LA00062DB1000100LA0006 /* DoableLiveActivityWidget.swift */,
+				95LA00082DB1000100LA0008 /* Assets.xcassets */,
+				95LA000D2DB1000100LA000D /* Info.plist */,
+			);
+			path = DoableLiveActivity;
+			sourceTree = "<group>";
+		};
+		95LT00082DB2000100LT0008 /* DoableLiveActivityTests */ = {
+			isa = PBXGroup;
+			children = (
+				95LT00022DB2000100LT0002 /* DoableLiveActivityTests.swift */,
+			);
+			path = DoableLiveActivityTests;
 			sourceTree = "<group>";
 		};
 		504EC3061FED79650016851F /* App */ = {
@@ -64,6 +151,7 @@
 			children = (
 				50379B222058CBB4000EE86E /* capacitor.config.json */,
 				504EC3071FED79650016851F /* AppDelegate.swift */,
+				95LP00022DB3000100LP0002 /* LiveActivityPreviewScreen.swift */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
 				504EC30E1FED79650016851F /* Assets.xcassets */,
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
@@ -84,10 +172,12 @@
 				504EC3001FED79650016851F /* Sources */,
 				504EC3011FED79650016851F /* Frameworks */,
 				504EC3021FED79650016851F /* Resources */,
+				95LA000C2DB1000100LA000C /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				95LA00112DB1000100LA0011 /* PBXTargetDependency */,
 			);
 			name = App;
 			packageProductDependencies = (
@@ -96,6 +186,40 @@
 			productName = App;
 			productReference = 504EC3041FED79650016851F /* App.app */;
 			productType = "com.apple.product-type.application";
+		};
+		95LA00102DB1000100LA0010 /* DoableLiveActivity */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 95LA00122DB1000100LA0012 /* Build configuration list for PBXNativeTarget "DoableLiveActivity" */;
+			buildPhases = (
+				95LA00132DB1000100LA0013 /* Sources */,
+				95LA000E2DB1000100LA000E /* Frameworks */,
+				95LA00142DB1000100LA0014 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DoableLiveActivity;
+			productName = DoableLiveActivity;
+			productReference = 95LA000A2DB1000100LA000A /* DoableLiveActivity.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		95LT00092DB2000100LT0009 /* DoableLiveActivityTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 95LT000C2DB2000100LT000C /* Build configuration list for PBXNativeTarget "DoableLiveActivityTests" */;
+			buildPhases = (
+				95LT000A2DB2000100LT000A /* Sources */,
+				95LT00072DB2000100LT0007 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				95LT000B2DB2000100LT000B /* PBXTargetDependency */,
+			);
+			name = DoableLiveActivityTests;
+			productName = DoableLiveActivityTests;
+			productReference = 95LT00062DB2000100LT0006 /* DoableLiveActivityTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -109,6 +233,14 @@
 					504EC3031FED79650016851F = {
 						CreatedOnToolsVersion = 9.2;
 						LastSwiftMigration = 1100;
+						ProvisioningStyle = Automatic;
+					};
+					95LA00102DB1000100LA0010 = {
+						CreatedOnToolsVersion = 15.0;
+						ProvisioningStyle = Automatic;
+					};
+					95LT00092DB2000100LT0009 = {
+						CreatedOnToolsVersion = 15.0;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -130,6 +262,8 @@
 			projectRoot = "";
 			targets = (
 				504EC3031FED79650016851F /* App */,
+				95LA00102DB1000100LA0010 /* DoableLiveActivity */,
+				95LT00092DB2000100LT0009 /* DoableLiveActivityTests */,
 			);
 		};
 /* End PBXProject section */
@@ -148,6 +282,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		95LA00142DB1000100LA0014 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				95LA00072DB1000100LA0007 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -156,6 +298,27 @@
 			buildActionMask = 2147483647;
 			files = (
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
+				95LP00012DB3000100LP0001 /* LiveActivityPreviewScreen.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		95LA00132DB1000100LA0013 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				95LA00012DB1000100LA0001 /* DoableActivityAttributes.swift in Sources */,
+				95LA00032DB1000100LA0003 /* DoableLiveActivityBundle.swift in Sources */,
+				95LA00052DB1000100LA0005 /* DoableLiveActivityWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		95LT000A2DB2000100LT000A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				95LT00012DB2000100LT0001 /* DoableLiveActivityTests.swift in Sources */,
+				95LT00032DB2000100LT0003 /* DoableActivityAttributes.swift in Sources */,
+				95LT00042DB2000100LT0004 /* DoableLiveActivityWidget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -179,6 +342,19 @@
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
+
+/* Begin PBXTargetDependency section */
+		95LA00112DB1000100LA0011 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 95LA00102DB1000100LA0010 /* DoableLiveActivity */;
+			targetProxy = 95LA000B2DB1000100LA000B /* PBXContainerItemProxy */;
+		};
+		95LT000B2DB2000100LT000B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 95LA00102DB1000100LA0010 /* DoableLiveActivity */;
+			targetProxy = 95LT00052DB2000100LT0005 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		504EC3141FED79650016851F /* Debug */ = {
@@ -336,6 +512,102 @@
 			};
 			name = Release;
 		};
+		95LA00152DB1000100LA0015 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TURHTWJ4AG;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = DoableLiveActivity/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focustodo.app.DoableLiveActivity;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		95LA00162DB1000100LA0016 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TURHTWJ4AG;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = DoableLiveActivity/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focustodo.app.DoableLiveActivity;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		95LT000D2DB2000100LT000D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TURHTWJ4AG;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focustodo.app.DoableLiveActivityTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		95LT000E2DB2000100LT000E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TURHTWJ4AG;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focustodo.app.DoableLiveActivityTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -353,6 +625,24 @@
 			buildConfigurations = (
 				504EC3171FED79650016851F /* Debug */,
 				504EC3181FED79650016851F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		95LA00122DB1000100LA0012 /* Build configuration list for PBXNativeTarget "DoableLiveActivity" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				95LA00152DB1000100LA0015 /* Debug */,
+				95LA00162DB1000100LA0016 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		95LT000C2DB2000100LT000C /* Build configuration list for PBXNativeTarget "DoableLiveActivityTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				95LT000D2DB2000100LT000D /* Debug */,
+				95LT000E2DB2000100LT000E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
