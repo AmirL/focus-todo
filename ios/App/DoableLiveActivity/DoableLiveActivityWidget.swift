@@ -32,11 +32,14 @@ struct DoableLiveActivityWidget: Widget {
                     }
                 }
             } compactLeading: {
-                Image(systemName: "timer")
-                    .foregroundColor(.accentColor)
+                Text(context.attributes.taskName)
+                    .font(.caption2)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
             } compactTrailing: {
                 elapsedTimeLabel(context.state.elapsedTime)
                     .font(.caption.monospacedDigit())
+                    .foregroundColor(.accentColor)
             } minimal: {
                 Image(systemName: "timer")
                     .foregroundColor(.accentColor)
