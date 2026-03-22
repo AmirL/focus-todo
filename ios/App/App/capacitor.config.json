@@ -3,7 +3,7 @@
 	"appName": "Doable",
 	"webDir": "capacitor-web",
 	"server": {
-		"url": "https://focus-todo.vercel.app",
+		"url": "https://doable-tasks.vercel.app",
 		"cleartext": true,
 		"allowNavigation": [
 			"*.vercel.app",
