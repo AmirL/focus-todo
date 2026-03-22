@@ -16,6 +16,8 @@
     "cy:open": "cypress open",
     "cy:run": "cypress run",
     "cy:run:record": "cypress run --record",
+    "build:ios": "npx cap sync ios",
+    "dev:ios": "CAPACITOR_SERVER_URL=http://localhost:3000 npx cap run ios --livereload",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "coverage": "bash scripts/coverage.sh",
@@ -34,6 +36,9 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.26.0",
+    "@capacitor/cli": "^8.2.0",
+    "@capacitor/core": "^8.2.0",
+    "@capacitor/ios": "^8.2.0",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",

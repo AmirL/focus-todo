@@ -1,0 +1,13 @@
+App/build
+App/Pods
+App/output
+DerivedData
+xcuserdata
+
+# Cordova plugins for Capacitor
+capacitor-cordova-ios-plugins
+
+# Generated Cordova runtime files (created by `cap sync`, depend on Capacitor version)
+App/App/public/cordova.js
+App/App/public/cordova_plugins.js
+App/App/public/plugins/

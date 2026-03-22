@@ -83,12 +83,12 @@ export function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
-        <div className="md:hidden fixed top-4 left-4 z-50">
+        <div className="md:hidden fixed left-4 z-50" style={{ top: 'calc(1rem + env(safe-area-inset-top, 0px))' }}>
           <MobileMenuButton />
         </div>
         <Sidebar>
           <div className="flex flex-col h-full">
-            <SidebarHeader>
+            <SidebarHeader style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
               {(() => {
                 const homeHref = buildHomeHref(statusFilter, listId);
                 return (
