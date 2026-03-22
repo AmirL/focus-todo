@@ -22,7 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     #if DEBUG
     private func showLiveActivityPreview() {
-        if #available(iOS 16.1, *) {
+        if #available(iOS 16.2, *) {
             let previewVC = UIHostingController(rootView: LiveActivityPreviewScreen())
             window = UIWindow(frame: UIScreen.main.bounds)
             window?.rootViewController = previewVC

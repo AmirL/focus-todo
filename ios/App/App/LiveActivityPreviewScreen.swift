@@ -1,12 +1,28 @@
 #if DEBUG
+import ActivityKit
 import SwiftUI
 
-/// Debug-only screen that renders the Live Activity views for screenshot capture.
+/// Mirror of DoableActivityAttributes from the extension target.
+/// Must match exactly so ActivityKit routes the activity to the widget.
+/// The canonical definition lives in DoableLiveActivity/DoableActivityAttributes.swift.
+@available(iOS 16.2, *)
+struct DoableActivityAttributes: ActivityAttributes {
+    var taskName: String
+    var startTimestamp: Date
+
+    struct ContentState: Codable, Hashable {
+        var isRunning: Bool
+    }
+}
+
+/// Debug-only screen that starts a real Live Activity and renders previews.
 /// Launch with --preview-live-activity argument to see this screen.
-@available(iOS 16.1, *)
+@available(iOS 16.2, *)
 struct LiveActivityPreviewScreen: View {
+    @State private var activityStarted = false
+    @State private var errorMessage: String?
     private let taskName = "Write quarterly report"
-    private let startTimestamp = Date().addingTimeInterval(-754) // ~12:34 ago
+    private let startTimestamp = Date()
 
     var body: some View {
         ScrollView {
@@ -14,6 +30,32 @@ struct LiveActivityPreviewScreen: View {
                 Text("Live Activity Preview")
                     .font(.largeTitle)
                     .padding(.top, 40)
+
+                if let error = errorMessage {
+                    Text(error)
+                        .foregroundColor(.red)
+                        .font(.caption)
+                        .padding()
+                }
+
+                if activityStarted {
+                    Text("Live Activity is running! Lock the screen (Cmd+L) to see it on the Lock Screen, or check the Dynamic Island.")
+                        .font(.body)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                        .background(Color.green.opacity(0.1))
+                        .cornerRadius(12)
+                } else {
+                    Button(action: startLiveActivity) {
+                        Label("Start Live Activity", systemImage: "play.fill")
+                            .font(.headline)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.accentColor)
+                            .foregroundColor(.white)
+                            .cornerRadius(12)
+                    }
+                }
 
                 // Compact Island
                 VStack(alignment: .leading) {
@@ -93,6 +135,30 @@ struct LiveActivityPreviewScreen: View {
                 }
             }
             .padding(.horizontal)
+        }
+        .onAppear {
+            startLiveActivity()
+        }
+    }
+
+    private func startLiveActivity() {
+        guard !activityStarted else { return }
+
+        let attributes = DoableActivityAttributes(
+            taskName: taskName,
+            startTimestamp: startTimestamp
+        )
+        let contentState = DoableActivityAttributes.ContentState(isRunning: true)
+
+        do {
+            let _ = try Activity<DoableActivityAttributes>.request(
+                attributes: attributes,
+                content: .init(state: contentState, staleDate: nil),
+                pushType: nil
+            )
+            activityStarted = true
+        } catch {
+            errorMessage = "Failed to start Live Activity: \(error.localizedDescription)"
         }
     }
 }
