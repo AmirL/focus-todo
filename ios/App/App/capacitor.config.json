@@ -1,0 +1,17 @@
+{
+	"appId": "com.focustodo.app",
+	"appName": "Doable",
+	"webDir": "capacitor-web",
+	"server": {
+		"url": "https://focus-todo.vercel.app",
+		"cleartext": true,
+		"allowNavigation": [
+			"*.vercel.app",
+			"localhost"
+		]
+	},
+	"ios": {
+		"scheme": "Doable"
+	},
+	"packageClassList": []
+}
