@@ -20,10 +20,20 @@
 		95LA00052DB1000100LA0005 /* DoableLiveActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95LA00062DB1000100LA0006 /* DoableLiveActivityWidget.swift */; };
 		95LA00072DB1000100LA0007 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 95LA00082DB1000100LA0008 /* Assets.xcassets */; };
 		95LA00092DB1000100LA0009 /* DoableLiveActivity.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 95LA000A2DB1000100LA000A /* DoableLiveActivity.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		95LT00012DB2000100LT0001 /* DoableLiveActivityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95LT00022DB2000100LT0002 /* DoableLiveActivityTests.swift */; };
+		95LT00032DB2000100LT0003 /* DoableActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95LA00022DB1000100LA0002 /* DoableActivityAttributes.swift */; };
+		95LT00042DB2000100LT0004 /* DoableLiveActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95LA00062DB1000100LA0006 /* DoableLiveActivityWidget.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		95LA000B2DB1000100LA000B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 95LA00102DB1000100LA0010;
+			remoteInfo = DoableLiveActivity;
+		};
+		95LT00052DB2000100LT0005 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
 			proxyType = 1;
@@ -63,6 +73,8 @@
 		95LA00082DB1000100LA0008 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		95LA000A2DB1000100LA000A /* DoableLiveActivity.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DoableLiveActivity.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		95LA000D2DB1000100LA000D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		95LT00022DB2000100LT0002 /* DoableLiveActivityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoableLiveActivityTests.swift; sourceTree = "<group>"; };
+		95LT00062DB2000100LT0006 /* DoableLiveActivityTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DoableLiveActivityTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +93,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		95LT00072DB2000100LT0007 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -90,6 +109,7 @@
 				958DCC722DB07C7200EA8C5F /* debug.xcconfig */,
 				504EC3061FED79650016851F /* App */,
 				95LA000F2DB1000100LA000F /* DoableLiveActivity */,
+				95LT00082DB2000100LT0008 /* DoableLiveActivityTests */,
 				504EC3051FED79650016851F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -99,6 +119,7 @@
 			children = (
 				504EC3041FED79650016851F /* App.app */,
 				95LA000A2DB1000100LA000A /* DoableLiveActivity.appex */,
+				95LT00062DB2000100LT0006 /* DoableLiveActivityTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -113,6 +134,14 @@
 				95LA000D2DB1000100LA000D /* Info.plist */,
 			);
 			path = DoableLiveActivity;
+			sourceTree = "<group>";
+		};
+		95LT00082DB2000100LT0008 /* DoableLiveActivityTests */ = {
+			isa = PBXGroup;
+			children = (
+				95LT00022DB2000100LT0002 /* DoableLiveActivityTests.swift */,
+			);
+			path = DoableLiveActivityTests;
 			sourceTree = "<group>";
 		};
 		504EC3061FED79650016851F /* App */ = {
@@ -172,6 +201,23 @@
 			productReference = 95LA000A2DB1000100LA000A /* DoableLiveActivity.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		95LT00092DB2000100LT0009 /* DoableLiveActivityTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 95LT000C2DB2000100LT000C /* Build configuration list for PBXNativeTarget "DoableLiveActivityTests" */;
+			buildPhases = (
+				95LT000A2DB2000100LT000A /* Sources */,
+				95LT00072DB2000100LT0007 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				95LT000B2DB2000100LT000B /* PBXTargetDependency */,
+			);
+			name = DoableLiveActivityTests;
+			productName = DoableLiveActivityTests;
+			productReference = 95LT00062DB2000100LT0006 /* DoableLiveActivityTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -187,6 +233,10 @@
 						ProvisioningStyle = Automatic;
 					};
 					95LA00102DB1000100LA0010 = {
+						CreatedOnToolsVersion = 15.0;
+						ProvisioningStyle = Automatic;
+					};
+					95LT00092DB2000100LT0009 = {
 						CreatedOnToolsVersion = 15.0;
 						ProvisioningStyle = Automatic;
 					};
@@ -210,6 +260,7 @@
 			targets = (
 				504EC3031FED79650016851F /* App */,
 				95LA00102DB1000100LA0010 /* DoableLiveActivity */,
+				95LT00092DB2000100LT0009 /* DoableLiveActivityTests */,
 			);
 		};
 /* End PBXProject section */
@@ -257,6 +308,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		95LT000A2DB2000100LT000A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				95LT00012DB2000100LT0001 /* DoableLiveActivityTests.swift in Sources */,
+				95LT00032DB2000100LT0003 /* DoableActivityAttributes.swift in Sources */,
+				95LT00042DB2000100LT0004 /* DoableLiveActivityWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
@@ -283,6 +344,11 @@
 			isa = PBXTargetDependency;
 			target = 95LA00102DB1000100LA0010 /* DoableLiveActivity */;
 			targetProxy = 95LA000B2DB1000100LA000B /* PBXContainerItemProxy */;
+		};
+		95LT000B2DB2000100LT000B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 95LA00102DB1000100LA0010 /* DoableLiveActivity */;
+			targetProxy = 95LT00052DB2000100LT0005 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -492,6 +558,52 @@
 			};
 			name = Release;
 		};
+		95LT000D2DB2000100LT000D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TURHTWJ4AG;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focustodo.app.DoableLiveActivityTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		95LT000E2DB2000100LT000E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TURHTWJ4AG;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focustodo.app.DoableLiveActivityTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -518,6 +630,15 @@
 			buildConfigurations = (
 				95LA00152DB1000100LA0015 /* Debug */,
 				95LA00162DB1000100LA0016 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		95LT000C2DB2000100LT000C /* Build configuration list for PBXNativeTarget "DoableLiveActivityTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				95LT000D2DB2000100LT000D /* Debug */,
+				95LT000E2DB2000100LT000E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
