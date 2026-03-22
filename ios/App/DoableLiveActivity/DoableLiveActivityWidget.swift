@@ -17,7 +17,7 @@ struct DoableLiveActivityWidget: Widget {
                 }
 
                 DynamicIslandExpandedRegion(.trailing) {
-                    elapsedTimeLabel(context.state.elapsedTime)
+                    liveTimer(since: context.attributes.startTimestamp)
                         .font(.title2.monospacedDigit())
                         .foregroundColor(.accentColor)
                 }
@@ -37,7 +37,7 @@ struct DoableLiveActivityWidget: Widget {
                     .lineLimit(1)
                     .truncationMode(.tail)
             } compactTrailing: {
-                elapsedTimeLabel(context.state.elapsedTime)
+                liveTimer(since: context.attributes.startTimestamp)
                     .font(.caption.monospacedDigit())
                     .foregroundColor(.accentColor)
             } minimal: {
@@ -64,7 +64,7 @@ struct DoableLiveActivityWidget: Widget {
 
             Spacer()
 
-            elapsedTimeLabel(context.state.elapsedTime)
+            liveTimer(since: context.attributes.startTimestamp)
                 .font(.title.monospacedDigit())
                 .foregroundColor(.accentColor)
         }
@@ -73,15 +73,22 @@ struct DoableLiveActivityWidget: Widget {
 
     // MARK: - Helpers
 
-    private func elapsedTimeLabel(_ elapsed: TimeInterval) -> Text {
+    /// Returns a live-updating timer Text that counts up from the given start date.
+    /// iOS updates this automatically every second without needing APNs pushes.
+    private func liveTimer(since startDate: Date) -> Text {
+        Text(timerInterval: startDate...Date.distantFuture, countsDown: false)
+    }
+
+    /// Formats elapsed seconds as HH:MM:SS or MM:SS for static display contexts.
+    static func formatElapsedTime(_ elapsed: TimeInterval) -> String {
         let hours = Int(elapsed) / 3600
         let minutes = (Int(elapsed) % 3600) / 60
         let seconds = Int(elapsed) % 60
 
         if hours > 0 {
-            return Text(String(format: "%d:%02d:%02d", hours, minutes, seconds))
+            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
         } else {
-            return Text(String(format: "%02d:%02d", minutes, seconds))
+            return String(format: "%02d:%02d", minutes, seconds)
         }
     }
 }
