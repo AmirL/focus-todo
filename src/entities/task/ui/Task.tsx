@@ -91,7 +91,7 @@ export function Task({ task, actionButtons, isDragging = false, dragHandle }: Ta
             </div>
           )}
           {!deleted && (
-            <TaskStartTimerButton taskId={Number(task.id)} />
+            <TaskStartTimerButton taskId={Number(task.id)} taskName={task.name} />
           )}
           <Checkbox
             id={`todo-${task.id}`}
