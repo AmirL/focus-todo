@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import { withAuthAndErrorHandling, createErrorResponse, createSuccessResponse } from '@/shared/lib/api/route-wrapper';
 
 async function updateTimeEntryHandler(req: NextRequest, session: { user: { id: string } }) {
-  const { id, startedAt, endedAt, taskId, taskName } = await req.json();
+  const { id, startedAt, endedAt, taskId, taskName, listId } = await req.json();
 
   if (!id) {
     return createErrorResponse('id is required', 400);
@@ -57,11 +57,12 @@ async function updateTimeEntryHandler(req: NextRequest, session: { user: { id: s
         .from(tasksTable)
         .where(eq(tasksTable.id, existing.taskId));
 
-      if (currentTask) {
+      const newTaskListId = listId ?? currentTask?.listId;
+      if (newTaskListId) {
         const [newTask] = await DB.insert(tasksTable)
           .values({
             name: taskName,
-            listId: currentTask.listId,
+            listId: newTaskListId,
             userId: session.user.id,
             completedAt: new Date(),
           })

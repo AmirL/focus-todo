@@ -58,7 +58,7 @@ export function useUpdateTimeEntryMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: { id: number; startedAt?: string; endedAt?: string; taskId?: number; taskName?: string }) => {
+    mutationFn: async (data: { id: number; startedAt?: string; endedAt?: string; taskId?: number; taskName?: string; listId?: number }) => {
       return await fetchBackend<TimeEntry>('update-time-entry', data);
     },
     onSettled: () => {

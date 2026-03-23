@@ -14,6 +14,7 @@ import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { Trash2, Save, ChevronDown } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
+import { SelectTaskCategory } from '@/shared/ui/task/SelectTaskCategory';
 import {
   formatTimeInput,
   formatGapDuration,
@@ -27,12 +28,12 @@ export interface DayTask {
 }
 
 interface EditTimeEntryDialogProps {
-  block: (TimelineBlock & { taskId: string }) | null;
+  block: (TimelineBlock & { taskId: string; listId: number | null }) | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   date: Date;
   dayTasks: DayTask[];
-  onSave: (data: { startedAt: string; endedAt: string; taskId?: number; taskName?: string }) => void;
+  onSave: (data: { startedAt: string; endedAt: string; taskId?: number; taskName?: string; listId?: number }) => void;
   onDelete: () => void;
 }
 
@@ -49,6 +50,7 @@ export function EditTimeEntryDialog({
   const [endTime, setEndTime] = useState('');
   const [taskInput, setTaskInput] = useState('');
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [selectedListId, setSelectedListId] = useState<number | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -58,6 +60,7 @@ export function EditTimeEntryDialog({
       setEndTime(block.endedAt ? formatTimeInput(block.endedAt) : '');
       setTaskInput(block.taskName);
       setSelectedTaskId(block.taskId);
+      setSelectedListId(block.listId);
       setDropdownOpen(false);
     }
   }, [open, block]);
@@ -87,7 +90,7 @@ export function EditTimeEntryDialog({
     const startedAt = new Date(`${dateStr}T${startTime}:00`).toISOString();
     const endedAt = new Date(`${dateStr}T${endTime}:00`).toISOString();
 
-    const data: { startedAt: string; endedAt: string; taskId?: number; taskName?: string } = {
+    const data: { startedAt: string; endedAt: string; taskId?: number; taskName?: string; listId?: number } = {
       startedAt,
       endedAt,
     };
@@ -96,6 +99,9 @@ export function EditTimeEntryDialog({
       data.taskId = Number(selectedTaskId);
     } else if (taskInput.trim() && taskInput.trim() !== block.taskName) {
       data.taskName = taskInput.trim();
+      if (selectedListId) {
+        data.listId = selectedListId;
+      }
     }
 
     onSave(data);
@@ -162,6 +168,19 @@ export function EditTimeEntryDialog({
               )}
             </Popover>
           </div>
+
+          {/* Category - shown when typing a new task name */}
+          {!selectedTaskId && (
+            <div>
+              <Label>Category</Label>
+              <div className="mt-1">
+                <SelectTaskCategory
+                  selectedListId={selectedListId}
+                  setSelectedListId={setSelectedListId}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Time fields */}
           <div className="flex gap-4">

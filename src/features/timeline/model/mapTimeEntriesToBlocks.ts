@@ -3,7 +3,7 @@ import type { TimeEntry } from '@/shared/api/time-entries';
 import type { TaskModel } from '@/entities/task/model/task';
 import type { TimelineBlock } from '@/shared/ui/timeline';
 
-export type TimelineBlockWithTaskId = TimelineBlock & { taskId: string };
+export type TimelineBlockWithTaskId = TimelineBlock & { taskId: string; listId: number | null };
 
 export function mapTimeEntriesToBlocks(
   timeEntries: TimeEntry[],
@@ -31,6 +31,7 @@ export function mapTimeEntriesToBlocks(
         listColor,
         durationMinutes: entry.durationMinutes,
         taskId: String(entry.taskId),
+        listId: task?.listId ?? null,
       };
     });
 }

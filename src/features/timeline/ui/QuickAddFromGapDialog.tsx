@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -12,15 +12,16 @@ import {
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, ChevronDown } from 'lucide-react';
 import { SelectTaskCategory } from '@/shared/ui/task/SelectTaskCategory';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { useCreateCompletedTaskMutation } from '@/shared/api/tasks';
 import type { TimelineGap } from '@/shared/ui/timeline';
+import type { DayTask } from './EditTimeEntryDialog';
 import {
   formatTimeInput,
   formatGapDuration,
   computeGapDuration,
-  isValidGapSubmission,
   buildGapTaskPayload,
 } from '../lib/gapDialogUtils';
 
@@ -28,32 +29,66 @@ interface QuickAddFromGapDialogProps {
   gap: TimelineGap | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  dayTasks?: DayTask[];
 }
 
-export function QuickAddFromGapDialog({ gap, open, onOpenChange }: QuickAddFromGapDialogProps) {
-  const [name, setName] = useState('');
+export function QuickAddFromGapDialog({ gap, open, onOpenChange, dayTasks = [] }: QuickAddFromGapDialogProps) {
+  const [taskInput, setTaskInput] = useState('');
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [selectedListId, setSelectedListId] = useState<number | null>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const createCompletedTask = useCreateCompletedTaskMutation();
 
   // Pre-fill times when dialog opens with a gap.
-  // Radix Dialog does not call onOpenChange when opened via the `open` prop,
-  // so we use an effect instead of relying on onOpenChange for initialization.
   useEffect(() => {
     if (open && gap) {
-      setName('');
+      setTaskInput('');
+      setSelectedTaskId(null);
       setStartTime(formatTimeInput(gap.startedAt));
       setEndTime(formatTimeInput(gap.endedAt));
       setSelectedListId(null);
+      setDropdownOpen(false);
     }
   }, [open, gap]);
 
-  const handleSubmit = () => {
-    if (!gap || !isValidGapSubmission(name, selectedListId, startTime, endTime, new Date(gap.startedAt))) return;
+  const filteredTasks = dayTasks.filter((t) =>
+    t.name.toLowerCase().includes(taskInput.toLowerCase()),
+  );
 
-    const payload = buildGapTaskPayload(name, selectedListId!, startTime, endTime, new Date(gap.startedAt));
-    createCompletedTask.mutate(payload);
+  const handleTaskSelect = (task: DayTask) => {
+    setTaskInput(task.name);
+    setSelectedTaskId(task.id);
+    setDropdownOpen(false);
+  };
+
+  const handleTaskInputChange = (value: string) => {
+    setTaskInput(value);
+    setSelectedTaskId(null);
+    setDropdownOpen(true);
+  };
+
+  const handleSubmit = () => {
+    if (!gap || !taskInput.trim()) return;
+
+    const computedDuration = computeGapDuration(startTime, endTime, new Date(gap.startedAt));
+    if (!computedDuration) return;
+
+    if (selectedTaskId) {
+      // Log time against existing task
+      const dateStr = new Date(gap.startedAt).toISOString().split('T')[0];
+      const startedAt = new Date(`${dateStr}T${startTime}:00`).toISOString();
+      const endedAt = new Date(`${dateStr}T${endTime}:00`).toISOString();
+      createCompletedTask.mutate({ taskId: Number(selectedTaskId), startedAt, endedAt });
+    } else {
+      // Create new task
+      if (!selectedListId) return;
+      const payload = buildGapTaskPayload(taskInput, selectedListId, startTime, endTime, new Date(gap.startedAt));
+      createCompletedTask.mutate(payload);
+    }
+
     onOpenChange(false);
   };
 
@@ -61,6 +96,8 @@ export function QuickAddFromGapDialog({ gap, open, onOpenChange }: QuickAddFromG
   const computedDuration = gap
     ? computeGapDuration(startTime, endTime, new Date(gap.startedAt))
     : null;
+
+  const isValid = taskInput.trim() && computedDuration && (selectedTaskId || selectedListId);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -73,17 +110,51 @@ export function QuickAddFromGapDialog({ gap, open, onOpenChange }: QuickAddFromG
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
+          {/* Task combobox */}
           <div>
             <Label htmlFor="gap-task-name">Task name</Label>
-            <Input
-              id="gap-task-name"
-              data-cy="gap-task-name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="What were you doing?"
-              className="mt-1"
-              autoFocus
-            />
+            <Popover open={dropdownOpen} onOpenChange={setDropdownOpen}>
+              <PopoverTrigger asChild>
+                <div className="relative mt-1">
+                  <Input
+                    id="gap-task-name"
+                    data-cy="gap-task-name"
+                    ref={inputRef}
+                    value={taskInput}
+                    onChange={(e) => handleTaskInputChange(e.target.value)}
+                    placeholder="What were you doing?"
+                    autoComplete="off"
+                    className="pr-8"
+                    autoFocus
+                  />
+                  {dayTasks.length > 0 && (
+                    <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  )}
+                </div>
+              </PopoverTrigger>
+              {filteredTasks.length > 0 && (
+                <PopoverContent
+                  className="p-1 w-[var(--radix-popover-trigger-width)]"
+                  align="start"
+                  onOpenAutoFocus={(e) => e.preventDefault()}
+                >
+                  <ul data-cy="gap-task-dropdown" className="max-h-48 overflow-y-auto">
+                    {filteredTasks.map((task) => (
+                      <li key={task.id}>
+                        <button
+                          type="button"
+                          data-cy="gap-task-option"
+                          className="w-full text-left px-2 py-1.5 text-sm rounded hover:bg-muted transition-colors"
+                          onClick={() => handleTaskSelect(task)}
+                        >
+                          {task.name}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </PopoverContent>
+              )}
+            </Popover>
           </div>
 
           <div className="flex gap-4">
@@ -118,15 +189,18 @@ export function QuickAddFromGapDialog({ gap, open, onOpenChange }: QuickAddFromG
             )}
           </div>
 
-          <div>
-            <Label>Category</Label>
-            <div className="mt-1">
-              <SelectTaskCategory
-                selectedListId={selectedListId}
-                setSelectedListId={setSelectedListId}
-              />
+          {/* Category - only shown when typing a new task name (not selecting existing) */}
+          {!selectedTaskId && (
+            <div>
+              <Label>Category</Label>
+              <div className="mt-1">
+                <SelectTaskCategory
+                  selectedListId={selectedListId}
+                  setSelectedListId={setSelectedListId}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <DialogFooter className="flex sm:justify-between">
@@ -135,7 +209,7 @@ export function QuickAddFromGapDialog({ gap, open, onOpenChange }: QuickAddFromG
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!name.trim() || !selectedListId || !computedDuration}
+            disabled={!isValid}
             data-cy="gap-submit-button"
           >
             <PlusCircle className="h-4 w-4 mr-2" />

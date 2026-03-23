@@ -69,7 +69,7 @@ export function CalendarDayPage() {
   );
 
   const handleEditSave = useCallback(
-    (data: { startedAt: string; endedAt: string; taskId?: number; taskName?: string }) => {
+    (data: { startedAt: string; endedAt: string; taskId?: number; taskName?: string; listId?: number }) => {
       if (!editingBlock) return;
       updateTimeEntry.mutate({
         id: Number(editingBlock.id),
@@ -133,6 +133,7 @@ export function CalendarDayPage() {
         gap={selectedGap}
         open={isGapDialogOpen}
         onOpenChange={setIsGapDialogOpen}
+        dayTasks={dayTasks}
       />
       <EditTimeEntryDialog
         block={editingBlock}
