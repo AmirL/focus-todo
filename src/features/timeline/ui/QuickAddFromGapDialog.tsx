@@ -157,6 +157,19 @@ export function QuickAddFromGapDialog({ gap, open, onOpenChange, dayTasks = [] }
             </Popover>
           </div>
 
+          {/* Category - only shown when typing a new task name (not selecting existing) */}
+          {!selectedTaskId && (
+            <div>
+              <Label>Category</Label>
+              <div className="mt-1">
+                <SelectTaskCategory
+                  selectedListId={selectedListId}
+                  setSelectedListId={setSelectedListId}
+                />
+              </div>
+            </div>
+          )}
+
           <div className="flex gap-4">
             <div className="flex-1">
               <Label htmlFor="gap-start-time">Start</Label>
@@ -188,19 +201,6 @@ export function QuickAddFromGapDialog({ gap, open, onOpenChange, dayTasks = [] }
               </div>
             )}
           </div>
-
-          {/* Category - only shown when typing a new task name (not selecting existing) */}
-          {!selectedTaskId && (
-            <div>
-              <Label>Category</Label>
-              <div className="mt-1">
-                <SelectTaskCategory
-                  selectedListId={selectedListId}
-                  setSelectedListId={setSelectedListId}
-                />
-              </div>
-            </div>
-          )}
         </div>
 
         <DialogFooter className="flex sm:justify-between">
