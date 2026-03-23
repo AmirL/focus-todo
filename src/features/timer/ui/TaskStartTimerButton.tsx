@@ -2,12 +2,14 @@
 import { StartTimerButton } from '@/shared/ui/timer';
 import { useTimerStore } from '../model/timerStore';
 import { useStartTimerMutation, useStopTimerMutation } from '@/shared/api/time-entries';
+import { startLiveActivity, endLiveActivity } from '../lib/liveActivityBridge';
 
 interface TaskStartTimerButtonProps {
   taskId: number;
+  taskName: string;
 }
 
-export function TaskStartTimerButton({ taskId }: TaskStartTimerButtonProps) {
+export function TaskStartTimerButton({ taskId, taskName }: TaskStartTimerButtonProps) {
   const activeEntry = useTimerStore((s) => s.activeEntry);
   const setActiveEntry = useTimerStore((s) => s.setActiveEntry);
   const startTimer = useStartTimerMutation();
@@ -18,11 +20,12 @@ export function TaskStartTimerButton({ taskId }: TaskStartTimerButtonProps) {
   const handleClick = async () => {
     if (isRunning) {
       const stopped = await stopTimer.mutateAsync();
-      // Keep the stopped entry visible so user can edit end time in the timer bar
       setActiveEntry(stopped);
+      await endLiveActivity();
     } else {
       const entry = await startTimer.mutateAsync(taskId);
       setActiveEntry(entry);
+      await startLiveActivity(taskName);
     }
   };
 

@@ -13,5 +13,5 @@
 	"ios": {
 		"scheme": "Doable"
 	},
-	"packageClassList": []
+	"packageClassList": ["LiveActivityPlugin"]
 }
