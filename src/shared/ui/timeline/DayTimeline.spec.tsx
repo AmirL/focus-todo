@@ -118,11 +118,29 @@ describe('DayTimeline', () => {
     expect(onAddEntry).toHaveBeenCalledWith(expect.stringMatching(/^\d{2}:00$/), expect.stringMatching(/^\d{2}:00$/));
   });
 
-  it('shows inline editor when a block is clicked', () => {
+  it('calls onBlockEditClick when a block is clicked', () => {
+    const onBlockEditClick = vi.fn();
     const blocks = [makeBlock()];
-    render(<DayTimeline date={baseDate} blocks={blocks} onBlockEdit={() => {}} />);
+    render(<DayTimeline date={baseDate} blocks={blocks} onBlockEditClick={onBlockEditClick} />);
     fireEvent.click(document.querySelector('[data-cy="day-timeline-block"]')!);
-    expect(document.querySelector('[data-cy="day-timeline-inline-editor"]')).toBeInTheDocument();
+    expect(onBlockEditClick).toHaveBeenCalledWith(expect.objectContaining({ id: 'block-1' }));
+  });
+
+  it('calls onBlockEditClick when pencil edit button is clicked', () => {
+    const onBlockEditClick = vi.fn();
+    const blocks = [makeBlock()];
+    render(<DayTimeline date={baseDate} blocks={blocks} onBlockEditClick={onBlockEditClick} />);
+    const editBtn = document.querySelector('[data-cy="day-timeline-edit-btn"]');
+    expect(editBtn).toBeInTheDocument();
+    fireEvent.click(editBtn!);
+    expect(onBlockEditClick).toHaveBeenCalledWith(expect.objectContaining({ id: 'block-1' }));
+  });
+
+  it('does not render inline editor when block is clicked', () => {
+    const blocks = [makeBlock()];
+    render(<DayTimeline date={baseDate} blocks={blocks} onBlockEditClick={() => {}} />);
+    fireEvent.click(document.querySelector('[data-cy="day-timeline-block"]')!);
+    expect(document.querySelector('[data-cy="day-timeline-inline-editor"]')).not.toBeInTheDocument();
   });
 
   it('calls onBlockDelete when delete button is clicked', () => {
@@ -184,27 +202,6 @@ describe('DayTimeline', () => {
     expect((dayBlocks[0] as HTMLElement).className).toContain('animate-pulse');
   });
 
-  it('saves edits via inline editor', () => {
-    const onBlockEdit = vi.fn();
-    const blocks = [makeBlock()];
-    render(<DayTimeline date={baseDate} blocks={blocks} onBlockEdit={onBlockEdit} />);
-    // Click block to open editor
-    fireEvent.click(document.querySelector('[data-cy="day-timeline-block"]')!);
-    expect(document.querySelector('[data-cy="day-timeline-inline-editor"]')).toBeInTheDocument();
-    // Click save
-    fireEvent.click(document.querySelector('[data-cy="day-timeline-edit-save"]')!);
-    expect(onBlockEdit).toHaveBeenCalledOnce();
-  });
-
-  it('cancels inline editor', () => {
-    const blocks = [makeBlock()];
-    render(<DayTimeline date={baseDate} blocks={blocks} onBlockEdit={() => {}} />);
-    fireEvent.click(document.querySelector('[data-cy="day-timeline-block"]')!);
-    expect(document.querySelector('[data-cy="day-timeline-inline-editor"]')).toBeInTheDocument();
-    fireEvent.click(document.querySelector('[data-cy="day-timeline-edit-cancel"]')!);
-    expect(document.querySelector('[data-cy="day-timeline-inline-editor"]')).not.toBeInTheDocument();
-  });
-
   it('calls onGapClick when gap is clicked', () => {
     const onGapClick = vi.fn();
     const blocks = [
@@ -239,22 +236,5 @@ describe('DayTimeline', () => {
     // endHour should round up to 24 since minutes > 0
     const dayBlocks = document.querySelectorAll('[data-cy="day-timeline-block"]');
     expect(dayBlocks.length).toBe(1);
-  });
-
-  it('edits time in inline editor inputs', () => {
-    const onBlockEdit = vi.fn();
-    const blocks = [makeBlock()];
-    render(<DayTimeline date={baseDate} blocks={blocks} onBlockEdit={onBlockEdit} />);
-    fireEvent.click(document.querySelector('[data-cy="day-timeline-block"]')!);
-
-    const startInput = document.querySelector('[data-cy="day-timeline-edit-start"]') as HTMLInputElement;
-    const endInput = document.querySelector('[data-cy="day-timeline-edit-end"]') as HTMLInputElement;
-    expect(startInput).toBeInTheDocument();
-    expect(endInput).toBeInTheDocument();
-
-    fireEvent.change(startInput, { target: { value: '08:00' } });
-    fireEvent.change(endInput, { target: { value: '11:00' } });
-    fireEvent.click(document.querySelector('[data-cy="day-timeline-edit-save"]')!);
-    expect(onBlockEdit).toHaveBeenCalledWith(expect.objectContaining({ id: 'block-1' }), '08:00', '11:00');
   });
 });
