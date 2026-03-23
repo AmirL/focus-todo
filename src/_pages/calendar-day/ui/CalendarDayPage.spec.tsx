@@ -24,7 +24,18 @@ vi.mock('@/shared/lib/listUtils', () => ({
 }));
 
 vi.mock('@/features/timeline', () => ({
-  mapTimeEntriesToBlocks: () => [],
+  mapTimeEntriesToBlocks: () => [
+    {
+      id: '1',
+      taskId: '42',
+      taskName: 'Test Task',
+      startedAt: '2024-01-01T09:00:00Z',
+      endedAt: '2024-01-01T10:00:00Z',
+      listName: 'Work',
+      listColor: 'blue',
+      durationMinutes: 60,
+    },
+  ],
   aggregateTimeByList: () => [],
   QuickAddFromGapDialog: ({ open }: { open: boolean }) =>
     open ? <div data-testid="gap-dialog">Gap Dialog</div> : null,
@@ -34,10 +45,6 @@ vi.mock('@/features/timeline', () => ({
         <button data-testid="dialog-delete" onClick={onDelete}>Delete</button>
       </div>
     ) : null,
-}));
-
-vi.mock('@/features/timeline/model/mapTimeEntriesToBlocks', () => ({
-  TimelineBlockWithTaskId: undefined,
 }));
 
 vi.mock('@/shared/ui/timeline', () => ({
@@ -129,9 +136,7 @@ describe('CalendarDayPage', () => {
     expect(screen.queryByTestId('edit-dialog')).toBeNull();
 
     fireEvent.click(screen.getByTestId('edit-block'));
-    // The edit dialog won't show because mapTimeEntriesToBlocks returns [] and blocks.find fails
-    // But no error is thrown
-    expect(screen.getByTestId('day-timeline')).toBeDefined();
+    expect(screen.getByTestId('edit-dialog')).toBeDefined();
   });
 
   it('deletes a time entry when a block is deleted', () => {
