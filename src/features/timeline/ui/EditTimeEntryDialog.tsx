@@ -130,7 +130,7 @@ export function EditTimeEntryDialog({
                     ref={inputRef}
                     value={taskInput}
                     onChange={(e) => handleTaskInputChange(e.target.value)}
-                    onFocus={() => setDropdownOpen(true)}
+
                     placeholder="Task name"
                     autoComplete="off"
                     className="pr-8"

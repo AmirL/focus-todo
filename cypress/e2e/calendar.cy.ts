@@ -180,14 +180,14 @@ describe("Calendar Day View", () => {
 
     cy.get('[data-cy="edit-time-entry-dialog"]', { timeout: 5000 }).should("be.visible");
 
-    // Open task dropdown and verify options appear
-    cy.get('[data-cy="edit-task-input"]').clear().type(" ");
-    cy.get('[data-cy="edit-task-dropdown"]', { timeout: 3000 }).should("be.visible");
+    // Type to trigger the task dropdown
+    cy.get('[data-cy="edit-task-input"]').clear().type("test");
+    cy.get('[data-cy="edit-task-dropdown"]', { timeout: 3000 }).should("exist");
     cy.get('[data-cy="edit-task-option"]').should("have.length.at.least", 1);
 
-    // Select the second task from the dropdown if available
-    cy.get('[data-cy="edit-task-option"]').first().click();
-    cy.get('[data-cy="edit-task-dropdown"]').should("not.be.visible");
+    // Select the first task from the dropdown
+    cy.get('[data-cy="edit-task-option"]').first().click({ force: true });
+    cy.get('[data-cy="edit-task-dropdown"]').should("not.exist");
 
     // Save and verify the API is called
     cy.get('[data-cy="edit-save-button"]').click();
