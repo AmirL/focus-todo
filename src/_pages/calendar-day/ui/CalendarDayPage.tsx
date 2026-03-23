@@ -46,7 +46,7 @@ export function CalendarDayPage() {
         seen.add(b.taskId);
         return true;
       })
-      .map((b) => ({ id: b.taskId, name: b.taskName }));
+      .map((b) => ({ id: b.taskId, name: b.taskName, listId: b.listId }));
   }, [blocks]);
 
   const handlePrevDay = useCallback(() => {

@@ -43,6 +43,12 @@ async function updateTimeEntryHandler(req: NextRequest, session: { user: { id: s
       .where(and(eq(tasksTable.id, taskId), eq(tasksTable.userId, session.user.id)));
     if (task) {
       updateData.taskId = taskId;
+      // Update task's list if a different one was selected
+      if (listId && task.listId !== listId) {
+        await DB.update(tasksTable)
+          .set({ listId })
+          .where(eq(tasksTable.id, taskId));
+      }
     }
   } else if (taskName) {
     // Find existing task by name or create a new one in the same list

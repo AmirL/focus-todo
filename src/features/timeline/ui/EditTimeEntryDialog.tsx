@@ -25,6 +25,7 @@ import type { TimelineBlock } from '@/shared/ui/timeline';
 export interface DayTask {
   id: string;
   name: string;
+  listId: number | null;
 }
 
 interface EditTimeEntryDialogProps {
@@ -74,6 +75,7 @@ export function EditTimeEntryDialog({
   const handleTaskSelect = (task: DayTask) => {
     setTaskInput(task.name);
     setSelectedTaskId(task.id);
+    setSelectedListId(task.listId);
     setDropdownOpen(false);
   };
 
@@ -99,9 +101,10 @@ export function EditTimeEntryDialog({
       data.taskId = Number(selectedTaskId);
     } else if (taskInput.trim() && taskInput.trim() !== block.taskName) {
       data.taskName = taskInput.trim();
-      if (selectedListId) {
-        data.listId = selectedListId;
-      }
+    }
+
+    if (selectedListId) {
+      data.listId = selectedListId;
     }
 
     onSave(data);
@@ -169,18 +172,16 @@ export function EditTimeEntryDialog({
             </Popover>
           </div>
 
-          {/* Category - shown when typing a new task name */}
-          {!selectedTaskId && (
-            <div>
-              <Label>Category</Label>
-              <div className="mt-1">
-                <SelectTaskCategory
-                  selectedListId={selectedListId}
-                  setSelectedListId={setSelectedListId}
-                />
-              </div>
+          {/* Category */}
+          <div>
+            <Label>Category</Label>
+            <div className="mt-1">
+              <SelectTaskCategory
+                selectedListId={selectedListId}
+                setSelectedListId={setSelectedListId}
+              />
             </div>
-          )}
+          </div>
 
           {/* Time fields */}
           <div className="flex gap-4">
