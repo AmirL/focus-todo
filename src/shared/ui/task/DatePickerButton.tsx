@@ -45,10 +45,11 @@ export function DatePickerButton({ selectedDate, onDateChange }: DatePickerButto
       modal={!isSafariBrowser} // Disable modal mode for Safari to fix dialog focus issues
     >
       <PopoverTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           className="flex h-10 items-center gap-2 px-3 text-sm"
+          data-cy="date-picker-button"
           style={{
             WebkitTouchCallout: 'none',
             WebkitUserSelect: 'none',

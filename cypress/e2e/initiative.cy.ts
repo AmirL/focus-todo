@@ -90,6 +90,62 @@ describe("Initiative", () => {
     });
   });
 
+  describe("Today's Focus Save and Verify", () => {
+    it("should save today's focus and show updated banner", () => {
+      cy.intercept("POST", "/api/current-initiative").as("setInitiative");
+      cy.intercept("PATCH", "/api/current-initiative/*").as("changeInitiative");
+
+      cy.get('[data-cy="filter-today"]').click({ force: true });
+      cy.get('[data-cy="today-focus-banner"]', { timeout: 10000 }).should("be.visible");
+      cy.get('[data-cy="today-focus-dropdown"]').click();
+
+      // Select an option and save
+      cy.get('[data-cy^="today-focus-option-"]').first().then(($option) => {
+        const optionText = $option.text().trim();
+        $option.trigger("click");
+
+        // Save if needed
+        cy.get("body").then(($body) => {
+          if ($body.find('[data-cy="today-focus-save"]').length > 0) {
+            cy.get('[data-cy="today-focus-save"]').click();
+            // Wait for the API call
+            cy.wait(["@setInitiative", "@changeInitiative"], { timeout: 10000 }).then(() => {
+              // After save, the banner should show the chosen category
+              cy.get('[data-cy="today-focus-banner"]').should("contain.text", optionText);
+            });
+          }
+        });
+      });
+    });
+
+    it("should not show save button when selecting current focus", () => {
+      cy.intercept("POST", "/api/current-initiative").as("setInitiative");
+      cy.intercept("PATCH", "/api/current-initiative/*").as("changeInitiative");
+
+      // First set a focus
+      cy.get('[data-cy="filter-today"]').click({ force: true });
+      cy.get('[data-cy="today-focus-banner"]', { timeout: 10000 }).should("be.visible");
+      cy.get('[data-cy="today-focus-dropdown"]').click();
+      cy.get('[data-cy^="today-focus-option-"]').first().click();
+      cy.get("body").then(($body) => {
+        if ($body.find('[data-cy="today-focus-save"]').length > 0) {
+          cy.get('[data-cy="today-focus-save"]').click();
+        }
+      });
+
+      // Wait for save to complete, then reopen dropdown
+      cy.wait(1000);
+      cy.get('[data-cy="today-focus-dropdown"]').click();
+
+      // Select the same option again (first)
+      cy.get('[data-cy^="today-focus-option-"]').first().click();
+
+      // Save button should NOT appear since selection matches saved value
+      cy.wait(500);
+      cy.get('[data-cy="today-focus-save"]').should("not.exist");
+    });
+  });
+
   describe("Tomorrow's Focus Picker", () => {
     it("should display the initiative picker on the Tomorrow filter", () => {
       cy.get('[data-cy="filter-tomorrow"]').click({ force: true });

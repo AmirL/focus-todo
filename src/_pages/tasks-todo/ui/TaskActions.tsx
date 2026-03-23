@@ -52,7 +52,7 @@ export function TaskActions() {
       {showActionButtons && (
         <div className="mt-4 flex flex-col sm:flex-row justify-end gap-2">
           <PrintButton tasks={sortedTasksForDisplay} />
-          <Button variant="outline" size="sm" onClick={handleCopyAsJson} className="flex items-center gap-2 text-xs sm:text-sm">
+          <Button variant="outline" size="sm" onClick={handleCopyAsJson} className="flex items-center gap-2 text-xs sm:text-sm" data-cy="copy-as-json-button">
             <Copy className="h-4 w-4" />
             <span className="hidden xs:inline sm:inline">Copy as</span> JSON
           </Button>
@@ -77,7 +77,7 @@ function ResetSelectedButton() {
   };
 
   return (
-    <Button variant="outline" size="sm" onClick={resetAllSelected} className="text-yellow-500 hover:text-yellow-600">
+    <Button variant="outline" size="sm" onClick={resetAllSelected} className="text-yellow-500 hover:text-yellow-600" data-cy="reset-selected-button">
       <RefreshCcw className="h-4 w-4 mr-1" />
       Reset All Selected Tasks
     </Button>

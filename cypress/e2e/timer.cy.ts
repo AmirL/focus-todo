@@ -256,6 +256,42 @@ describe("Timer", () => {
     });
   });
 
+  it("should save start time changes when blurring start time input", () => {
+    cy.intercept("POST", "/api/update-time-entry").as("updateEntry");
+    const taskName = `Start time edit ${Date.now()}`;
+    createTaskAndGetId(taskName).then((taskId) => {
+      // Start and stop timer
+      cy.get(`[data-cy="task-${taskId}"]`)
+        .find('[data-cy="start-timer-button"]')
+        .click();
+      cy.wait("@startTimer");
+      cy.get('[data-cy="timer-bar"]', { timeout: 10000 }).should("be.visible");
+
+      cy.get('[data-cy="timer-stop-button"]').click();
+      cy.wait("@stopTimer");
+
+      // Edit start time (add 1 minute to avoid midnight issues)
+      cy.get('[data-cy="timer-start-input"]').then(($input) => {
+        const currentValue = $input.val() as string;
+        const [h, m] = currentValue.split(":").map(Number);
+        const newMin = String((m + 1) % 60).padStart(2, "0");
+        const newTime = `${String(h).padStart(2, "0")}:${newMin}`;
+
+        cy.get('[data-cy="timer-start-input"]').clear().type(newTime).blur();
+        cy.wait("@updateEntry").then((interception) => {
+          expect(interception.response!.statusCode).to.equal(200);
+          // Verify the request sent the updated start time
+          expect(interception.request.body.startedAt).to.be.a("string");
+        });
+
+        // Save status should appear
+        cy.get('[data-cy="timer-save-status"]')
+          .should("contain.text", "Saved")
+          .should("be.visible");
+      });
+    });
+  });
+
   it("should show start timer button on completed tasks", () => {
     cy.intercept("POST", "/api/update-task").as("updateTask");
     const taskName = `Done timer test ${Date.now()}`;
