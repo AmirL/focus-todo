@@ -63,6 +63,8 @@ export function useUpdateTimeEntryMutation() {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: timeEntryKeys.all });
+      // Also invalidate tasks since the API may update the task's listId
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
     },
   });
 }

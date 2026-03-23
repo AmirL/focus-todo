@@ -23,6 +23,7 @@ import {
   formatGapDuration,
   computeGapDuration,
   buildGapTaskPayload,
+  buildTimeRange,
 } from '../lib/gapDialogUtils';
 
 interface QuickAddFromGapDialogProps {
@@ -78,9 +79,7 @@ export function QuickAddFromGapDialog({ gap, open, onOpenChange, dayTasks = [] }
 
     if (selectedTaskId) {
       // Log time against existing task
-      const dateStr = new Date(gap.startedAt).toISOString().split('T')[0];
-      const startedAt = new Date(`${dateStr}T${startTime}:00`).toISOString();
-      const endedAt = new Date(`${dateStr}T${endTime}:00`).toISOString();
+      const { startedAt, endedAt } = buildTimeRange(startTime, endTime, new Date(gap.startedAt));
       createCompletedTask.mutate({ taskId: Number(selectedTaskId), startedAt, endedAt });
     } else {
       // Create new task

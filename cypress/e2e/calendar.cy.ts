@@ -309,6 +309,73 @@ describe("Calendar Day View", () => {
     );
   });
 
+  it("should keep the time entry visible after changing its category", () => {
+    setupEntriesAndVisitCalendar("Category change test");
+
+    // Count initial blocks
+    cy.get('[data-cy="day-timeline-block"]', { timeout: 10000 })
+      .should("have.length.at.least", 2)
+      .then(($blocks) => {
+        const initialCount = $blocks.length;
+
+        // Open edit dialog on first block
+        cy.get('[data-cy="day-timeline-block"]').first().click({ force: true });
+        cy.get('[data-cy="edit-time-entry-dialog"]', { timeout: 5000 }).should("be.visible");
+
+        // Change category via the selector
+        cy.get('[data-cy="edit-time-entry-dialog"]')
+          .find('[data-cy="category-selector"]')
+          .click();
+        // Select the last list option (different from current)
+        cy.get('[role="option"]').last().click();
+
+        // Save
+        cy.get('[data-cy="edit-save-button"]').click();
+
+        cy.wait("@updateTimeEntry").then((interception) => {
+          expect(interception.response!.statusCode).to.eq(200);
+        });
+
+        // The entry must still be visible (not disappear)
+        cy.get('[data-cy="edit-time-entry-dialog"]').should("not.exist");
+        cy.get('[data-cy="day-timeline-block"]', { timeout: 10000 }).should(
+          "have.length",
+          initialCount,
+        );
+      });
+  });
+
+  it("should keep the time entry visible after editing only the end time", () => {
+    setupEntriesAndVisitCalendar("Time edit test");
+
+    cy.get('[data-cy="day-timeline-block"]', { timeout: 10000 })
+      .should("have.length.at.least", 2)
+      .then(($blocks) => {
+        const initialCount = $blocks.length;
+
+        // Open edit dialog on first block
+        cy.get('[data-cy="day-timeline-block"]').first().click({ force: true });
+        cy.get('[data-cy="edit-time-entry-dialog"]', { timeout: 5000 }).should("be.visible");
+
+        // Change only the end time
+        cy.get('[data-cy="edit-end-time"]').clear().type("09:45");
+
+        // Save
+        cy.get('[data-cy="edit-save-button"]').click();
+
+        cy.wait("@updateTimeEntry").then((interception) => {
+          expect(interception.response!.statusCode).to.eq(200);
+        });
+
+        // The entry must still be visible
+        cy.get('[data-cy="edit-time-entry-dialog"]').should("not.exist");
+        cy.get('[data-cy="day-timeline-block"]', { timeout: 10000 }).should(
+          "have.length",
+          initialCount,
+        );
+      });
+  });
+
   it("should show calendar link between filters and categories in sidebar", () => {
     cy.visit("/");
     cy.waitForAppLoad();

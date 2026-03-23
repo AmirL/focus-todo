@@ -19,6 +19,7 @@ import {
   formatTimeInput,
   formatGapDuration,
   computeGapDuration,
+  buildTimeRange,
 } from '../lib/gapDialogUtils';
 import type { TimelineBlock } from '@/shared/ui/timeline';
 
@@ -88,9 +89,7 @@ export function EditTimeEntryDialog({
   const handleSave = () => {
     if (!block || !startTime || !endTime) return;
 
-    const dateStr = date.toISOString().split('T')[0];
-    const startedAt = new Date(`${dateStr}T${startTime}:00`).toISOString();
-    const endedAt = new Date(`${dateStr}T${endTime}:00`).toISOString();
+    const { startedAt, endedAt } = buildTimeRange(startTime, endTime, date);
 
     const data: { startedAt: string; endedAt: string; taskId?: number; taskName?: string; listId?: number } = {
       startedAt,
