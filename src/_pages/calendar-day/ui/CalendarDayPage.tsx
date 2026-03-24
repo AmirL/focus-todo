@@ -10,7 +10,7 @@ import { useListsQuery } from '@/shared/api/lists';
 import { useListNameMap, useListColorMap } from '@/shared/lib/listUtils';
 import { mapTimeEntriesToBlocks, aggregateTimeByList, QuickAddFromGapDialog, EditTimeEntryDialog } from '@/features/timeline';
 import type { TimelineBlockWithTaskId } from '@/features/timeline/model/mapTimeEntriesToBlocks';
-import { isTaskToday, isTaskOverdue, isTaskDeletedAgo, isTaskCompletedAgo } from '@/entities/task/model/task';
+import { isTaskToday, isTaskOverdue, isTaskSelected, isTaskDeletedAgo, isTaskCompletedAgo } from '@/entities/task/model/task';
 import { DoughnutChart } from '@/shared/ui/charts';
 
 export function CalendarDayPage() {
@@ -55,7 +55,7 @@ export function CalendarDayPage() {
     for (const t of tasks) {
       if (seen.has(t.id)) continue;
       if (isTaskDeletedAgo(t) || isTaskCompletedAgo(t)) continue;
-      if (isTaskToday(t) || isTaskOverdue(t)) {
+      if (isTaskToday(t) || isTaskOverdue(t) || isTaskSelected(t)) {
         seen.add(t.id);
         result.push({ id: t.id, name: t.name, listId: t.listId });
       }
