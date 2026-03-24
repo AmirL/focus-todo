@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useMemo } from 'react';
 import { cn } from '@/shared/lib/utils';
 import { getColorClasses } from '@/shared/lib/colors';
 import { formatDuration } from '@/shared/lib/format-duration';
@@ -18,7 +18,7 @@ interface DayTimelineProps {
   blocks: TimelineBlock[];
   onPrevDay?: () => void;
   onNextDay?: () => void;
-  onBlockEdit?: (block: TimelineBlock, startTime: string, endTime: string) => void;
+  onBlockEditClick?: (block: TimelineBlock) => void;
   onBlockDelete?: (block: TimelineBlock) => void;
   onGapClick?: (gap: TimelineGap) => void;
   onAddEntry?: (startTime: string, endTime: string) => void;
@@ -253,73 +253,14 @@ function computeVerticalLayout(blocks: TimelineBlock[], startHour: number): {
   return { blockPositions, gapPositions };
 }
 
-function TimeBlockInlineEditor({
-  startTime,
-  endTime,
-  onSave,
-  onCancel,
-}: {
-  startTime: string;
-  endTime: string;
-  onSave: (start: string, end: string) => void;
-  onCancel: () => void;
-}) {
-  const [start, setStart] = useState(startTime);
-  const [end, setEnd] = useState(endTime);
-
-  return (
-    <div
-      className="flex items-center gap-1.5 mt-1"
-      data-cy="day-timeline-inline-editor"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <input
-        type="time"
-        value={start}
-        onChange={(e) => setStart(e.target.value)}
-        className="w-[70px] rounded border border-gray-300 bg-white px-1 py-0.5 text-xs text-gray-900"
-        data-cy="day-timeline-edit-start"
-      />
-      <span className="text-xs text-gray-500">-</span>
-      <input
-        type="time"
-        value={end}
-        onChange={(e) => setEnd(e.target.value)}
-        className="w-[70px] rounded border border-gray-300 bg-white px-1 py-0.5 text-xs text-gray-900"
-        data-cy="day-timeline-edit-end"
-      />
-      <button
-        onClick={() => onSave(start, end)}
-        className="rounded bg-green-600 px-1.5 py-0.5 text-[10px] font-medium text-white hover:bg-green-700"
-        data-cy="day-timeline-edit-save"
-      >
-        Save
-      </button>
-      <button
-        onClick={onCancel}
-        className="rounded bg-gray-200 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 hover:bg-gray-300"
-        data-cy="day-timeline-edit-cancel"
-      >
-        Cancel
-      </button>
-    </div>
-  );
-}
-
 function TimeBlock({
   position,
-  onEdit,
+  onEditClick,
   onDelete,
-  isEditing,
-  onStartEdit,
-  onCancelEdit,
 }: {
   position: BlockPosition;
-  onEdit?: (block: TimelineBlock, startTime: string, endTime: string) => void;
+  onEditClick?: (block: TimelineBlock) => void;
   onDelete?: (block: TimelineBlock) => void;
-  isEditing: boolean;
-  onStartEdit: () => void;
-  onCancelEdit: () => void;
 }) {
   const { block, topPx, heightPx } = position;
   const isRunning = block.endedAt === null;
@@ -327,14 +268,6 @@ function TimeBlock({
   const durationStr = isRunning
     ? formatDuration(block.durationMinutes) || 'running'
     : formatDuration(block.durationMinutes);
-
-  const handleSave = useCallback(
-    (start: string, end: string) => {
-      onEdit?.(block, start, end);
-      onCancelEdit();
-    },
-    [block, onEdit, onCancelEdit]
-  );
 
   const hasColumns = position.column !== undefined && position.totalColumns !== undefined;
   const isShort = hasColumns || heightPx < 48;
@@ -364,7 +297,7 @@ function TimeBlock({
       )}
       style={{ top: `${topPx}px`, height: `${heightPx}px`, ...columnStyle }}
       title={isShort ? tooltipText : undefined}
-      onClick={onStartEdit}
+      onClick={() => onEditClick?.(block)}
     >
       <div className="flex items-center justify-between gap-1 min-w-0">
         <div className="flex items-center gap-1.5 min-w-0 flex-1">
@@ -386,7 +319,7 @@ function TimeBlock({
             )}
             onClick={(e) => {
               e.stopPropagation();
-              onStartEdit();
+              onEditClick?.(block);
             }}
           >
             <Pencil className={cn('h-3.5 w-3.5', colors.text)} />
@@ -412,14 +345,6 @@ function TimeBlock({
       )}
       {isShort && !hasColumns && (
         <span className={cn('text-[10px] opacity-70', colors.text)}>{durationStr}</span>
-      )}
-      {isEditing && (
-        <TimeBlockInlineEditor
-          startTime={formatTimeHHMM(block.startedAt)}
-          endTime={block.endedAt ? formatTimeHHMM(block.endedAt) : formatTimeHHMM(new Date().toISOString())}
-          onSave={handleSave}
-          onCancel={onCancelEdit}
-        />
       )}
     </div>
   );
@@ -462,13 +387,12 @@ export function DayTimeline({
   blocks,
   onPrevDay,
   onNextDay,
-  onBlockEdit,
+  onBlockEditClick,
   onBlockDelete,
   onGapClick,
   onAddEntry,
   className,
 }: DayTimelineProps) {
-  const [editingBlockId, setEditingBlockId] = useState<string | null>(null);
   const { startHour, endHour } = useMemo(() => computeHourRange(blocks), [blocks]);
   const totalHours = endHour - startHour;
   const layout = useMemo(() => computeVerticalLayout(blocks, startHour), [blocks, startHour]);
@@ -541,11 +465,8 @@ export function DayTimeline({
           <TimeBlock
             key={pos.block.id}
             position={pos}
-            onEdit={onBlockEdit}
+            onEditClick={onBlockEditClick}
             onDelete={onBlockDelete}
-            isEditing={editingBlockId === pos.block.id}
-            onStartEdit={() => setEditingBlockId(pos.block.id)}
-            onCancelEdit={() => setEditingBlockId(null)}
           />
         ))}
 
@@ -567,4 +488,3 @@ export function DayTimeline({
     </div>
   );
 }
-

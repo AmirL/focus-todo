@@ -114,7 +114,7 @@ describe("Calendar Day View", () => {
       });
   });
 
-  it("should open inline editor when clicking a time block", () => {
+  it("should open edit dialog when clicking a time block", () => {
     setupEntriesAndVisitCalendar("Edit test");
 
     // Use force:true because gap buttons can overlap blocks in the z-order
@@ -122,44 +122,109 @@ describe("Calendar Day View", () => {
       .first()
       .click({ force: true });
 
-    cy.get('[data-cy="day-timeline-inline-editor"]').should("be.visible");
-    cy.get('[data-cy="day-timeline-edit-start"]').should("be.visible");
-    cy.get('[data-cy="day-timeline-edit-end"]').should("be.visible");
-    cy.get('[data-cy="day-timeline-edit-save"]').should("be.visible");
-    cy.get('[data-cy="day-timeline-edit-cancel"]').should("be.visible");
+    cy.get('[data-cy="edit-time-entry-dialog"]', { timeout: 5000 }).should("be.visible");
+    cy.get('[data-cy="edit-start-time"]').should("not.have.value", "");
+    cy.get('[data-cy="edit-end-time"]').should("not.have.value", "");
+    cy.get('[data-cy="edit-task-input"]').should("not.have.value", "");
+    cy.get('[data-cy="edit-save-button"]').should("be.visible");
+    cy.get('[data-cy="edit-delete-button"]').should("be.visible");
   });
 
-  it("should cancel inline edit without saving", () => {
+  it("should open edit dialog when clicking the pencil icon on a time block", () => {
+    setupEntriesAndVisitCalendar("Pencil edit test");
+
+    cy.get('[data-cy="day-timeline-block"]', { timeout: 10000 }).first().trigger('mouseover', { force: true });
+    cy.get('[data-cy="day-timeline-edit-btn"]').first().click({ force: true });
+
+    cy.get('[data-cy="edit-time-entry-dialog"]', { timeout: 5000 }).should("be.visible");
+  });
+
+  it("should cancel edit dialog without saving", () => {
     setupEntriesAndVisitCalendar("Cancel edit test");
 
     cy.get('[data-cy="day-timeline-block"]', { timeout: 10000 })
       .first()
       .click({ force: true });
 
-    cy.get('[data-cy="day-timeline-inline-editor"]').should("be.visible");
-    cy.get('[data-cy="day-timeline-edit-cancel"]').click();
-    cy.get('[data-cy="day-timeline-inline-editor"]').should("not.exist");
+    cy.get('[data-cy="edit-time-entry-dialog"]', { timeout: 5000 }).should("be.visible");
+    cy.get('[data-cy="edit-time-entry-dialog"]').contains("Cancel").click();
+    cy.get('[data-cy="edit-time-entry-dialog"]').should("not.exist");
   });
 
-  it("should save edited time entry via inline editor", () => {
+  it("should save edited time entry via edit dialog", () => {
     setupEntriesAndVisitCalendar("Save edit test");
 
     cy.get('[data-cy="day-timeline-block"]', { timeout: 10000 })
       .first()
       .click({ force: true });
 
-    cy.get('[data-cy="day-timeline-inline-editor"]').should("be.visible");
+    cy.get('[data-cy="edit-time-entry-dialog"]', { timeout: 5000 }).should("be.visible");
 
     // Modify end time
-    cy.get('[data-cy="day-timeline-edit-end"]').clear().type("10:30");
-    cy.get('[data-cy="day-timeline-edit-save"]').click();
+    cy.get('[data-cy="edit-end-time"]').clear().type("10:30");
+    cy.get('[data-cy="edit-save-button"]').click();
 
+    cy.wait("@updateTimeEntry").then((interception) => {
+      expect(interception.response!.statusCode).to.eq(200);
+    });
+
+    cy.get('[data-cy="edit-time-entry-dialog"]').should("not.exist");
+  });
+
+  it("should show task dropdown in edit dialog and allow task change", () => {
+    setupEntriesAndVisitCalendar("Task change test");
+
+    cy.get('[data-cy="day-timeline-block"]', { timeout: 10000 })
+      .first()
+      .click({ force: true });
+
+    cy.get('[data-cy="edit-time-entry-dialog"]', { timeout: 5000 }).should("be.visible");
+
+    // Type to trigger the task dropdown
+    cy.get('[data-cy="edit-task-input"]').clear().type("test");
+    cy.get('[data-cy="edit-task-dropdown"]', { timeout: 3000 }).should("exist");
+    cy.get('[data-cy="edit-task-option"]').should("have.length.at.least", 1);
+
+    // Select the first task from the dropdown
+    cy.get('[data-cy="edit-task-option"]').first().click({ force: true });
+    cy.get('[data-cy="edit-task-dropdown"]').should("not.exist");
+
+    // Save and verify the API is called
+    cy.get('[data-cy="edit-save-button"]').click();
     cy.wait("@updateTimeEntry").then((interception) => {
       expect(interception.response!.statusCode).to.eq(200);
     });
   });
 
-  it("should delete a time entry", () => {
+  it("should delete a time entry from the edit dialog", () => {
+    setupEntriesAndVisitCalendar("Delete from dialog test");
+
+    cy.get('[data-cy="day-timeline-block"]', { timeout: 10000 }).should(
+      "have.length.at.least",
+      2,
+    );
+
+    // Open edit dialog for first block
+    cy.get('[data-cy="day-timeline-block"]').first().click({ force: true });
+    cy.get('[data-cy="edit-time-entry-dialog"]', { timeout: 5000 }).should("be.visible");
+
+    // Click delete button
+    cy.get('[data-cy="edit-delete-button"]').click();
+
+    cy.wait("@deleteTimeEntry").then((interception) => {
+      expect(interception.response!.statusCode).to.eq(200);
+    });
+
+    cy.get('[data-cy="edit-time-entry-dialog"]').should("not.exist");
+
+    // One fewer block
+    cy.get('[data-cy="day-timeline-block"]', { timeout: 10000 }).should(
+      "have.length.at.least",
+      1,
+    );
+  });
+
+  it("should delete a time entry via the delete button on the block", () => {
     setupEntriesAndVisitCalendar("Delete test");
 
     cy.get('[data-cy="day-timeline-block"]', { timeout: 10000 }).should(
@@ -242,6 +307,73 @@ describe("Calendar Day View", () => {
     cy.get('[data-cy="calendar-day-page"]', { timeout: 10000 }).should(
       "be.visible",
     );
+  });
+
+  it("should keep the time entry visible after changing its category", () => {
+    setupEntriesAndVisitCalendar("Category change test");
+
+    // Count initial blocks
+    cy.get('[data-cy="day-timeline-block"]', { timeout: 10000 })
+      .should("have.length.at.least", 2)
+      .then(($blocks) => {
+        const initialCount = $blocks.length;
+
+        // Open edit dialog on first block
+        cy.get('[data-cy="day-timeline-block"]').first().click({ force: true });
+        cy.get('[data-cy="edit-time-entry-dialog"]', { timeout: 5000 }).should("be.visible");
+
+        // Change category via the selector
+        cy.get('[data-cy="edit-time-entry-dialog"]')
+          .find('[data-cy="category-selector"]')
+          .click();
+        // Select the last list option (different from current)
+        cy.get('[role="option"]').last().click();
+
+        // Save
+        cy.get('[data-cy="edit-save-button"]').click();
+
+        cy.wait("@updateTimeEntry").then((interception) => {
+          expect(interception.response!.statusCode).to.eq(200);
+        });
+
+        // The entry must still be visible (not disappear)
+        cy.get('[data-cy="edit-time-entry-dialog"]').should("not.exist");
+        cy.get('[data-cy="day-timeline-block"]', { timeout: 10000 }).should(
+          "have.length",
+          initialCount,
+        );
+      });
+  });
+
+  it("should keep the time entry visible after editing only the end time", () => {
+    setupEntriesAndVisitCalendar("Time edit test");
+
+    cy.get('[data-cy="day-timeline-block"]', { timeout: 10000 })
+      .should("have.length.at.least", 2)
+      .then(($blocks) => {
+        const initialCount = $blocks.length;
+
+        // Open edit dialog on first block
+        cy.get('[data-cy="day-timeline-block"]').first().click({ force: true });
+        cy.get('[data-cy="edit-time-entry-dialog"]', { timeout: 5000 }).should("be.visible");
+
+        // Change only the end time
+        cy.get('[data-cy="edit-end-time"]').clear().type("09:45");
+
+        // Save
+        cy.get('[data-cy="edit-save-button"]').click();
+
+        cy.wait("@updateTimeEntry").then((interception) => {
+          expect(interception.response!.statusCode).to.eq(200);
+        });
+
+        // The entry must still be visible
+        cy.get('[data-cy="edit-time-entry-dialog"]').should("not.exist");
+        cy.get('[data-cy="day-timeline-block"]', { timeout: 10000 }).should(
+          "have.length",
+          initialCount,
+        );
+      });
   });
 
   it("should show calendar link between filters and categories in sidebar", () => {

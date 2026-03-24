@@ -58,11 +58,13 @@ export function useUpdateTimeEntryMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: { id: number; startedAt?: string; endedAt?: string }) => {
+    mutationFn: async (data: { id: number; startedAt?: string; endedAt?: string; taskId?: number; taskName?: string; listId?: number }) => {
       return await fetchBackend<TimeEntry>('update-time-entry', data);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: timeEntryKeys.all });
+      // Also invalidate tasks since the API may update the task's listId
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
     },
   });
 }

@@ -24,24 +24,41 @@ vi.mock('@/shared/lib/listUtils', () => ({
 }));
 
 vi.mock('@/features/timeline', () => ({
-  mapTimeEntriesToBlocks: () => [],
+  mapTimeEntriesToBlocks: () => [
+    {
+      id: '1',
+      taskId: '42',
+      taskName: 'Test Task',
+      startedAt: '2024-01-01T09:00:00Z',
+      endedAt: '2024-01-01T10:00:00Z',
+      listName: 'Work',
+      listColor: 'blue',
+      durationMinutes: 60,
+    },
+  ],
   aggregateTimeByList: () => [],
   QuickAddFromGapDialog: ({ open }: { open: boolean }) =>
     open ? <div data-testid="gap-dialog">Gap Dialog</div> : null,
+  EditTimeEntryDialog: ({ open, onDelete }: { open: boolean; onDelete: () => void }) =>
+    open ? (
+      <div data-testid="edit-dialog">
+        <button data-testid="dialog-delete" onClick={onDelete}>Delete</button>
+      </div>
+    ) : null,
 }));
 
 vi.mock('@/shared/ui/timeline', () => ({
   DayTimeline: ({
     onPrevDay,
     onNextDay,
-    onBlockEdit,
+    onBlockEditClick,
     onBlockDelete,
     onGapClick,
     onAddEntry,
   }: {
     onPrevDay: () => void;
     onNextDay: () => void;
-    onBlockEdit: (block: { id: string }, start: string, end: string) => void;
+    onBlockEditClick: (block: { id: string }) => void;
     onBlockDelete: (block: { id: string }) => void;
     onGapClick: (gap: { startedAt: string; endedAt: string; durationMinutes: number }) => void;
     onAddEntry: (start: string, end: string) => void;
@@ -55,7 +72,7 @@ vi.mock('@/shared/ui/timeline', () => ({
       </button>
       <button
         data-testid="edit-block"
-        onClick={() => onBlockEdit({ id: '1' }, '09:00', '10:00')}
+        onClick={() => onBlockEditClick({ id: '1' })}
       >
         Edit
       </button>
@@ -112,17 +129,14 @@ describe('CalendarDayPage', () => {
     expect(screen.getByTestId('day-timeline')).toBeDefined();
   });
 
-  it('updates a time entry when a block is edited', () => {
+  it('opens the edit dialog when a block edit is clicked', () => {
     render(<CalendarDayPage />);
 
+    // Edit dialog should not be visible initially
+    expect(screen.queryByTestId('edit-dialog')).toBeNull();
+
     fireEvent.click(screen.getByTestId('edit-block'));
-    expect(mockMutate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        id: 1,
-        startedAt: expect.any(String),
-        endedAt: expect.any(String),
-      }),
-    );
+    expect(screen.getByTestId('edit-dialog')).toBeDefined();
   });
 
   it('deletes a time entry when a block is deleted', () => {

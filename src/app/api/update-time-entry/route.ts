@@ -1,12 +1,12 @@
 import { NextRequest } from 'next/server';
 import { DB } from '@/shared/lib/db';
 import { and, eq } from 'drizzle-orm';
-import { timeEntriesTable } from '@/shared/lib/drizzle/schema';
+import { timeEntriesTable, tasksTable } from '@/shared/lib/drizzle/schema';
 import dayjs from 'dayjs';
 import { withAuthAndErrorHandling, createErrorResponse, createSuccessResponse } from '@/shared/lib/api/route-wrapper';
 
 async function updateTimeEntryHandler(req: NextRequest, session: { user: { id: string } }) {
-  const { id, startedAt, endedAt } = await req.json();
+  const { id, startedAt, endedAt, taskId, taskName, listId } = await req.json();
 
   if (!id) {
     return createErrorResponse('id is required', 400);
@@ -34,6 +34,50 @@ async function updateTimeEntryHandler(req: NextRequest, session: { user: { id: s
 
   if (finalEnd) {
     updateData.durationMinutes = Math.max(Math.round(finalEnd.diff(finalStart, 'minute', true)), 1);
+  }
+
+  // Handle task reassignment by ID
+  if (taskId) {
+    const [task] = await DB.select()
+      .from(tasksTable)
+      .where(and(eq(tasksTable.id, taskId), eq(tasksTable.userId, session.user.id)));
+    if (task) {
+      updateData.taskId = taskId;
+      // Update task's list if a different one was selected
+      if (listId && task.listId !== listId) {
+        await DB.update(tasksTable)
+          .set({ listId })
+          .where(eq(tasksTable.id, taskId));
+      }
+    }
+  } else if (taskName) {
+    // Find existing task by name or create a new one in the same list
+    const [existingTask] = await DB.select()
+      .from(tasksTable)
+      .where(and(eq(tasksTable.name, taskName), eq(tasksTable.userId, session.user.id)));
+
+    if (existingTask) {
+      updateData.taskId = existingTask.id;
+    } else {
+      const [currentTask] = await DB.select()
+        .from(tasksTable)
+        .where(eq(tasksTable.id, existing.taskId));
+
+      const newTaskListId = listId ?? currentTask?.listId;
+      if (newTaskListId) {
+        const [newTask] = await DB.insert(tasksTable)
+          .values({
+            name: taskName,
+            listId: newTaskListId,
+            userId: session.user.id,
+            completedAt: new Date(),
+          })
+          .$returningId();
+        if (newTask) {
+          updateData.taskId = newTask.id;
+        }
+      }
+    }
   }
 
   await DB.update(timeEntriesTable)

@@ -87,11 +87,10 @@ export function useCreateCompletedTaskMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: {
-      task: { name: string; listId: number };
-      startedAt: string;
-      endedAt: string;
-    }) => {
+    mutationFn: async (data: (
+      | { task: { name: string; listId: number }; taskId?: never }
+      | { taskId: number; task?: never }
+    ) & { startedAt: string; endedAt: string }) => {
       const response = await fetchBackend<{
         task: TaskPlain;
         timeEntry: TimeEntry;

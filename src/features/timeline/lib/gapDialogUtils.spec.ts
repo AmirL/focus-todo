@@ -6,6 +6,7 @@ import {
   computeGapDuration,
   isValidGapSubmission,
   buildGapTaskPayload,
+  buildTimeRange,
 } from './gapDialogUtils';
 
 describe('formatTimeInput', () => {
@@ -112,6 +113,41 @@ describe('isValidGapSubmission', () => {
   it('returns false when end is not after start', () => {
     expect(isValidGapSubmission('Task', 1, '10:00', '09:00', ref)).toBe(false);
     expect(isValidGapSubmission('Task', 1, '09:00', '09:00', ref)).toBe(false);
+  });
+});
+
+describe('buildTimeRange', () => {
+  it('preserves the local date when building ISO strings', () => {
+    // Simulate a reference date where UTC date differs from local date.
+    // E.g., March 24 at 01:00 AM in UTC+3 = March 23 at 22:00 UTC.
+    // The bug: date.toISOString().split('T')[0] returns "2026-03-23" (UTC),
+    // but the user is viewing March 24 (local).
+    const ref = new Date(2026, 2, 24, 1, 0); // March 24, 01:00 local time
+    const result = buildTimeRange('09:00', '10:00', ref);
+
+    const start = new Date(result.startedAt);
+    const end = new Date(result.endedAt);
+
+    // The resulting dates must be on the same LOCAL day as the reference
+    expect(start.getDate()).toBe(24);
+    expect(start.getHours()).toBe(9);
+    expect(start.getMinutes()).toBe(0);
+    expect(end.getDate()).toBe(24);
+    expect(end.getHours()).toBe(10);
+    expect(end.getMinutes()).toBe(0);
+  });
+
+  it('works for mid-day reference dates', () => {
+    const ref = new Date(2026, 2, 24, 15, 0); // March 24, 15:00
+    const result = buildTimeRange('09:00', '17:00', ref);
+
+    const start = new Date(result.startedAt);
+    const end = new Date(result.endedAt);
+
+    expect(start.getDate()).toBe(24);
+    expect(start.getHours()).toBe(9);
+    expect(end.getDate()).toBe(24);
+    expect(end.getHours()).toBe(17);
   });
 });
 

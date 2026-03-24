@@ -40,6 +40,21 @@ export function computeGapDuration(
   return mins > 0 ? mins : null;
 }
 
+/** Build ISO date strings from time inputs and a reference date.
+ * Uses parseTimeToDate to correctly preserve the local date,
+ * avoiding the bug where date.toISOString().split('T')[0] returns
+ * the UTC date which can differ from the local date. */
+export function buildTimeRange(
+  startTime: string,
+  endTime: string,
+  referenceDate: Date,
+): { startedAt: string; endedAt: string } {
+  return {
+    startedAt: parseTimeToDate(startTime, referenceDate).toISOString(),
+    endedAt: parseTimeToDate(endTime, referenceDate).toISOString(),
+  };
+}
+
 /** Validate that a gap task submission has all required fields */
 export function isValidGapSubmission(
   name: string,

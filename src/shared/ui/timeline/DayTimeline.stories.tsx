@@ -76,7 +76,7 @@ export const FewEntries: Story = {
     onNextDay: () => console.log('Next day'),
     onGapClick: (gap) => console.log('Gap clicked:', gap),
     onBlockDelete: (block) => console.log('Delete:', block.taskName),
-    onBlockEdit: (block, start, end) => console.log('Edit:', block.taskName, start, end),
+    onBlockEditClick: (block) => console.log('Edit clicked:', block.taskName),
   },
 };
 
@@ -161,7 +161,7 @@ export const BusyDay: Story = {
     onNextDay: () => console.log('Next day'),
     onGapClick: (gap) => console.log('Gap clicked:', gap),
     onBlockDelete: (block) => console.log('Delete:', block.taskName),
-    onBlockEdit: (block, start, end) => console.log('Edit:', block.taskName, start, end),
+    onBlockEditClick: (block) => console.log('Edit clicked:', block.taskName),
   },
 };
 
@@ -219,7 +219,7 @@ export const EditMode: Story = {
     ],
     onPrevDay: () => console.log('Previous day'),
     onNextDay: () => console.log('Next day'),
-    onBlockEdit: (block, start, end) => console.log('Edit:', block.taskName, start, end),
+    onBlockEditClick: (block) => console.log('Edit clicked:', block.taskName),
     onBlockDelete: (block) => console.log('Delete:', block.taskName),
   },
 };
@@ -325,7 +325,7 @@ export const MixedWorkAndPersonal: Story = {
     onNextDay: () => console.log('Next day'),
     onGapClick: (gap) => console.log('Gap clicked:', gap),
     onBlockDelete: (block) => console.log('Delete:', block.taskName),
-    onBlockEdit: (block, start, end) => console.log('Edit:', block.taskName, start, end),
+    onBlockEditClick: (block) => console.log('Edit clicked:', block.taskName),
   },
 };
 
@@ -386,7 +386,7 @@ export const ShortEntries: Story = {
     onNextDay: () => console.log('Next day'),
     onGapClick: (gap) => console.log('Gap clicked:', gap),
     onBlockDelete: (block) => console.log('Delete:', block.taskName),
-    onBlockEdit: (block, start, end) => console.log('Edit:', block.taskName, start, end),
+    onBlockEditClick: (block) => console.log('Edit clicked:', block.taskName),
   },
 };
 
@@ -464,7 +464,7 @@ export const ShortEntriesSideBySide: Story = {
     onNextDay: () => console.log('Next day'),
     onGapClick: (gap) => console.log('Gap clicked:', gap),
     onBlockDelete: (block) => console.log('Delete:', block.taskName),
-    onBlockEdit: (block, start, end) => console.log('Edit:', block.taskName, start, end),
+    onBlockEditClick: (block) => console.log('Edit clicked:', block.taskName),
   },
 };
 
@@ -526,6 +526,6 @@ export const CrossHourOverlap: Story = {
     onNextDay: () => console.log('Next day'),
     onGapClick: (gap) => console.log('Gap clicked:', gap),
     onBlockDelete: (block) => console.log('Delete:', block.taskName),
-    onBlockEdit: (block, start, end) => console.log('Edit:', block.taskName, start, end),
+    onBlockEditClick: (block) => console.log('Edit clicked:', block.taskName),
   },
 };

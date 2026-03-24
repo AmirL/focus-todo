@@ -8,13 +8,16 @@ import { useTimeEntriesQuery, useUpdateTimeEntryMutation, useDeleteTimeEntryMuta
 import { useTasksQuery } from '@/shared/api/tasks';
 import { useListsQuery } from '@/shared/api/lists';
 import { useListNameMap, useListColorMap } from '@/shared/lib/listUtils';
-import { mapTimeEntriesToBlocks, aggregateTimeByList, QuickAddFromGapDialog } from '@/features/timeline';
+import { mapTimeEntriesToBlocks, aggregateTimeByList, QuickAddFromGapDialog, EditTimeEntryDialog } from '@/features/timeline';
+import type { TimelineBlockWithTaskId } from '@/features/timeline/model/mapTimeEntriesToBlocks';
 import { DoughnutChart } from '@/shared/ui/charts';
 
 export function CalendarDayPage() {
   const [selectedDate, setSelectedDate] = useState(() => dayjs());
   const [selectedGap, setSelectedGap] = useState<TimelineGap | null>(null);
   const [isGapDialogOpen, setIsGapDialogOpen] = useState(false);
+  const [editingBlock, setEditingBlock] = useState<TimelineBlockWithTaskId | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const { data: timeEntries = [] } = useTimeEntriesQuery();
   const { data: tasks = [] } = useTasksQuery();
@@ -34,6 +37,18 @@ export function CalendarDayPage() {
     [timeEntries, tasks, lists, selectedDate],
   );
 
+  // Extract unique tasks shown for the current day (for the edit dialog combobox)
+  const dayTasks = useMemo(() => {
+    const seen = new Set<string>();
+    return blocks
+      .filter((b) => {
+        if (seen.has(b.taskId)) return false;
+        seen.add(b.taskId);
+        return true;
+      })
+      .map((b) => ({ id: b.taskId, name: b.taskName, listId: b.listId }));
+  }, [blocks]);
+
   const handlePrevDay = useCallback(() => {
     setSelectedDate((prev) => prev.subtract(1, 'day'));
   }, []);
@@ -42,17 +57,32 @@ export function CalendarDayPage() {
     setSelectedDate((prev) => prev.add(1, 'day'));
   }, []);
 
-  const handleBlockEdit = useCallback(
-    (block: TimelineBlock, startTime: string, endTime: string) => {
-      const dateStr = selectedDate.format('YYYY-MM-DD');
+  const handleBlockEditClick = useCallback(
+    (block: TimelineBlock) => {
+      const fullBlock = blocks.find((b) => b.id === block.id);
+      if (fullBlock) {
+        setEditingBlock(fullBlock);
+        setIsEditDialogOpen(true);
+      }
+    },
+    [blocks],
+  );
+
+  const handleEditSave = useCallback(
+    (data: { startedAt: string; endedAt: string; taskId?: number; taskName?: string; listId?: number }) => {
+      if (!editingBlock) return;
       updateTimeEntry.mutate({
-        id: Number(block.id),
-        startedAt: new Date(`${dateStr}T${startTime}:00`).toISOString(),
-        endedAt: new Date(`${dateStr}T${endTime}:00`).toISOString(),
+        id: Number(editingBlock.id),
+        ...data,
       });
     },
-    [selectedDate, updateTimeEntry],
+    [editingBlock, updateTimeEntry],
   );
+
+  const handleEditDelete = useCallback(() => {
+    if (!editingBlock) return;
+    deleteTimeEntry.mutate(Number(editingBlock.id));
+  }, [editingBlock, deleteTimeEntry]);
 
   const handleBlockDelete = useCallback(
     (block: TimelineBlock) => {
@@ -90,7 +120,7 @@ export function CalendarDayPage() {
           blocks={blocks}
           onPrevDay={handlePrevDay}
           onNextDay={handleNextDay}
-          onBlockEdit={handleBlockEdit}
+          onBlockEditClick={handleBlockEditClick}
           onBlockDelete={handleBlockDelete}
           onGapClick={handleGapClick}
           onAddEntry={handleAddEntry}
@@ -103,6 +133,16 @@ export function CalendarDayPage() {
         gap={selectedGap}
         open={isGapDialogOpen}
         onOpenChange={setIsGapDialogOpen}
+        dayTasks={dayTasks}
+      />
+      <EditTimeEntryDialog
+        block={editingBlock}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        date={selectedDate.toDate()}
+        dayTasks={dayTasks}
+        onSave={handleEditSave}
+        onDelete={handleEditDelete}
       />
     </div>
   );

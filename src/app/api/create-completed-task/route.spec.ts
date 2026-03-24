@@ -58,7 +58,7 @@ describe('POST /api/create-completed-task', () => {
     const res = await POST(makeRequest({ task: { listId: 1 }, startedAt: '2024-06-15T10:00:00Z', endedAt: '2024-06-15T11:00:00Z' }));
     expect(res.status).toBe(400);
     const body = await res.json();
-    expect(body.error).toBe('task.name and task.listId are required');
+    expect(body.error).toBe('Either taskId or task.name+task.listId are required');
   });
 
   it('returns 400 when startedAt/endedAt are missing', async () => {
