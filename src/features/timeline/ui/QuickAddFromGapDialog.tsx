@@ -137,7 +137,7 @@ export function QuickAddFromGapDialog({ gap, open, onOpenChange, dayTasks = [] }
                   align="start"
                   onOpenAutoFocus={(e) => e.preventDefault()}
                 >
-                  <ul data-cy="gap-task-dropdown" className="max-h-48 overflow-y-auto">
+                  <ul data-cy="gap-task-dropdown" className="max-h-72 overflow-y-auto">
                     {filteredTasks.map((task) => (
                       <li key={task.id}>
                         <button

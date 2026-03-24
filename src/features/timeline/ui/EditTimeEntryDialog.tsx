@@ -152,7 +152,7 @@ export function EditTimeEntryDialog({
                   align="start"
                   onOpenAutoFocus={(e) => e.preventDefault()}
                 >
-                  <ul data-cy="edit-task-dropdown" className="max-h-48 overflow-y-auto">
+                  <ul data-cy="edit-task-dropdown" className="max-h-72 overflow-y-auto">
                     {filteredTasks.map((task) => (
                       <li key={task.id}>
                         <button
