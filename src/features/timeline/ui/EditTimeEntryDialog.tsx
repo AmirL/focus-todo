@@ -152,7 +152,7 @@ export function EditTimeEntryDialog({
                   align="start"
                   onOpenAutoFocus={(e) => e.preventDefault()}
                 >
-                  <ul data-cy="edit-task-dropdown" className="max-h-48 overflow-y-auto">
+                  <ul data-cy="edit-task-dropdown" className="max-h-72 overflow-y-auto">
                     {filteredTasks.map((task) => (
                       <li key={task.id}>
                         <button
@@ -183,8 +183,8 @@ export function EditTimeEntryDialog({
           </div>
 
           {/* Time fields */}
-          <div className="flex gap-4">
-            <div className="flex-1">
+          <div className="grid grid-cols-2 gap-3 sm:flex sm:gap-4">
+            <div className="sm:flex-1">
               <Label htmlFor="edit-start-time">Start</Label>
               <Input
                 id="edit-start-time"
@@ -195,7 +195,7 @@ export function EditTimeEntryDialog({
                 className="mt-1"
               />
             </div>
-            <div className="flex-1">
+            <div className="sm:flex-1">
               <Label htmlFor="edit-end-time">End</Label>
               <Input
                 id="edit-end-time"
@@ -207,7 +207,7 @@ export function EditTimeEntryDialog({
               />
             </div>
             {computedDuration && (
-              <div className="flex items-end pb-1">
+              <div className="col-span-2 sm:col-span-1 flex items-end sm:pb-1">
                 <span className="text-sm text-muted-foreground whitespace-nowrap">
                   {formatGapDuration(computedDuration)}
                 </span>
@@ -216,7 +216,7 @@ export function EditTimeEntryDialog({
           </div>
         </div>
 
-        <DialogFooter className="flex sm:justify-between">
+        <DialogFooter className="flex flex-row justify-between gap-2">
           <Button
             variant="destructive"
             size="sm"

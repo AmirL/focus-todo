@@ -10,6 +10,7 @@ import { useListsQuery } from '@/shared/api/lists';
 import { useListNameMap, useListColorMap } from '@/shared/lib/listUtils';
 import { mapTimeEntriesToBlocks, aggregateTimeByList, QuickAddFromGapDialog, EditTimeEntryDialog } from '@/features/timeline';
 import type { TimelineBlockWithTaskId } from '@/features/timeline/model/mapTimeEntriesToBlocks';
+import { isTaskToday, isTaskOverdue, isTaskSelected, isTaskDeletedAgo, isTaskCompletedAgo } from '@/entities/task/model/task';
 import { DoughnutChart } from '@/shared/ui/charts';
 
 export function CalendarDayPage() {
@@ -37,17 +38,31 @@ export function CalendarDayPage() {
     [timeEntries, tasks, lists, selectedDate],
   );
 
-  // Extract unique tasks shown for the current day (for the edit dialog combobox)
+  // Combine tasks from time entries + today's to-do list for the combobox
   const dayTasks = useMemo(() => {
     const seen = new Set<string>();
-    return blocks
-      .filter((b) => {
-        if (seen.has(b.taskId)) return false;
+    const result: { id: string; name: string; listId: number | null }[] = [];
+
+    // First add tasks that already have time entries today
+    for (const b of blocks) {
+      if (!seen.has(b.taskId)) {
         seen.add(b.taskId);
-        return true;
-      })
-      .map((b) => ({ id: b.taskId, name: b.taskName, listId: b.listId }));
-  }, [blocks]);
+        result.push({ id: b.taskId, name: b.taskName, listId: b.listId });
+      }
+    }
+
+    // Then add today's to-do tasks (and overdue) that don't have time entries yet
+    for (const t of tasks) {
+      if (seen.has(t.id)) continue;
+      if (isTaskDeletedAgo(t) || isTaskCompletedAgo(t)) continue;
+      if (isTaskToday(t) || isTaskOverdue(t) || isTaskSelected(t)) {
+        seen.add(t.id);
+        result.push({ id: t.id, name: t.name, listId: t.listId });
+      }
+    }
+
+    return result;
+  }, [blocks, tasks]);
 
   const handlePrevDay = useCallback(() => {
     setSelectedDate((prev) => prev.subtract(1, 'day'));
