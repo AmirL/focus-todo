@@ -20,7 +20,7 @@ Query parameters (all optional):
 
 | Param | Type | Description |
 |-------|------|-------------|
-| `on` | `today` \| `tomorrow` \| `YYYY-MM-DD` | Filter by day |
+| `on` | `today` \| `tomorrow` \| `YYYY-MM-DD` | Filter by day. `today` includes overdue (past incomplete) tasks |
 | `since` | ISO 8601 date | Tasks with date >= value |
 | `until` | ISO 8601 date | Tasks with date < value |
 | `listId` | number | Filter by list ID |
@@ -28,7 +28,7 @@ Query parameters (all optional):
 | `completed` | `true` \| `false` | Filter by completion status |
 | `includeDeleted` | `true` \| `false` | Include soft-deleted tasks (default: false) |
 | `includeRecentlyDeleted` | `true` \| `false` | Include tasks deleted in last 24h (default: false) |
-| `tzOffset` | number | Timezone offset from UTC in minutes (e.g., -120 for UTC+2) |
+| `tzOffset` | number | Timezone offset from UTC in minutes, e.g. -180 for UTC+3 (default: -180) |
 | `limit` | 1–500 | Max results (default: 100) |
 
 Response: `200 OK`

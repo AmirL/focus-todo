@@ -1,4 +1,4 @@
-import { eq, gt, gte, isNull, lt, or, SQL } from 'drizzle-orm';
+import { and, eq, gt, gte, isNull, lt, or, SQL } from 'drizzle-orm';
 import dayjs from 'dayjs';
 import { tasksTable } from '@/shared/lib/drizzle/schema';
 
@@ -50,7 +50,7 @@ export function buildTaskListConditions(params: TaskListFilterParams): (SQL | un
   }
 
   // Date filters against task 'date' column
-  const offsetMin = Number.isFinite(Number(tzOffsetParam)) ? Number(tzOffsetParam) : 0;
+  const offsetMin = Number.isFinite(Number(tzOffsetParam)) ? Number(tzOffsetParam) : -180;
 
   const startOfLocalDay = (base: Date) =>
     dayjs(base).add(-offsetMin, 'minute').startOf('day').add(offsetMin, 'minute').toDate();
@@ -58,8 +58,10 @@ export function buildTaskListConditions(params: TaskListFilterParams): (SQL | un
 
   if (onParam) {
     let startUtc: Date | null = null;
+    let includeOverdue = false;
     if (onParam === 'today') {
       startUtc = startOfLocalDay(new Date());
+      includeOverdue = true;
     } else if (onParam === 'tomorrow') {
       const todayStart = startOfLocalDay(new Date());
       startUtc = nextDay(todayStart);
@@ -77,8 +79,25 @@ export function buildTaskListConditions(params: TaskListFilterParams): (SQL | un
     }
     if (startUtc) {
       const endUtc = nextDay(startUtc);
-      conditions.push(gte(tasksTable.date, startUtc));
-      conditions.push(lt(tasksTable.date, endUtc));
+      if (includeOverdue) {
+        // on=today: include today's tasks AND overdue (past incomplete) tasks
+        const EPOCH = new Date(0);
+        conditions.push(lt(tasksTable.date, endUtc));
+        conditions.push(
+          or(
+            // Today's tasks (completed or not)
+            gte(tasksTable.date, startUtc),
+            // Overdue: before today and not completed
+            and(
+              lt(tasksTable.date, startUtc),
+              or(isNull(tasksTable.completedAt), lt(tasksTable.completedAt, EPOCH))
+            )
+          )
+        );
+      } else {
+        conditions.push(gte(tasksTable.date, startUtc));
+        conditions.push(lt(tasksTable.date, endUtc));
+      }
     }
   } else {
     const since = parseDate(sinceParam);
