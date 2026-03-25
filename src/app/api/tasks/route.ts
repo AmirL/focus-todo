@@ -8,8 +8,35 @@ import { withApiAuth } from '@/shared/lib/api/api-route-wrapper';
 import { serializeTask } from './serialize';
 import { buildTaskListConditions } from './buildTaskListConditions';
 
+const ALLOWED_PARAMS: Record<string, string> = {
+  on: 'Filter by day: "today", "tomorrow", or "YYYY-MM-DD"',
+  since: 'Tasks with date >= value (ISO date string)',
+  until: 'Tasks with date < value (ISO date string)',
+  listId: 'Filter by list ID (number)',
+  goalId: 'Filter by goal ID (number)',
+  completed: 'Filter by completion: "true" or "false"',
+  includeDeleted: 'Include deleted tasks: "true" or "false"',
+  includeRecentlyDeleted: 'Include tasks deleted in last 24h: "true" or "false"',
+  tzOffset: 'Timezone offset from UTC in minutes, e.g. -180 for UTC+3 (default: -180)',
+  limit: 'Max results 1-500 (default: 100)',
+  apiKey: 'API key (prefer Authorization header instead)',
+};
+
 async function getHandler(req: NextRequest, userId: string) {
   const { searchParams } = new URL(req.url);
+
+  // Validate query parameters
+  const unknownParams = [...searchParams.keys()].filter((k) => !(k in ALLOWED_PARAMS));
+  if (unknownParams.length > 0) {
+    return NextResponse.json(
+      {
+        error: `Unknown query parameter(s): ${unknownParams.join(', ')}`,
+        allowedParameters: ALLOWED_PARAMS,
+      },
+      { status: 400 }
+    );
+  }
+
   const tzOffsetParam = searchParams.get('tzOffset'); // minutes offset from UTC (e.g., -120 for UTC+2)
   const limitParam = searchParams.get('limit');
 
@@ -28,7 +55,7 @@ async function getHandler(req: NextRequest, userId: string) {
 
   // Limit
   const limit = clamp(Number(limitParam || 100), 1, 500);
-  const offsetMin = Number.isFinite(Number(tzOffsetParam)) ? Number(tzOffsetParam) : 0;
+  const offsetMin = Number.isFinite(Number(tzOffsetParam)) ? Number(tzOffsetParam) : -180;
 
   const tasks = await DB.select()
     .from(tasksTable)

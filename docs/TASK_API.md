@@ -26,7 +26,7 @@ Retrieve a list of tasks with optional filtering.
 
 | Parameter                | Type                                  | Default | Description                                                |
 | ------------------------ | ------------------------------------- | ------- | ---------------------------------------------------------- |
-| `on`                     | `today` \| `tomorrow` \| `YYYY-MM-DD` | -       | Filter by specific day                                     |
+| `on`                     | `today` \| `tomorrow` \| `YYYY-MM-DD` | -       | Filter by specific day. `today` also includes overdue (past incomplete) tasks |
 | `since`                  | ISO date string                       | -       | Tasks with date >= since                                   |
 | `until`                  | ISO date string                       | -       | Tasks with date < until                                    |
 | `listId`                 | number                                | -       | Filter by list ID                                          |
@@ -34,7 +34,7 @@ Retrieve a list of tasks with optional filtering.
 | `completed`              | `true` \| `false`                     | -       | Filter by completion status                                |
 | `includeDeleted`         | `true` \| `false`                     | `false` | Include all deleted tasks                                  |
 | `includeRecentlyDeleted` | `true` \| `false`                     | `false` | Include tasks deleted in last 24h                          |
-| `tzOffset`               | number                                | `0`     | Timezone offset from UTC in minutes (e.g., -120 for UTC+2) |
+| `tzOffset`               | number                                | `-180`  | Timezone offset from UTC in minutes (e.g., -180 for UTC+3) |
 | `limit`                  | 1-500                                 | 100     | Maximum number of tasks to return                          |
 
 #### Example Request
