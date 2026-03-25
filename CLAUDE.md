@@ -80,6 +80,8 @@ This project follows **Feature-Sliced Design (FSD)** architecture. For complete 
 
 **External API** (API key authentication):
 
+- **Production URL**: `https://doable-tasks.vercel.app`
+
 Full RESTful API for programmatic access to tasks, goals, lists, and initiative. See [`docs/TASK_API.md`](./docs/TASK_API.md) for complete documentation and [`docs/TASK_API_SKILL.md`](./docs/TASK_API_SKILL.md) for the LLM-optimized version.
 
 - `GET/POST /api/tasks`, `GET/PATCH/DELETE /api/tasks/:id` - Task CRUD with filtering
